@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Word2Vec Model Training - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2017/09/06/w2vTrain/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/home_sdo4.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Word2Vec Model Training</h1>
+                    
+                    <h2 class="subheading">Playing with Word2vec Model</h2>
+                    
+                    <span class="meta">Posted by Melenar on September 6, 2017</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Why Spark?</h3>
+Until recently there were no single processing framework that was able to solve several very different analytical problems like statistics and graphs. Spark is the first framework that can do it. It is the fundamental advantage of Spark that provides a framework for advanced analytics right out of the box. This framework includes a tool for accelerated queries, a machine learning library, and graph processing engine.</p>
+<p>
+<h3>Databricks Community </h3>
+Databricks community edition is an entry to Spark Big Data Analytics. It allows to create a cluster on Amazon Cloud and makes it is easy for data scientists and data engineers to write Spark code and debug it.
+And it's free!</p>
+
+<p><a href="https://databricks.com/blog/2016/02/17/introducing-databricks-community-edition-apache-spark-for-all.html">Databricks community edition</a>.</p>
+
+<p>
+<h3>About Word2Vec Model </h3>
+<a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec model</a> was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product. Word2Vec model transforms words to vectors. This gives us new insights in text analytics. </p>
+<p>Here is an excellent article about word2vec model: </p>
+<p><a href="https://blog.acolyer.org/2016/04/21/the-amazing-power-of-word-vectors/">The amazing power of word vectors</a>.</p>
+<p></p>
+<p>
+<h3>Training a Word2Vec Model </h3>
+AWS cluster we run via Databricks Community is not so big. To train Word2vec model we will get a 42 MB public file about news and load it to Databricks: </p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/02pvyoae1504568133317/newsTest.txt"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span></code></pre></figure>
+
+<p>First we'll tokenize the data</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kn">import</span> <span class="nn">org.apache.spark.ml._</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
+<span class="n">val</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RegexTokenizer</span><span class="o">().</span>
+<span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span><span class="na">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span><span class="na">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
+<span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">3</span><span class="o">).</span><span class="na">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+<span class="n">val</span> <span class="n">tokenizedNews</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="na">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">)</span></code></pre></figure>
+
+<p>Then we'll train the Word2VecModel </p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kn">import</span> <span class="nn">org.apache.spark.ml.feature.Word2Vec</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.ml._</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.ml.feature.Word2VecModel</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.Row</span>
+<span class="n">val</span> <span class="n">word2vec</span><span class="o">=</span> <span class="k">new</span> <span class="n">Word2Vec</span><span class="o">()</span>
+  <span class="o">.</span><span class="na">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">)</span>
+  <span class="o">.</span><span class="na">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
+<span class="n">val</span> <span class="n">w2VmodelNews</span><span class="o">=</span><span class="n">word2vec</span><span class="o">.</span><span class="na">fit</span><span class="o">(</span><span class="n">tokenizedNews</span><span class="o">)</span></code></pre></figure>
+
+<p>Then we will save the model and we don't need to train it again.</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">w2VmodelNews</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">overwrite</span><span class="o">.</span><span class="n">save</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">word2vecNews</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">load</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span></code></pre></figure>
+
+<p>Now let's test the model. The most popular function of Word2Vec model shows us how different words are associated:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">word2vecNews</span><span class="o">.</span><span class="n">findSynonyms</span><span class="o">(</span><span class="s">"stress"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
+
+<span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
+<span class="n">risk</span><span class="o">,</span><span class="mf">0.6505142450332642</span>
+<span class="n">adversely</span><span class="o">,</span><span class="mf">0.6353756785392761</span>
+<span class="n">clots</span><span class="o">,</span><span class="mf">0.6308229565620422</span>
+<span class="n">anxiety</span><span class="o">,</span><span class="mf">0.6186497807502747</span>
+<span class="n">traumatic</span><span class="o">,</span><span class="mf">0.6167819499969482</span>
+<span class="n">persistent</span><span class="o">,</span><span class="mf">0.6142207980155945</span>
+<span class="n">problems</span><span class="o">,</span><span class="mf">0.6132286190986633</span></code></pre></figure>
+
+<p><h3>How Trained Corpus Affects the Word2Vec Model? </h3>
+
+To see how the corpus that we used to train the model affects the results we will add a small file, train the model on  combined corpus and compare the results. </p>
+<p>To play with data about psychology we copied it from several Wikipedia articles, got a small file (180 KB), and combined it with news file (42 MB). Then we trained the Word2vec model on this combined file. </p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputWiki</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/opef4cqb1504567762417/WikiTest.txt"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">tokenizedNewsWiki</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">inputWiki</span><span class="o">))</span></code></pre></figure>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2VmodelNewsWiki</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span><span class="n">fit</span><span class="o">(</span><span class="n">tokenizedNewsWiki</span><span class="o">)</span>
+<span class="n">w2VmodelNewsWiki</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">overwrite</span><span class="o">.</span><span class="n">save</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">modelNewsWiki</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">modelNewsWiki</span><span class="o">.</span><span class="n">findSynonyms</span><span class="o">(</span><span class="s">"stress"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span></code></pre></figure>
+
+<p>The results of these models are very different for some words and very similar for some other words. Here are examples:</p>
+
+<p>Word: <b>Stress</b></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News:</span>
+<span class="kt">word</span><span class="o">,</span><span class="n">similarity</span>
+<span class="n">risk</span><span class="o">,</span><span class="mf">0.6505142450332642</span>
+<span class="n">adversely</span><span class="o">,</span><span class="mf">0.6353756785392761</span>
+<span class="n">clots</span><span class="o">,</span><span class="mf">0.6308229565620422</span>
+<span class="n">anxiety</span><span class="o">,</span><span class="mf">0.6186497807502747</span>
+<span class="n">traumatic</span><span class="o">,</span><span class="mf">0.6167819499969482</span>
+<span class="n">persistent</span><span class="o">,</span><span class="mf">0.6142207980155945</span>
+<span class="n">problems</span><span class="o">,</span><span class="mf">0.6132286190986633</span>
+
+<span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News</span> <span class="kt">+</span> <span class="kt">Wiki:</span>
+<span class="kt">word</span><span class="o">,</span><span class="n">similarity</span>
+<span class="n">obesity</span><span class="o">,</span><span class="mf">0.6602367758750916</span>
+<span class="n">adverse</span><span class="o">,</span><span class="mf">0.6559499502182007</span>
+<span class="n">systemic</span><span class="o">,</span><span class="mf">0.6525574326515198</span>
+<span class="n">averse</span><span class="o">,</span><span class="mf">0.6500416994094849</span>
+<span class="n">risk</span><span class="o">,</span><span class="mf">0.6457705497741699</span>
+<span class="n">detect</span><span class="o">,</span><span class="mf">0.6430484652519226</span>
+<span class="n">infection</span><span class="o">,</span><span class="mf">0.6407146453857422</span></code></pre></figure>
+
+<p>Word: <b>Rain</b></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News</span>
+<span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
+<span class="n">snow</span><span class="o">,</span><span class="mf">0.8456688523292542</span>
+<span class="n">winds</span><span class="o">,</span><span class="mf">0.800561785697937</span>
+<span class="n">rains</span><span class="o">,</span><span class="mf">0.7878957986831665</span>
+<span class="n">fog</span><span class="o">,</span><span class="mf">0.7052807211875916</span>
+<span class="n">inches</span><span class="o">,</span><span class="mf">0.690990686416626</span>
+<span class="n">storm</span><span class="o">,</span><span class="mf">0.6725252270698547</span>
+<span class="n">gusts</span><span class="o">,</span><span class="mf">0.6721619963645935</span>
+
+<span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News</span> <span class="kt">+</span> <span class="kt">Wiki:</span>
+<span class="kt">Rain</span> <span class="kt">News/Wiki</span>
+<span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
+<span class="n">snow</span><span class="o">,</span><span class="mf">0.8400915265083313</span>
+<span class="n">rains</span><span class="o">,</span><span class="mf">0.7938879728317261</span>
+<span class="n">winds</span><span class="o">,</span><span class="mf">0.7620705366134644</span>
+<span class="n">mph</span><span class="o">,</span><span class="mf">0.7246450781822205</span>
+<span class="n">storm</span><span class="o">,</span><span class="mf">0.7209596633911133</span>
+<span class="n">storms</span><span class="o">,</span><span class="mf">0.7147307395935059</span>
+<span class="n">inches</span><span class="o">,</span><span class="mf">0.7076087594032288</span></code></pre></figure>
+
+<p>Word: <b>Specialty</b></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News:</span>
+<span class="kt">word</span><span class="o">,</span><span class="n">similarity</span>
+<span class="n">semiconductor</span><span class="o">,</span><span class="mf">0.8236984014511108</span>
+<span class="n">diversified</span><span class="o">,</span><span class="mf">0.8118916153907776</span>
+<span class="n">biotech</span><span class="o">,</span><span class="mf">0.8052045106887817</span>
+<span class="n">manufacturer</span><span class="o">,</span><span class="mf">0.789034903049469</span>
+<span class="n">maxx</span><span class="o">,</span><span class="mf">0.7876819968223572</span>
+<span class="n">boutiques</span><span class="o">,</span><span class="mf">0.785348117351532</span>
+<span class="n">biotechnology</span><span class="o">,</span><span class="mf">0.7794807553291321</span>
+
+<span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News</span> <span class="kt">+</span> <span class="kt">Wiki:</span>
+<span class="kt">word</span><span class="o">,</span><span class="n">similarity</span>
+<span class="n">diversified</span><span class="o">,</span><span class="mf">0.8359127640724182</span>
+<span class="n">titan</span><span class="o">,</span><span class="mf">0.8055083751678467</span>
+<span class="n">automation</span><span class="o">,</span><span class="mf">0.8038058876991272</span>
+<span class="n">machinery</span><span class="o">,</span><span class="mf">0.8027305603027344</span>
+<span class="n">computerized</span><span class="o">,</span><span class="mf">0.8011659383773804</span>
+<span class="n">analytics</span><span class="o">,</span><span class="mf">0.8006263375282288</span>
+<span class="n">apparel</span><span class="o">,</span><span class="mf">0.7975579500198364</span></code></pre></figure>
+
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    
+                    <li class="next">
+                        <a href="/2017/09/17/word2vec2graph/" data-toggle="tooltip" data-placement="top" title="Introduction to Word2Vec2Graph">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2017</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+
+
+</body>
+
+</html>

@@ -1,0 +1,168 @@
+---
+layout:     post
+title:      "Word2Vec Model Training"
+subtitle:   "Playing with Word2vec Model"
+date:       2017-09-06 12:00:00
+author:     "Melenar"
+header-img: "img/home_sdo4.jpg"
+---
+
+<p><h3>Why Spark?</h3>
+Until recently there were no single processing framework that was able to solve several very different analytical problems like statistics and graphs. Spark is the first framework that can do it. It is the fundamental advantage of Spark that provides a framework for advanced analytics right out of the box. This framework includes a tool for accelerated queries, a machine learning library, and graph processing engine.</p>
+<p>
+<h3>Databricks Community </h3>
+Databricks community edition is an entry to Spark Big Data Analytics. It allows to create a cluster on Amazon Cloud and makes it is easy for data scientists and data engineers to write Spark code and debug it.
+And it's free!</p>
+
+<a href="https://databricks.com/blog/2016/02/17/introducing-databricks-community-edition-apache-spark-for-all.html">Databricks community edition</a>.
+
+<p>
+<h3>About Word2Vec Model </h3>
+<a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec model</a> was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product. Word2Vec model transforms words to vectors. This gives us new insights in text analytics. </p>
+<p>Here is an excellent article about word2vec model: </p>
+<a href="https://blog.acolyer.org/2016/04/21/the-amazing-power-of-word-vectors/">The amazing power of word vectors</a>.
+<p></p>
+<p>
+<h3>Training a Word2Vec Model </h3>
+AWS cluster we run via Databricks Community is not so big. To train Word2vec model we will get a 42 MB public file about news and load it to Databricks: </p>
+
+<p></p>
+{% highlight scala %}
+val inputNews=sc.textFile("/FileStore/tables/02pvyoae1504568133317/newsTest.txt").toDF("charLine")
+
+{% endhighlight %}
+
+<p>First we'll tokenize the data</p>
+{% highlight java %}
+import org.apache.spark.ml._
+import org.apache.spark.ml.feature._
+val tokenizer = new RegexTokenizer().
+setInputCol("charLine").setOutputCol("value").setPattern("[^a-z]+").
+setMinTokenLength(3).setGaps(true)
+val tokenizedNews = tokenizer.transform(inputNews)
+{% endhighlight %}
+
+<p>Then we'll train the Word2VecModel </p>
+{% highlight java %}
+import org.apache.spark.ml.feature.Word2Vec
+import org.apache.spark.ml._
+import org.apache.spark.ml.feature.Word2VecModel
+import org.apache.spark.sql.Row
+val word2vec= new Word2Vec()
+  .setInputCol("value")
+  .setOutputCol("result")
+val w2VmodelNews=word2vec.fit(tokenizedNews)
+{% endhighlight %}
+
+<p>Then we will save the model and we don't need to train it again.</p>
+{% highlight scala %}
+w2VmodelNews.write.overwrite.save("w2vNews")
+val word2vecNews=Word2VecModel.read.load("w2vNews")
+{% endhighlight %}
+
+<p>Now let's test the model. The most popular function of Word2Vec model shows us how different words are associated:</p>
+{% highlight scala %}
+display(word2vecNews.findSynonyms("stress",7))
+
+word,similarity
+risk,0.6505142450332642
+adversely,0.6353756785392761
+clots,0.6308229565620422
+anxiety,0.6186497807502747
+traumatic,0.6167819499969482
+persistent,0.6142207980155945
+problems,0.6132286190986633
+{% endhighlight %}
+
+<p><h3>How Trained Corpus Affects the Word2Vec Model? </h3>
+
+To see how the corpus that we used to train the model affects the results we will add a small file, train the model on  combined corpus and compare the results. </p>
+<p>To play with data about psychology we copied it from several Wikipedia articles, got a small file (180 KB), and combined it with news file (42 MB). Then we trained the Word2vec model on this combined file. </p>
+{% highlight scala %}
+val inputWiki=sc.textFile("/FileStore/tables/opef4cqb1504567762417/WikiTest.txt").toDF("charLine")
+val tokenizedNewsWiki = tokenizer.transform(inputNews.union(inputWiki))
+{% endhighlight %}
+
+<p></p>
+{% highlight scala %}
+val w2VmodelNewsWiki=word2vec.fit(tokenizedNewsWiki)
+w2VmodelNewsWiki.write.overwrite.save("w2vNewsWiki")
+val modelNewsWiki=Word2VecModel.read.load("w2vNewsWiki")
+display(modelNewsWiki.findSynonyms("stress",7))
+{% endhighlight %}
+
+<p>The results of these models are very different for some words and very similar for some other words. Here are examples:</p>
+
+<p>Word: <b>Stress</b></p>
+
+{% highlight scala %}
+Input File: News:
+word,similarity
+risk,0.6505142450332642
+adversely,0.6353756785392761
+clots,0.6308229565620422
+anxiety,0.6186497807502747
+traumatic,0.6167819499969482
+persistent,0.6142207980155945
+problems,0.6132286190986633
+
+Input File: News + Wiki:
+word,similarity
+obesity,0.6602367758750916
+adverse,0.6559499502182007
+systemic,0.6525574326515198
+averse,0.6500416994094849
+risk,0.6457705497741699
+detect,0.6430484652519226
+infection,0.6407146453857422
+{% endhighlight %}
+
+<p>Word: <b>Rain</b></p>
+
+{% highlight scala %}
+Input File: News
+word,similarity
+snow,0.8456688523292542
+winds,0.800561785697937
+rains,0.7878957986831665
+fog,0.7052807211875916
+inches,0.690990686416626
+storm,0.6725252270698547
+gusts,0.6721619963645935
+
+Input File: News + Wiki:
+Rain News/Wiki
+word,similarity
+snow,0.8400915265083313
+rains,0.7938879728317261
+winds,0.7620705366134644
+mph,0.7246450781822205
+storm,0.7209596633911133
+storms,0.7147307395935059
+inches,0.7076087594032288
+{% endhighlight %}
+
+<p>Word: <b>Specialty</b></p>
+
+{% highlight scala %}
+Input File: News:
+word,similarity
+semiconductor,0.8236984014511108
+diversified,0.8118916153907776
+biotech,0.8052045106887817
+manufacturer,0.789034903049469
+maxx,0.7876819968223572
+boutiques,0.785348117351532
+biotechnology,0.7794807553291321
+
+Input File: News + Wiki:
+word,similarity
+diversified,0.8359127640724182
+titan,0.8055083751678467
+automation,0.8038058876991272
+machinery,0.8027305603027344
+computerized,0.8011659383773804
+analytics,0.8006263375282288
+apparel,0.7975579500198364
+
+{% endhighlight %}
