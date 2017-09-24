@@ -2,7 +2,7 @@
 layout:     post
 title:      "Word2Vec2Graph for Pairs of Words"
 subtitle:   "Connecting Word2vec Model with Graph"
-date:       2017-09-29 12:00:00
+date:       2017-09-28 12:00:00
 author:     "Melenar"
 header-img: "img/home_sdo8.jpg"
 ---

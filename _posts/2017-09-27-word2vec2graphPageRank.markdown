@@ -2,7 +2,7 @@
 layout:     post
 title:      "Word2Vec2Graph Page Rank"
 subtitle:   "Connecting Word2vec Model with Graph"
-date:       2017-09-27 12:00:00
+date:       2017-09-26 12:00:00
 author:     "Melenar"
 header-img: "img/sdo11.jpg"
 ---
