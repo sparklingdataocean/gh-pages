@@ -14,7 +14,7 @@ Spark GraphFrames library has many interesting functions. In this post we will l
 
 
 
-<p>We will use the Word2Vec2Graph model based on a small Stress data file - text file about stress that we extracted from Wikipedia. As edge weights we used cosine similarity based on Word2VecModel model trained on the corpus of combined News data and Wiki data.</p>
+<p>We will use the Word2Vec2Graph model based on a small Stress Data File - text file about stress that we extracted from Wikipedia. We used word from Stress Data File as vertices and Word2Vec model cosine similarity as edge weights. The Word2Vec model was trained on the corpus of combined News data and Wiki data.</p>
 
 <p><h3>Get Data from Data Storage</h3>
 Read word to word Stress Data File combinations with Word2Vec cosine similarities: </p>
