@@ -1,13 +1,13 @@
 ---
 layout:     post
-title:      "Word2Vec2Graph Page Rank"
+title:      "Word2Vec2Graph Model Page Rank"
 subtitle:   "Connecting Word2vec Model with Graph"
 date:       2017-09-28 12:00:00
 author:     "Melenar"
-header-img: "img/sdo11.jpg"
+header-img: "img/pic29.jpg"
 ---
 
-<p><h3>Word2Vec2Graph Model</h3>
+<p><h3>Word2Vec2Graph Model - Page Rank</h3>
 In the previous post we explained how to build Word2Vec2Graph model as combination of Word2vec model and Graph engine in Spark.
 Spark GraphFrames library has many interesting functions. In this post we will look at Page Rank for Word2Vec2Graph.
 </p>
