@@ -126,8 +126,11 @@ AWS cluster we run via Databricks Community is not so big. To train Word2vec mod
 <figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kn">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="kn">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
 <span class="n">val</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RegexTokenizer</span><span class="o">().</span>
-<span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span><span class="na">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span><span class="na">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
-<span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">3</span><span class="o">).</span><span class="na">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
+   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
+   <span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">3</span><span class="o">).</span>
+   <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
 <span class="n">val</span> <span class="n">tokenizedNews</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="na">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">)</span></code></pre></figure>
 
 <p>Then we'll train the Word2VecModel </p>
@@ -136,15 +139,20 @@ AWS cluster we run via Databricks Community is not so big. To train Word2vec mod
 <span class="kn">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="kn">import</span> <span class="nn">org.apache.spark.ml.feature.Word2VecModel</span>
 <span class="kn">import</span> <span class="nn">org.apache.spark.sql.Row</span>
-<span class="n">val</span> <span class="n">word2vec</span><span class="o">=</span> <span class="k">new</span> <span class="n">Word2Vec</span><span class="o">()</span>
-  <span class="o">.</span><span class="na">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">)</span>
-  <span class="o">.</span><span class="na">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
+<span class="n">val</span> <span class="n">word2vec</span><span class="o">=</span> <span class="k">new</span> <span class="n">Word2Vec</span><span class="o">().</span>
+   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
 <span class="n">val</span> <span class="n">w2VmodelNews</span><span class="o">=</span><span class="n">word2vec</span><span class="o">.</span><span class="na">fit</span><span class="o">(</span><span class="n">tokenizedNews</span><span class="o">)</span></code></pre></figure>
 
 <p>Then we will save the model and we don't need to train it again.</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">w2VmodelNews</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">overwrite</span><span class="o">.</span><span class="n">save</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">word2vecNews</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">load</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">w2VmodelNews</span><span class="o">.</span>
+   <span class="n">write</span><span class="o">.</span>
+   <span class="n">overwrite</span><span class="o">.</span>
+   <span class="n">save</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">word2vecNews</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+   <span class="n">read</span><span class="o">.</span>
+   <span class="n">load</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span></code></pre></figure>
 
 <p>Now let's test the model. The most popular function of Word2Vec model shows us how different words are associated:</p>
 
@@ -164,15 +172,25 @@ AWS cluster we run via Databricks Community is not so big. To train Word2vec mod
 To see how the corpus that we used to train the model affects the results we will add a small file, train the model on  combined corpus and compare the results. </p>
 <p>To play with data about psychology we copied it from several Wikipedia articles, got a small file (180 KB), and combined it with news file (42 MB). Then we trained the Word2vec model on this combined file. </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputWiki</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/opef4cqb1504567762417/WikiTest.txt"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">tokenizedNewsWiki</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">inputWiki</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputWiki</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/opef4cqb1504567762417/WikiTest.txt"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">tokenizedNewsWiki</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="n">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">inputWiki</span><span class="o">))</span></code></pre></figure>
 
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2VmodelNewsWiki</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span><span class="n">fit</span><span class="o">(</span><span class="n">tokenizedNewsWiki</span><span class="o">)</span>
-<span class="n">w2VmodelNewsWiki</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">overwrite</span><span class="o">.</span><span class="n">save</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">modelNewsWiki</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">modelNewsWiki</span><span class="o">.</span><span class="n">findSynonyms</span><span class="o">(</span><span class="s">"stress"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2VmodelNewsWiki</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span>
+   <span class="n">fit</span><span class="o">(</span><span class="n">tokenizedNewsWiki</span><span class="o">)</span>
+<span class="n">w2VmodelNewsWiki</span><span class="o">.</span>
+   <span class="n">write</span><span class="o">.</span>
+   <span class="n">overwrite</span><span class="o">.</span>
+   <span class="n">save</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">modelNewsWiki</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+   <span class="n">read</span><span class="o">.</span>
+   <span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">modelNewsWiki</span><span class="o">.</span>
+   <span class="n">findSynonyms</span><span class="o">(</span><span class="s">"stress"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span></code></pre></figure>
 
 <p>The results of these models are very different for some words and very similar for some other words. Here are examples:</p>
 
@@ -243,6 +261,9 @@ To see how the corpus that we used to train the model affects the results we wil
 <span class="n">analytics</span><span class="o">,</span><span class="mf">0.8006263375282288</span>
 <span class="n">apparel</span><span class="o">,</span><span class="mf">0.7975579500198364</span></code></pre></figure>
 
+<p><h3>Next Post - Introduction to Word2Vec2Graph Model</h3>
+In the next post we will introduce Word2Vec2Graph model - a combination of Word2Vec model and Spark GraphFrame library.
+</p>
 
 
                 <hr>
@@ -251,7 +272,7 @@ To see how the corpus that we used to train the model affects the results we wil
                     
                     
                     <li class="next">
-                        <a href="/2017/09/17/word2vec2graph/" data-toggle="tooltip" data-placement="top" title="Introduction to Word2Vec2Graph">Next Post &rarr;</a>
+                        <a href="/2017/09/17/word2vec2graph/" data-toggle="tooltip" data-placement="top" title="Introduction to Word2Vec2Graph Model">Next Post &rarr;</a>
                     </li>
                     
                 </ul>

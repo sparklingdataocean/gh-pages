@@ -37,8 +37,11 @@ val inputNews=sc.textFile("/FileStore/tables/02pvyoae1504568133317/newsTest.txt"
 import org.apache.spark.ml._
 import org.apache.spark.ml.feature._
 val tokenizer = new RegexTokenizer().
-setInputCol("charLine").setOutputCol("value").setPattern("[^a-z]+").
-setMinTokenLength(3).setGaps(true)
+   setInputCol("charLine").
+   setOutputCol("value").
+   setPattern("[^a-z]+").
+   setMinTokenLength(3).
+   setGaps(true)
 val tokenizedNews = tokenizer.transform(inputNews)
 {% endhighlight %}
 
@@ -48,16 +51,21 @@ import org.apache.spark.ml.feature.Word2Vec
 import org.apache.spark.ml._
 import org.apache.spark.ml.feature.Word2VecModel
 import org.apache.spark.sql.Row
-val word2vec= new Word2Vec()
-  .setInputCol("value")
-  .setOutputCol("result")
+val word2vec= new Word2Vec().
+   setInputCol("value").
+   setOutputCol("result")
 val w2VmodelNews=word2vec.fit(tokenizedNews)
 {% endhighlight %}
 
 <p>Then we will save the model and we don't need to train it again.</p>
 {% highlight scala %}
-w2VmodelNews.write.overwrite.save("w2vNews")
-val word2vecNews=Word2VecModel.read.load("w2vNews")
+w2VmodelNews.
+   write.
+   overwrite.
+   save("w2vNews")
+val word2vecNews=Word2VecModel.
+   read.
+   load("w2vNews")
 {% endhighlight %}
 
 <p>Now let's test the model. The most popular function of Word2Vec model shows us how different words are associated:</p>
@@ -79,16 +87,26 @@ problems,0.6132286190986633
 To see how the corpus that we used to train the model affects the results we will add a small file, train the model on  combined corpus and compare the results. </p>
 <p>To play with data about psychology we copied it from several Wikipedia articles, got a small file (180 KB), and combined it with news file (42 MB). Then we trained the Word2vec model on this combined file. </p>
 {% highlight scala %}
-val inputWiki=sc.textFile("/FileStore/tables/opef4cqb1504567762417/WikiTest.txt").toDF("charLine")
-val tokenizedNewsWiki = tokenizer.transform(inputNews.union(inputWiki))
+val inputWiki=sc.textFile("/FileStore/tables/opef4cqb1504567762417/WikiTest.txt").
+   toDF("charLine")
+val tokenizedNewsWiki = tokenizer.
+   transform(inputNews.
+   union(inputWiki))
 {% endhighlight %}
 
 <p></p>
 {% highlight scala %}
-val w2VmodelNewsWiki=word2vec.fit(tokenizedNewsWiki)
-w2VmodelNewsWiki.write.overwrite.save("w2vNewsWiki")
-val modelNewsWiki=Word2VecModel.read.load("w2vNewsWiki")
-display(modelNewsWiki.findSynonyms("stress",7))
+val w2VmodelNewsWiki=word2vec.
+   fit(tokenizedNewsWiki)
+w2VmodelNewsWiki.
+   write.
+   overwrite.
+   save("w2vNewsWiki")
+val modelNewsWiki=Word2VecModel.
+   read.
+   load("w2vNewsWiki")
+display(modelNewsWiki.
+   findSynonyms("stress",7))
 {% endhighlight %}
 
 <p>The results of these models are very different for some words and very similar for some other words. Here are examples:</p>
@@ -166,3 +184,7 @@ analytics,0.8006263375282288
 apparel,0.7975579500198364
 
 {% endhighlight %}
+
+<p><h3>Next Post - Introduction to Word2Vec2Graph Model</h3>
+In the next post we will introduce Word2Vec2Graph model - a combination of Word2Vec model and Spark GraphFrame library.
+</p>

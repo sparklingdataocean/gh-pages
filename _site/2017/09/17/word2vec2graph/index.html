@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Spark for Big Data Analytics.">
 
-    <title>Introduction to Word2Vec2Graph - Sparkling Data Ocean</title>
+    <title>Introduction to Word2Vec2Graph Model - Sparkling Data Ocean</title>
 
     <link rel="canonical" href="http://localhost:4000/2017/09/17/word2vec2graph/">
 
@@ -81,7 +81,7 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <div class="post-heading">
-                    <h1>Introduction to Word2Vec2Graph</h1>
+                    <h1>Introduction to Word2Vec2Graph Model</h1>
                     
                     <h2 class="subheading">Connecting Word2Vec Model with Graph</h2>
                     
@@ -109,7 +109,7 @@ Word2Vec model maps words to vectors so we can calculate cosine similarity withi
 Read Wiki data file: </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputStress</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/cjzokasj1506175253652/stressWiki.txt"</span><span class="o">).</span>
-<span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
 <span class="n">inputStress</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">247</span></code></pre></figure>
 
 <p>Tokenize Stress data file:</p>
@@ -117,23 +117,32 @@ Read Wiki data file: </p>
 <figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kn">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="kn">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
 <span class="n">val</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RegexTokenizer</span><span class="o">().</span>
-<span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span><span class="na">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span><span class="na">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
-<span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span><span class="na">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
-<span class="n">val</span> <span class="n">tokenizedStress</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="na">transform</span><span class="o">(</span><span class="n">inputStress</span><span class="o">)</span>
+   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
+   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
+   <span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
+   <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+<span class="n">val</span> <span class="n">tokenizedStress</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">inputStress</span><span class="o">)</span>
 <span class="n">tokenizedStress</span><span class="o">.</span><span class="na">count</span><span class="c1">//--274</span></code></pre></figure>
 
 <p>Remove stop words from Stress data file: </p>
 
-<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">val</span> <span class="n">remover</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StopWordsRemover</span><span class="o">().</span><span class="na">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span><span class="na">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
-<span class="n">val</span> <span class="n">removedStopWordsStress</span> <span class="o">=</span> <span class="n">remover</span><span class="o">.</span><span class="na">setStopWords</span><span class="o">(</span><span class="n">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span><span class="n">remover</span><span class="o">.</span><span class="na">getStopWords</span><span class="o">).</span>
-<span class="n">transform</span><span class="o">(</span><span class="n">tokenizedStress</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">val</span> <span class="n">remover</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StopWordsRemover</span><span class="o">().</span>
+   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
+<span class="n">val</span> <span class="n">removedStopWordsStress</span> <span class="o">=</span> <span class="n">remover</span><span class="o">.</span>
+   <span class="nf">setStopWords</span><span class="o">(</span><span class="n">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span><span class="n">remover</span><span class="o">.</span><span class="na">getStopWords</span><span class="o">).</span>
+   <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedStress</span><span class="o">)</span></code></pre></figure>
 
 <p> </p>
 <p>Explode Stress word arrays to words:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
 <span class="k">val</span> <span class="n">slpitCleanWordsStress</span> <span class="k">=</span> <span class="n">removedStopWordsStress</span><span class="o">.</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"stopWordFree"</span><span class="o">)).</span><span class="n">select</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">).</span><span class="n">distinct</span>
+   <span class="n">withColumn</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"stopWordFree"</span><span class="o">)).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">).</span>
+   <span class="n">distinct</span>
 <span class="n">slpitCleanWordsStress</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">1233</span></code></pre></figure>
 
 <p> </p>
@@ -146,27 +155,35 @@ Read our trained Word2VecModel</p>
 <span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.ml.feature.Word2VecModel</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.Row</span>
-<span class="k">val</span> <span class="n">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">()</span>
-  <span class="o">.</span><span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">)</span>
-  <span class="o">.</span><span class="n">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">modelNewsWiki</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="n">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">().</span>
+   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">modelNewsWiki</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+   <span class="n">read</span><span class="o">.</span>
+   <span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span></code></pre></figure>
 
 <p>Get all words from the Word2Vec model</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modelWords</span><span class="k">=</span><span class="n">modelNewsWiki</span><span class="o">.</span><span class="n">getVectors</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modelWords</span><span class="k">=</span><span class="n">modelNewsWiki</span><span class="o">.</span>
+   <span class="n">getVectors</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span></code></pre></figure>
 
 <p>Filter out words from Wiki data file that are not in the Word2Vec words</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressWords</span><span class="k">=</span><span class="n">slpitCleanWordsStress</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">modelWords</span><span class="o">,</span><span class="ss">'cleanWord </span><span class="o">===</span> <span class="ss">'word)</span><span class="o">.</span>
-<span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">).</span><span class="n">distinct</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressWords</span><span class="k">=</span><span class="n">slpitCleanWordsStress</span><span class="o">.</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">modelWords</span><span class="o">,</span><span class="ss">'cleanWord </span><span class="o">===</span> <span class="ss">'word)</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">).</span>
+   <span class="n">distinct</span>
 <span class="n">stressWords</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">1125</span></code></pre></figure>
 
 <p></p>
 
 <p>Create word to word matrix</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressWords2</span><span class="k">=</span><span class="n">stressWords</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">w2wStress</span><span class="k">=</span><span class="n">stressWords</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">stressWords2</span><span class="o">,</span><span class="ss">'word=</span><span class="o">!='</span><span class="n">word2</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressWords2</span><span class="k">=</span><span class="n">stressWords</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">w2wStress</span><span class="k">=</span><span class="n">stressWords</span><span class="o">.</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">stressWords2</span><span class="o">,</span><span class="ss">'word=</span><span class="o">!='</span><span class="n">word2</span><span class="o">)</span>
 <span class="n">w2wStress</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">1264500</span></code></pre></figure>
 
 <p>
@@ -185,8 +202,10 @@ Now we want to see how words are connected with other words. We will create a fu
     <span class="n">dotDouble</span><span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)/(</span><span class="n">magnitudeDouble</span><span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="o">*</span> <span class="n">magnitudeDouble</span><span class="o">(</span><span class="n">y</span><span class="o">))</span>
 <span class="o">}</span>
 
-<span class="k">val</span> <span class="n">modelMap</span> <span class="k">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">broadcast</span><span class="o">(</span><span class="n">modelNewsWiki</span><span class="o">.</span><span class="n">getVectors</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="n">r</span><span class="o">.</span><span class="n">getString</span><span class="o">(</span><span class="mi">0</span><span class="o">),</span>
-<span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">DenseVector</span><span class="o">](</span><span class="mi">1</span><span class="o">).</span><span class="n">toArray</span><span class="o">)).</span><span class="n">collect</span><span class="o">.</span><span class="n">toMap</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">modelMap</span> <span class="k">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">broadcast</span><span class="o">(</span><span class="n">modelNewsWiki</span><span class="o">.</span>
+     <span class="n">getVectors</span><span class="o">.</span>
+     <span class="n">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="n">r</span><span class="o">.</span><span class="n">getString</span><span class="o">(</span><span class="mi">0</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">DenseVector</span><span class="o">](</span><span class="mi">1</span><span class="o">).</span><span class="n">toArray</span><span class="o">)).</span>
+        <span class="n">collect</span><span class="o">.</span><span class="n">toMap</span><span class="o">)</span>
 
 <span class="k">def</span> <span class="n">w2wCosine</span><span class="o">(</span><span class="n">word1</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">word2</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
     <span class="n">cosineDouble</span><span class="o">(</span><span class="n">modelMap</span><span class="o">.</span><span class="n">value</span><span class="o">(</span><span class="n">word1</span><span class="o">),</span><span class="n">modelMap</span><span class="o">.</span><span class="n">value</span><span class="o">(</span><span class="n">word2</span><span class="o">))</span>
@@ -205,15 +224,25 @@ Now we want to see how words are connected with other words. We will create a fu
 <h3>Cosine Similarity between Stress data file Words</h3>
 Next step: calculate word to word cosine similarities and save the results.</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wStressBroadcast</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">broadcast</span><span class="o">(</span><span class="n">w2wStress</span><span class="o">.</span><span class="n">collect</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">w2wStressCos</span><span class="k">=</span><span class="n">w2wStressBroadcast</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span>
-<span class="n">w2wCosine</span><span class="o">(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">)))</span>
-<span class="k">val</span> <span class="n">w2wStressCosDF</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">)</span>
-<span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wStressBroadcast</span><span class="k">=</span>
+   <span class="n">sc</span><span class="o">.</span><span class="n">broadcast</span><span class="o">(</span><span class="n">w2wStress</span><span class="o">.</span><span class="n">collect</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">w2wStressCos</span><span class="k">=</span><span class="n">w2wStressBroadcast</span><span class="o">.</span>
+   <span class="n">value</span><span class="o">.</span>
+   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span><span class="n">w2wCosine</span><span class="o">(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span>
+      <span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">)))</span>
+<span class="k">val</span> <span class="n">w2wStressCosDF</span><span class="k">=</span>
+   <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">)</span>
+<span class="n">w2wStressCosDF</span><span class="o">.</span>
+   <span class="n">write</span><span class="o">.</span>
+   <span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span></code></pre></figure>
 
 <p>Example: Word combinations with high Cosine Similarities:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="ss">'word1,'word2,'cos)</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="mf">0.8</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2wStressCosDF</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="ss">'word1,'word2,'cos)</span><span class="o">.</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="mf">0.8</span><span class="o">).</span>
+   <span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 
 <span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">disorders</span><span class="o">,</span><span class="n">chronic</span><span class="o">,</span><span class="mf">0.8239098331266418</span>
@@ -226,8 +255,11 @@ Next step: calculate word to word cosine similarities and save the results.</p>
 
 <p>Example: Word combinations with low Cosine Similarity:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="ss">'word1,'word2,'cos)</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'cos&lt;</span><span class="o">(</span><span class="mf">0.65</span><span class="o">)).</span>
-<span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="o">(</span><span class="mf">0.6</span><span class="o">)).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2wStressCosDF</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="ss">'word1,'word2,'cos)</span><span class="o">.</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&lt;</span><span class="o">(</span><span class="mf">0.65</span><span class="o">)).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="o">(</span><span class="mf">0.6</span><span class="o">)).</span>
+   <span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 
 <span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">interaction</span><span class="o">,</span><span class="n">disorders</span><span class="o">,</span><span class="mf">0.6114415840642784</span>
@@ -243,22 +275,35 @@ Now we can build a graph using words as nodes, {word1, word2} word combinations 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
 
-<span class="k">val</span> <span class="n">graphNodes</span><span class="k">=</span><span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphEdges</span><span class="k">=</span><span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">).</span>
-  <span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphNodes</span><span class="k">=</span><span class="n">w2wStressCosDF</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">).</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)).</span>
+   <span class="n">distinct</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphEdges</span><span class="k">=</span><span class="n">w2wStressCosDF</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">).</span>
+   <span class="n">distinct</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes</span><span class="o">,</span><span class="n">graphEdges</span><span class="o">)</span></code></pre></figure>
 
 <p>We will save graph vertices and edges in Parquet format</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">graph1</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressNodes"</span><span class="o">)</span>
-<span class="n">graph1</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressEdges"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">graph1</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+   <span class="n">write</span><span class="o">.</span>
+   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressNodes"</span><span class="o">)</span>
+<span class="n">graph1</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+   <span class="n">write</span><span class="o">.</span>
+   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressEdges"</span><span class="o">)</span></code></pre></figure>
 
 <p> Load vertices and edges and rebuild the same graph</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
-<span class="k">val</span> <span class="n">graphStressNodes</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressNodes"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphStressEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphStressNodes</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
+   <span class="n">read</span><span class="o">.</span>
+   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressNodes"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphStressEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
+   <span class="n">read</span><span class="o">.</span>
+   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressEdges"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">graphStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphStressNodes</span><span class="o">,</span><span class="n">graphStressEdges</span><span class="o">)</span></code></pre></figure>
 
 <p></p>
@@ -269,8 +314,13 @@ It's a lot of interesting things we can do with Spark GraphFrames. In this post 
 </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">resultStressCC</span> <span class="k">=</span> <span class="n">graphStress</span><span class="o">.</span><span class="n">connectedComponents</span><span class="o">.</span><span class="n">run</span><span class="o">()</span>
-<span class="k">val</span> <span class="n">ccStressCount</span><span class="k">=</span><span class="n">resultStressCC</span><span class="o">.</span><span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">resultStressCC</span> <span class="k">=</span> <span class="n">graphStress</span><span class="o">.</span>
+   <span class="n">connectedComponents</span><span class="o">.</span>
+   <span class="n">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="n">ccStressCount</span><span class="k">=</span><span class="n">resultStressCC</span><span class="o">.</span>
+   <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="n">count</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
 <span class="n">display</span><span class="o">(</span><span class="n">ccStressCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">))</span>
 
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
@@ -285,15 +335,23 @@ It's a lot of interesting things we can do with Spark GraphFrames. In this post 
 Now we will look at connected components of subgraph with different edge weight thresholds.
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">edgeHightWeight</span> <span class="k">=</span> <span class="n">graphStress</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"edgeWeight &gt; 0.75"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">edgeHightWeight</span> <span class="k">=</span> <span class="n">graphStress</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+   <span class="n">filter</span><span class="o">(</span><span class="s">"edgeWeight &gt; 0.75"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">graphHightWeight</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphStress</span><span class="o">.</span><span class="n">vertices</span><span class="o">,</span> <span class="n">edgeHightWeight</span><span class="o">)</span></code></pre></figure>
 
 <p>Run connected components for graph with high cosine similarity
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphHightWeightCC</span> <span class="k">=</span> <span class="n">graphHightWeight</span><span class="o">.</span><span class="n">connectedComponents</span><span class="o">.</span><span class="n">run</span><span class="o">()</span>
-<span class="k">val</span> <span class="n">graphHightWeightCcCount</span><span class="k">=</span><span class="n">graphHightWeightCC</span><span class="o">.</span><span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCcCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphHightWeightCC</span> <span class="k">=</span> <span class="n">graphHightWeight</span><span class="o">.</span>
+   <span class="n">connectedComponents</span><span class="o">.</span>
+   <span class="n">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="n">graphHightWeightCcCount</span><span class="k">=</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
+   <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="n">count</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCcCount</span><span class="o">.</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">).</span>
+   <span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
 
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
 <span class="mi">60129542144</span><span class="o">,</span><span class="mi">17</span>
@@ -310,7 +368,9 @@ Now we will look at connected components of subgraph with different edge weight 
 
 <p>Words in the biggest component:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCC</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"component=60129542144"</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
+   <span class="n">filter</span><span class="o">(</span><span class="s">"component=60129542144"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
 
 <span class="n">id</span>
 <span class="n">humans</span>
@@ -333,7 +393,9 @@ Now we will look at connected components of subgraph with different edge weight 
 
 <p>Words in the second component:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCC</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"component=60129542145"</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
+   <span class="n">filter</span><span class="o">(</span><span class="s">"component=60129542145"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
 
 <span class="n">id</span>
 <span class="n">capabilities</span>
@@ -350,7 +412,9 @@ Now we will look at connected components of subgraph with different edge weight 
 
 <p>And of course some components are not very interesting:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCC</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"component=240518168580"</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
+   <span class="n">filter</span><span class="o">(</span><span class="s">"component=240518168580"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
 
 <span class="n">id</span>
 <span class="n">increased</span>
@@ -364,7 +428,7 @@ Now we will look at connected components of subgraph with different edge weight 
 
 <p></p>
 <p>
-<h3>Next Post - Page Rank</h3>
+<h3>Next Post - Word2Vec2Graph Page Rank</h3>
 Spark GraphFrames library has many interesting functions. In the next post we will look at Page Rank for Word2Vec2Graph.
 </p>
 
@@ -379,7 +443,7 @@ Spark GraphFrames library has many interesting functions. In the next post we wi
                     
                     
                     <li class="next">
-                        <a href="/2017/09/28/word2vec2graphPageRank/" data-toggle="tooltip" data-placement="top" title="Word2Vec2Graph Model Page Rank">Next Post &rarr;</a>
+                        <a href="/2017/09/28/word2vec2graphPageRank/" data-toggle="tooltip" data-placement="top" title="Word2Vec2Graph Model - Page Rank">Next Post &rarr;</a>
                     </li>
                     
                 </ul>

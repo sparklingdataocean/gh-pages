@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Spark for Big Data Analytics.">
 
-    <title>Word2Vec2Graph - Neighbors - Sparkling Data Ocean</title>
+    <title>Word2Vec2Graph Model - Neighbors - Sparkling Data Ocean</title>
 
     <link rel="canonical" href="http://localhost:4000/2017/10/03/word2vec2graphNeighbors/">
 
@@ -81,7 +81,7 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <div class="post-heading">
-                    <h1>Word2Vec2Graph - Neighbors</h1>
+                    <h1>Word2Vec2Graph Model - Neighbors</h1>
                     
                     <h2 class="subheading">Connecting Word2vec Model with Graph</h2>
                     
@@ -99,10 +99,10 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
 				<p><h3>Word2Vec2Graph Model - How to Find Neighbors</h3>
-Two posts before we introduced a
-<a href="https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/">Word2Vec2Graph model</a>.
+Two posts before we introduced
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/">Word2Vec2Graph model</a></i>.
 In the previous post we played with
-<a href="https://sparklingdataocean.github.io/gh-pages/2017/09/28/word2vec2graphPageRank/">Page Rank for Word2Vec2Graph</a>.
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/28/word2vec2graphPageRank/">Page Rank for Word2Vec2Graph</a></i>.
 
 <p>In this post we will look at different ways to find neighbors via the Word2Vec2Graph model.</p>
 
@@ -111,9 +111,14 @@ In the previous post we played with
 Here are the results from the previous post. We combined two large connected components with Page Rank. </p>
 <p>Biggest component: </p>
 
-<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">val</span> <span class="n">cc1</span><span class="o">=</span><span class="n">graphHightWeightCC</span><span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="err">'</span><span class="n">component</span><span class="o">===</span><span class="s">"60129542144"</span><span class="o">).</span><span class="na">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">).</span><span class="na">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">cc1</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">stressHightWeightPageRank</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span><span class="err">'</span><span class="n">word</span><span class="o">===</span><span class="err">'</span><span class="n">id</span><span class="o">).</span>
-<span class="n">select</span><span class="o">(</span><span class="err">'</span><span class="n">word</span><span class="o">,</span><span class="err">'</span><span class="n">pagerank</span><span class="o">).</span><span class="na">orderBy</span><span class="o">(</span><span class="err">'</span><span class="n">pagerank</span><span class="o">.</span><span class="na">desc</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">val</span> <span class="n">cc1</span><span class="o">=</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="err">'</span><span class="n">component</span><span class="o">===</span><span class="s">"60129542144"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">cc1</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">stressHightWeightPageRank</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span>
+   <span class="err">'</span><span class="n">word</span><span class="o">===</span><span class="err">'</span><span class="n">id</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="err">'</span><span class="n">word</span><span class="o">,</span><span class="err">'</span><span class="n">pagerank</span><span class="o">).</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="err">'</span><span class="n">pagerank</span><span class="o">.</span><span class="na">desc</span><span class="o">))</span>
 <span class="n">word</span><span class="o">,</span><span class="n">pagerank</span>
 <span class="n">hormones</span><span class="o">,</span><span class="mf">11.925990421899789</span>
 <span class="n">disorders</span><span class="o">,</span><span class="mf">10.58017031766379</span>
@@ -136,9 +141,14 @@ Here are the results from the previous post. We combined two large connected com
 
 <p>Second component: </p>
 
-<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">val</span> <span class="n">cc1</span><span class="o">=</span><span class="n">graphHightWeightCC</span><span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="err">'</span><span class="n">component</span><span class="o">===</span><span class="s">"60129542145"</span><span class="o">).</span><span class="na">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">).</span><span class="na">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">cc1</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">stressHightWeightPageRank</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span><span class="err">'</span><span class="n">word</span><span class="o">===</span><span class="err">'</span><span class="n">id</span><span class="o">).</span>
-<span class="n">select</span><span class="o">(</span><span class="err">'</span><span class="n">word</span><span class="o">,</span><span class="err">'</span><span class="n">pagerank</span><span class="o">).</span><span class="na">orderBy</span><span class="o">(</span><span class="err">'</span><span class="n">pagerank</span><span class="o">.</span><span class="na">desc</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">val</span> <span class="n">cc1</span><span class="o">=</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="err">'</span><span class="n">component</span><span class="o">===</span><span class="s">"60129542145"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">cc1</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">stressHightWeightPageRank</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span>
+   <span class="err">'</span><span class="n">word</span><span class="o">===</span><span class="err">'</span><span class="n">id</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="err">'</span><span class="n">word</span><span class="o">,</span><span class="err">'</span><span class="n">pagerank</span><span class="o">).</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="err">'</span><span class="n">pagerank</span><span class="o">.</span><span class="na">desc</span><span class="o">))</span>
 <span class="n">word</span><span class="o">,</span><span class="n">pagerank</span>
 <span class="n">processes</span><span class="o">,</span><span class="mf">11.314750484908657</span>
 <span class="n">strategies</span><span class="o">,</span><span class="mf">5.968773769006186</span>
@@ -155,9 +165,12 @@ Here are the results from the previous post. We combined two large connected com
 We will look at neighbors of the word with highest Page Rank for each of these connected components. To find word neighbors we will use 'find' GraphFrames function. </p>
 <p>Word "hormones":</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">neighbor1</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b)"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"hormones"</span><span class="o">).</span>
-<span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">neighbor1</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">neighbor1</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span>
+   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b)"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"hormones"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">neighbor1</span><span class="o">.</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">))</span>
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
 <span class="n">hormones</span><span class="o">,</span><span class="n">function</span><span class="o">,</span><span class="mf">0.7766509520166169</span>
 <span class="n">hormones</span><span class="o">,</span><span class="n">harmful</span><span class="o">,</span><span class="mf">0.7686013469021604</span>
@@ -168,9 +181,12 @@ We will look at neighbors of the word with highest Page Rank for each of these c
 
 <p>Word "processes":</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">neighbor1</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b)"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"processes"</span><span class="o">).</span>
-<span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">neighbor1</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">neighbor1</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span>
+   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b)"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"processes"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">neighbor1</span><span class="o">.</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">))</span>
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
 <span class="n">processes</span><span class="o">,</span><span class="n">functions</span><span class="o">,</span><span class="mf">0.846240488718132</span>
 <span class="n">processes</span><span class="o">,</span><span class="n">capabilities</span><span class="o">,</span><span class="mf">0.8165733928557892</span>
@@ -186,16 +202,21 @@ Another way to find word neighbors is similar to 'findSynonyms' in Word2Vec. Her
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.DataFrame</span>
 
-<span class="k">def</span> <span class="n">findSimilarWords</span><span class="o">(</span><span class="n">w2wCos</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">word</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">cosine</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span> <span class="n">number</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="n">w2wCos</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'word1=</span><span class="o">==</span><span class="n">word</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="n">cosine</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="ss">'word2,'cos)</span><span class="o">.</span>
-  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'cos.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="n">number</span><span class="o">)</span>
+<span class="k">def</span> <span class="n">findSimilarWords</span><span class="o">(</span><span class="n">w2wCos</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">word</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">cosine</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span> <span class="n">number</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span>
+   <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
+     <span class="n">w2wCos</span><span class="o">.</span>
+     <span class="n">filter</span><span class="o">(</span><span class="ss">'word1=</span><span class="o">==</span><span class="n">word</span><span class="o">).</span>
+     <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="n">cosine</span><span class="o">).</span>
+     <span class="n">select</span><span class="o">(</span><span class="ss">'word2,'cos)</span><span class="o">.</span>
+     <span class="n">orderBy</span><span class="o">(</span><span class="ss">'cos.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="n">number</span><span class="o">)</span>
 <span class="o">}</span></code></pre></figure>
 
 
 <p>Word "processes" neighbors - we use the same threshold as we used to build a graph. We are getting the same results as using GraphFrames 'find' function:</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findSimilarWords</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">,</span><span class="s">"processes"</span><span class="o">,</span><span class="mf">0.75</span><span class="o">,</span><span class="mi">11</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findSimilarWords</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">,</span>
+   <span class="s">"processes"</span><span class="o">,</span><span class="mf">0.75</span><span class="o">,</span><span class="mi">11</span><span class="o">))</span>
 <span class="n">word2</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">functions</span><span class="o">,</span><span class="mf">0.846240488718132</span>
 <span class="n">capabilities</span><span class="o">,</span><span class="mf">0.8165733928557892</span>
@@ -208,7 +229,8 @@ Another way to find word neighbors is similar to 'findSynonyms' in Word2Vec. Her
 <p>Word "hormones" neighbors:</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findSimilarWords</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">,</span><span class="s">"hormones"</span><span class="o">,</span><span class="mf">0.75</span><span class="o">,</span><span class="mi">11</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findSimilarWords</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">,</span>
+   <span class="s">"hormones"</span><span class="o">,</span><span class="mf">0.75</span><span class="o">,</span><span class="mi">11</span><span class="o">))</span>
 <span class="n">word2</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">function</span><span class="o">,</span><span class="mf">0.7766509520166169</span>
 <span class="n">harmful</span><span class="o">,</span><span class="mf">0.7686013469021604</span>
@@ -224,9 +246,11 @@ Now let's say we need to find neighbors of neighbors, i.e. words with two degree
 <p>Word "processes" neighbors of neighbors:</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">neighbor2</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
-<span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"processes"</span><span class="o">).</span>
-<span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">neighbor2</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span>
+   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"processes"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">)</span>
 <span class="n">display</span><span class="o">(</span><span class="n">neighbor2</span><span class="o">)</span>
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
 <span class="n">processes</span><span class="o">,</span><span class="n">strategies</span><span class="o">,</span><span class="mf">0.8079603436193109</span><span class="o">,</span><span class="n">governmental</span><span class="o">,</span><span class="mf">0.7553409742807539</span>
@@ -240,9 +264,11 @@ Now let's say we need to find neighbors of neighbors, i.e. words with two degree
 <p>Word "hormones" neighbors of neighbors:</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">neighbor2</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
-<span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"hormones"</span><span class="o">).</span>
-<span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">neighbor2</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span>
+   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"hormones"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">)</span>
 <span class="n">display</span><span class="o">(</span><span class="n">neighbor2</span><span class="o">)</span>
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
 <span class="n">hormones</span><span class="o">,</span><span class="n">digestive</span><span class="o">,</span><span class="mf">0.767779980189556</span><span class="o">,</span><span class="n">disorders</span><span class="o">,</span><span class="mf">0.7784715813141609</span></code></pre></figure>
@@ -259,8 +285,13 @@ Now let's say we need to find neighbors of neighbors, i.e. words with two degree
 First we will look GraphFrames 'triangleCount' function  </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphTriangles</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span><span class="n">triangleCount</span><span class="o">.</span><span class="n">run</span><span class="o">()</span>
-<span class="n">display</span><span class="o">(</span><span class="n">graphTriangles</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="ss">'id,'count)</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'count&gt;</span><span class="mi">0</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphTriangles</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span>
+   <span class="n">triangleCount</span><span class="o">.</span>
+   <span class="n">run</span><span class="o">()</span>
+<span class="n">display</span><span class="o">(</span><span class="n">graphTriangles</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="ss">'id,'count)</span><span class="o">.</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'count&gt;</span><span class="mi">0</span><span class="o">).</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
 <span class="n">id</span><span class="o">,</span><span class="n">count</span>
 <span class="n">capabilities</span><span class="o">,</span><span class="mi">1</span>
 <span class="n">decrease</span><span class="o">,</span><span class="mi">3</span>
@@ -282,10 +313,14 @@ First we will look GraphFrames 'triangleCount' function  </p>
 
 <p>To see triangle word combinations will use 'find' function:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">triangles</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c); (c) - [ca] -&gt; (a)"</span><span class="o">).</span>
-<span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">&lt;</span><span class="n">$</span><span class="s">"b.id"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"b.id"</span><span class="o">&lt;</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
-<span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">triangles</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'word1)</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">triangles</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span>
+   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c); (c) - [ca] -&gt; (a)"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">&lt;</span><span class="n">$</span><span class="s">"b.id"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"b.id"</span><span class="o">&lt;</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">triangles</span><span class="o">.</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'word1)</span><span class="o">)</span>
 <span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">word3</span>
 <span class="n">capabilities</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="n">strategies</span>
 <span class="n">decrease</span><span class="o">,</span><span class="n">decreased</span><span class="o">,</span><span class="n">versus</span>
@@ -308,9 +343,13 @@ In the next post we will look at direct Word2Vec2Graph graphs.
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/2017/09/28/word2vec2graphPageRank/" data-toggle="tooltip" data-placement="top" title="Word2Vec2Graph Model Page Rank">&larr; Previous Post</a>
+                        <a href="/2017/09/28/word2vec2graphPageRank/" data-toggle="tooltip" data-placement="top" title="Word2Vec2Graph Model - Page Rank">&larr; Previous Post</a>
                     </li>
                     
+                    
+                    <li class="next">
+                        <a href="/2017/10/14/word2vec2graphWordPairs/" data-toggle="tooltip" data-placement="top" title="Word2Vec2Graph for Pairs of Words">Next Post &rarr;</a>
+                    </li>
                     
                 </ul>
 

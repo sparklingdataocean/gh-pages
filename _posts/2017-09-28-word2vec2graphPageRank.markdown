@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Word2Vec2Graph Model Page Rank"
+title:      "Word2Vec2Graph Model - Page Rank"
 subtitle:   "Connecting Word2vec Model with Graph"
 date:       2017-09-28 12:00:00
 author:     "Melenar"
@@ -19,36 +19,57 @@ Spark GraphFrames library has many interesting functions. In this post we will l
 <p><h3>Get Data from Data Storage</h3>
 Read word to word Stress Data File combinations with Word2Vec cosine similarities: </p>
 {% highlight scala %}
-val w2wStressCos = sqlContext.read.parquet("w2wStressCos")
+val w2wStressCos = sqlContext.
+   read.
+   parquet("w2wStressCos")
 {% endhighlight %}
 
 Read vertices and edges of Word2Vec2Graph and build a graph: </p>
 {% highlight scala %}
 import org.graphframes.GraphFrame
-val graphStressNodes = sqlContext.read.parquet("graphStressNodes")
-val graphStressEdges = sqlContext.read.parquet("graphStressEdges")
+val graphStressNodes = sqlContext.
+   read.
+   parquet("graphStressNodes")
+val graphStressEdges = sqlContext.
+   read.
+   parquet("graphStressEdges")
 val graphStress = GraphFrame(graphStressNodes,graphStressEdges)
 {% endhighlight %}
 
 <p><h3>Page Rank</h3>
 Calculate Page Rank: </p>
 {% highlight scala %}
-val stressPageRank = graphStress.pageRank.resetProbability(0.15).maxIter(11).run()
-display(stressPageRank.vertices.distinct().sort($"pagerank".asc).limit(11))
+val stressPageRank = graphStress.
+   pageRank.
+   resetProbability(0.15).
+   maxIter(11).
+   run()
+display(stressPageRank.vertices.
+   distinct().
+   sort($"pagerank".asc).
+   limit(11))
 {% endhighlight %}
 
 <p>Our graph is built on the full matrix so all words pairs are connected therefore we are getting all Page Ranks equal to 1. Now we will look at Page Rank of a subgraph based on the edge weight threshold. We will use the same threshold (>.075) as we used in the previous post when we calculated graph  connected components.</p>
 <p>Build subgraph: </p>
 {% highlight java %}
-val edgeHightWeight = graphStress.edges.filter("edgeWeight > 0.75")
+val edgeHightWeight = graphStress.edges.
+   filter("edgeWeight > 0.75")
 val graphHightWeight = GraphFrame(graphStress.vertices, edgeHightWeight)
 {% endhighlight %}
 
 <p>Calculate Page Rank: </p>
 {% highlight java %}
-val stressHightWeightPageRank = graphHightWeight.pageRank.
-resetProbability(0.15).maxIter(11).run()
-display(stressHightWeightPageRank.vertices.distinct().sort($"pagerank".desc).limit(11))
+val stressHightWeightPageRank = graphHightWeight.
+   pageRank.
+   resetProbability(0.15).
+   maxIter(11).
+   run()
+display(stressHightWeightPageRank.
+   vertices.
+   distinct().
+   sort($"pagerank".desc).
+   limit(11))
 
 id,pagerank
 hormones,11.925990421899789
@@ -67,8 +88,11 @@ cardiovascular,6.061954567119659
 <p><h3>Page Rank and Degrees</h3>
 Graph that we use now is indirect so high Page Rank vertices are similar to high in-degree vertices: </p>
 {% highlight scala %}
-val vertexInDegrees= graphHightWeight.inDegrees
-display(vertexInDegrees.orderBy('inDegree.desc).limit(11))
+val vertexInDegrees= graphHightWeight.
+   inDegrees
+display(vertexInDegrees.
+   orderBy('inDegree.desc).
+   limit(11))
 id,inDegree
 processes,6
 disorders,6
@@ -83,15 +107,22 @@ tumors,3
 strategies,3
 {% endhighlight %}
 
-<p>In the next post we will look at direct Word2Vec2Graph and the results will be different.</p>
+<p>In future posts we will look at direct Word2Vec2Graph and the results will be different.</p>
 
 <p><h3>Page Rank and Connected Components</h3>
 Connected components: </p>
 {% highlight scala %}
 sc.setCheckpointDir("/FileStore/")
-val graphHightWeightCC = graphHightWeight.connectedComponents.run()
-val graphHightWeightCcCount=graphHightWeightCC.groupBy("component").count.toDF("cc","ccCt")
-display(graphHightWeightCcCount.orderBy('ccCt.desc).limit(11))
+val graphHightWeightCC = graphHightWeight.
+   connectedComponents.
+   run()
+val graphHightWeightCcCount=graphHightWeightCC.
+   groupBy("component").
+   count.
+   toDF("cc","ccCt")
+display(graphHightWeightCcCount.
+   orderBy('ccCt.desc).
+   limit(11))
 cc,ccCt
 60129542144,17
 60129542145,9
@@ -108,9 +139,14 @@ cc,ccCt
 
 <p>Combine two connected components with Page Rank. Biggest component: </p>
 {% highlight java %}
-val cc1=graphHightWeightCC.filter('component==="60129542144").select("id").toDF("word")
-display(cc1.join(stressHightWeightPageRank.vertices,'word==='id).
-select('word,'pagerank).orderBy('pagerank.desc))
+val cc1=graphHightWeightCC.
+   filter('component==="60129542144").
+   select("id").
+   toDF("word")
+display(cc1.join(stressHightWeightPageRank.vertices,
+   'word==='id).
+   select('word,'pagerank).
+   orderBy('pagerank.desc))
 word,pagerank
 hormones,11.925990421899789
 disorders,10.58017031766379
@@ -133,9 +169,14 @@ prevention,2.3170945436519768
 
 <p>Second component: </p>
 {% highlight java %}
-val cc1=graphHightWeightCC.filter('component==="60129542145").select("id").toDF("word")
-display(cc1.join(stressHightWeightPageRank.vertices,'word==='id).
-select('word,'pagerank).orderBy('pagerank.desc))
+val cc1=graphHightWeightCC.
+   filter('component==="60129542145").
+   select("id").
+   toDF("word")
+display(cc1.join(stressHightWeightPageRank.vertices,
+   'word==='id).
+   select('word,'pagerank).
+   orderBy('pagerank.desc))
 word,pagerank
 processes,11.314750484908657
 strategies,5.968773769006186

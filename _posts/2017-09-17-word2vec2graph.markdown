@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Introduction to Word2Vec2Graph"
+title:      "Introduction to Word2Vec2Graph Model"
 subtitle:   "Connecting Word2Vec Model with Graph"
 date:       2017-09-17 12:00:00
 author:     "Melenar"
@@ -18,7 +18,7 @@ Word2Vec model maps words to vectors so we can calculate cosine similarity withi
 Read Wiki data file: </p>
 {% highlight scala %}
 val inputStress=sc.textFile("/FileStore/tables/cjzokasj1506175253652/stressWiki.txt").
-toDF("charLine")
+   toDF("charLine")
 inputStress.count//--247
 {% endhighlight %}
 
@@ -27,17 +27,24 @@ inputStress.count//--247
 import org.apache.spark.ml._
 import org.apache.spark.ml.feature._
 val tokenizer = new RegexTokenizer().
-setInputCol("charLine").setOutputCol("value").setPattern("[^a-z]+").
-setMinTokenLength(5).setGaps(true)
-val tokenizedStress = tokenizer.transform(inputStress)
+   setInputCol("charLine").
+   setOutputCol("value").
+   setPattern("[^a-z]+").
+   setMinTokenLength(5).
+   setGaps(true)
+val tokenizedStress = tokenizer.
+   transform(inputStress)
 tokenizedStress.count//--274
 {% endhighlight %}
 
 <p>Remove stop words from Stress data file: </p>
 {% highlight java %}
-val remover = new StopWordsRemover().setInputCol("value").setOutputCol("stopWordFree")
-val removedStopWordsStress = remover.setStopWords(Array("none","also","nope","null")++remover.getStopWords).
-transform(tokenizedStress)
+val remover = new StopWordsRemover().
+   setInputCol("value").
+   setOutputCol("stopWordFree")
+val removedStopWordsStress = remover.
+   setStopWords(Array("none","also","nope","null")++remover.getStopWords).
+   transform(tokenizedStress)
 
 {% endhighlight %}
 
@@ -47,7 +54,9 @@ transform(tokenizedStress)
 
 import org.apache.spark.sql.functions.explode
 val slpitCleanWordsStress = removedStopWordsStress.
-withColumn("cleanWord",explode($"stopWordFree")).select("cleanWord").distinct
+   withColumn("cleanWord",explode($"stopWordFree")).
+   select("cleanWord").
+   distinct
 slpitCleanWordsStress.count//--1233
 
 {% endhighlight %}
@@ -62,22 +71,28 @@ import org.apache.spark.ml.feature.Word2Vec
 import org.apache.spark.ml._
 import org.apache.spark.ml.feature.Word2VecModel
 import org.apache.spark.sql.Row
-val word2vec= new Word2Vec()
-  .setInputCol("value")
-  .setOutputCol("result")
-val modelNewsWiki=Word2VecModel.read.load("w2vNewsWiki")
+val word2vec= new Word2Vec().
+   setInputCol("value").
+   setOutputCol("result")
+val modelNewsWiki=Word2VecModel.
+   read.
+   load("w2vNewsWiki")
 
 {% endhighlight %}
 
 <p>Get all words from the Word2Vec model</p>
 {% highlight scala %}
-val modelWords=modelNewsWiki.getVectors.select("word")
+val modelWords=modelNewsWiki.
+   getVectors.
+   select("word")
 {% endhighlight %}
 
 <p>Filter out words from Wiki data file that are not in the Word2Vec words</p>
 {% highlight scala %}
-val stressWords=slpitCleanWordsStress.join(modelWords,'cleanWord === 'word).
-select("word").distinct
+val stressWords=slpitCleanWordsStress.
+   join(modelWords,'cleanWord === 'word).
+   select("word").
+   distinct
 stressWords.count//--1125
 
 {% endhighlight %}
@@ -85,8 +100,10 @@ stressWords.count//--1125
 
 <p>Create word to word matrix</p>
 {% highlight scala %}
-val stressWords2=stressWords.toDF("word2")
-val w2wStress=stressWords.join(stressWords2,'word=!='word2)
+val stressWords2=stressWords.
+   toDF("word2")
+val w2wStress=stressWords.
+   join(stressWords2,'word=!='word2)
 w2wStress.count//--1264500
 {% endhighlight %}
 
@@ -106,8 +123,10 @@ def cosineDouble(x: Array[Double], y: Array[Double]): Double = {
     dotDouble(x, y)/(magnitudeDouble(x) * magnitudeDouble(y))
 }
 
-val modelMap = sc.broadcast(modelNewsWiki.getVectors.map(r=>(r.getString(0),
-r.getAs[DenseVector](1).toArray)).collect.toMap)
+val modelMap = sc.broadcast(modelNewsWiki.
+     getVectors.
+     map(r=>(r.getString(0),r.getAs[DenseVector](1).toArray)).
+        collect.toMap)
 
 def w2wCosine(word1: String, word2: String): Double = {
     cosineDouble(modelMap.value(word1),modelMap.value(word2))
@@ -129,17 +148,27 @@ res1: Double = 0.2533538702772619
 Next step: calculate word to word cosine similarities and save the results.</p>
 {% highlight scala %}
 
-val w2wStressBroadcast=sc.broadcast(w2wStress.collect)
-val w2wStressCos=w2wStressBroadcast.value.map(s=>(s(0).toString,s(1).toString,
-w2wCosine(s(0).toString,s(1).toString)))
-val w2wStressCosDF=sc.parallelize(w2wStressCos).toDF("word1","word2","cos")
-w2wStressCosDF.write.parquet("w2wStressCos")
+val w2wStressBroadcast=
+   sc.broadcast(w2wStress.collect)
+val w2wStressCos=w2wStressBroadcast.
+   value.
+   map(s=>(s(0).toString,s(1).toString,w2wCosine(s(0).toString,
+      s(1).toString)))
+val w2wStressCosDF=
+   sc.parallelize(w2wStressCos).
+   toDF("word1","word2","cos")
+w2wStressCosDF.
+   write.
+   parquet("w2wStressCos")
 
 {% endhighlight %}
 
 <p>Example: Word combinations with high Cosine Similarities:</p>
 {% highlight scala %}
-display(w2wStressCosDF.select('word1,'word2,'cos).filter('cos>0.8).limit(7))
+display(w2wStressCosDF.
+   select('word1,'word2,'cos).
+   filter('cos>0.8).
+   limit(7))
 
 word1,word2,cos
 disorders,chronic,0.8239098331266418
@@ -153,8 +182,11 @@ second,first,0.8096815780218063
 
 <p>Example: Word combinations with low Cosine Similarity:</p>
 {% highlight scala %}
-display(w2wStressCosDF.select('word1,'word2,'cos).filter('cos<(0.65)).
-filter('cos>(0.6)).limit(7))
+display(w2wStressCosDF.
+   select('word1,'word2,'cos).
+   filter('cos<(0.65)).
+   filter('cos>(0.6)).
+   limit(7))
 
 word1,word2,cos
 interaction,disorders,0.6114415840642784
@@ -171,10 +203,15 @@ Now we can build a graph using words as nodes, {word1, word2} word combinations 
 {% highlight scala %}
 import org.graphframes.GraphFrame
 
-val graphNodes=w2wStressCosDF.select("word1").
-  union(w2wStressCosDF.select("word2")).distinct.toDF("id")
-val graphEdges=w2wStressCosDF.select("word1","word2","cos").
-  distinct.toDF("src","dst","edgeWeight")
+val graphNodes=w2wStressCosDF.
+   select("word1").
+   union(w2wStressCosDF.select("word2")).
+   distinct.
+   toDF("id")
+val graphEdges=w2wStressCosDF.
+   select("word1","word2","cos").
+   distinct.
+   toDF("src","dst","edgeWeight")
 val graph1 = GraphFrame(graphNodes,graphEdges)
 
 {% endhighlight %}
@@ -183,8 +220,12 @@ val graph1 = GraphFrame(graphNodes,graphEdges)
 
 {% highlight scala %}
 
-graph1.vertices.write.parquet("graphStressNodes")
-graph1.edges.write.parquet("graphStressEdges")
+graph1.vertices.
+   write.
+   parquet("graphStressNodes")
+graph1.edges.
+   write.
+   parquet("graphStressEdges")
 
 {% endhighlight %}
 
@@ -192,8 +233,12 @@ graph1.edges.write.parquet("graphStressEdges")
 
 {% highlight scala %}
 import org.graphframes.GraphFrame
-val graphStressNodes = sqlContext.read.parquet("graphStressNodes")
-val graphStressEdges = sqlContext.read.parquet("graphStressEdges")
+val graphStressNodes = sqlContext.
+   read.
+   parquet("graphStressNodes")
+val graphStressEdges = sqlContext.
+   read.
+   parquet("graphStressEdges")
 val graphStress = GraphFrame(graphStressNodes,graphStressEdges)
 
 {% endhighlight %}
@@ -207,8 +252,13 @@ It's a lot of interesting things we can do with Spark GraphFrames. In this post 
 
 
 sc.setCheckpointDir("/FileStore/")
-val resultStressCC = graphStress.connectedComponents.run()
-val ccStressCount=resultStressCC.groupBy("component").count.toDF("cc","ccCt")
+val resultStressCC = graphStress.
+   connectedComponents.
+   run()
+val ccStressCount=resultStressCC.
+   groupBy("component").
+   count.
+   toDF("cc","ccCt")
 display(ccStressCount.orderBy('ccCt.desc))
 
 cc,ccCt
@@ -225,7 +275,8 @@ Now we will look at connected components of subgraph with different edge weight 
 </p>
 {% highlight scala %}
 
-val edgeHightWeight = graphStress.edges.filter("edgeWeight > 0.75")
+val edgeHightWeight = graphStress.edges.
+   filter("edgeWeight > 0.75")
 val graphHightWeight = GraphFrame(graphStress.vertices, edgeHightWeight)
 
 {% endhighlight %}
@@ -234,9 +285,16 @@ val graphHightWeight = GraphFrame(graphStress.vertices, edgeHightWeight)
 </p>
 {% highlight scala %}
 
-val graphHightWeightCC = graphHightWeight.connectedComponents.run()
-val graphHightWeightCcCount=graphHightWeightCC.groupBy("component").count.toDF("cc","ccCt")
-display(graphHightWeightCcCount.orderBy('ccCt.desc).limit(11))
+val graphHightWeightCC = graphHightWeight.
+   connectedComponents.
+   run()
+val graphHightWeightCcCount=graphHightWeightCC.
+   groupBy("component").
+   count.
+   toDF("cc","ccCt")
+display(graphHightWeightCcCount.
+   orderBy('ccCt.desc).
+   limit(11))
 
 cc,ccCt
 60129542144,17
@@ -256,7 +314,9 @@ cc,ccCt
 <p>Words in the biggest component:</p>
 {% highlight scala %}
 
-display(graphHightWeightCC.filter("component=60129542144").select('id))
+display(graphHightWeightCC.
+   filter("component=60129542144").
+   select('id))
 
 id
 humans
@@ -281,7 +341,9 @@ acute
 <p>Words in the second component:</p>
 {% highlight scala %}
 
-display(graphHightWeightCC.filter("component=60129542145").select('id))
+display(graphHightWeightCC.
+   filter("component=60129542145").
+   select('id))
 
 id
 capabilities
@@ -299,7 +361,9 @@ processes
 <p>And of course some components are not very interesting:</p>
 {% highlight scala %}
 
-display(graphHightWeightCC.filter("component=240518168580").select('id))
+display(graphHightWeightCC.
+   filter("component=240518168580").
+   select('id))
 
 id
 increased
@@ -313,6 +377,6 @@ decreased
 {% endhighlight %}
 <p></p>
 <p>
-<h3>Next Post - Page Rank</h3>
+<h3>Next Post - Word2Vec2Graph Page Rank</h3>
 Spark GraphFrames library has many interesting functions. In the next post we will look at Page Rank for Word2Vec2Graph.
 </p>

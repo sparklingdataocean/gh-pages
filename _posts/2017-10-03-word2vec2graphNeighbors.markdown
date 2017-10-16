@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Word2Vec2Graph - Neighbors"
+title:      "Word2Vec2Graph Model - Neighbors"
 subtitle:   "Connecting Word2vec Model with Graph"
 date:       2017-10-03 12:00:00
 author:     "Melenar"
@@ -8,10 +8,10 @@ header-img: "img/pic17.jpg"
 ---
 
 <p><h3>Word2Vec2Graph Model - How to Find Neighbors</h3>
-Two posts before we introduced a
-<a href="https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/">Word2Vec2Graph model</a>.
+Two posts before we introduced
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/">Word2Vec2Graph model</a></i>.
 In the previous post we played with
-<a href="https://sparklingdataocean.github.io/gh-pages/2017/09/28/word2vec2graphPageRank/">Page Rank for Word2Vec2Graph</a>.
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/28/word2vec2graphPageRank/">Page Rank for Word2Vec2Graph</a></i>.
 
 <p>In this post we will look at different ways to find neighbors via the Word2Vec2Graph model.</p>
 
@@ -20,9 +20,14 @@ In the previous post we played with
 Here are the results from the previous post. We combined two large connected components with Page Rank. </p>
 <p>Biggest component: </p>
 {% highlight java %}
-val cc1=graphHightWeightCC.filter('component==="60129542144").select("id").toDF("word")
-display(cc1.join(stressHightWeightPageRank.vertices,'word==='id).
-select('word,'pagerank).orderBy('pagerank.desc))
+val cc1=graphHightWeightCC.
+   filter('component==="60129542144").
+   select("id").
+   toDF("word")
+display(cc1.join(stressHightWeightPageRank.vertices,
+   'word==='id).
+   select('word,'pagerank).
+   orderBy('pagerank.desc))
 word,pagerank
 hormones,11.925990421899789
 disorders,10.58017031766379
@@ -45,9 +50,14 @@ prevention,2.3170945436519768
 
 <p>Second component: </p>
 {% highlight java %}
-val cc1=graphHightWeightCC.filter('component==="60129542145").select("id").toDF("word")
-display(cc1.join(stressHightWeightPageRank.vertices,'word==='id).
-select('word,'pagerank).orderBy('pagerank.desc))
+val cc1=graphHightWeightCC.
+   filter('component==="60129542145").
+   select("id").
+   toDF("word")
+display(cc1.join(stressHightWeightPageRank.vertices,
+   'word==='id).
+   select('word,'pagerank).
+   orderBy('pagerank.desc))
 word,pagerank
 processes,11.314750484908657
 strategies,5.968773769006186
@@ -65,9 +75,12 @@ We will look at neighbors of the word with highest Page Rank for each of these c
 <p>Word "hormones":</p>
 {% highlight scala %}
 
-val neighbor1=graphHightWeight.find("(a) - [ab] -> (b)").filter($"a.id"==="hormones").
-select("ab.src","ab.dst","ab.edgeWeight")
-display(neighbor1.orderBy('edgeWeight.desc))
+val neighbor1=graphHightWeight.
+   find("(a) - [ab] -> (b)").
+   filter($"a.id"==="hormones").
+   select("ab.src","ab.dst","ab.edgeWeight")
+display(neighbor1.
+   orderBy('edgeWeight.desc))
 src,dst,edgeWeight
 hormones,function,0.7766509520166169
 hormones,harmful,0.7686013469021604
@@ -79,9 +92,12 @@ hormones,humans,0.7537222776853296
 <p>Word "processes":</p>
 {% highlight scala %}
 
-val neighbor1=graphHightWeight.find("(a) - [ab] -> (b)").filter($"a.id"==="processes").
-select("ab.src","ab.dst","ab.edgeWeight")
-display(neighbor1.orderBy('edgeWeight.desc))
+val neighbor1=graphHightWeight.
+   find("(a) - [ab] -> (b)").
+   filter($"a.id"==="processes").
+   select("ab.src","ab.dst","ab.edgeWeight")
+display(neighbor1.
+   orderBy('edgeWeight.desc))
 src,dst,edgeWeight
 processes,functions,0.846240488718132
 processes,capabilities,0.8165733928557892
@@ -97,16 +113,21 @@ Another way to find word neighbors is similar to 'findSynonyms' in Word2Vec. Her
 {% highlight scala %}
 import org.apache.spark.sql.DataFrame
 
-def findSimilarWords(w2wCos: DataFrame, word: String, cosine: Double, number: Int): DataFrame = {
-  w2wCos.filter('word1===word).filter('cos>cosine).select('word2,'cos).
-  orderBy('cos.desc).limit(number)
+def findSimilarWords(w2wCos: DataFrame, word: String, cosine: Double, number: Int):
+   DataFrame = {
+     w2wCos.
+     filter('word1===word).
+     filter('cos>cosine).
+     select('word2,'cos).
+     orderBy('cos.desc).limit(number)
 }
 {% endhighlight %}
 
 <p>Word "processes" neighbors - we use the same threshold as we used to build a graph. We are getting the same results as using GraphFrames 'find' function:</p>
 
 {% highlight scala %}
-display(findSimilarWords(w2wStressCos,"processes",0.75,11))
+display(findSimilarWords(w2wStressCos,
+   "processes",0.75,11))
 word2,cos
 functions,0.846240488718132
 capabilities,0.8165733928557892
@@ -119,7 +140,8 @@ practices,0.7548515830286028
 <p>Word "hormones" neighbors:</p>
 
 {% highlight scala %}
-display(findSimilarWords(w2wStressCos,"hormones",0.75,11))
+display(findSimilarWords(w2wStressCos,
+   "hormones",0.75,11))
 word2,cos
 function,0.7766509520166169
 harmful,0.7686013469021604
@@ -135,9 +157,11 @@ Now let's say we need to find neighbors of neighbors, i.e. words with two degree
 <p>Word "processes" neighbors of neighbors:</p>
 
 {% highlight scala %}
-val neighbor2=graphHightWeight.find("(a) - [ab] -> (b); (b) - [bc] -> (c)").
-filter($"a.id"=!=$"c.id").filter($"a.id"==="processes").
-select("ab.src","ab.dst","ab.edgeWeight","bc.dst","bc.edgeWeight")
+val neighbor2=graphHightWeight.
+   find("(a) - [ab] -> (b); (b) - [bc] -> (c)").
+   filter($"a.id"=!=$"c.id").
+   filter($"a.id"==="processes").
+   select("ab.src","ab.dst","ab.edgeWeight","bc.dst","bc.edgeWeight")
 display(neighbor2)
 src,dst,edgeWeight,dst,edgeWeight
 processes,strategies,0.8079603436193109,governmental,0.7553409742807539
@@ -151,9 +175,11 @@ processes,functions,0.846240488718132,enhance,0.7894137410909503
 <p>Word "hormones" neighbors of neighbors:</p>
 
 {% highlight scala %}
-val neighbor2=graphHightWeight.find("(a) - [ab] -> (b); (b) - [bc] -> (c)").
-filter($"a.id"=!=$"c.id").filter($"a.id"==="hormones").
-select("ab.src","ab.dst","ab.edgeWeight","bc.dst","bc.edgeWeight")
+val neighbor2=graphHightWeight.
+   find("(a) - [ab] -> (b); (b) - [bc] -> (c)").
+   filter($"a.id"=!=$"c.id").
+   filter($"a.id"==="hormones").
+   select("ab.src","ab.dst","ab.edgeWeight","bc.dst","bc.edgeWeight")
 display(neighbor2)
 src,dst,edgeWeight,dst,edgeWeight
 hormones,digestive,0.767779980189556,disorders,0.7784715813141609
@@ -170,8 +196,13 @@ hormones,digestive,0.767779980189556,disorders,0.7784715813141609
 First we will look GraphFrames 'triangleCount' function  </p>
 
 {% highlight scala %}
-val graphTriangles=graphHightWeight.triangleCount.run()
-display(graphTriangles.select('id,'count).filter('count>0).orderBy('id))
+val graphTriangles=graphHightWeight.
+   triangleCount.
+   run()
+display(graphTriangles.
+   select('id,'count).
+   filter('count>0).
+   orderBy('id))
 id,count
 capabilities,1
 decrease,3
@@ -193,10 +224,14 @@ versus,1
 
 <p>To see triangle word combinations will use 'find' function:</p>
 {% highlight scala %}
-val triangles=graphHightWeight.find("(a) - [ab] -> (b); (b) - [bc] -> (c); (c) - [ca] -> (a)").
-filter($"a.id"<$"b.id").filter($"b.id"<$"c.id").
-select("ab.src","ab.dst","bc.dst").toDF("word1","word2","word3")
-display(triangles.orderBy('word1))
+val triangles=graphHightWeight.
+   find("(a) - [ab] -> (b); (b) - [bc] -> (c); (c) - [ca] -> (a)").
+   filter($"a.id"<$"b.id").
+   filter($"b.id"<$"c.id").
+   select("ab.src","ab.dst","bc.dst").
+   toDF("word1","word2","word3")
+display(triangles.
+   orderBy('word1))
 word1,word2,word3
 capabilities,processes,strategies
 decrease,decreased,versus
