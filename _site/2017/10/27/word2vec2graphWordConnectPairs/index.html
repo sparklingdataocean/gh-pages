@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Direct Word2Vec2Graph - Connected Pair Groups - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2017/10/27/word2vec2graphWordConnectPairs/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/modern10.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Direct Word2Vec2Graph - Connected Pair Groups</h1>
+                    
+                    <h2 class="subheading">Connecting Word2vec Model with Graph</h2>
+                    
+                    <span class="meta">Posted by Melenar on October 27, 2017</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Read Word Pairs Graph</h3>
+In the previous post we built and saved  
+
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/10/14/word2vec2graphWordPairs/">Word2Vec2Graph for pair of words </a></i>of Stress Data file.
+
+In this post we will look for connected word pair groups using Spark GraphFrames library functions: Connected Components and Label Propagation.</p>
+
+<p>
+Read stored vertices and edges and rebuilt the graph:
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
+<span class="k">val</span> <span class="n">graphNgramStressVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphNgramStressEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="n">graphNgramStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span> <span class="n">graphNgramStressEdges</span><span class="o">)</span></code></pre></figure>
+
+</p>
+
+<h3>Connected Components</h3>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">resultStressCC</span> <span class="k">=</span> <span class="n">graphNgramStress</span><span class="o">.</span>
+   <span class="n">connectedComponents</span><span class="o">.</span>
+   <span class="n">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="n">ccStressCount</span><span class="k">=</span><span class="n">resultStressCC</span><span class="o">.</span>
+   <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="n">count</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">ccStressCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">))</span>
+
+<span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
+<span class="mi">0</span><span class="o">,</span><span class="mi">1111</span>
+<span class="mi">240518168576</span><span class="o">,</span><span class="mi">2</span></code></pre></figure>
+
+<p>As we could expect, almost all word pairs are connected therefore almost alls of them are in the same large connected component. </p>
+<p>When we looked at all word to word combinations from text file, pairs of words were tightly connected and we could not split them to separate groups. Now looking at ngram word pairs we can use community detection algorithms to split them to word pair groups. We'll start with the simplest community detection algorithm - Label Propagation.
+</p>
+
+<h3>Label Propagation</h3>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">lapelPropId</span> <span class="k">=</span> <span class="n">graphNgramStress</span><span class="o">.</span>
+  <span class="n">labelPropagation</span><span class="o">.</span>
+  <span class="n">maxIter</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
+  <span class="n">run</span><span class="o">().</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord"</span><span class="o">,</span><span class="s">"lpLabel"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">.</span>
+  <span class="n">groupBy</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"label"</span><span class="o">,</span><span class="s">"count"</span><span class="o">).</span>
+  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'count.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+
+  <span class="n">label</span><span class="o">,</span><span class="n">count</span>
+  <span class="mi">386547056642</span><span class="o">,</span><span class="mi">115</span>
+  <span class="mi">317827579910</span><span class="o">,</span><span class="mi">107</span>
+  <span class="mi">515396075520</span><span class="o">,</span><span class="mi">26</span>
+  <span class="mi">420906795012</span><span class="o">,</span><span class="mi">22</span>
+  <span class="mi">274877906949</span><span class="o">,</span><span class="mi">19</span>
+  <span class="mi">738734374914</span><span class="o">,</span><span class="mi">12</span>
+  <span class="mi">481036337155</span><span class="o">,</span><span class="mi">10</span>
+  <span class="mi">1382979469314</span><span class="o">,</span><span class="mi">10</span>
+  <span class="mi">575525617667</span><span class="o">,</span><span class="mi">10</span>
+  <span class="mi">188978561028</span><span class="o">,</span><span class="mi">9</span>
+  <span class="mi">927712935936</span><span class="o">,</span><span class="mi">9</span></code></pre></figure>
+
+<p>
+As Label Propagation algorithm is cutting loosely connected edges, we want to see which {word1, word2} ngram pairs from text file are within the same Label Propagation groups.
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">pairLabel</span><span class="k">=</span><span class="n">graphNgramStress</span><span class="o">.</span>
+  <span class="n">edges</span><span class="o">.</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">lpWord</span><span class="o">).</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">.</span>
+    <span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord2"</span><span class="o">,</span><span class="s">"lpLabel2"</span><span class="o">),</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">lpWord2</span><span class="o">).</span>
+  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">=='</span><span class="n">lpLabel2</span><span class="o">).</span>
+  <span class="n">select</span><span class="o">(</span><span class="ss">'src,'dst,'edgeWeight,'lpLabel)</span>
+  </code></pre></figure>
+
+
+<p>
+For now we will ignore small groups and look at groups that have at least 3 {word1, word2} pairs.
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala">  
+<span class="n">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
+  <span class="n">groupBy</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"lpLabelCount"</span><span class="o">,</span><span class="s">"pairCount"</span><span class="o">).</span>
+  <span class="n">filter</span><span class="o">(</span><span class="s">"pairCount&gt;2"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'pairCount.</span><span class="n">desc</span><span class="o">))</span>
+
+<span class="n">lpLabelCount</span><span class="o">,</span><span class="n">pairCount</span>
+  <span class="mi">386547056642</span><span class="o">,</span><span class="mi">54</span>
+  <span class="mi">317827579910</span><span class="o">,</span><span class="mi">30</span>
+  <span class="mi">274877906949</span><span class="o">,</span><span class="mi">8</span></code></pre></figure>
+
+
+<h3>Word Pair Groups</h3>
+We'll start with the second group - group that contains 30 {word1, word2} pairs.
+<p>
+Here are edges that belong to this group - {word1, word2, word2vec cosine similarity}:
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
+  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"317827579910"</span><span class="o">).</span>
+  <span class="n">select</span><span class="o">(</span><span class="ss">'src,'dst,'edgeWeight)</span><span class="o">.</span>
+  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">))</span>
+
+<span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
+<span class="n">military</span><span class="o">,</span><span class="n">combat</span><span class="o">,</span><span class="mf">0.6585100225253417</span>
+<span class="n">theories</span><span class="o">,</span><span class="n">kinds</span><span class="o">,</span><span class="mf">0.614683170553027</span>
+<span class="n">greatly</span><span class="o">,</span><span class="n">affect</span><span class="o">,</span><span class="mf">0.5703911227199971</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">susceptible</span><span class="o">,</span><span class="mf">0.5092298863558692</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">indirectly</span><span class="o">,</span><span class="mf">0.50178581898798</span>
+<span class="n">changes</span><span class="o">,</span><span class="n">affect</span><span class="o">,</span><span class="mf">0.44110535802060397</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">examples</span><span class="o">,</span><span class="mf">0.435892677464733</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">either</span><span class="o">,</span><span class="mf">0.4149070407876195</span>
+<span class="k">requires</span><span class="o">,</span><span class="n">individual</span><span class="o">,</span><span class="mf">0.4125513014023833</span>
+<span class="n">affect</span><span class="o">,</span><span class="n">individual</span><span class="o">,</span><span class="mf">0.3983243027379392</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">better</span><span class="o">,</span><span class="mf">0.38429278796103433</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">perceive</span><span class="o">,</span><span class="mf">0.3798804220663263</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">experience</span><span class="o">,</span><span class="mf">0.36348468757986896</span>
+<span class="n">cause</span><span class="o">,</span><span class="n">changes</span><span class="o">,</span><span class="mf">0.35436057661804354</span>
+<span class="n">indirectly</span><span class="o">,</span><span class="n">deals</span><span class="o">,</span><span class="mf">0.33550190287381315</span>
+<span class="n">prevention</span><span class="o">,</span><span class="k">requires</span><span class="o">,</span><span class="mf">0.3049172137994746</span>
+<span class="n">displacement</span><span class="o">,</span><span class="n">individual</span><span class="o">,</span><span class="mf">0.2841213622282649</span>
+<span class="n">better</span><span class="o">,</span><span class="n">negative</span><span class="o">,</span><span class="mf">0.2451413181091326</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">diminished</span><span class="o">,</span><span class="mf">0.23837691546795897</span>
+<span class="n">cause</span><span class="o">,</span><span class="n">either</span><span class="o">,</span><span class="mf">0.22592468033966373</span>
+<span class="n">humor</span><span class="o">,</span><span class="n">individual</span><span class="o">,</span><span class="mf">0.221442007247884</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">personality</span><span class="o">,</span><span class="mf">0.20933309402530506</span>
+<span class="n">affect</span><span class="o">,</span><span class="n">promoting</span><span class="o">,</span><span class="mf">0.19505527986421928</span>
+<span class="n">cause</span><span class="o">,</span><span class="n">individual</span><span class="o">,</span><span class="mf">0.18144254665538492</span>
+<span class="n">changes</span><span class="o">,</span><span class="n">caused</span><span class="o">,</span><span class="mf">0.15654198248664133</span>
+<span class="n">experience</span><span class="o">,</span><span class="n">conflicting</span><span class="o">,</span><span class="mf">0.14323076298532875</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">level</span><span class="o">,</span><span class="mf">0.09802076461154222</span>
+<span class="n">level</span><span class="o">,</span><span class="n">combat</span><span class="o">,</span><span class="mf">0.0915599285372975</span>
+<span class="n">causing</span><span class="o">,</span><span class="n">individual</span><span class="o">,</span><span class="mf">0.008010528297421033</span>
+<span class="n">individual</span><span class="o">,</span><span class="n">takes</span><span class="o">,</span><span class="mf">0.0017983474881583593</span></code></pre></figure>
+
+
+<p>Graph (via Gephi):
+
+<a href="#">
+    <img src="/img/labelGroup2wb.jpg" alt="Post Sample Image" />
+</a>
+
+We use a semi-manual way on building Gephi graphs. Create a list of direct edges:  
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
+  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"317827579910"</span><span class="o">).</span>
+  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span> <span class="s">" -&gt; "</span><span class="o">+</span> <span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">)))</span></code></pre></figure>
+
+
+<p>Then put the list within 'digraph{...}' and getting data in .DOT format:
+</p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">digraph</span><span class="o">{</span><span class="n">p</span><span class="o">&gt;</span>
+<span class="n">level</span> <span class="o">-&gt;</span> <span class="n">combat</span>
+<span class="n">military</span> <span class="o">-&gt;</span> <span class="n">combat</span>
+<span class="n">changes</span> <span class="o">-&gt;</span> <span class="n">caused</span>
+<span class="n">indirectly</span> <span class="o">-&gt;</span> <span class="n">deals</span>
+<span class="k">requires</span> <span class="o">-&gt;</span> <span class="n">individual</span>
+<span class="n">displacement</span> <span class="o">-&gt;</span> <span class="n">individual</span>
+<span class="n">cause</span> <span class="o">-&gt;</span> <span class="n">individual</span>
+<span class="n">humor</span> <span class="o">-&gt;</span> <span class="n">individual</span>
+<span class="n">causing</span> <span class="o">-&gt;</span> <span class="n">individual</span>
+<span class="n">affect</span> <span class="o">-&gt;</span> <span class="n">individual</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">examples</span>
+<span class="n">experience</span> <span class="o">-&gt;</span> <span class="n">conflicting</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">either</span>
+<span class="n">cause</span> <span class="o">-&gt;</span> <span class="n">either</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">susceptible</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">experience</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">better</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">personality</span>
+<span class="n">affect</span> <span class="o">-&gt;</span> <span class="n">promoting</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">perceive</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">diminished</span>
+<span class="n">theories</span> <span class="o">-&gt;</span> <span class="n">kinds</span>
+<span class="n">changes</span> <span class="o">-&gt;</span> <span class="n">affect</span>
+<span class="n">greatly</span> <span class="o">-&gt;</span> <span class="n">affect</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">level</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">indirectly</span>
+<span class="n">cause</span> <span class="o">-&gt;</span> <span class="n">changes</span>
+<span class="n">individual</span> <span class="o">-&gt;</span> <span class="n">takes</span>
+<span class="n">better</span> <span class="o">-&gt;</span> <span class="n">negative</span>
+<span class="n">prevention</span> <span class="o">-&gt;</span> <span class="k">requires</span>
+<span class="o">}</span></code></pre></figure>
+
+
+
+<p>Here is the graph for the group of 54 pair. 'Stress' - the word with the highest PageRank is in the center of this graph:
+</p>
+
+<a href="#">
+    <img src="/img/labelGroup1w2.jpg" alt="Post Sample Image" />
+</a>
+
+
+<p>Here is the graph for the group of 8 pair:
+</p>
+<a href="#">
+    <img src="/img/labelGroup3w.jpg" alt="Post Sample Image" />
+</a>
+
+<p><h3>High Topics of Label Groups</h3>
+We can see that in the center of the biggest group is the word 'stress' - the word with the highest PageRank. We'll calculate high PageRank words for word pair groups.   </p>
+<p>Calculate PageRank:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphNgramStressPageRank</span> <span class="k">=</span>
+  <span class="n">graphNgramStress</span><span class="o">.</span>
+  <span class="n">pageRank</span><span class="o">.</span>
+  <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+  <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
+  <span class="n">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="n">pageRankId</span><span class="k">=</span><span class="n">graphNgramStressPageRank</span><span class="o">.</span>
+  <span class="n">vertices</span><span class="o">.</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"prWord"</span><span class="o">,</span><span class="s">"pagerank"</span><span class="o">)</span></code></pre></figure>
+
+
+<p>Calculate lists of distinct words in the label groups:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">wordLabel</span><span class="k">=</span><span class="n">pairLabel</span><span class="o">.</span>
+  <span class="n">select</span><span class="o">(</span><span class="ss">'src,'lpLabel)</span><span class="o">.</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
+    <span class="n">select</span><span class="o">(</span><span class="ss">'dst,'lpLabel)</span><span class="o">).</span>
+  <span class="n">distinct</span><span class="o">.</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord"</span><span class="o">,</span><span class="s">"lpLabel"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">wordLabel</span><span class="o">.</span>
+  <span class="n">groupBy</span><span class="o">(</span><span class="ss">'lpLabel)</span><span class="o">.</span><span class="n">count</span><span class="o">.</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">,</span><span class="s">"labelCount"</span><span class="o">).</span>
+  <span class="n">filter</span><span class="o">(</span><span class="s">"labelCount&gt;2"</span><span class="o">).</span>
+  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'labelCount.</span><span class="n">desc</span><span class="o">))</span>
+<span class="n">lpLabel</span><span class="o">,</span><span class="n">labelCount</span>
+<span class="mi">386547056642</span><span class="o">,</span><span class="mi">47</span>
+<span class="mi">317827579910</span><span class="o">,</span><span class="mi">30</span>
+<span class="mi">274877906949</span><span class="o">,</span><span class="mi">7</span>
+<span class="mi">146028888068</span><span class="o">,</span><span class="mi">4</span>
+<span class="mi">1675037245443</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
+
+
+<p>Top 10 Words in Label Groups</p>
+<p>
+The biggest group:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">wordLabelPageRank</span><span class="k">=</span><span class="n">wordLabel</span><span class="o">.</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">pageRankId</span><span class="o">,</span><span class="ss">'lpWord=</span><span class="o">=='</span><span class="n">prWord</span><span class="o">).</span>
+  <span class="n">select</span><span class="o">(</span><span class="ss">'lpLabel,'lpWord,'pageRank)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
+  <span class="n">select</span><span class="o">(</span><span class="ss">'lpWord,'pageRank)</span><span class="o">.</span>
+  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"386547056642"</span><span class="o">).</span>
+  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'pageRank.</span><span class="n">desc</span><span class="o">).</span>
+  <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+
+  <span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
+  <span class="n">stress</span><span class="o">,</span><span class="mf">36.799029843873036</span>
+  <span class="n">stressful</span><span class="o">,</span><span class="mf">7.982561760153138</span>
+  <span class="n">anxiety</span><span class="o">,</span><span class="mf">5.280935662282566</span>
+  <span class="n">levels</span><span class="o">,</span><span class="mf">3.577601059501528</span>
+  <span class="n">depression</span><span class="o">,</span><span class="mf">2.997965863478802</span>
+  <span class="n">cognitive</span><span class="o">,</span><span class="mf">2.4835377323499968</span>
+  <span class="n">event</span><span class="o">,</span><span class="mf">2.376589797720234</span>
+  <span class="n">system</span><span class="o">,</span><span class="mf">2.209925145397034</span>
+  <span class="n">physiological</span><span class="o">,</span><span class="mf">2.010263387749949</span>
+  <span class="n">laughter</span><span class="o">,</span><span class="mf">1.9427846994029507</span></code></pre></figure>
+
+
+<p>Second group: </p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
+  <span class="n">select</span><span class="o">(</span><span class="ss">'lpWord,'pageRank)</span><span class="o">.</span>
+  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"317827579910"</span><span class="o">).</span>
+  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'pageRank.</span><span class="n">desc</span><span class="o">).</span>
+  <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+
+  <span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
+  <span class="n">individual</span><span class="o">,</span><span class="mf">8.75686668967628</span>
+  <span class="n">changes</span><span class="o">,</span><span class="mf">5.642126628136839</span>
+  <span class="n">negative</span><span class="o">,</span><span class="mf">3.89748211412626</span>
+  <span class="n">affect</span><span class="o">,</span><span class="mf">2.869162036449995</span>
+  <span class="n">cause</span><span class="o">,</span><span class="mf">2.82449665904923</span>
+  <span class="n">humor</span><span class="o">,</span><span class="mf">2.654039734715573</span>
+  <span class="n">either</span><span class="o">,</span><span class="mf">2.629897237315239</span>
+  <span class="n">examples</span><span class="o">,</span><span class="mf">2.2158219523034477</span>
+  <span class="n">experience</span><span class="o">,</span><span class="mf">2.086137279362367</span>
+  <span class="n">level</span><span class="o">,</span><span class="mf">1.7538722184950524</span></code></pre></figure>
+
+
+<p>Third Group:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
+  <span class="n">select</span><span class="o">(</span><span class="ss">'lpWord,'pageRank)</span><span class="o">.</span>
+  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"274877906949"</span><span class="o">).</span>
+  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'pageRank.</span><span class="n">desc</span><span class="o">).</span>
+  <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+
+  <span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
+  <span class="n">disease</span><span class="o">,</span><span class="mf">4.195635531226847</span>
+  <span class="n">illness</span><span class="o">,</span><span class="mf">2.90222622174496</span>
+  <span class="n">heart</span><span class="o">,</span><span class="mf">2.1357113367905662</span>
+  <span class="n">increased</span><span class="o">,</span><span class="mf">1.4318340158498353</span>
+  <span class="n">stage</span><span class="o">,</span><span class="mf">1.0047304801814618</span>
+  <span class="n">resistance</span><span class="o">,</span><span class="mf">0.8456856157412355</span>
+  <span class="n">confronting</span><span class="o">,</span><span class="mf">0.6327411341532586</span></code></pre></figure>
+
+
+<p>Comparing group graphs with PageRanks of words within groups shows that the words with high PageRanks are located in graph center.   </p>
+
+<p><h3>Next Post - More Pair Connections</h3>
+In the next post we will continue playing with Spark GraphFrames library to find more interesting word to word connections.
+</p>
+</p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2017/10/14/word2vec2graphWordPairs/" data-toggle="tooltip" data-placement="top" title="Word2Vec2Graph for Pairs of Words">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2017</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+
+
+</body>
+
+</html>

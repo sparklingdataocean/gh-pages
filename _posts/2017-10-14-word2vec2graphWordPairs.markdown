@@ -265,5 +265,5 @@ display(graphNgramStressPageRank.vertices.
 {% endhighlight %}
 
 
-<p><h3>Next Post - Page Rank</h3>
-In the next post we will play with Spark GraphFrames library and run Connected Components and Strong Connected Components functions for direct Word2Vec2Graph model.</p>
+<p><h3>Next Post - Connected Word Pairs</h3>
+In the next post we will play with Spark GraphFrames library and run Connected Components and Label Propagation functions for direct Word2Vec2Graph model.</p>
