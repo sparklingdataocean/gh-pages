@@ -119,7 +119,9 @@ AWS cluster we run via Databricks Community is not so big. To train Word2vec mod
 
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/02pvyoae1504568133317/newsTest.txt"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+  <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/02pvyoae1504568133317/newsTest.txt"</span><span class="o">).</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span></code></pre></figure>
 
 <p>First we'll tokenize the data</p>
 
@@ -178,7 +180,7 @@ To see how the corpus that we used to train the model affects the results we wil
    <span class="n">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>
    <span class="n">union</span><span class="o">(</span><span class="n">inputWiki</span><span class="o">))</span></code></pre></figure>
 
-<p></p>
+<p>Train Word2Vec model and save the results:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2VmodelNewsWiki</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span>
    <span class="n">fit</span><span class="o">(</span><span class="n">tokenizedNewsWiki</span><span class="o">)</span>
@@ -194,20 +196,20 @@ To see how the corpus that we used to train the model affects the results we wil
 
 <p>The results of these models are very different for some words and very similar for some other words. Here are examples:</p>
 
-<p>Word: <b>Stress</b></p>
+<p>Word: <b>Stress</b> - Input File: <b>News:</b></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News:</span>
-<span class="kt">word</span><span class="o">,</span><span class="n">similarity</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
 <span class="n">risk</span><span class="o">,</span><span class="mf">0.6505142450332642</span>
 <span class="n">adversely</span><span class="o">,</span><span class="mf">0.6353756785392761</span>
 <span class="n">clots</span><span class="o">,</span><span class="mf">0.6308229565620422</span>
 <span class="n">anxiety</span><span class="o">,</span><span class="mf">0.6186497807502747</span>
 <span class="n">traumatic</span><span class="o">,</span><span class="mf">0.6167819499969482</span>
 <span class="n">persistent</span><span class="o">,</span><span class="mf">0.6142207980155945</span>
-<span class="n">problems</span><span class="o">,</span><span class="mf">0.6132286190986633</span>
+<span class="n">problems</span><span class="o">,</span><span class="mf">0.6132286190986633</span></code></pre></figure>
 
-<span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News</span> <span class="kt">+</span> <span class="kt">Wiki:</span>
-<span class="kt">word</span><span class="o">,</span><span class="n">similarity</span>
+<p>Input File: <b>News + Wiki</b>:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
 <span class="n">obesity</span><span class="o">,</span><span class="mf">0.6602367758750916</span>
 <span class="n">adverse</span><span class="o">,</span><span class="mf">0.6559499502182007</span>
 <span class="n">systemic</span><span class="o">,</span><span class="mf">0.6525574326515198</span>
@@ -216,20 +218,20 @@ To see how the corpus that we used to train the model affects the results we wil
 <span class="n">detect</span><span class="o">,</span><span class="mf">0.6430484652519226</span>
 <span class="n">infection</span><span class="o">,</span><span class="mf">0.6407146453857422</span></code></pre></figure>
 
-<p>Word: <b>Rain</b></p>
+<p>Word: <b>Rain</b> - Input File: <b>News:</b></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News</span>
-<span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
 <span class="n">snow</span><span class="o">,</span><span class="mf">0.8456688523292542</span>
 <span class="n">winds</span><span class="o">,</span><span class="mf">0.800561785697937</span>
 <span class="n">rains</span><span class="o">,</span><span class="mf">0.7878957986831665</span>
 <span class="n">fog</span><span class="o">,</span><span class="mf">0.7052807211875916</span>
 <span class="n">inches</span><span class="o">,</span><span class="mf">0.690990686416626</span>
 <span class="n">storm</span><span class="o">,</span><span class="mf">0.6725252270698547</span>
-<span class="n">gusts</span><span class="o">,</span><span class="mf">0.6721619963645935</span>
+<span class="n">gusts</span><span class="o">,</span><span class="mf">0.6721619963645935</span></code></pre></figure>
 
-<span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News</span> <span class="kt">+</span> <span class="kt">Wiki:</span>
-<span class="kt">Rain</span> <span class="kt">News/Wiki</span>
+<p>Input File: <b>News + Wiki:</b></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nc">Rain</span> <span class="nc">News</span><span class="o">/</span><span class="nc">Wiki</span>
 <span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
 <span class="n">snow</span><span class="o">,</span><span class="mf">0.8400915265083313</span>
 <span class="n">rains</span><span class="o">,</span><span class="mf">0.7938879728317261</span>
@@ -239,20 +241,20 @@ To see how the corpus that we used to train the model affects the results we wil
 <span class="n">storms</span><span class="o">,</span><span class="mf">0.7147307395935059</span>
 <span class="n">inches</span><span class="o">,</span><span class="mf">0.7076087594032288</span></code></pre></figure>
 
-<p>Word: <b>Specialty</b></p>
+<p>Word: <b>Specialty</b> - Input File: <b>News:</b></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News:</span>
-<span class="kt">word</span><span class="o">,</span><span class="n">similarity</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
 <span class="n">semiconductor</span><span class="o">,</span><span class="mf">0.8236984014511108</span>
 <span class="n">diversified</span><span class="o">,</span><span class="mf">0.8118916153907776</span>
 <span class="n">biotech</span><span class="o">,</span><span class="mf">0.8052045106887817</span>
 <span class="n">manufacturer</span><span class="o">,</span><span class="mf">0.789034903049469</span>
 <span class="n">maxx</span><span class="o">,</span><span class="mf">0.7876819968223572</span>
 <span class="n">boutiques</span><span class="o">,</span><span class="mf">0.785348117351532</span>
-<span class="n">biotechnology</span><span class="o">,</span><span class="mf">0.7794807553291321</span>
+<span class="n">biotech</span></code></pre></figure>
 
-<span class="nc">Input</span> <span class="nc">File</span><span class="k">:</span> <span class="kt">News</span> <span class="kt">+</span> <span class="kt">Wiki:</span>
-<span class="kt">word</span><span class="o">,</span><span class="n">similarity</span>
+<p>Input File: <b>News + Wiki:</b></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
 <span class="n">diversified</span><span class="o">,</span><span class="mf">0.8359127640724182</span>
 <span class="n">titan</span><span class="o">,</span><span class="mf">0.8055083751678467</span>
 <span class="n">automation</span><span class="o">,</span><span class="mf">0.8038058876991272</span>

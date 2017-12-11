@@ -24,16 +24,12 @@ val graphNgramStressVertices = sqlContext.read.parquet("graphNgramVertices")
 val graphNgramStressEdges = sqlContext.read.parquet("graphNgramEdges")
 
 val graphNgramStress = GraphFrame(graphNgramStressVertices, graphNgramStressEdges)
-
 {% endhighlight %}
 </p>
 
 <h3>Connected Components</h3>
 
-
 {% highlight scala %}
-
-
 sc.setCheckpointDir("/FileStore/")
 val resultStressCC = graphNgramStress.
    connectedComponents.
@@ -87,12 +83,10 @@ As Label Propagation algorithm is cutting loosely connected edges, we want to se
 val pairLabel=graphNgramStress.
   edges.
   join(lapelPropId,'src==='lpWord).
-  join(lapelPropId.
-    toDF("lpWord2","lpLabel2"),'dst==='lpWord2).
+  join(lapelPropId.toDF("lpWord2","lpLabel2"),'dst==='lpWord2).
   filter('lpLabel==='lpLabel2).
   select('src,'dst,'edgeWeight,'lpLabel)
   {% endhighlight %}
-
 <p>
 For now we will ignore small groups and look at groups that have at least 3 {word1, word2} pairs.
 
@@ -109,7 +103,6 @@ lpLabelCount,pairCount
 
 <h3>Word Pair Groups</h3>
 We'll start with the second group - group that contains 30 {word1, word2} pairs.
-<p>
 Here are edges that belong to this group - {word1, word2, word2vec cosine similarity}:
 
 {% highlight scala %}
@@ -163,7 +156,6 @@ We use a semi-manual way on building Gephi graphs. Create a list of direct edges
 display(pairLabel.
   filter('lpLabel==="317827579910").
   map(s=>(s(0).toString + " -> "+ s(1).toString)))
-
 {% endhighlight %}
 
 <p>Then put the list within 'digraph{...}' and getting data in .DOT format:
@@ -236,19 +228,18 @@ val pageRankId=graphNgramStressPageRank.
 
 <p>Calculate lists of distinct words in the label groups:</p>
 {% highlight scala %}
-
 val wordLabel=pairLabel.
   select('src,'lpLabel).
   union(pairLabel.
     select('dst,'lpLabel)).
   distinct.
   toDF("lpWord","lpLabel")
-
 display(wordLabel.
   groupBy('lpLabel).count.
   toDF("lpLabel","labelCount").
   filter("labelCount>2").
   orderBy('labelCount.desc))
+
 lpLabel,labelCount
 386547056642,47
 317827579910,30
@@ -257,8 +248,7 @@ lpLabel,labelCount
 1675037245443,3
 {% endhighlight %}
 
-<p>Top 10 Words in Label Groups</p>
-<p>
+<p><h4>Top 10 Words in Label Groups</h4><p>
 The biggest group:</p>
 {% highlight scala %}
 val wordLabelPageRank=wordLabel.

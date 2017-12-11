@@ -8,16 +8,17 @@ header-img: "img/sdo14.jpg"
 ---
 
 <p><h3>Graph and Word2Vec Model </h3>
-Word2Vec model maps words to vectors so we can calculate cosine similarity within pairs of words and translate pairs of words to graph: words to nodes, pairs to edges and cosine similarities to edge weights.</p>
+Word2Vec model maps words to vectors which gives us an oppotunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.</p>
 
-<p>We are running a small AWS cluster so we will run a small text file with data about stress that was copied from Wikipedia article. We will call it Stress data file.</p>
+<p>We are running a small AWS cluster so we will run a small text file with data about stress that was copied from Wikipedia article. We will call this text file Stress Data File.</p>
 <p>As Word2VecModel we will use the model that was trained on News and Wiki data about psychology. We described this model in our previous post.</p>
 
 <p>
 <h3>Read and Clean Stress Data File </h3>
 Read Wiki data file: </p>
 {% highlight scala %}
-val inputStress=sc.textFile("/FileStore/tables/cjzokasj1506175253652/stressWiki.txt").
+val inputStress=sc.
+   textFile("/FileStore/tables/cjzokasj1506175253652/stressWiki.txt").
    toDF("charLine")
 inputStress.count//--247
 {% endhighlight %}
@@ -63,8 +64,7 @@ slpitCleanWordsStress.count//--1233
 <p> </p>
 <p>
 <h3>Exclude Words that are not in the Word2Vec Model </h3>
-
-Read our trained Word2VecModel</p>
+We will use our trained Word2Vec model for word pairs cosine similarities. First, we will read our trained Word2VecModel:</p>
 {% highlight scala %}
 
 import org.apache.spark.ml.feature.Word2Vec
@@ -77,17 +77,16 @@ val word2vec= new Word2Vec().
 val modelNewsWiki=Word2VecModel.
    read.
    load("w2vNewsWiki")
-
 {% endhighlight %}
 
-<p>Get all words from the Word2Vec model</p>
+<p>Next we will get the list of all words from the Word2Vec model:</p>
 {% highlight scala %}
 val modelWords=modelNewsWiki.
    getVectors.
    select("word")
 {% endhighlight %}
 
-<p>Filter out words from Wiki data file that are not in the Word2Vec words</p>
+<p>To be able to use this Word2Vec model for Stress Data file cosine similarities, we will filter out words from Stress Data file that are not in the Word2Vec list of words:</p>
 {% highlight scala %}
 val stressWords=slpitCleanWordsStress.
    join(modelWords,'cleanWord === 'word).
@@ -98,7 +97,7 @@ stressWords.count//--1125
 {% endhighlight %}
 <p></p>
 
-<p>Create word to word matrix</p>
+<p>Finally we will create word to word matrix:</p>
 {% highlight scala %}
 val stressWords2=stressWords.
    toDF("word2")
@@ -109,7 +108,7 @@ w2wStress.count//--1264500
 
 <p>
 <h3>Word2Vec Cosine Similarity Function</h3>
-Now we want to see how words are connected with other words. We will create a function to calculate cosine similarity between vectors from the Word2Vec model</p>
+Now we want to use Word2Vec cosine similarity to see how words are connected with other words. We will create a function to calculate cosine similarity between vectors from the Word2Vec model</p>
 {% highlight scala %}
 import org.apache.spark.ml.linalg.DenseVector
 def dotDouble(x: Array[Double], y: Array[Double]): Double = {
@@ -144,8 +143,8 @@ res1: Double = 0.2533538702772619
 
 <p></p>
 <p>
-<h3>Cosine Similarity between Stress data file Words</h3>
-Next step: calculate word to word cosine similarities and save the results.</p>
+<h3>Cosine Similarity between Stress Data File Words</h3>
+Now we can calculate word to word cosine similarities between word pairs from Stress Data File and save the results.</p>
 {% highlight scala %}
 
 val w2wStressBroadcast=
@@ -199,7 +198,7 @@ recognize,respond,0.6024905770721792
 {% endhighlight %}
 
 <p><h3>Graph of Combinations of Stress Data File Words </h3>
-Now we can build a graph using words as nodes, {word1, word2} word combinations as edges and cosine similarities between the words as edge weight</p>
+Now we can build a graph using words as nodes, {word1, word2} word combinations as edges and cosine similarities between the words as edge weights:</p>
 {% highlight scala %}
 import org.graphframes.GraphFrame
 
@@ -216,7 +215,7 @@ val graph1 = GraphFrame(graphNodes,graphEdges)
 
 {% endhighlight %}
 
-<p>We will save graph vertices and edges in Parquet format</p>
+<p>We will save graph vertices and edges in Parquet format to use them for future posts:</p>
 
 {% highlight scala %}
 
@@ -229,7 +228,7 @@ graph1.edges.
 
 {% endhighlight %}
 
-<p> Load vertices and edges and rebuild the same graph</p>
+<p> Load vertices and edges and rebuild the same graph:</p>
 
 {% highlight scala %}
 import org.graphframes.GraphFrame
@@ -246,11 +245,9 @@ val graphStress = GraphFrame(graphStressNodes,graphStressEdges)
 <p></p>
 <p>
 <h3>Connected Components</h3>
-It's a lot of interesting things we can do with Spark GraphFrames. In this post we will play with connected components.
+They are many interesting things we can do with Spark GraphFrames. In this post we will play with connected components.
 </p>
 {% highlight scala %}
-
-
 sc.setCheckpointDir("/FileStore/")
 val resultStressCC = graphStress.
    connectedComponents.
@@ -265,13 +262,14 @@ cc,ccCt
 0,1125
 {% endhighlight %}
 
-<p>As we expected all word pairs are in the same large connected component.
+<p>This graph was built on all {word1, word2} combinations of Stress Data File so all word pairs are in the same large connected component. We will look at connected components of subgraphs with different edge weight thresholds.
+
 </p>
 <p></p>
 <p></p>
 <p>
 <h3>Connected Components with High Cosine Similarity</h3>
-Now we will look at connected components of subgraph with different edge weight thresholds.
+For this post we will use edge weight threshold 0.75, i.e. we will use only word pairs with cosine similarity higher than 0.75.
 </p>
 {% highlight scala %}
 
@@ -281,7 +279,7 @@ val graphHightWeight = GraphFrame(graphStress.vertices, edgeHightWeight)
 
 {% endhighlight %}
 
-<p>Run connected components for graph with high cosine similarity
+<p>Run connected components for graph with high cosine similarity:
 </p>
 {% highlight scala %}
 

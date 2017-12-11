@@ -28,7 +28,9 @@ AWS cluster we run via Databricks Community is not so big. To train Word2vec mod
 
 <p></p>
 {% highlight scala %}
-val inputNews=sc.textFile("/FileStore/tables/02pvyoae1504568133317/newsTest.txt").toDF("charLine")
+val inputNews=sc.
+  textFile("/FileStore/tables/02pvyoae1504568133317/newsTest.txt").
+  toDF("charLine")
 
 {% endhighlight %}
 
@@ -94,7 +96,7 @@ val tokenizedNewsWiki = tokenizer.
    union(inputWiki))
 {% endhighlight %}
 
-<p></p>
+<p>Train Word2Vec model and save the results:</p>
 {% highlight scala %}
 val w2VmodelNewsWiki=word2vec.
    fit(tokenizedNewsWiki)
@@ -111,10 +113,10 @@ display(modelNewsWiki.
 
 <p>The results of these models are very different for some words and very similar for some other words. Here are examples:</p>
 
-<p>Word: <b>Stress</b></p>
+<p>Word: <b>Stress</b> - Input File: <b>News:</b></p>
 
 {% highlight scala %}
-Input File: News:
+
 word,similarity
 risk,0.6505142450332642
 adversely,0.6353756785392761
@@ -123,8 +125,9 @@ anxiety,0.6186497807502747
 traumatic,0.6167819499969482
 persistent,0.6142207980155945
 problems,0.6132286190986633
-
-Input File: News + Wiki:
+{% endhighlight %}
+Input File: <b>News + Wiki</b>:
+{% highlight scala %}
 word,similarity
 obesity,0.6602367758750916
 adverse,0.6559499502182007
@@ -135,10 +138,10 @@ detect,0.6430484652519226
 infection,0.6407146453857422
 {% endhighlight %}
 
-<p>Word: <b>Rain</b></p>
+<p>Word: <b>Rain</b> - Input File: <b>News:</b></p>
 
 {% highlight scala %}
-Input File: News
+
 word,similarity
 snow,0.8456688523292542
 winds,0.800561785697937
@@ -147,8 +150,9 @@ fog,0.7052807211875916
 inches,0.690990686416626
 storm,0.6725252270698547
 gusts,0.6721619963645935
-
-Input File: News + Wiki:
+{% endhighlight %}
+Input File: <b>News + Wiki:</b>
+{% highlight scala %}
 Rain News/Wiki
 word,similarity
 snow,0.8400915265083313
@@ -160,10 +164,10 @@ storms,0.7147307395935059
 inches,0.7076087594032288
 {% endhighlight %}
 
-<p>Word: <b>Specialty</b></p>
+<p>Word: <b>Specialty</b> - Input File: <b>News:</b></p>
 
 {% highlight scala %}
-Input File: News:
+
 word,similarity
 semiconductor,0.8236984014511108
 diversified,0.8118916153907776
@@ -171,9 +175,10 @@ biotech,0.8052045106887817
 manufacturer,0.789034903049469
 maxx,0.7876819968223572
 boutiques,0.785348117351532
-biotechnology,0.7794807553291321
+biotech{% endhighlight %}
 
-Input File: News + Wiki:
+Input File: <b>News + Wiki:</b>
+{% highlight scala %}
 word,similarity
 diversified,0.8359127640724182
 titan,0.8055083751678467

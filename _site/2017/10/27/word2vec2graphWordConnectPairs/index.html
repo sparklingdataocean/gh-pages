@@ -168,12 +168,10 @@ As Label Propagation algorithm is cutting loosely connected edges, we want to se
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">pairLabel</span><span class="k">=</span><span class="n">graphNgramStress</span><span class="o">.</span>
   <span class="n">edges</span><span class="o">.</span>
   <span class="n">join</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">lpWord</span><span class="o">).</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">.</span>
-    <span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord2"</span><span class="o">,</span><span class="s">"lpLabel2"</span><span class="o">),</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">lpWord2</span><span class="o">).</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord2"</span><span class="o">,</span><span class="s">"lpLabel2"</span><span class="o">),</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">lpWord2</span><span class="o">).</span>
   <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">=='</span><span class="n">lpLabel2</span><span class="o">).</span>
   <span class="n">select</span><span class="o">(</span><span class="ss">'src,'dst,'edgeWeight,'lpLabel)</span>
   </code></pre></figure>
-
 
 <p>
 For now we will ignore small groups and look at groups that have at least 3 {word1, word2} pairs.
@@ -192,7 +190,6 @@ For now we will ignore small groups and look at groups that have at least 3 {wor
 
 <h3>Word Pair Groups</h3>
 We'll start with the second group - group that contains 30 {word1, word2} pairs.
-<p>
 Here are edges that belong to this group - {word1, word2, word2vec cosine similarity}:
 
 
@@ -324,12 +321,12 @@ We can see that in the center of the biggest group is the word 'stress' - the wo
     <span class="n">select</span><span class="o">(</span><span class="ss">'dst,'lpLabel)</span><span class="o">).</span>
   <span class="n">distinct</span><span class="o">.</span>
   <span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord"</span><span class="o">,</span><span class="s">"lpLabel"</span><span class="o">)</span>
-
 <span class="n">display</span><span class="o">(</span><span class="n">wordLabel</span><span class="o">.</span>
   <span class="n">groupBy</span><span class="o">(</span><span class="ss">'lpLabel)</span><span class="o">.</span><span class="n">count</span><span class="o">.</span>
   <span class="n">toDF</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">,</span><span class="s">"labelCount"</span><span class="o">).</span>
   <span class="n">filter</span><span class="o">(</span><span class="s">"labelCount&gt;2"</span><span class="o">).</span>
   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'labelCount.</span><span class="n">desc</span><span class="o">))</span>
+
 <span class="n">lpLabel</span><span class="o">,</span><span class="n">labelCount</span>
 <span class="mi">386547056642</span><span class="o">,</span><span class="mi">47</span>
 <span class="mi">317827579910</span><span class="o">,</span><span class="mi">30</span>
@@ -338,8 +335,7 @@ We can see that in the center of the biggest group is the word 'stress' - the wo
 <span class="mi">1675037245443</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
 
 
-<p>Top 10 Words in Label Groups</p>
-<p>
+<p><h4>Top 10 Words in Label Groups</h4><p>
 The biggest group:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">wordLabelPageRank</span><span class="k">=</span><span class="n">wordLabel</span><span class="o">.</span>
@@ -419,6 +415,10 @@ In the next post we will continue playing with Spark GraphFrames library to find
                         <a href="/2017/10/14/word2vec2graphWordPairs/" data-toggle="tooltip" data-placement="top" title="Word2Vec2Graph for Pairs of Words">&larr; Previous Post</a>
                     </li>
                     
+                    
+                    <li class="next">
+                        <a href="/2017/12/09/word2vec2graphWordPairsContinue/" data-toggle="tooltip" data-placement="top" title="Direct Word2Vec2Graph - Finding Topics">Next Post &rarr;</a>
+                    </li>
                     
                 </ul>
 

@@ -214,7 +214,7 @@ val graph1 = GraphFrame(graphNodes1,graphEdges1)
 
 {% endhighlight %}
 
-<p>To use this graph in several blogs we will save graph vertices and edges as Parquet to Databricks locations.</p>
+<p>To use this graph in several posts we will save graph vertices and edges as Parquet to Databricks locations.</p>
 
 {% highlight scala %}
 

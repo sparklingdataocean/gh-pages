@@ -99,16 +99,17 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
 				<p><h3>Graph and Word2Vec Model </h3>
-Word2Vec model maps words to vectors so we can calculate cosine similarity within pairs of words and translate pairs of words to graph: words to nodes, pairs to edges and cosine similarities to edge weights.</p>
+Word2Vec model maps words to vectors which gives us an oppotunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.</p>
 
-<p>We are running a small AWS cluster so we will run a small text file with data about stress that was copied from Wikipedia article. We will call it Stress data file.</p>
+<p>We are running a small AWS cluster so we will run a small text file with data about stress that was copied from Wikipedia article. We will call this text file Stress Data File.</p>
 <p>As Word2VecModel we will use the model that was trained on News and Wiki data about psychology. We described this model in our previous post.</p>
 
 <p>
 <h3>Read and Clean Stress Data File </h3>
 Read Wiki data file: </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputStress</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/cjzokasj1506175253652/stressWiki.txt"</span><span class="o">).</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputStress</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/cjzokasj1506175253652/stressWiki.txt"</span><span class="o">).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
 <span class="n">inputStress</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">247</span></code></pre></figure>
 
@@ -148,8 +149,7 @@ Read Wiki data file: </p>
 <p> </p>
 <p>
 <h3>Exclude Words that are not in the Word2Vec Model </h3>
-
-Read our trained Word2VecModel</p>
+We will use our trained Word2Vec model for word pairs cosine similarities. First, we will read our trained Word2VecModel:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml.feature.Word2Vec</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
@@ -162,13 +162,13 @@ Read our trained Word2VecModel</p>
    <span class="n">read</span><span class="o">.</span>
    <span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span></code></pre></figure>
 
-<p>Get all words from the Word2Vec model</p>
+<p>Next we will get the list of all words from the Word2Vec model:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modelWords</span><span class="k">=</span><span class="n">modelNewsWiki</span><span class="o">.</span>
    <span class="n">getVectors</span><span class="o">.</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span></code></pre></figure>
 
-<p>Filter out words from Wiki data file that are not in the Word2Vec words</p>
+<p>To be able to use this Word2Vec model for Stress Data file cosine similarities, we will filter out words from Stress Data file that are not in the Word2Vec list of words:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressWords</span><span class="k">=</span><span class="n">slpitCleanWordsStress</span><span class="o">.</span>
    <span class="n">join</span><span class="o">(</span><span class="n">modelWords</span><span class="o">,</span><span class="ss">'cleanWord </span><span class="o">===</span> <span class="ss">'word)</span><span class="o">.</span>
@@ -178,7 +178,7 @@ Read our trained Word2VecModel</p>
 
 <p></p>
 
-<p>Create word to word matrix</p>
+<p>Finally we will create word to word matrix:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressWords2</span><span class="k">=</span><span class="n">stressWords</span><span class="o">.</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)</span>
@@ -188,7 +188,7 @@ Read our trained Word2VecModel</p>
 
 <p>
 <h3>Word2Vec Cosine Similarity Function</h3>
-Now we want to see how words are connected with other words. We will create a function to calculate cosine similarity between vectors from the Word2Vec model</p>
+Now we want to use Word2Vec cosine similarity to see how words are connected with other words. We will create a function to calculate cosine similarity between vectors from the Word2Vec model</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml.linalg.DenseVector</span>
 <span class="k">def</span> <span class="n">dotDouble</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Double</span><span class="o">],</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Double</span><span class="o">])</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
@@ -221,8 +221,8 @@ Now we want to see how words are connected with other words. We will create a fu
 
 <p></p>
 <p>
-<h3>Cosine Similarity between Stress data file Words</h3>
-Next step: calculate word to word cosine similarities and save the results.</p>
+<h3>Cosine Similarity between Stress Data File Words</h3>
+Now we can calculate word to word cosine similarities between word pairs from Stress Data File and save the results.</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wStressBroadcast</span><span class="k">=</span>
    <span class="n">sc</span><span class="o">.</span><span class="n">broadcast</span><span class="o">(</span><span class="n">w2wStress</span><span class="o">.</span><span class="n">collect</span><span class="o">)</span>
@@ -271,7 +271,7 @@ Next step: calculate word to word cosine similarities and save the results.</p>
 <span class="n">recognize</span><span class="o">,</span><span class="n">respond</span><span class="o">,</span><span class="mf">0.6024905770721792</span></code></pre></figure>
 
 <p><h3>Graph of Combinations of Stress Data File Words </h3>
-Now we can build a graph using words as nodes, {word1, word2} word combinations as edges and cosine similarities between the words as edge weight</p>
+Now we can build a graph using words as nodes, {word1, word2} word combinations as edges and cosine similarities between the words as edge weights:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
 
@@ -286,7 +286,7 @@ Now we can build a graph using words as nodes, {word1, word2} word combinations 
    <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes</span><span class="o">,</span><span class="n">graphEdges</span><span class="o">)</span></code></pre></figure>
 
-<p>We will save graph vertices and edges in Parquet format</p>
+<p>We will save graph vertices and edges in Parquet format to use them for future posts:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">graph1</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
    <span class="n">write</span><span class="o">.</span>
@@ -295,7 +295,7 @@ Now we can build a graph using words as nodes, {word1, word2} word combinations 
    <span class="n">write</span><span class="o">.</span>
    <span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressEdges"</span><span class="o">)</span></code></pre></figure>
 
-<p> Load vertices and edges and rebuild the same graph</p>
+<p> Load vertices and edges and rebuild the same graph:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
 <span class="k">val</span> <span class="n">graphStressNodes</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
@@ -310,7 +310,7 @@ Now we can build a graph using words as nodes, {word1, word2} word combinations 
 <p></p>
 <p>
 <h3>Connected Components</h3>
-It's a lot of interesting things we can do with Spark GraphFrames. In this post we will play with connected components.
+They are many interesting things we can do with Spark GraphFrames. In this post we will play with connected components.
 </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
@@ -326,20 +326,21 @@ It's a lot of interesting things we can do with Spark GraphFrames. In this post 
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
 <span class="mi">0</span><span class="o">,</span><span class="mi">1125</span></code></pre></figure>
 
-<p>As we expected all word pairs are in the same large connected component.
+<p>This graph was built on all {word1, word2} combinations of Stress Data File so all word pairs are in the same large connected component. We will look at connected components of subgraphs with different edge weight thresholds.
+
 </p>
 <p></p>
 <p></p>
 <p>
 <h3>Connected Components with High Cosine Similarity</h3>
-Now we will look at connected components of subgraph with different edge weight thresholds.
+For this post we will use edge weight threshold 0.75, i.e. we will use only word pairs with cosine similarity higher than 0.75.
 </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">edgeHightWeight</span> <span class="k">=</span> <span class="n">graphStress</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
    <span class="n">filter</span><span class="o">(</span><span class="s">"edgeWeight &gt; 0.75"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">graphHightWeight</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphStress</span><span class="o">.</span><span class="n">vertices</span><span class="o">,</span> <span class="n">edgeHightWeight</span><span class="o">)</span></code></pre></figure>
 
-<p>Run connected components for graph with high cosine similarity
+<p>Run connected components for graph with high cosine similarity:
 </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphHightWeightCC</span> <span class="k">=</span> <span class="n">graphHightWeight</span><span class="o">.</span>

@@ -276,7 +276,7 @@ Now we can build a graph on word pairs: words will be nodes, ngrams - edges and 
    <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes1</span><span class="o">,</span><span class="n">graphEdges1</span><span class="o">)</span></code></pre></figure>
 
-<p>To use this graph in several blogs we will save graph vertices and edges as Parquet to Databricks locations.</p>
+<p>To use this graph in several posts we will save graph vertices and edges as Parquet to Databricks locations.</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">graph1</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">write</span><span class="o">.</span>
    <span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>

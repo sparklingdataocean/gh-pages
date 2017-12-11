@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Direct Word2Vec2Graph - Finding Topics - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2017/12/09/word2vec2graphWordPairsContinue/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/modern29.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Direct Word2Vec2Graph - Finding Topics</h1>
+                    
+                    <h2 class="subheading">Connecting Word2vec Model with Graph</h2>
+                    
+                    <span class="meta">Posted by Melenar on December 9, 2017</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Read Word Pairs Graph</h3>
+In one of previous posts we built and saved  
+
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/10/14/word2vec2graphWordPairs/">Word2Vec2Graph for pair of words </a></i>of Stress Data file.
+
+In this post we will look for topics of the Stress Data file.</p>
+
+<p>
+Read stored vertices and edges and rebuilt the graph:
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
+<span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
+<span class="k">val</span> <span class="n">graphNgramStressVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphNgramStressEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphNgramStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span> <span class="n">graphNgramStressEdges</span><span class="o">)</span></code></pre></figure>
+
+</p>
+
+<p><h3>Connected Components with Cosine Similarity Thresholds </h3>
+In the previous post we showed that in the graph of all word pairs, almost all pairs are connected within the same large connected component. To find topics in that post we used Label Propagation algorithm. In this post we will look at connected components with thresholds on Word2Vec cosine similarity.
+<p>As input parameters in this function we will use:
+graph vertices and edges, minimum and maximum of edge weight and minimum and maximum of
+connected component sizes.</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.DataFrame</span>
+<span class="k">def</span> <span class="n">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
+     <span class="n">cosineMin</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span> <span class="n">cosineMax</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span>
+     <span class="n">ccMin</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">ccMax</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span>
+  <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">val</span> <span class="n">graphEdgesSub</span><span class="k">=</span> <span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&gt;</span><span class="n">cosineMin</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&lt;</span><span class="n">cosineMax</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
+  <span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
+     <span class="n">connectedComponents</span><span class="o">.</span>
+     <span class="n">run</span><span class="o">()</span>
+  <span class="k">val</span> <span class="n">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
+     <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+     <span class="n">count</span><span class="o">.</span>
+     <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+ <span class="k">val</span> <span class="n">sizeCC</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component=</span><span class="o">=='</span><span class="n">cc</span><span class="o">).</span>
+     <span class="n">filter</span><span class="o">(</span><span class="ss">'ccCt&lt;</span><span class="n">ccMax</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'ccCt&gt;</span><span class="n">ccMin</span><span class="o">).</span>
+     <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="n">distinct</span>
+ <span class="n">graphEdges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span>
+     <span class="n">union</span><span class="o">(</span><span class="n">graphEdges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">id</span><span class="o">)).</span>
+     <span class="n">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span>
+<span class="o">}</span></code></pre></figure>
+
+
+
+<p>As output of this function we are getting DataFrame with connected component identifiers, connected component sizes, and source, target and weight of edges. Example:
+</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span>
+  <span class="n">graphNgramStressEdges</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="mi">30</span><span class="o">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">persist</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'component)</span><span class="o">.</span><span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">effect</span><span class="o">,</span><span class="n">mental</span><span class="o">,</span><span class="mf">0.019197841854283394</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">negative</span><span class="o">,</span><span class="n">event</span><span class="o">,-</span><span class="mf">0.1545046492202531</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">dictate</span><span class="o">,</span><span class="n">effect</span><span class="o">,</span><span class="mf">0.38921675236752246</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">impact</span><span class="o">,</span><span class="n">effect</span><span class="o">,</span><span class="mf">0.5603950362283256</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">positive</span><span class="o">,</span><span class="n">affect</span><span class="o">,</span><span class="mf">0.19312906545029415</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">negative</span><span class="o">,</span><span class="n">counterproductive</span><span class="o">,</span><span class="mf">0.4585309254797448</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">negatively</span><span class="o">,</span><span class="n">impact</span><span class="o">,</span><span class="mf">0.6222451350552916</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">effect</span><span class="o">,</span><span class="n">social</span><span class="o">,-</span><span class="mf">0.09071914329524373</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">increasing</span><span class="o">,</span><span class="n">positive</span><span class="o">,</span><span class="mf">0.39817338998452684</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">either</span><span class="o">,</span><span class="n">positive</span><span class="o">,</span><span class="mf">0.14172399395894802</span></code></pre></figure>
+
+
+<h3>Transform to .DOT Language</h3>
+We described in our previous post how to build graph on Gephi.
+This function creates a list of direct edges with labels on .DOT format.
+This function takes an output of the w2v2gConnectedComponents function, component id
+and minimum and maximum of edge weight:
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">component2dot</span><span class="o">(</span><span class="n">graphComponents</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">componentId</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span>
+  <span class="n">cosineMin</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span> <span class="n">cosineMax</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>  
+ <span class="n">graphComponents</span><span class="o">.</span>
+  <span class="n">filter</span><span class="o">(</span><span class="ss">'component=</span><span class="o">==</span><span class="n">componentId</span><span class="o">).</span>
+  <span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&gt;</span><span class="n">cosineMin</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&lt;</span><span class="n">cosineMax</span><span class="o">).</span>
+  <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
+  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
+        <span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+</span><span class="n">roundAt</span><span class="o">(</span><span class="mi">2</span><span class="o">)(</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">toDouble</span><span class="o">)+</span><span class="s">"\"];"</span><span class="o">)).</span>
+        <span class="n">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
+<span class="o">}</span></code></pre></figure>
+
+
+<p>This example is based on the the same parameters that we used to get an example of w2v2gConnectedComponents function:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">8589934598L</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
+<span class="s">"negatively"</span> <span class="o">-&gt;</span> <span class="s">"impact"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">62"</span><span class="o">];</span>
+<span class="s">"negative"</span> <span class="o">-&gt;</span> <span class="s">"impact"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">55"</span><span class="o">];</span>
+<span class="s">"impact"</span> <span class="o">-&gt;</span> <span class="s">"effect"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">56"</span><span class="o">];</span>
+<span class="s">"positive"</span> <span class="o">-&gt;</span> <span class="s">"negative"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">56"</span><span class="o">];</span></code></pre></figure>
+
+
+<p>This topic does not look very interesting: is shows well known word connections. Now we will look at the results based on different thresholds.</p>
+
+
+<h3>How to Find Topics?</h3>
+
+Do select potentially interesting connected components first we'll look at three most highly connected word pairs of all components. We will start with connected components based on word pairs with cosine similarity &gt;0.5.
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span><span class="n">graphNgramStressEdges</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="mi">30</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">))</span>
+<span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">negatively</span><span class="o">,</span><span class="n">impact</span><span class="o">,</span><span class="mf">0.6222451350552916</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">impact</span><span class="o">,</span><span class="n">effect</span><span class="o">,</span><span class="mf">0.5603950362283256</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">positive</span><span class="o">,</span><span class="n">negative</span><span class="o">,</span><span class="mf">0.5554003154620236</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">103079215107</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">importance</span><span class="o">,</span><span class="n">understanding</span><span class="o">,</span><span class="mf">0.698049637786647</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">103079215107</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">understanding</span><span class="o">,</span><span class="n">external</span><span class="o">,</span><span class="mf">0.5310704126705637</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">103079215107</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">understanding</span><span class="o">,</span><span class="n">communicate</span><span class="o">,</span><span class="mf">0.5114201442010496</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">146028888067</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">strategies</span><span class="o">,</span><span class="n">improve</span><span class="o">,</span><span class="mf">0.6293635958167312</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">146028888067</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">strategies</span><span class="o">,</span><span class="n">techniques</span><span class="o">,</span><span class="mf">0.5683039143777363</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">146028888067</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">communication</span><span class="o">,</span><span class="n">methods</span><span class="o">,</span><span class="mf">0.5668162125661717</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">764504178688</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">levels</span><span class="o">,</span><span class="n">increase</span><span class="o">,</span><span class="mf">0.5656564144629672</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">764504178688</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">higher</span><span class="o">,</span><span class="n">levels</span><span class="o">,</span><span class="mf">0.563192594480148</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">764504178688</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">lower</span><span class="o">,</span><span class="n">levels</span><span class="o">,</span><span class="mf">0.561116314190353</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
+
+
+<p>We will select connected component '146028888067' and run 'component2dot' function with different thresholds. </p>
+<p>Word pairs with cosine similarity &gt;0.5:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">146028888067L</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
+<span class="s">"communication"</span> <span class="o">-&gt;</span> <span class="s">"methods"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">57"</span><span class="o">];</span>
+<span class="s">"techniques"</span> <span class="o">-&gt;</span> <span class="s">"monitoring"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">51"</span><span class="o">];</span>
+<span class="s">"therapeutic"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">53"</span><span class="o">];</span>
+<span class="s">"strategies"</span> <span class="o">-&gt;</span> <span class="s">"improve"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">63"</span><span class="o">];</span>
+<span class="s">"strategies"</span> <span class="o">-&gt;</span> <span class="s">"techniques"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">57"</span><span class="o">];</span>
+<span class="s">"communication"</span> <span class="o">-&gt;</span> <span class="s">"techniques"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">56"</span><span class="o">];</span>
+<span class="o">}</span></code></pre></figure>
+
+
+<p>Here is the graph:
+</p>
+<a href="#">
+    <img src="/img/graph14.jpg" alt="Post Sample Image" width="350" height="350" />
+</a>
+
+
+<p>Word pairs with cosine similarity between 0.1 and 0.4:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">146028888067L</span><span class="o">,</span><span class="mf">0.1</span><span class="o">,</span><span class="mf">0.4</span><span class="o">)</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
+<span class="s">"types"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">37"</span><span class="o">];</span>
+<span class="s">"communication"</span> <span class="o">-&gt;</span> <span class="s">"assertive"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">38"</span><span class="o">];</span>
+<span class="s">"skill"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">34"</span><span class="o">];</span>
+<span class="s">"therapeutic"</span> <span class="o">-&gt;</span> <span class="s">"humor"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">3"</span><span class="o">];</span>
+<span class="s">"common"</span> <span class="o">-&gt;</span> <span class="s">"strategies"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">15"</span><span class="o">];</span>
+<span class="s">"assertive"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">38"</span><span class="o">];</span>
+<span class="s">"resentment"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">3"</span><span class="o">];</span>
+<span class="s">"affect"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">19"</span><span class="o">];</span>
+<span class="s">"improve"</span> <span class="o">-&gt;</span> <span class="s">"stress"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">39"</span><span class="o">];</span>
+<span class="s">"techniques"</span> <span class="o">-&gt;</span> <span class="s">"different"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">32"</span><span class="o">];</span>
+<span class="s">"relating"</span> <span class="o">-&gt;</span> <span class="s">"methods"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">38"</span><span class="o">];</span>
+<span class="s">"therapeutic"</span> <span class="o">-&gt;</span> <span class="s">"important"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">2"</span><span class="o">];</span>
+<span class="s">"allows"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">35"</span><span class="o">];</span>
+<span class="s">"techniques"</span> <span class="o">-&gt;</span> <span class="s">"include"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">3"</span><span class="o">];</span>
+<span class="s">"communication"</span> <span class="o">-&gt;</span> <span class="s">"requires"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">35"</span><span class="o">];</span>
+<span class="s">"spectrum"</span> <span class="o">-&gt;</span> <span class="s">"techniques"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">37"</span><span class="o">];</span>
+<span class="s">"communication"</span> <span class="o">-&gt;</span> <span class="s">"stress"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">33"</span><span class="o">];</span>
+<span class="s">"communication"</span> <span class="o">-&gt;</span> <span class="s">"difficulties"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">31"</span><span class="o">];</span>
+<span class="s">"communication"</span> <span class="o">-&gt;</span> <span class="s">"important"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">15"</span><span class="o">];</span>
+<span class="s">"verbal"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">22"</span><span class="o">];</span>
+<span class="s">"techniques"</span> <span class="o">-&gt;</span> <span class="s">"traditionally"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">39"</span><span class="o">];</span>
+<span class="s">"hinder"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">31"</span><span class="o">];</span>
+<span class="s">"diminish"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">37"</span><span class="o">];</span>
+<span class="s">"defines"</span> <span class="o">-&gt;</span> <span class="s">"therapeutic"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">18"</span><span class="o">];</span>
+<span class="s">"therapeutic"</span> <span class="o">-&gt;</span> <span class="s">"value"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">3"</span><span class="o">];</span>
+<span class="o">}</span></code></pre></figure>
+
+
+<p>Here is the graph for these topics:
+</p>
+<a href="#">
+    <img src="/img/graph15.jpg" alt="Post Sample Image" width="500" height="500" />
+</a>
+We can see in this graph that associations between word pairs with low cosine similarity give us more new ideas then word pairs with high cosine similarity. To find more new associations we will look at connected components based on word pairs with lower cosine similarity.
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span>
+   <span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectedComponents</span><span class="o">(</span>
+   <span class="n">graphNgramStressVertices</span><span class="o">,</span><span class="n">graphNgramStressEdges</span><span class="o">,</span>
+   <span class="mf">0.1</span><span class="o">,</span><span class="mf">0.4</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="mi">30</span><span class="o">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">persist</span>
+<span class="k">val</span> <span class="n">result3edges</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span>
+   <span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">result3edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">))</span>
+<span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
+<span class="mi">60129542144</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="n">disorders</span><span class="o">,</span><span class="mf">0.5963055756093992</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">60129542144</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">stress</span><span class="o">,</span><span class="n">disorders</span><span class="o">,</span><span class="mf">0.5028157528421987</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">60129542144</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">disorders</span><span class="o">,</span><span class="n">performed</span><span class="o">,</span><span class="mf">0.3437520800691034</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">68719476739</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">create</span><span class="o">,</span><span class="n">relaxing</span><span class="o">,</span><span class="mf">0.3524359789309395</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">68719476739</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">visualization</span><span class="o">,</span><span class="n">create</span><span class="o">,</span><span class="mf">0.2846863145713592</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">68719476739</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">guided</span><span class="o">,</span><span class="n">imagery</span><span class="o">,</span><span class="mf">0.2726519739627892</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">206158430208</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">physical</span><span class="o">,</span><span class="n">mental</span><span class="o">,</span><span class="mf">0.6985440607130862</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">206158430208</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">adverse</span><span class="o">,</span><span class="n">consequences</span><span class="o">,</span><span class="mf">0.5996755426245488</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">206158430208</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">consequences</span><span class="o">,</span><span class="n">stress</span><span class="o">,</span><span class="mf">0.5891517529295102</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">214748364804</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">emotion</span><span class="o">,</span><span class="n">behaviour</span><span class="o">,</span><span class="mf">0.436535207865593</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">214748364804</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">emotion</span><span class="o">,</span><span class="n">reflection</span><span class="o">,</span><span class="mf">0.4204730414594547</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">214748364804</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">writing</span><span class="o">,</span><span class="n">express</span><span class="o">,</span><span class="mf">0.281473311231902</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">549755813891</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">relieve</span><span class="o">,</span><span class="n">stress</span><span class="o">,</span><span class="mf">0.465133494259944</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">549755813891</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">coping</span><span class="o">,</span><span class="n">laughter</span><span class="o">,</span><span class="mf">0.45099090546448384</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">549755813891</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">laughter</span><span class="o">,</span><span class="n">humor</span><span class="o">,</span><span class="mf">0.44800112141807397</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
+
+
+<p>We will start with connected component '68719476739' that has word pairs with lowest cosine similarities. Graph DOT lines with the same thresholds:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot1</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">68719476739L</span><span class="o">,</span><span class="mf">0.1</span><span class="o">,</span><span class="mf">0.4</span><span class="o">)</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">resultDot1</span><span class="o">)</span>
+<span class="s">"imagery"</span> <span class="o">-&gt;</span> <span class="s">"visualization"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">21"</span><span class="o">];</span>
+<span class="s">"create"</span> <span class="o">-&gt;</span> <span class="s">"relaxing"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">35"</span><span class="o">];</span>
+<span class="s">"guided"</span> <span class="o">-&gt;</span> <span class="s">"imagery"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">27"</span><span class="o">];</span>
+<span class="s">"visualization"</span> <span class="o">-&gt;</span> <span class="s">"create"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">28"</span><span class="o">];</span></code></pre></figure>
+
+
+
+<a href="#">
+    <img src="/img/graph16.jpg" alt="Post Sample Image" width="400" height="400" />
+</a>
+
+<p>Graph DOT lines with no thresholds:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot2</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">68719476739L</span><span class="o">,-</span><span class="mf">1.0</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">resultDot2</span><span class="o">)</span>
+<span class="s">"imagery"</span> <span class="o">-&gt;</span> <span class="s">"visualization"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">21"</span><span class="o">];</span>
+<span class="s">"create"</span> <span class="o">-&gt;</span> <span class="s">"relaxing"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">35"</span><span class="o">];</span>
+<span class="s">"create"</span> <span class="o">-&gt;</span> <span class="s">"pressure"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">01"</span><span class="o">];</span>
+<span class="s">"guided"</span> <span class="o">-&gt;</span> <span class="s">"imagery"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">27"</span><span class="o">];</span>
+<span class="s">"events"</span> <span class="o">-&gt;</span> <span class="s">"create"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">05"</span><span class="o">];</span>
+<span class="s">"visualization"</span> <span class="o">-&gt;</span> <span class="s">"create"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">28"</span><span class="o">];</span>
+<span class="s">"relaxing"</span> <span class="o">-&gt;</span> <span class="s">"state"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">-</span><span class="err">0</span><span class="kt">.</span><span class="err">18"</span><span class="o">];</span></code></pre></figure>
+
+
+<a href="#">
+    <img src="/img/graph17.jpg" alt="Post Sample Image" width="500" height="500" />
+</a>
+
+<p>Here a other topics that gives us more ideas about stress relieve. We run  'component2dot' with no cosine similarity thresholds:
+</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot3</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">549755813891L</span><span class="o">,-</span><span class="mf">1.0</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">resultDot3</span><span class="o">)</span>
+<span class="s">"laughter"</span> <span class="o">-&gt;</span> <span class="s">"humor"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">45"</span><span class="o">];</span>
+<span class="s">"laughter"</span> <span class="o">-&gt;</span> <span class="s">"relieve"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">3"</span><span class="o">];</span>
+<span class="s">"drastically"</span> <span class="o">-&gt;</span> <span class="s">"children"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">-</span><span class="err">0</span><span class="kt">.</span><span class="err">24"</span><span class="o">];</span>
+<span class="s">"minutes"</span> <span class="o">-&gt;</span> <span class="s">"laughter"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">12"</span><span class="o">];</span>
+<span class="s">"children"</span> <span class="o">-&gt;</span> <span class="s">"relatively"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">04"</span><span class="o">];</span>
+<span class="s">"studies"</span> <span class="o">-&gt;</span> <span class="s">"laughter"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">-</span><span class="err">0</span><span class="kt">.</span><span class="err">03"</span><span class="o">];</span>
+<span class="s">"children"</span> <span class="o">-&gt;</span> <span class="s">"laughter"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">26"</span><span class="o">];</span>
+<span class="s">"relieve"</span> <span class="o">-&gt;</span> <span class="s">"stress"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">47"</span><span class="o">];</span>
+<span class="s">"stress"</span> <span class="o">-&gt;</span> <span class="s">"minutes"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">-</span><span class="err">0</span><span class="kt">.</span><span class="err">15"</span><span class="o">];</span>
+<span class="s">"coping"</span> <span class="o">-&gt;</span> <span class="s">"laughter"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">45"</span><span class="o">];</span>
+<span class="s">"hospitalized"</span> <span class="o">-&gt;</span> <span class="s">"children"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">31"</span><span class="o">];</span>
+<span class="s">"importance"</span> <span class="o">-&gt;</span> <span class="s">"laughter"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">09"</span><span class="o">];</span></code></pre></figure>
+
+
+<a href="#">
+    <img src="/img/graph18.jpg" alt="Post Sample Image" width="500" height="500" />
+</a>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot4</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">206158430208L</span><span class="o">,-</span><span class="mf">1.0</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">resultDot4</span><span class="o">)</span>
+<span class="s">"resilience"</span> <span class="o">-&gt;</span> <span class="s">"building"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">09"</span><span class="o">];</span>
+<span class="s">"adverse"</span> <span class="o">-&gt;</span> <span class="s">"consequences"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">6"</span><span class="o">];</span>
+<span class="s">"consequences"</span> <span class="o">-&gt;</span> <span class="s">"marked"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">06"</span><span class="o">];</span>
+<span class="s">"physical"</span> <span class="o">-&gt;</span> <span class="s">"mental"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">7"</span><span class="o">];</span>
+<span class="s">"drawing"</span> <span class="o">-&gt;</span> <span class="s">"mainly"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">41"</span><span class="o">];</span>
+<span class="s">"mental"</span> <span class="o">-&gt;</span> <span class="s">"illnesses"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">51"</span><span class="o">];</span>
+<span class="s">"continues"</span> <span class="o">-&gt;</span> <span class="s">"building"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">09"</span><span class="o">];</span>
+<span class="s">"building"</span> <span class="o">-&gt;</span> <span class="s">"number"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">01"</span><span class="o">];</span>
+<span class="s">"consequences"</span> <span class="o">-&gt;</span> <span class="s">"stress"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">59"</span><span class="o">];</span>
+<span class="s">"effect"</span> <span class="o">-&gt;</span> <span class="s">"mental"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">02"</span><span class="o">];</span>
+<span class="s">"traditionally"</span> <span class="o">-&gt;</span> <span class="s">"developed"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">4"</span><span class="o">];</span>
+<span class="s">"building"</span> <span class="o">-&gt;</span> <span class="s">"resistance"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">-</span><span class="err">0</span><span class="kt">.</span><span class="err">07"</span><span class="o">];</span>
+<span class="s">"building"</span> <span class="o">-&gt;</span> <span class="s">"developed"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">26"</span><span class="o">];</span>
+<span class="s">"mental"</span> <span class="o">-&gt;</span> <span class="s">"consequences"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">35"</span><span class="o">];</span>
+<span class="s">"developed"</span> <span class="o">-&gt;</span> <span class="s">"consequences"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">19"</span><span class="o">];</span>
+<span class="s">"developed"</span> <span class="o">-&gt;</span> <span class="s">"drawing"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">11"</span><span class="o">];</span></code></pre></figure>
+
+
+<a href="#">
+    <img src="/img/graph19.jpg" alt="Post Sample Image" width="500" height="500" />
+</a>
+
+<p><h3>Next Post - Different Data</h3>
+We've got some stress related ideas - now it's time to change the subject. In the next post we will build Word2Vec2Graph model for different data.
+</p>
+</p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2017/10/27/word2vec2graphWordConnectPairs/" data-toggle="tooltip" data-placement="top" title="Direct Word2Vec2Graph - Connected Pair Groups">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2017</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+
+
+</body>
+
+</html>
