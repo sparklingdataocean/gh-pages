@@ -324,5 +324,5 @@ val resultDot4=component2dot(result,206158430208L,-1.0,1.0)
 </a>
 
 <p><h3>Next Post - Different Data</h3>
-We've got some stress related ideas - now it's time to change the subject. In the next post we will build Word2Vec2Graph model for different data.
+We've got some stress related ideas - now it's time to change the subject. In the next post we will run Word2Vec2Graph model with different data.
 </p>
