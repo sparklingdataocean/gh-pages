@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Word2Vec2Graph Model - Neighbors"
-subtitle:   "Connecting Word2vec Model with Graph"
+subtitle:   "Review Friends-of-Friends for Words"
 date:       2017-10-03 12:00:00
 author:     "Melenar"
 header-img: "img/pic17.jpg"

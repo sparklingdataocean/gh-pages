@@ -8,7 +8,7 @@ header-img: "img/sdo14.jpg"
 ---
 
 <p><h3>Graph and Word2Vec Model </h3>
-Word2Vec model maps words to vectors which gives us an oppotunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.</p>
+Word2Vec model maps words to vectors which gives us an opportunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.</p>
 
 <p>We are running a small AWS cluster so we will run a small text file with data about stress that was copied from Wikipedia article. We will call this text file Stress Data File.</p>
 <p>As Word2VecModel we will use the model that was trained on News and Wiki data about psychology. We described this model in our previous post.</p>

@@ -6,6 +6,64 @@ date:       2017-09-06 12:00:00
 author:     "Melenar"
 header-img: "img/home_sdo4.jpg"
 ---
+<h3>About Word2Vec Model </h3>
+<a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec model</a> was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product.
+Word2Vec model transforms words to vectors. This gives us new insights in text analytics.
+Here is an excellent article about word2vec model:
+<a href="https://blog.acolyer.org/2016/04/21/the-amazing-power-of-word-vectors/">The amazing power of word vectors</a>.
+
+
+<p>Let's look at some examples that help us to understand Word2Vec model. We'll start with well known algorithm - Google pageRank and run it on text file about Word2Vec model. Here are top pageRank words that shows us then Word2Vec model is about words, vectors, training, and so on: </p>
+
+
+{% highlight scala %}
+id,pagerank
+words,28.97
+model,25.08
+vectors,20.24
+training,16.32
+vector,15.32
+using,14.31
+models,13.84
+representations,9.11
+example,8.28
+syntactic,8.21
+semantic,8.00
+accuracy,7.88
+results,7.23
+phrases,6.82
+vocabulary,6.44
+neural,6.03
+similar,6.01
+context,5.97
+{% endhighlight %}
+
+<p>Which words in documents about Word2Vec model are located between the words 'words' and 'vectors'?</p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/graphWv.jpg" alt="Post Sample Image" width="600" >
+</a>
+
+<p>This is one of well known Word2Vec examples. It shows Country - Capital associations like France - Germany + Berlin = Paris </p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/countryCapital.jpg" alt="Post Sample Image" height="600" >
+</a>
+
+<p>These pictures are built on graph of words with high Word2Vec cosine similarities. The first picture shows connected component, the second 'Germany' neighbors and neighbors of neighbors, the third a circle of word pairs. Numbers on edges are Word2Vec cosine similarities  between the words.</p>
+
+<p>Here are some more examples. We built a graph of words with low Word2Vec cosine similarities, ran connected components (first picture) and looked at neighbors of neighbors for the word 'vectors' (second picture):</p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/ccLowCos.jpg" alt="Post Sample Image" width="500" >
+</a>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/ngbVectors.jpg" alt="Post Sample Image" width="500" >
+</a>
+
+
+<p>In the next several posts we will show a new Word2Vec2Graph model. This model connects Word2Vec model with Graphs. As a tool we will use Spark. We will run it on Amazon Cloud via Databricks Community. </p>
 
 <p><h3>Why Spark?</h3>
 Until recently there were no single processing framework that was able to solve several very different analytical problems like statistics and graphs. Spark is the first framework that can do it. It is the fundamental advantage of Spark that provides a framework for advanced analytics right out of the box. This framework includes a tool for accelerated queries, a machine learning library, and graph processing engine.</p>
@@ -16,15 +74,10 @@ And it's free!</p>
 
 <a href="https://databricks.com/blog/2016/02/17/introducing-databricks-community-edition-apache-spark-for-all.html">Databricks community edition</a>.
 
-<p>
-<h3>About Word2Vec Model </h3>
-<a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec model</a> was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product. Word2Vec model transforms words to vectors. This gives us new insights in text analytics. </p>
-<p>Here is an excellent article about word2vec model: </p>
-<a href="https://blog.acolyer.org/2016/04/21/the-amazing-power-of-word-vectors/">The amazing power of word vectors</a>.
-<p></p>
-<p>
+
 <h3>Training a Word2Vec Model </h3>
-AWS cluster we run via Databricks Community is not so big. To train Word2vec model we will get a 42 MB public file about news and load it to Databricks: </p>
+<p>In our first post we will train Word2vec model in Spark and show how training corpus affects the Word2Vec model results.</p>
+<p>AWS cluster that we run via Databricks Community is not so big. To be able to train Word2vec model we will get a 42 MB public file about news and load it to Databricks: </p>
 
 <p></p>
 {% highlight scala %}
@@ -191,5 +244,5 @@ apparel,0.7975579500198364
 {% endhighlight %}
 
 <p><h3>Next Post - Introduction to Word2Vec2Graph Model</h3>
-In the next post we will introduce Word2Vec2Graph model - a combination of Word2Vec model and Spark GraphFrame library.
+In the next post we will introduce Word2Vec2Graph model - a combination of Word2Vec model and Graphs. We will build the model in Spark Machine Learning Library and Spark GraphFrame library.
 </p>

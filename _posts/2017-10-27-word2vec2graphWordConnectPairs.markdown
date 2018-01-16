@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Direct Word2Vec2Graph - Connected Pair Groups"
-subtitle:   "Connecting Word2vec Model with Graph"
+subtitle:   "Reveal Word Communities"
 date:       2017-10-27 12:00:00
 author:     "Melenar"
 header-img: "img/modern10.jpg"
@@ -249,7 +249,7 @@ lpLabel,labelCount
 {% endhighlight %}
 
 <p><h4>Top 10 Words in Label Groups</h4><p>
-The biggest group:</p>
+The biggest group:</p
 {% highlight scala %}
 val wordLabelPageRank=wordLabel.
   join(pageRankId,'lpWord==='prWord).

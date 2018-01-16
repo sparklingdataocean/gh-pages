@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Word2Vec2Graph for Pairs of Words"
-subtitle:   "Connecting Word2vec Model with Graph"
+subtitle:   "Binding Pairs of Words"
 date:       2017-10-14 12:00:00
 author:     "Melenar"
 header-img: "img/klee2.jpg"

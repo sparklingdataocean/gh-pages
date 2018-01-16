@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-12-25T15:56:16-05:00</updated><id>http://localhost:4000/</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Word2Vec2Graph - Psychoanalysis Topics</title><link href="http://localhost:4000/2017/12/24/word2vec2graphPsychoanalysis/" rel="alternate" type="text/html" title="Word2Vec2Graph - Psychoanalysis Topics" /><published>2017-12-24T07:00:00-05:00</published><updated>2017-12-24T07:00:00-05:00</updated><id>http://localhost:4000/2017/12/24/word2vec2graphPsychoanalysis</id><content type="html" xml:base="http://localhost:4000/2017/12/24/word2vec2graphPsychoanalysis/">&lt;p&gt;&lt;h3&gt;Word2Vec2Graph Model and Free Associations&lt;/h3&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-01-15T20:10:39-05:00</updated><id>http://localhost:4000/</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Word2Vec2Graph - Psychoanalysis Topics</title><link href="http://localhost:4000/2017/12/24/word2vec2graphPsychoanalysis/" rel="alternate" type="text/html" title="Word2Vec2Graph - Psychoanalysis Topics" /><published>2017-12-24T07:00:00-05:00</published><updated>2017-12-24T07:00:00-05:00</updated><id>http://localhost:4000/2017/12/24/word2vec2graphPsychoanalysis</id><content type="html" xml:base="http://localhost:4000/2017/12/24/word2vec2graphPsychoanalysis/">&lt;p&gt;&lt;h3&gt;Word2Vec2Graph Model and Free Associations&lt;/h3&gt;
 In this post we will show the process of converting text files to Word2Vec2Graph model. As a text file we will use text data about Psychoanalysis from Wikipedia. &lt;/p&gt;
 &lt;p&gt;Word2Vec2Graph technique to find topics is similar to Free Association technique used in psychoanalysis. &quot;The importance of free association is that the patients spoke for themselves, rather than repeating the ideas of the analyst; they work through their own material, rather than parroting another's suggestions&quot; (Freud).
 &lt;/p&gt;
@@ -916,7 +916,7 @@ We can see that in the center of the biggest group is the word 'stress' - the wo
 
 
 &lt;p&gt;&lt;h4&gt;Top 10 Words in Label Groups&lt;/h4&gt;&lt;p&gt;
-The biggest group:&lt;/p&gt;
+The biggest group:&amp;lt;/p
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wordLabelPageRank&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wordLabel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
   &lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pageRankId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'lpWord=&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=='&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;prWord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
@@ -984,7 +984,7 @@ The biggest group:&lt;/p&gt;
 &lt;p&gt;&lt;h3&gt;Next Post - More Pair Connections&lt;/h3&gt;
 In the next post we will continue playing with Spark GraphFrames library to find more interesting word to word connections.
 &lt;/p&gt;
-&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Read Word Pairs Graph In the previous post we built and saved</summary></entry><entry><title type="html">Word2Vec2Graph for Pairs of Words</title><link href="http://localhost:4000/2017/10/14/word2vec2graphWordPairs/" rel="alternate" type="text/html" title="Word2Vec2Graph for Pairs of Words" /><published>2017-10-14T08:00:00-04:00</published><updated>2017-10-14T08:00:00-04:00</updated><id>http://localhost:4000/2017/10/14/word2vec2graphWordPairs</id><content type="html" xml:base="http://localhost:4000/2017/10/14/word2vec2graphWordPairs/">&lt;p&gt;&lt;h3&gt;Word2Vec2Graph Model - Direct Graph&lt;/h3&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Read Word Pairs Graph In the previous post we built and saved</summary></entry><entry><title type="html">Word2Vec2Graph for Pairs of Words</title><link href="http://localhost:4000/2017/10/14/word2vec2graphWordPairs/" rel="alternate" type="text/html" title="Word2Vec2Graph for Pairs of Words" /><published>2017-10-14T08:00:00-04:00</published><updated>2017-10-14T08:00:00-04:00</updated><id>http://localhost:4000/2017/10/14/word2vec2graphWordPairs</id><content type="html" xml:base="http://localhost:4000/2017/10/14/word2vec2graphWordPairs/">&lt;p&gt;&lt;h3&gt;Word2Vec2Graph Model - Direct Graph&lt;/h3&gt;
 In previous posts we introduced
 &lt;i&gt;&lt;a href=&quot;https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/&quot;&gt;Word2Vec2Graph model in Spark&lt;/a&gt;&lt;/i&gt;.
 Word2Vec2Graph model connects Word2Vec model with Spark GraphFrames library and gives us new opportunities to use graph approach to text mining.&lt;/p&gt;
@@ -1615,7 +1615,7 @@ Connected components: &lt;/p&gt;
 &lt;p&gt;&lt;h3&gt;Next Post - Word Neighbors&lt;/h3&gt;
 In the next post we will look at word neighbors for Word2Vec2Graph.
 &lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Word2Vec2Graph Model - Page Rank In the previous post we explained how to build Word2Vec2Graph model as combination of Word2vec model and Graph engine in Spark. Spark GraphFrames library has many interesting functions. In this post we will look at Page Rank for Word2Vec2Graph.</summary></entry><entry><title type="html">Introduction to Word2Vec2Graph Model</title><link href="http://localhost:4000/2017/09/17/word2vec2graph/" rel="alternate" type="text/html" title="Introduction to Word2Vec2Graph Model" /><published>2017-09-17T08:00:00-04:00</published><updated>2017-09-17T08:00:00-04:00</updated><id>http://localhost:4000/2017/09/17/word2vec2graph</id><content type="html" xml:base="http://localhost:4000/2017/09/17/word2vec2graph/">&lt;p&gt;&lt;h3&gt;Graph and Word2Vec Model &lt;/h3&gt;
-Word2Vec model maps words to vectors which gives us an oppotunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.&lt;/p&gt;
+Word2Vec model maps words to vectors which gives us an opportunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.&lt;/p&gt;
 
 &lt;p&gt;We are running a small AWS cluster so we will run a small text file with data about stress that was copied from Wikipedia article. We will call this text file Stress Data File.&lt;/p&gt;
 &lt;p&gt;As Word2VecModel we will use the model that was trained on News and Wiki data about psychology. We described this model in our previous post.&lt;/p&gt;
@@ -1947,7 +1947,61 @@ For this post we will use edge weight threshold 0.75, i.e. we will use only word
 &lt;p&gt;
 &lt;h3&gt;Next Post - Word2Vec2Graph Page Rank&lt;/h3&gt;
 Spark GraphFrames library has many interesting functions. In the next post we will look at Page Rank for Word2Vec2Graph.
-&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Graph and Word2Vec Model Word2Vec model maps words to vectors which gives us an oppotunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.</summary></entry><entry><title type="html">Word2Vec Model Training</title><link href="http://localhost:4000/2017/09/06/w2vTrain/" rel="alternate" type="text/html" title="Word2Vec Model Training" /><published>2017-09-06T08:00:00-04:00</published><updated>2017-09-06T08:00:00-04:00</updated><id>http://localhost:4000/2017/09/06/w2vTrain</id><content type="html" xml:base="http://localhost:4000/2017/09/06/w2vTrain/">&lt;p&gt;&lt;h3&gt;Why Spark?&lt;/h3&gt;
+&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Graph and Word2Vec Model Word2Vec model maps words to vectors which gives us an opportunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.</summary></entry><entry><title type="html">Word2Vec Model Training</title><link href="http://localhost:4000/2017/09/06/w2vTrain/" rel="alternate" type="text/html" title="Word2Vec Model Training" /><published>2017-09-06T08:00:00-04:00</published><updated>2017-09-06T08:00:00-04:00</updated><id>http://localhost:4000/2017/09/06/w2vTrain</id><content type="html" xml:base="http://localhost:4000/2017/09/06/w2vTrain/">&lt;h3&gt;About Word2Vec Model &lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Word2vec&quot;&gt;Word2Vec model&lt;/a&gt; was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product.
+Word2Vec model transforms words to vectors. This gives us new insights in text analytics.
+Here is an excellent article about word2vec model:
+&lt;a href=&quot;https://blog.acolyer.org/2016/04/21/the-amazing-power-of-word-vectors/&quot;&gt;The amazing power of word vectors&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let's look at some examples that help us to understand Word2Vec model. We'll start with well known algorithm - Google pageRank and run it on text file about Word2Vec model. Here are top pageRank words that shows us then Word2Vec model is about words, vectors, training, and so on: &lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pagerank&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;words&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;28.97&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;25.08&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;vectors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;20.24&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;training&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;16.32&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;15.32&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;using&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;14.31&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;models&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;13.84&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;representations&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;9.11&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;example&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;8.28&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;syntactic&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;8.21&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;semantic&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;8.00&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;accuracy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;7.88&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;7.23&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;phrases&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.82&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.44&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;neural&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.03&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;similar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.01&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;5.97&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Which words in documents about Word2Vec model are located between the words 'words' and 'vectors'?&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/graphWv.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;600&quot; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;This is one of well known Word2Vec examples. It shows Country - Capital associations like France - Germany + Berlin = Paris &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/countryCapital.jpg&quot; alt=&quot;Post Sample Image&quot; height=&quot;600&quot; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;These pictures are built on graph of words with high Word2Vec cosine similarities. The first picture shows connected component, the second 'Germany' neighbors and neighbors of neighbors, the third a circle of word pairs. Numbers on edges are Word2Vec cosine similarities  between the words.&lt;/p&gt;
+
+&lt;p&gt;Here are some more examples. We built a graph of words with low Word2Vec cosine similarities, ran connected components (first picture) and looked at neighbors of neighbors for the word 'vectors' (second picture):&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/ccLowCos.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/ngbVectors.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;In the next several posts we will show a new Word2Vec2Graph model. This model connects Word2Vec model with Graphs. As a tool we will use Spark. We will run it on Amazon Cloud via Databricks Community. &lt;/p&gt;
+
+&lt;p&gt;&lt;h3&gt;Why Spark?&lt;/h3&gt;
 Until recently there were no single processing framework that was able to solve several very different analytical problems like statistics and graphs. Spark is the first framework that can do it. It is the fundamental advantage of Spark that provides a framework for advanced analytics right out of the box. This framework includes a tool for accelerated queries, a machine learning library, and graph processing engine.&lt;/p&gt;
 &lt;p&gt;
 &lt;h3&gt;Databricks Community &lt;/h3&gt;
@@ -1956,15 +2010,9 @@ And it's free!&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://databricks.com/blog/2016/02/17/introducing-databricks-community-edition-apache-spark-for-all.html&quot;&gt;Databricks community edition&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;
-&lt;h3&gt;About Word2Vec Model &lt;/h3&gt;
-&lt;a href=&quot;https://en.wikipedia.org/wiki/Word2vec&quot;&gt;Word2Vec model&lt;/a&gt; was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product. Word2Vec model transforms words to vectors. This gives us new insights in text analytics. &lt;/p&gt;
-&lt;p&gt;Here is an excellent article about word2vec model: &lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;https://blog.acolyer.org/2016/04/21/the-amazing-power-of-word-vectors/&quot;&gt;The amazing power of word vectors&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;p&gt;
 &lt;h3&gt;Training a Word2Vec Model &lt;/h3&gt;
-AWS cluster we run via Databricks Community is not so big. To train Word2vec model we will get a 42 MB public file about news and load it to Databricks: &lt;/p&gt;
+&lt;p&gt;In our first post we will train Word2vec model in Spark and show how training corpus affects the Word2Vec model results.&lt;/p&gt;
+&lt;p&gt;AWS cluster that we run via Databricks Community is not so big. To be able to train Word2vec model we will get a 42 MB public file about news and load it to Databricks: &lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;
 
@@ -2113,5 +2161,5 @@ To see how the corpus that we used to train the model affects the results we wil
 &lt;span class=&quot;n&quot;&gt;apparel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.7975579500198364&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;&lt;h3&gt;Next Post - Introduction to Word2Vec2Graph Model&lt;/h3&gt;
-In the next post we will introduce Word2Vec2Graph model - a combination of Word2Vec model and Spark GraphFrame library.
-&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Why Spark? Until recently there were no single processing framework that was able to solve several very different analytical problems like statistics and graphs. Spark is the first framework that can do it. It is the fundamental advantage of Spark that provides a framework for advanced analytics right out of the box. This framework includes a tool for accelerated queries, a machine learning library, and graph processing engine. Databricks Community Databricks community edition is an entry to Spark Big Data Analytics. It allows to create a cluster on Amazon Cloud and makes it is easy for data scientists and data engineers to write Spark code and debug it. And it's free!</summary></entry></feed>
+In the next post we will introduce Word2Vec2Graph model - a combination of Word2Vec model and Graphs. We will build the model in Spark Machine Learning Library and Spark GraphFrame library.
+&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">About Word2Vec Model Word2Vec model was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product. Word2Vec model transforms words to vectors. This gives us new insights in text analytics. Here is an excellent article about word2vec model: The amazing power of word vectors.</summary></entry></feed>

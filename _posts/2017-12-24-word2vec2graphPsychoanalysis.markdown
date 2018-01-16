@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Word2Vec2Graph - Psychoanalysis Topics"
-subtitle:   "Connecting Word2vec Model with Graph"
+subtitle:   "Quick Look at Text"
 date:       2017-12-24 12:00:00
 author:     "Melenar"
 header-img: "img/modern36.jpg"

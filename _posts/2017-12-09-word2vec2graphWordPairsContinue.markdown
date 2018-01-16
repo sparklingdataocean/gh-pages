@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Direct Word2Vec2Graph - Finding Topics"
-subtitle:   "Connecting Word2vec Model with Graph"
+subtitle:   "Detect Topics in Text"
 date:       2017-12-09 12:00:00
 author:     "Melenar"
 header-img: "img/modern29.jpg"

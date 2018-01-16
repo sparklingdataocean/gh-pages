@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Word2Vec2Graph Model - Page Rank"
-subtitle:   "Connecting Word2vec Model with Graph"
+subtitle:   "Observe Important Words"
 date:       2017-09-28 12:00:00
 author:     "Melenar"
 header-img: "img/pic29.jpg"

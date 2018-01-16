@@ -1,0 +1,32 @@
+About word2vec
+a suite of algorithms
+for unsupervised training
+of dense vector representations of words
+on large corpora.
+Resulting embeddings have been shown (Mikolov and Dean 2013) to capture semantic word similarity as well as more complex semantic relationships through linear vector manipulation,
+
+topic extraction
+
+Word2Vec Model Training
+Playing with Word2vec Model
+
+Introduction to Word2Vec2Graph Model
+Connecting Word2Vec Model with Graph
+
+Word2Vec2Graph Model - Page Rank
+Observe Important Words
+
+Word2Vec2Graph Model - Neighbors
+Review Friends-of-Friends for Words
+
+Word2Vec2Graph for Pairs of Words
+Binding Pairs of Words
+
+Direct Word2Vec2Graph - Connected Pair Groups
+Reveal Word Communities
+
+Direct Word2Vec2Graph - Finding Topics
+Detect Topics in Text
+
+Word2Vec2Graph - Psychoanalysis Topics
+Quick Look at Text
