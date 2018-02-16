@@ -23,7 +23,7 @@ As a text file we will use the same Stress Data file - a small text file with da
 <h3>Read and Clean Stress Data File </h3>
 Read Stress Data file:
 {% highlight scala %}
-val inputStress=sc.textFile("/FileStore/tables/cjzokasj1506175253652/stressWiki.txt").
+val inputStress=sc.textFile("/FileStore/tables/stressWiki.txt").
    toDF("charLine")
 
 {% endhighlight %}
@@ -75,103 +75,63 @@ val slpitNgrams=ngramCleanWords.
    toDF("ngram","ngram1","ngram2").
    filter('ngram1=!='ngram2)
 
-
+display(slpitNgrams)
+ngram,ngram1,ngram2
+psychological stress,psychological,stress
+wikipedia encyclopedia,wikipedia,encyclopedia
+kinds stress,kinds,stress
+stress disambiguation,stress,disambiguation
+video explanation,video,explanation
+psychology stress,psychology,stress
+stress feeling,stress,feeling
+feeling strain,feeling,strain
+strain pressure,strain,pressure
+pressure small,pressure,small
+small amounts,small,amounts
+amounts stress,amounts,stress
+stress desired,stress,desired
+desired beneficial,desired,beneficial
+beneficial healthy,beneficial,healthy
+healthy positive,healthy,positive
+positive stress,positive,stress
 {% endhighlight %}
 
 <p><h3>Exclude Word Pairs that are not in the Word2Vec Model </h3>
 
-Read the trained Word2Vec model</p>
+In the post where we
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/"> introduced Word2Vec2Graph model</a></i>, we calculated cosine similarities of all word-to-word combinations of
+Stress Data File based on Word2Vec model and saved the results.
+</p>
 {% highlight scala %}
 
-import org.apache.spark.ml.feature.Word2Vec
-import org.apache.spark.ml._
-import org.apache.spark.ml.feature.Word2VecModel
-import org.apache.spark.sql.Row
-val word2vec= new Word2Vec().
-   setInputCol("value").
-   setOutputCol("result")
-val modelNewsWiki=Word2VecModel.
-   read.
-   load("w2vNewsWiki")
+val w2wStressCos = sqlContext.read.parquet("w2wStressCos")
+display(w2wStressCos.filter('cos< 0.1).filter('cos> 0.0).limit(7))
+word1,word2,cos
+conducted,contribute,0.08035969605150468
+association,contribute,0.06940379539008698
+conducted,crucial,0.0254494353390933
+conducted,consequences,0.046451274237478545
+exhaustion,ideas,0.08462263299060188
+conducted,experience,0.05733563656740034
+conducted,inflammation,0.09058846853618428
 
 {% endhighlight %}
 
-<p>Get a set of all words from the Word2Vec model</p>
-{% highlight scala %}
-val modelWords=modelNewsWiki.
-   getVectors.
-   select("word")
-{% endhighlight %}
+
 
 <p>Filter out word pairs with words that are not in the set of words from the Word2Vec model</p>
 {% highlight scala %}
 
 val ngramW2V=slpitNgrams.
-   join(modelWords,'ngram1==='word).
-   join(modelWords.toDF("word2"),'ngram2==='word2).
-   select("ngram","ngram1","ngram2").
-   distinct
-
+   join(w2wStressCos,'ngram1==='word1 && 'ngram2==='word2).
+   select("ngram","ngram1","ngram2","cos").distinct
 {% endhighlight %}
 
-
-
-<p><h3>How Word Pairs are Connected?</h3>
-Now we will calculate cosine similarities of words within word pairs.
-
-We already introduced Word2Vec Cosine Similarity Function in the  
-<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/">Word2Vec2Graph model Introduction post.</a></i>
-</p>
-{% highlight scala %}
-import org.apache.spark.ml.linalg.DenseVector
-def dotDouble(x: Array[Double], y: Array[Double]): Double = {
-   (for((a, b) <- x zip y) yield a * b) sum
-  }
-def magnitudeDouble(x: Array[Double]): Double = {
-   math.sqrt(x map(i => i*i) sum)
-  }
-def cosineDouble(x: Array[Double], y: Array[Double]): Double = {
-   require(x.size == y.size)
-   dotDouble(x, y)/(magnitudeDouble(x) * magnitudeDouble(y))
-}
-val modelMap = sc.broadcast(modelNewsWiki.
-   getVectors.
-   map(r=>(r.getString(0),r.getAs[DenseVector](1).toArray)).
-      collect.toMap)
-def w2wCosine(word1: String, word2: String): Double = {
-   cosineDouble(modelMap.value(word1),modelMap.value(word2))
-}
-{% endhighlight %}
-
-Next step: calculate cosine similarity within ngrams:</p>
-{% highlight scala %}
-
-val ngBroadcast=sc.broadcast(ngramW2V.collect)
-val ngW2V=ngBroadcast.
-   value.
-   map(s=>(s(0).toString,
-      s(1).toString,
-      s(2).toString,
-      w2wCosine(s(1).toString,s(2).toString)))
-val ngramWord2VecDF=sc.parallelize(ngW2V).
-   toDF("ngram","ngram1","ngram2","cos")
-display(ngramWord2VecDF.limit(7))
-ngram,ngram1,ngram2,cos
-humans chronic,humans,chronic,0.4952597099545433
-individuals exposed,individuals,exposed,0.18908252800993414
-general suppression,general,suppression,0.18860520433779804
-response partial,response,partial,0.4066760138993952
-environmental stimulus,environmental,stimulus,0.21930354206811606
-stress subject,stress,subject,0.4080685672179879
-hospitalized children,hospitalized,children,0.31194855489247675
-{% endhighlight %}
-
-<p>Example: Word Pairs with High Cosine Similarity:</p>
-{% highlight scala %}
-display(ngramWord2VecDF.
+<p>Example: Word Pairs with high Cosine Similarity >0.7:</p>
+   {% highlight scala %}
+display(ngramW2V.
    select('ngram,'cos).
-   filter('cos>0.7).
-   orderBy('cos.desc))
+   filter('cos>0.7).orderBy('cos.desc))
 ngram,cos
 acute chronic,0.7848571640793651
 governmental organizations,0.7414504735574394
@@ -180,8 +140,8 @@ disease chronic,0.7064366889098306
 feelings thoughts,0.7000105635150229
 thoughts feelings,0.7000105635150229
 
-
 {% endhighlight %}
+
 
 <p>Example: Word Pairs with Cosine Similarity close to 0:</p>
 {% highlight scala %}
@@ -200,16 +160,15 @@ individual takes,0.0017983474881583593
 <p><h3>Graph on Word Pairs</h3>
 Now we can build a graph on word pairs: words will be nodes, ngrams - edges and cosine similarities - edge weights.</p>
 {% highlight scala %}
+
 import org.graphframes.GraphFrame
-val graphNodes1=ngramWord2VecDF.
+val graphNodes1=ngramW2V.
    select("ngram1").
-   union(ngramWord2VecDF.select("ngram2")).
-   distinct.
-   toDF("id")
-val graphEdges1=ngramWord2VecDF.
+   union(ngramW2V.select("ngram2")).
+   distinct.toDF("id")
+val graphEdges1=ngramW2V.  
    select("ngram1","ngram2","cos").
-   distinct.
-   toDF("src","dst","edgeWeight")
+   distinct.toDF("src","dst","edgeWeight")
 val graph1 = GraphFrame(graphNodes1,graphEdges1)
 
 {% endhighlight %}

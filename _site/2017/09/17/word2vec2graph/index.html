@@ -109,7 +109,7 @@ Word2Vec model maps words to vectors which gives us an opportunity to calculate 
 Read Wiki data file: </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputStress</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
-   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/cjzokasj1506175253652/stressWiki.txt"</span><span class="o">).</span>
+   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/stressWiki.txt"</span><span class="o">).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
 <span class="n">inputStress</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">247</span></code></pre></figure>
 
@@ -165,15 +165,13 @@ We will use our trained Word2Vec model for word pairs cosine similarities. First
 <p>Next we will get the list of all words from the Word2Vec model:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modelWords</span><span class="k">=</span><span class="n">modelNewsWiki</span><span class="o">.</span>
-   <span class="n">getVectors</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span></code></pre></figure>
+   <span class="n">getVectors</span></code></pre></figure>
 
 <p>To be able to use this Word2Vec model for Stress Data file cosine similarities, we will filter out words from Stress Data file that are not in the Word2Vec list of words:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressWords</span><span class="k">=</span><span class="n">slpitCleanWordsStress</span><span class="o">.</span>
    <span class="n">join</span><span class="o">(</span><span class="n">modelWords</span><span class="o">,</span><span class="ss">'cleanWord </span><span class="o">===</span> <span class="ss">'word)</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">).</span>
-   <span class="n">distinct</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span><span class="n">distinct</span>
 <span class="n">stressWords</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">1125</span></code></pre></figure>
 
 <p></p>
@@ -181,7 +179,7 @@ We will use our trained Word2Vec model for word pairs cosine similarities. First
 <p>Finally we will create word to word matrix:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressWords2</span><span class="k">=</span><span class="n">stressWords</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">w2wStress</span><span class="k">=</span><span class="n">stressWords</span><span class="o">.</span>
    <span class="n">join</span><span class="o">(</span><span class="n">stressWords2</span><span class="o">,</span><span class="ss">'word=</span><span class="o">!='</span><span class="n">word2</span><span class="o">)</span>
 <span class="n">w2wStress</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">1264500</span></code></pre></figure>
@@ -190,32 +188,21 @@ We will use our trained Word2Vec model for word pairs cosine similarities. First
 <h3>Word2Vec Cosine Similarity Function</h3>
 Now we want to use Word2Vec cosine similarity to see how words are connected with other words. We will create a function to calculate cosine similarity between vectors from the Word2Vec model</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml.linalg.DenseVector</span>
-<span class="k">def</span> <span class="n">dotDouble</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Double</span><span class="o">],</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Double</span><span class="o">])</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
-    <span class="o">(</span><span class="k">for</span><span class="o">((</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span> <span class="k">&lt;-</span> <span class="n">x</span> <span class="n">zip</span> <span class="n">y</span><span class="o">)</span> <span class="k">yield</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="o">)</span> <span class="n">sum</span>
-  <span class="o">}</span>
-<span class="k">def</span> <span class="n">magnitudeDouble</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Double</span><span class="o">])</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
-    <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="o">(</span><span class="n">x</span> <span class="n">map</span><span class="o">(</span><span class="n">i</span> <span class="k">=&gt;</span> <span class="n">i</span><span class="o">*</span><span class="n">i</span><span class="o">)</span> <span class="n">sum</span><span class="o">)</span>
-  <span class="o">}</span>
-<span class="k">def</span> <span class="n">cosineDouble</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Double</span><span class="o">],</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Double</span><span class="o">])</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
-    <span class="n">require</span><span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="o">)</span>
-    <span class="n">dotDouble</span><span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)/(</span><span class="n">magnitudeDouble</span><span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="o">*</span> <span class="n">magnitudeDouble</span><span class="o">(</span><span class="n">y</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml.linalg.Vector</span>
+<span class="k">def</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+             <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">var</span> <span class="n">dot</span><span class="k">=</span><span class="mf">0.0</span>
+  <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span><span class="mi">0</span> <span class="n">to</span> <span class="n">vectorX</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">dot</span> <span class="o">+=</span> <span class="n">vectorX</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">*</span> <span class="n">vectorY</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
+  <span class="n">dot</span>
 <span class="o">}</span>
-
-<span class="k">val</span> <span class="n">modelMap</span> <span class="k">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">broadcast</span><span class="o">(</span><span class="n">modelNewsWiki</span><span class="o">.</span>
-     <span class="n">getVectors</span><span class="o">.</span>
-     <span class="n">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="n">r</span><span class="o">.</span><span class="n">getString</span><span class="o">(</span><span class="mi">0</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">DenseVector</span><span class="o">](</span><span class="mi">1</span><span class="o">).</span><span class="n">toArray</span><span class="o">)).</span>
-        <span class="n">collect</span><span class="o">.</span><span class="n">toMap</span><span class="o">)</span>
-
-<span class="k">def</span> <span class="n">w2wCosine</span><span class="o">(</span><span class="n">word1</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">word2</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
-    <span class="n">cosineDouble</span><span class="o">(</span><span class="n">modelMap</span><span class="o">.</span><span class="n">value</span><span class="o">(</span><span class="n">word1</span><span class="o">),</span><span class="n">modelMap</span><span class="o">.</span><span class="n">value</span><span class="o">(</span><span class="n">word2</span><span class="o">))</span>
+<span class="k">def</span> <span class="n">cosineVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+                 <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="n">require</span><span class="o">(</span><span class="n">vectorX</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">vectorY</span><span class="o">.</span><span class="n">size</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">dot</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">div</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorX</span><span class="o">)</span> <span class="o">*</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorY</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">div</span><span class="o">==</span><span class="mi">0</span><span class="o">)</span><span class="mi">0</span>
+  <span class="k">else</span> <span class="n">dot</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="o">(</span><span class="n">div</span><span class="o">)</span>
 <span class="o">}</span></code></pre></figure>
-
-<p>Example: Word2Vec cosine similarity between words</p>
-
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">w2wCosine</span><span class="o">(</span><span class="s">"stress"</span><span class="o">,</span><span class="s">"idea"</span><span class="o">)</span>
-
-<span class="n">res1</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="mf">0.2533538702772619</span></code></pre></figure>
 
 <p></p>
 
@@ -224,18 +211,11 @@ Now we want to use Word2Vec cosine similarity to see how words are connected wit
 <h3>Cosine Similarity between Stress Data File Words</h3>
 Now we can calculate word to word cosine similarities between word pairs from Stress Data File and save the results.</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wStressBroadcast</span><span class="k">=</span>
-   <span class="n">sc</span><span class="o">.</span><span class="n">broadcast</span><span class="o">(</span><span class="n">w2wStress</span><span class="o">.</span><span class="n">collect</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">w2wStressCos</span><span class="k">=</span><span class="n">w2wStressBroadcast</span><span class="o">.</span>
-   <span class="n">value</span><span class="o">.</span>
-   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span><span class="n">w2wCosine</span><span class="o">(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span>
-      <span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">)))</span>
-<span class="k">val</span> <span class="n">w2wStressCosDF</span><span class="k">=</span>
-   <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">)</span>
-<span class="n">w2wStressCosDF</span><span class="o">.</span>
-   <span class="n">write</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wStressCosDF</span><span class="k">=</span><span class="n">w2wStress</span><span class="o">.</span>
+   <span class="n">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">2</span><span class="o">),</span>
+    <span class="n">cosineVector</span><span class="o">(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">),</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">3</span><span class="o">)))).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">)</span></code></pre></figure>
 
 <p>Example: Word combinations with high Cosine Similarities:</p>
 
@@ -269,6 +249,11 @@ Now we can calculate word to word cosine similarities between word pairs from St
 <span class="n">persist</span><span class="o">,</span><span class="n">perceptions</span><span class="o">,</span><span class="mf">0.6048191825219467</span>
 <span class="n">everyday</span><span class="o">,</span><span class="n">communicate</span><span class="o">,</span><span class="mf">0.6137230335862902</span>
 <span class="n">recognize</span><span class="o">,</span><span class="n">respond</span><span class="o">,</span><span class="mf">0.6024905770721792</span></code></pre></figure>
+
+<p>Store and read Stress Data File word pairs with cosine similarities between them:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">w2wStressCos2</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span></code></pre></figure>
 
 <p><h3>Graph of Combinations of Stress Data File Words </h3>
 Now we can build a graph using words as nodes, {word1, word2} word combinations as edges and cosine similarities between the words as edge weights:</p>

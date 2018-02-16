@@ -18,7 +18,7 @@ Word2Vec model maps words to vectors which gives us an opportunity to calculate 
 Read Wiki data file: </p>
 {% highlight scala %}
 val inputStress=sc.
-   textFile("/FileStore/tables/cjzokasj1506175253652/stressWiki.txt").
+   textFile("/FileStore/tables/stressWiki.txt").
    toDF("charLine")
 inputStress.count//--247
 {% endhighlight %}
@@ -82,16 +82,14 @@ val modelNewsWiki=Word2VecModel.
 <p>Next we will get the list of all words from the Word2Vec model:</p>
 {% highlight scala %}
 val modelWords=modelNewsWiki.
-   getVectors.
-   select("word")
+   getVectors
 {% endhighlight %}
 
 <p>To be able to use this Word2Vec model for Stress Data file cosine similarities, we will filter out words from Stress Data file that are not in the Word2Vec list of words:</p>
 {% highlight scala %}
 val stressWords=slpitCleanWordsStress.
    join(modelWords,'cleanWord === 'word).
-   select("word").
-   distinct
+   select("word","vector").distinct
 stressWords.count//--1125
 
 {% endhighlight %}
@@ -100,7 +98,7 @@ stressWords.count//--1125
 <p>Finally we will create word to word matrix:</p>
 {% highlight scala %}
 val stressWords2=stressWords.
-   toDF("word2")
+   toDF("word2","vector2")
 val w2wStress=stressWords.
    join(stressWords2,'word=!='word2)
 w2wStress.count//--1264500
@@ -110,34 +108,26 @@ w2wStress.count//--1264500
 <h3>Word2Vec Cosine Similarity Function</h3>
 Now we want to use Word2Vec cosine similarity to see how words are connected with other words. We will create a function to calculate cosine similarity between vectors from the Word2Vec model</p>
 {% highlight scala %}
-import org.apache.spark.ml.linalg.DenseVector
-def dotDouble(x: Array[Double], y: Array[Double]): Double = {
-    (for((a, b) <- x zip y) yield a * b) sum
-  }
-def magnitudeDouble(x: Array[Double]): Double = {
-    math.sqrt(x map(i => i*i) sum)
-  }
-def cosineDouble(x: Array[Double], y: Array[Double]): Double = {
-    require(x.size == y.size)
-    dotDouble(x, y)/(magnitudeDouble(x) * magnitudeDouble(y))
+
+import org.apache.spark.ml.linalg.Vector
+def dotVector(vectorX: org.apache.spark.ml.linalg.Vector,
+             vectorY: org.apache.spark.ml.linalg.Vector): Double = {
+  var dot=0.0
+  for (i <-0 to vectorX.size-1) dot += vectorX(i) * vectorY(i)
+  dot
+}
+def cosineVector(vectorX: org.apache.spark.ml.linalg.Vector,
+                 vectorY: org.apache.spark.ml.linalg.Vector): Double = {
+  require(vectorX.size == vectorY.size)
+  val dot=dotVector(vectorX,vectorY)
+  val div=dotVector(vectorX,vectorX) * dotVector(vectorY,vectorY)
+  if (div==0)0
+  else dot/math.sqrt(div)
 }
 
-val modelMap = sc.broadcast(modelNewsWiki.
-     getVectors.
-     map(r=>(r.getString(0),r.getAs[DenseVector](1).toArray)).
-        collect.toMap)
-
-def w2wCosine(word1: String, word2: String): Double = {
-    cosineDouble(modelMap.value(word1),modelMap.value(word2))
-}
 {% endhighlight %}
 
-<p>Example: Word2Vec cosine similarity between words</p>
-{% highlight scala %}
-w2wCosine("stress","idea")
 
-res1: Double = 0.2533538702772619
-{% endhighlight %}
 
 <p></p>
 
@@ -146,19 +136,13 @@ res1: Double = 0.2533538702772619
 <h3>Cosine Similarity between Stress Data File Words</h3>
 Now we can calculate word to word cosine similarities between word pairs from Stress Data File and save the results.</p>
 {% highlight scala %}
-
-val w2wStressBroadcast=
-   sc.broadcast(w2wStress.collect)
-val w2wStressCos=w2wStressBroadcast.
-   value.
-   map(s=>(s(0).toString,s(1).toString,w2wCosine(s(0).toString,
-      s(1).toString)))
-val w2wStressCosDF=
-   sc.parallelize(w2wStressCos).
+val w2wStressCosDF=w2wStress.
+   map(r=>(r.getAs[String](0),r.getAs[String](2),
+    cosineVector(r.getAs[org.apache.spark.ml.linalg.Vector](1),
+    r.getAs[org.apache.spark.ml.linalg.Vector](3)))).
    toDF("word1","word2","cos")
-w2wStressCosDF.
-   write.
-   parquet("w2wStressCos")
+
+
 
 {% endhighlight %}
 
@@ -195,6 +179,13 @@ interaction,empathy,0.6406613207655409
 persist,perceptions,0.6048191825219467
 everyday,communicate,0.6137230335862902
 recognize,respond,0.6024905770721792
+{% endhighlight %}
+
+
+<p>Store and read Stress Data File word pairs with cosine similarities between them:</p>
+{% highlight scala %}
+w2wStressCosDF.write.parquet("w2wStressCos")
+val w2wStressCos2 = sqlContext.read.parquet("w2wStressCos")
 {% endhighlight %}
 
 <p><h3>Graph of Combinations of Stress Data File Words </h3>

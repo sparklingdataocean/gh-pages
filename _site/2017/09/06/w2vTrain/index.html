@@ -168,7 +168,7 @@ And it's free!</p>
 <p></p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
-  <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/02pvyoae1504568133317/newsTest.txt"</span><span class="o">).</span>
+  <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/newsTest.txt"</span><span class="o">).</span>
   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span></code></pre></figure>
 
 <p>First we'll tokenize the data</p>
@@ -222,7 +222,7 @@ And it's free!</p>
 To see how the corpus that we used to train the model affects the results we will add a small file, train the model on  combined corpus and compare the results. </p>
 <p>To play with data about psychology we copied it from several Wikipedia articles, got a small file (180 KB), and combined it with news file (42 MB). Then we trained the Word2vec model on this combined file. </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputWiki</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/opef4cqb1504567762417/WikiTest.txt"</span><span class="o">).</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputWiki</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/WikiTest.txt"</span><span class="o">).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">tokenizedNewsWiki</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
    <span class="n">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>

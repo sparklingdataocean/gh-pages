@@ -146,8 +146,10 @@ individual,takes,0.0017983474881583593
 
 <p>Graph (via Gephi):
 
+
+
 <a href="#">
-    <img src="{{ site.baseurl }}/img/labelGroup2wb.jpg" alt="Post Sample Image">
+    <img src="{{ site.baseurl }}/img/labelGroup2wb.jpg" alt="Post Sample Image" width="650">
 </a>
 
 We use a semi-manual way on building Gephi graphs. Create a list of direct edges:  

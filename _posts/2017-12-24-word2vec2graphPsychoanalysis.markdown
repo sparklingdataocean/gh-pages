@@ -38,27 +38,21 @@ val removedStopWordsPsychoanalysis = remover.
 
 {% endhighlight %}
 
-
-<p><h3>Transform to Pairs of Words</h3>
-Get pairs of words and explode ngrams:</p>
+<p> </p>
+<p>Explode Psychoanalysis word arrays to words:</p>
 {% highlight scala %}
+
 import org.apache.spark.sql.functions.explode
-val ngram = new NGram().
-   setInputCol("stopWordFree").
-   setOutputCol("ngrams").
-   setN(2)
-val ngramCleanWords = ngram.
-   transform(removedStopWordsPsychoanalysis)
-val slpitNgrams=ngramCleanWords.
-      withColumn("ngram",explode($"ngrams")).
-      select("ngram").
-      map(s=>(s(0).toString,
-         s(0).toString.split(" ")(0),
-         s(0).toString.split(" ")(1))).
-      toDF("ngram","ngram1","ngram2").
-      filter('ngram1=!='ngram2)
-slpitNgrams.count//--12206
+val slpitCleanPsychoanalysis = removedStopWordsPsychoanalysis.
+   withColumn("cleanWord",explode($"stopWordFree")).
+   select("cleanWord").
+   distinct
+slpitCleanPsychoanalysis.count//--4030
+
 {% endhighlight %}
+<p> </p>
+
+
 
 <p><h3>Are Word Pairs in Trained Word2Vec Model? </h3>
 Read trained Word2Vec model that was trained and described in
@@ -79,27 +73,26 @@ val modelNewsWiki=Word2VecModel.
 
 <p>Get a set of all words from the Word2Vec model and compare Psychoanalysis file word pairs with words from the Word2Vec model </p>
 {% highlight scala %}
-val modelWords=modelNewsWiki.
-   getVectors.
-   select("word")
-val ngramW2V=slpitNgrams.
-      join(modelWords,'ngram1==='word).
-      join(modelWords.toDF("word2"),'ngram2==='word2).
-      select("ngram","ngram1","ngram2").
-      distinct
-ngramW2V.count//--8935
+
+val cleanPsychoW2V=slpitCleanPsychoanalysis.
+   join(modelWords,'cleanWord==='word).
+   select("cleanWord").
+   distinct
+cleanPsychoW2V.count//--3318
+
 {% endhighlight %}
 
-<p>The Word2Vec model was trained on corpus based on News and Wikipedia data about psychology but only 73% of Psychoanalysis File word pairs are in the model. To increase this percentage we will include Psychoanalysis file data to training corpus and retrain the Word2Vec model. </p>
+<p>The Word2Vec model was trained on corpus based on News and Wikipedia data about psychology but only 82% of Psychoanalysis File word pairs are in the model. To increase this percentage we will include Psychoanalysis file data to training corpus and retrain the Word2Vec model. </p>
 
 <p><h3>Retrain Word2Vec Model</h3>
 
 
 {% highlight scala %}
+
 val inputNews=sc.
-  textFile("/FileStore/tables/02pvyoae1504568133317/newsTest.txt").
+  textFile("/FileStore/tables/newsTest.txt").
   toDF("charLine")
-val inputWiki=sc.textFile("/FileStore/tables/opef4cqb1504567762417/WikiTest.txt").
+val inputWiki=sc.textFile("/FileStore/tables/WikiTest.txt").
    toDF("charLine")
 val tokenizedNewsWikiPsychoanalysis = tokenizer.
    transform(inputNews.
@@ -107,29 +100,33 @@ val tokenizedNewsWikiPsychoanalysis = tokenizer.
    union(inputPsychoanalysis))
 
 val w2VmodelNewsWikiPsychoanalysis=word2vec.
-   fit(tokenizedNewsWikiPsychoanalysis)
+      fit(tokenizedNewsWikiPsychoanalysis)
    w2VmodelNewsWikiPsychoanalysis.
-   write.overwrite.
-   save("w2VmodelNewsWikiPsychoanalysis")
+      write.
+      overwrite.
+      save("w2VmodelNewsWikiPsychoanalysis")
 val modelNewsWikiPsychoanalysis=Word2VecModel.
-   read.load("w2VmodelNewsWikiPsychoanalysis")
-
+      read.
+      load("w2VmodelNewsWikiPsychoanalysis")   
 {% endhighlight %}
 
-<p>Get a set of all words from the new Word2Vec model and compare them with Psychoanalysis file word pairs:</p>
+<p>Get a set of all words from the new Word2Vec model and compare them with Psychoanalysis file words:</p>
 {% highlight scala %}
+
+val modelNewsWikiPsychoanalysis=Word2VecModel.
+   read.
+   load("w2VmodelNewsWikiPsychoanalysis")
 val modelWordsPsychoanalysis=modelNewsWikiPsychoanalysis.
-   getVectors.
-   select("word")
-val ngramW2V=slpitNgrams.
-   join(modelWordsPsychoanalysis,'ngram1==='word).
-   join(modelWordsPsychoanalysis.toDF("word2"),'ngram2==='word2).
-   select("ngram","ngram1","ngram2").
-   distinct
-ngramW2V.count//--9736
+    getVectors.
+    select("word","vector")
+val cleanPsychoNewW2V=slpitCleanPsychoanalysis.
+    join(modelWordsPsychoanalysis,'cleanWord==='word).
+    select("word","vector").
+    distinct
+cleanPsychoNewW2V.count//--3433    
 {% endhighlight %}
 
-<p>This new Word2Vec model works better: 80% of Psychoanalysis File word pairs are in the model. </p>
+<p>This new Word2Vec model works better: 85% of Psychoanalysis File words are in the model. </p>
 
 <p><h3>How Word Pairs are Connected?</h3>
 Now we will calculate cosine similarities of words within word pairs.
@@ -137,66 +134,89 @@ We introduced Word2Vec Cosine Similarity Function in the
 <i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/">Word2Vec2Graph model Introduction post.</a></i>
 </p>
 {% highlight scala %}
-import org.apache.spark.ml.linalg.DenseVector
-def dotDouble(x: Array[Double], y: Array[Double]): Double = {
-   (for((a, b) <- x zip y) yield a * b) sum
-  }
-def magnitudeDouble(x: Array[Double]): Double = {
-   math.sqrt(x map(i => i*i) sum)
-  }
-def cosineDouble(x: Array[Double], y: Array[Double]): Double = {
-   require(x.size == y.size)
-   dotDouble(x, y)/(magnitudeDouble(x) * magnitudeDouble(y))
+
+import org.apache.spark.ml.linalg.Vector
+def dotVector(vectorX: org.apache.spark.ml.linalg.Vector,
+             vectorY: org.apache.spark.ml.linalg.Vector): Double = {
+  var dot=0.0
+  for (i <-0 to vectorX.size-1) dot += vectorX(i) * vectorY(i)
+  dot
 }
-val modelMap = sc.broadcast(modelNewsWiki.
-   getVectors.
-   map(r=>(r.getString(0),r.getAs[DenseVector](1).toArray)).
-      collect.toMap)
-def w2wCosine(word1: String, word2: String): Double = {
-   cosineDouble(modelMap.value(word1),modelMap.value(word2))
+def cosineVector(vectorX: org.apache.spark.ml.linalg.Vector,
+                 vectorY: org.apache.spark.ml.linalg.Vector): Double = {
+  require(vectorX.size == vectorY.size)
+  val dot=dotVector(vectorX,vectorY)
+  val div=dotVector(vectorX,vectorX) * dotVector(vectorY,vectorY)
+  if (div==0)0
+  else dot/math.sqrt(div)
 }
 
-val ngBroadcast=sc.broadcast(ngramW2V.collect)
-val ngW2V=ngBroadcast.
-   value.
-   map(s=>(s(0).toString,
-      s(1).toString,
-      s(2).toString,
-      w2wCosine(s(1).toString,s(2).toString)))
-val ngramWord2VecDF=sc.parallelize(ngW2V).
-   toDF("ngram","ngram1","ngram2","cos")
-
+val cleanPsychoNewW2V2=cleanPsychoNewW2V.
+   toDF("word2","vector2")
+val w2wPsycho=cleanPsychoNewW2V.
+   join(cleanPsychoNewW2V2,'word=!='word2)
+val w2wPsychoCosDF=w2wPsycho.
+   map(r=>(r.getAs[String](0),r.getAs[String](2),
+    cosineVector(r.getAs[org.apache.spark.ml.linalg.Vector](1),
+    r.getAs[org.apache.spark.ml.linalg.Vector](3)))).
+   toDF("word1","word2","cos")
 {% endhighlight %}
 
+<p><h3>Transform to Pairs of Words</h3>
+Get pairs of words and explode ngrams:</p>
 
+{% highlight scala %}
+import org.apache.spark.sql.functions.explode
+val ngram = new NGram().
+   setInputCol("stopWordFree").
+   setOutputCol("ngrams").
+   setN(2)
+val ngramCleanWords = ngram.
+   transform(removedStopWordsPsychoanalysis)
+val slpitNgrams=ngramCleanWords.
+    withColumn("ngram",explode($"ngrams")).
+    select("ngram").
+    map(s=>(s(0).toString,
+         s(0).toString.split(" ")(0),
+         s(0).toString.split(" ")(1))).
+    toDF("ngram","ngram1","ngram2").
+    filter('ngram1=!='ngram2)   
+{% endhighlight %}
+
+Cosine similarities for pairs of words:</p>
+
+{% highlight scala %}
+val ngramCos=slpitNgrams.
+   join(w2wPsychoCosDF,'ngram1==='word1 && 'ngram2==='word2)
+{% endhighlight %}
 
 <p><h3>Graph on Word Pairs</h3>
 Now we can build a graph on word pairs: words will be nodes, ngrams - edges and cosine similarities - edge weights.</p>
 <p>We will save graph vertices and edges as Parquet to Databricks locations, load vertices and edges and rebuild the same graph.</p>
 
 {% highlight scala %}
+
 import org.graphframes.GraphFrame
-val graphNodes1=ngramWord2VecDF.
+val graphNodes1=ngramCos.
    select("ngram1").
-   union(ngramWord2VecDF.select("ngram2")).
+   union(ngramCos.select("ngram2")).
    distinct.
    toDF("id")
-val graphEdges1=ngramWord2VecDF.
+val graphEdges1=ngramCos.
    select("ngram1","ngram2","cos").
    distinct.
    toDF("src","dst","edgeWeight")
 val graph1 = GraphFrame(graphNodes1,graphEdges1)
 
 graph1.vertices.write.
-   parquet("graphNgramVertices")
+   parquet("graphPsychoVertices")
 graph1.edges.write.
-   parquet("graphNgramEdges")
+   parquet("graphPsychoEdges")
 
-val graphNgramStressVertices = sqlContext.read.
-   parquet("graphNgramVertices")
-val graphNgramStressEdges = sqlContext.read.
-   parquet("graphNgramEdges")
-val graphNgramStress = GraphFrame(graphNgramStressVertices, graphNgramStressEdges)
+val graphPsychoanalysisVertices = sqlContext.read.parquet("graphPsychoVertices")
+val graphPsychoanalysisEdges = sqlContext.read.parquet("graphPsychoEdges")
+
+val graphPsychoanalysis = GraphFrame(graphPsychoanalysisVertices, graphPsychoanalysisEdges)
 
 {% endhighlight %}
 
@@ -387,4 +407,4 @@ Connected components with edge weights in (-0.5, 0.0): </p>
 <p>This post example topics with high cosine similarity word pairs are more expected then topics with low cosine similarity word pairs. Lowly correlated word pairs give us more interesting and unpredicted results. The last example shows that within Psychoanalysis text file the word 'association' is associated with unexpected words...</p>
 
 <p><h3>Next Post - Associations</h3>
-In the next post we will deeper look at associations via Word2Vec2Graph model.</p>
+In the next several posts we will deeper look at data associations.</p>

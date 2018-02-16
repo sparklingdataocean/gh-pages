@@ -82,7 +82,7 @@ And it's free!</p>
 <p></p>
 {% highlight scala %}
 val inputNews=sc.
-  textFile("/FileStore/tables/02pvyoae1504568133317/newsTest.txt").
+  textFile("/FileStore/tables/newsTest.txt").
   toDF("charLine")
 
 {% endhighlight %}
@@ -142,7 +142,7 @@ problems,0.6132286190986633
 To see how the corpus that we used to train the model affects the results we will add a small file, train the model on  combined corpus and compare the results. </p>
 <p>To play with data about psychology we copied it from several Wikipedia articles, got a small file (180 KB), and combined it with news file (42 MB). Then we trained the Word2vec model on this combined file. </p>
 {% highlight scala %}
-val inputWiki=sc.textFile("/FileStore/tables/opef4cqb1504567762417/WikiTest.txt").
+val inputWiki=sc.textFile("/FileStore/tables/WikiTest.txt").
    toDF("charLine")
 val tokenizedNewsWiki = tokenizer.
    transform(inputNews.
