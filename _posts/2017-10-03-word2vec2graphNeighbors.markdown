@@ -13,7 +13,7 @@ Two posts before we introduced
 In the previous post we played with
 <i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/28/word2vec2graphPageRank/">Page Rank for Word2Vec2Graph</a></i>.
 
-<p>In this post we will look at different ways to find neighbors via the Word2Vec2Graph model.</p>
+<p>In this post we will look at different ways to find neighbors - via Word2Vec model and via Word2Vec2Graph model.</p>
 
 
 <p><h3>Two Connected Components with Page Rank </h3>
@@ -24,6 +24,7 @@ val cc1=graphHightWeightCC.
    filter('component==="60129542144").
    select("id").
    toDF("word")
+
 display(cc1.join(stressHightWeightPageRank.vertices,
    'word==='id).
    select('word,'pagerank).
@@ -54,6 +55,7 @@ val cc1=graphHightWeightCC.
    filter('component==="60129542145").
    select("id").
    toDF("word")
+
 display(cc1.join(stressHightWeightPageRank.vertices,
    'word==='id).
    select('word,'pagerank).
@@ -79,6 +81,7 @@ val neighbor1=graphHightWeight.
    find("(a) - [ab] -> (b)").
    filter($"a.id"==="hormones").
    select("ab.src","ab.dst","ab.edgeWeight")
+
 display(neighbor1.
    orderBy('edgeWeight.desc))
 src,dst,edgeWeight
@@ -96,6 +99,7 @@ val neighbor1=graphHightWeight.
    find("(a) - [ab] -> (b)").
    filter($"a.id"==="processes").
    select("ab.src","ab.dst","ab.edgeWeight")
+
 display(neighbor1.
    orderBy('edgeWeight.desc))
 src,dst,edgeWeight
@@ -162,6 +166,7 @@ val neighbor2=graphHightWeight.
    filter($"a.id"=!=$"c.id").
    filter($"a.id"==="processes").
    select("ab.src","ab.dst","ab.edgeWeight","bc.dst","bc.edgeWeight")
+
 display(neighbor2)
 src,dst,edgeWeight,dst,edgeWeight
 processes,strategies,0.8079603436193109,governmental,0.7553409742807539
@@ -180,6 +185,7 @@ val neighbor2=graphHightWeight.
    filter($"a.id"=!=$"c.id").
    filter($"a.id"==="hormones").
    select("ab.src","ab.dst","ab.edgeWeight","bc.dst","bc.edgeWeight")
+
 display(neighbor2)
 src,dst,edgeWeight,dst,edgeWeight
 hormones,digestive,0.767779980189556,disorders,0.7784715813141609
@@ -199,6 +205,7 @@ First we will look GraphFrames 'triangleCount' function  </p>
 val graphTriangles=graphHightWeight.
    triangleCount.
    run()
+
 display(graphTriangles.
    select('id,'count).
    filter('count>0).
@@ -230,6 +237,7 @@ val triangles=graphHightWeight.
    filter($"b.id"<$"c.id").
    select("ab.src","ab.dst","bc.dst").
    toDF("word1","word2","word3")
+
 display(triangles.
    orderBy('word1))
 word1,word2,word3

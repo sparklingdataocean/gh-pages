@@ -104,7 +104,7 @@ Two posts before we introduced
 In the previous post we played with
 <i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/28/word2vec2graphPageRank/">Page Rank for Word2Vec2Graph</a></i>.
 
-<p>In this post we will look at different ways to find neighbors via the Word2Vec2Graph model.</p>
+<p>In this post we will look at different ways to find neighbors - via Word2Vec model and via Word2Vec2Graph model.</p>
 
 
 <p><h3>Two Connected Components with Page Rank </h3>
@@ -115,6 +115,7 @@ Here are the results from the previous post. We combined two large connected com
    <span class="nf">filter</span><span class="o">(</span><span class="err">'</span><span class="n">component</span><span class="o">===</span><span class="s">"60129542144"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">cc1</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">stressHightWeightPageRank</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span>
    <span class="err">'</span><span class="n">word</span><span class="o">===</span><span class="err">'</span><span class="n">id</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="err">'</span><span class="n">word</span><span class="o">,</span><span class="err">'</span><span class="n">pagerank</span><span class="o">).</span>
@@ -145,6 +146,7 @@ Here are the results from the previous post. We combined two large connected com
    <span class="nf">filter</span><span class="o">(</span><span class="err">'</span><span class="n">component</span><span class="o">===</span><span class="s">"60129542145"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">cc1</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">stressHightWeightPageRank</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span>
    <span class="err">'</span><span class="n">word</span><span class="o">===</span><span class="err">'</span><span class="n">id</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="err">'</span><span class="n">word</span><span class="o">,</span><span class="err">'</span><span class="n">pagerank</span><span class="o">).</span>
@@ -169,6 +171,7 @@ We will look at neighbors of the word with highest Page Rank for each of these c
    <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b)"</span><span class="o">).</span>
    <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"hormones"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">neighbor1</span><span class="o">.</span>
    <span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">))</span>
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
@@ -185,6 +188,7 @@ We will look at neighbors of the word with highest Page Rank for each of these c
    <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b)"</span><span class="o">).</span>
    <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"processes"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">neighbor1</span><span class="o">.</span>
    <span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">))</span>
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
@@ -251,6 +255,7 @@ Now let's say we need to find neighbors of neighbors, i.e. words with two degree
    <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
    <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"processes"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">neighbor2</span><span class="o">)</span>
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
 <span class="n">processes</span><span class="o">,</span><span class="n">strategies</span><span class="o">,</span><span class="mf">0.8079603436193109</span><span class="o">,</span><span class="n">governmental</span><span class="o">,</span><span class="mf">0.7553409742807539</span>
@@ -269,6 +274,7 @@ Now let's say we need to find neighbors of neighbors, i.e. words with two degree
    <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
    <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"hormones"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">neighbor2</span><span class="o">)</span>
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
 <span class="n">hormones</span><span class="o">,</span><span class="n">digestive</span><span class="o">,</span><span class="mf">0.767779980189556</span><span class="o">,</span><span class="n">disorders</span><span class="o">,</span><span class="mf">0.7784715813141609</span></code></pre></figure>
@@ -288,6 +294,7 @@ First we will look GraphFrames 'triangleCount' function  </p>
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphTriangles</span><span class="k">=</span><span class="n">graphHightWeight</span><span class="o">.</span>
    <span class="n">triangleCount</span><span class="o">.</span>
    <span class="n">run</span><span class="o">()</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">graphTriangles</span><span class="o">.</span>
    <span class="n">select</span><span class="o">(</span><span class="ss">'id,'count)</span><span class="o">.</span>
    <span class="n">filter</span><span class="o">(</span><span class="ss">'count&gt;</span><span class="mi">0</span><span class="o">).</span>
@@ -319,6 +326,7 @@ First we will look GraphFrames 'triangleCount' function  </p>
    <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"b.id"</span><span class="o">&lt;</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">triangles</span><span class="o">.</span>
    <span class="n">orderBy</span><span class="o">(</span><span class="ss">'word1)</span><span class="o">)</span>
 <span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">word3</span>

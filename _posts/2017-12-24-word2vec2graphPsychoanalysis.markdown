@@ -8,8 +8,9 @@ header-img: "img/modern36.jpg"
 ---
 
 <p><h3>Word2Vec2Graph Model and Free Associations</h3>
-In this post we will show the process of converting text files to Word2Vec2Graph model. As a text file we will use text data about Psychoanalysis from Wikipedia. </p>
-<p>Word2Vec2Graph technique to find topics is similar to Free Association technique used in psychoanalysis. "The importance of free association is that the patients spoke for themselves, rather than repeating the ideas of the analyst; they work through their own material, rather than parroting another's suggestions" (Freud).
+
+<p>Word2Vec2Graph technique to find text topics is similar to Free Association technique used in psychoanalysis: "The importance of free association is that the patients spoke for themselves, rather than repeating the ideas of the analyst; they work through their own material, rather than parroting another's suggestions" (Freud).</p>
+<p>In this post we will show some examples that prove this analogy. As a text file we will use data about Psychoanalysis from Wikipedia.
 </p>
 
 <h3>Read and Clean Psychoanalysis Data File </h3>
@@ -82,7 +83,7 @@ cleanPsychoW2V.count//--3318
 
 {% endhighlight %}
 
-<p>The Word2Vec model was trained on corpus based on News and Wikipedia data about psychology but only 82% of Psychoanalysis File word pairs are in the model. To increase this percentage we will include Psychoanalysis file data to training corpus and retrain the Word2Vec model. </p>
+<p>The Word2Vec model was trained on corpus based on News and Wikipedia data about psychology but only 82% of Psychoanalysis file word pairs are in the model. To increase this percentage we will include Psychoanalysis file data to training corpus and retrain the Word2Vec model. </p>
 
 <p><h3>Retrain Word2Vec Model</h3>
 
@@ -126,7 +127,7 @@ val cleanPsychoNewW2V=slpitCleanPsychoanalysis.
 cleanPsychoNewW2V.count//--3433    
 {% endhighlight %}
 
-<p>This new Word2Vec model works better: 85% of Psychoanalysis File words are in the model. </p>
+<p>This new Word2Vec model works a little bit better: 85% of Psychoanalysis File words are in the model. </p>
 
 <p><h3>How Word Pairs are Connected?</h3>
 Now we will calculate cosine similarities of words within word pairs.
@@ -222,7 +223,7 @@ val graphPsychoanalysis = GraphFrame(graphPsychoanalysisVertices, graphPsychoana
 
 
 <p><h3>Page Rank</h3>
-Calculate Page Rank : </p>
+Calculate Page Rank:</p>
 {% highlight scala %}
 val graphPsychoanalysisPageRank = graphPsychoanalysis.
    pageRank.
@@ -385,26 +386,26 @@ Connected components with edge weights in (-0.5, 0.0): </p>
 <p>Graph picture with no parameters: edge weights in (-1.0, 1.0):</p>
 
 
-<p>Example1:</p>
+<p>Example 1:</p>
 
 <a href="#">
     <img src="{{ site.baseurl }}/img/graph24.jpg" alt="Post Sample Image" width="500" height="500">
 </a>
 
 
-<p>Example2:</p>
+<p>Example 2:</p>
 
 <a href="#">
     <img src="{{ site.baseurl }}/img/graph23.jpg" alt="Post Sample Image" width="560" height="500">
 </a>
 
-<p>Example3:</p>
+<p>Example 3:</p>
 
 <a href="#">
     <img src="{{ site.baseurl }}/img/graph22.jpg" alt="Post Sample Image" width="700" height="500">
 </a>
 
-<p>This post example topics with high cosine similarity word pairs are more expected then topics with low cosine similarity word pairs. Lowly correlated word pairs give us more interesting and unpredicted results. The last example shows that within Psychoanalysis text file the word 'association' is associated with unexpected words...</p>
+<p>This post example topics with high cosine similarity word pairs are more expected then topics with low cosine similarity word pairs. Lowly correlated word pairs give us more interesting and unpredicted results. The last example shows that within Psychoanalysis text file the word 'association' is associated with some unexpected words...</p>
 
 <p><h3>Next Post - Associations</h3>
 In the next several posts we will deeper look at data associations.</p>

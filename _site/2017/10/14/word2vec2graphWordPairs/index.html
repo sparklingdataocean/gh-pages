@@ -104,11 +104,8 @@ In previous posts we introduced
 Word2Vec2Graph model connects Word2Vec model with Spark GraphFrames library and gives us new opportunities to use graph approach to text mining.</p>
 
 <p>
-As Word2Vec model we will use the same
-<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/06/w2vTrain/">Word2Vec model </a></i> that was trained on the corpus of combined News data and Wiki data files.</p>
-
-<p>
-As a text file we will use the same Stress Data file - a small text file with data about stress that was copied from Wikipedia article. In previous posts we looked at graph for all pairs of words from Stress Data file. Now we will look at pairs of words that stay next to each other in text file and will use these pairs as graph edges.</p>
+In this post as Word2Vec model we will use the same model that was
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/06/w2vTrain/">trained on the corpus of News and Wiki data</a></i> and as a text file we will use the same Stress Data file. In previous posts we looked at graph for all pairs of words from Stress Data file. Now we will look at pairs of words that stay next to each other in text file and will use these pairs as graph edges.</p>
 
 <h3>Read and Clean Stress Data File </h3>
 <p>Read Stress Data file:</p>
@@ -186,7 +183,10 @@ Stress Data File based on Word2Vec model and saved the results.
 </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wStressCos</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'cos&lt;</span> <span class="mf">0.1</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span> <span class="mf">0.0</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">.</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&lt;</span> <span class="mf">0.1</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span> <span class="mf">0.0</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">conducted</span><span class="o">,</span><span class="n">contribute</span><span class="o">,</span><span class="mf">0.08035969605150468</span>
 <span class="n">association</span><span class="o">,</span><span class="n">contribute</span><span class="o">,</span><span class="mf">0.06940379539008698</span>
@@ -219,7 +219,8 @@ Stress Data File based on Word2Vec model and saved the results.
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">ngramWord2VecDF</span><span class="o">.</span>
    <span class="n">select</span><span class="o">(</span><span class="ss">'ngram,'cos)</span><span class="o">.</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="o">(-</span><span class="mf">0.002</span><span class="o">)).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'cos&lt;</span><span class="o">(</span><span class="mf">0.002</span><span class="o">)).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'cos)</span><span class="o">)</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="o">(-</span><span class="mf">0.002</span><span class="o">)).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&lt;</span><span class="o">(</span><span class="mf">0.002</span><span class="o">)).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'cos)</span><span class="o">)</span>
 <span class="n">ngram</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">researchers</span> <span class="n">interested</span><span class="o">,-</span><span class="mf">0.0019752767768097153</span>
 <span class="n">defense</span> <span class="n">mechanisms</span><span class="o">,-</span><span class="mf">0.0014974826488316265</span>
@@ -264,11 +265,11 @@ Calculate Page Rank: </p>
    <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
    <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
    <span class="n">run</span><span class="o">()</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">graphNgramStressPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
    <span class="n">distinct</span><span class="o">.</span>
    <span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span>
    <span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
-
    <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
    <span class="n">stress</span><span class="o">,</span><span class="mf">36.799029843873065</span>
    <span class="n">social</span><span class="o">,</span><span class="mf">8.794399876715186</span>
@@ -283,7 +284,7 @@ Calculate Page Rank: </p>
    <span class="n">chronic</span><span class="o">,</span><span class="mf">5.2918611240572755</span></code></pre></figure>
 
 <p><h3>Next Post - Connected Word Pairs</h3>
-In the next post we will play with Spark GraphFrames library and run Connected Components and Label Propagation functions for direct Word2Vec2Graph model.</p>
+In the next post we will run Connected Components and Label Propagation functions of Spark GraphFrames library to analyze direct Word2Vec2Graph model.</p>
 
 
                 <hr>

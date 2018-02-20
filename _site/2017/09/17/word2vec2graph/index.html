@@ -99,11 +99,11 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
 				<p><h3>Graph and Word2Vec Model </h3>
-Word2Vec model maps words to vectors which gives us an opportunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.</p>
-
-<p>We are running a small AWS cluster so we will run a small text file with data about stress that was copied from Wikipedia article. We will call this text file Stress Data File.</p>
-<p>As Word2VecModel we will use the model that was trained on News and Wiki data about psychology. We described this model in our previous post.</p>
-
+Word2Vec model maps words to vectors which gives us an opportunity to calculate cosine similarities within pairs of words then translate pairs of words to graph using words as nodes, word pairs as edges and cosine similarities as edge weights.</p>
+<p>We are running a small AWS cluster
+<i><a href="https://databricks.com/blog/2016/02/17/introducing-databricks-community-edition-apache-spark-for-all.html">on Databricks community edition</a></i>
+and for the Word2Vec2Graph model we will use a small size text file with data about stress taken from a Wikipedia article. We will call this text file Stress Data File.</p>
+<p>As Word2VecModel we will use the model that was trained on News and Wiki data about psychology corpus. <i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/06/w2vTrain/"> We described this model in our previous post.</a></i>
 <p>
 <h3>Read and Clean Stress Data File </h3>
 Read Wiki data file: </p>
@@ -112,6 +112,7 @@ Read Wiki data file: </p>
    <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/stressWiki.txt"</span><span class="o">).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
 <span class="n">inputStress</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">247</span></code></pre></figure>
+
 
 <p>Tokenize Stress data file:</p>
 
@@ -125,7 +126,9 @@ Read Wiki data file: </p>
    <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
 <span class="n">val</span> <span class="n">tokenizedStress</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span>
    <span class="nf">transform</span><span class="o">(</span><span class="n">inputStress</span><span class="o">)</span>
+
 <span class="n">tokenizedStress</span><span class="o">.</span><span class="na">count</span><span class="c1">//--274</span></code></pre></figure>
+
 
 <p>Remove stop words from Stress data file: </p>
 
@@ -136,6 +139,7 @@ Read Wiki data file: </p>
    <span class="nf">setStopWords</span><span class="o">(</span><span class="n">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span><span class="n">remover</span><span class="o">.</span><span class="na">getStopWords</span><span class="o">).</span>
    <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedStress</span><span class="o">)</span></code></pre></figure>
 
+
 <p> </p>
 <p>Explode Stress word arrays to words:</p>
 
@@ -144,6 +148,7 @@ Read Wiki data file: </p>
    <span class="n">withColumn</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"stopWordFree"</span><span class="o">)).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">).</span>
    <span class="n">distinct</span>
+
 <span class="n">slpitCleanWordsStress</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">1233</span></code></pre></figure>
 
 <p> </p>
@@ -162,16 +167,19 @@ We will use our trained Word2Vec model for word pairs cosine similarities. First
    <span class="n">read</span><span class="o">.</span>
    <span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span></code></pre></figure>
 
+
 <p>Next we will get the list of all words from the Word2Vec model:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modelWords</span><span class="k">=</span><span class="n">modelNewsWiki</span><span class="o">.</span>
    <span class="n">getVectors</span></code></pre></figure>
+
 
 <p>To be able to use this Word2Vec model for Stress Data file cosine similarities, we will filter out words from Stress Data file that are not in the Word2Vec list of words:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressWords</span><span class="k">=</span><span class="n">slpitCleanWordsStress</span><span class="o">.</span>
    <span class="n">join</span><span class="o">(</span><span class="n">modelWords</span><span class="o">,</span><span class="ss">'cleanWord </span><span class="o">===</span> <span class="ss">'word)</span><span class="o">.</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span><span class="n">distinct</span>
+
 <span class="n">stressWords</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">1125</span></code></pre></figure>
 
 <p></p>
@@ -182,7 +190,9 @@ We will use our trained Word2Vec model for word pairs cosine similarities. First
    <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">w2wStress</span><span class="k">=</span><span class="n">stressWords</span><span class="o">.</span>
    <span class="n">join</span><span class="o">(</span><span class="n">stressWords2</span><span class="o">,</span><span class="ss">'word=</span><span class="o">!='</span><span class="n">word2</span><span class="o">)</span>
+
 <span class="n">w2wStress</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">1264500</span></code></pre></figure>
+
 
 <p>
 <h3>Word2Vec Cosine Similarity Function</h3>
@@ -190,19 +200,22 @@ Now we want to use Word2Vec cosine similarity to see how words are connected wit
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml.linalg.Vector</span>
 <span class="k">def</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
-             <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="k">var</span> <span class="n">dot</span><span class="k">=</span><span class="mf">0.0</span>
-  <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span><span class="mi">0</span> <span class="n">to</span> <span class="n">vectorX</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">dot</span> <span class="o">+=</span> <span class="n">vectorX</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">*</span> <span class="n">vectorY</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
-  <span class="n">dot</span>
+   <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
+   <span class="k">var</span> <span class="n">dot</span><span class="k">=</span><span class="mf">0.0</span>
+   <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span><span class="mi">0</span> <span class="n">to</span> <span class="n">vectorX</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">dot</span> <span class="o">+=</span> <span class="n">vectorX</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">*</span> <span class="n">vectorY</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
+   <span class="n">dot</span>
 <span class="o">}</span>
 <span class="k">def</span> <span class="n">cosineVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
-                 <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="n">require</span><span class="o">(</span><span class="n">vectorX</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">vectorY</span><span class="o">.</span><span class="n">size</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">dot</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">div</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorX</span><span class="o">)</span> <span class="o">*</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorY</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
-  <span class="k">if</span> <span class="o">(</span><span class="n">div</span><span class="o">==</span><span class="mi">0</span><span class="o">)</span><span class="mi">0</span>
-  <span class="k">else</span> <span class="n">dot</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="o">(</span><span class="n">div</span><span class="o">)</span>
+   <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
+   <span class="n">require</span><span class="o">(</span><span class="n">vectorX</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">vectorY</span><span class="o">.</span><span class="n">size</span><span class="o">)</span>
+   <span class="k">val</span> <span class="n">dot</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+   <span class="k">val</span> <span class="n">div</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorX</span><span class="o">)</span> <span class="o">*</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorY</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+   <span class="k">if</span> <span class="o">(</span><span class="n">div</span><span class="o">==</span><span class="mi">0</span><span class="o">)</span><span class="mi">0</span>
+   <span class="k">else</span> <span class="n">dot</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="o">(</span><span class="n">div</span><span class="o">)</span>
 <span class="o">}</span></code></pre></figure>
+
+
+
 
 <p></p>
 
@@ -217,13 +230,12 @@ Now we can calculate word to word cosine similarities between word pairs from St
     <span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">3</span><span class="o">)))).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">)</span></code></pre></figure>
 
+
 <p>Example: Word combinations with high Cosine Similarities:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2wStressCosDF</span><span class="o">.</span>
    <span class="n">select</span><span class="o">(</span><span class="ss">'word1,'word2,'cos)</span><span class="o">.</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="mf">0.8</span><span class="o">).</span>
-   <span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
-
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="mf">0.8</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">disorders</span><span class="o">,</span><span class="n">chronic</span><span class="o">,</span><span class="mf">0.8239098331266418</span>
 <span class="n">strategies</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="mf">0.8079603436193109</span>
@@ -233,14 +245,13 @@ Now we can calculate word to word cosine similarities between word pairs from St
 <span class="n">second</span><span class="o">,</span><span class="n">third</span><span class="o">,</span><span class="mf">0.8717226080244964</span>
 <span class="n">second</span><span class="o">,</span><span class="n">first</span><span class="o">,</span><span class="mf">0.8096815780218063</span></code></pre></figure>
 
+
 <p>Example: Word combinations with low Cosine Similarity:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2wStressCosDF</span><span class="o">.</span>
    <span class="n">select</span><span class="o">(</span><span class="ss">'word1,'word2,'cos)</span><span class="o">.</span>
    <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&lt;</span><span class="o">(</span><span class="mf">0.65</span><span class="o">)).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="o">(</span><span class="mf">0.6</span><span class="o">)).</span>
-   <span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
-
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="o">(</span><span class="mf">0.6</span><span class="o">)).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">interaction</span><span class="o">,</span><span class="n">disorders</span><span class="o">,</span><span class="mf">0.6114415840642784</span>
 <span class="n">persist</span><span class="o">,</span><span class="n">affect</span><span class="o">,</span><span class="mf">0.6126901072184042</span>
@@ -250,16 +261,18 @@ Now we can calculate word to word cosine similarities between word pairs from St
 <span class="n">everyday</span><span class="o">,</span><span class="n">communicate</span><span class="o">,</span><span class="mf">0.6137230335862902</span>
 <span class="n">recognize</span><span class="o">,</span><span class="n">respond</span><span class="o">,</span><span class="mf">0.6024905770721792</span></code></pre></figure>
 
+
+
 <p>Store and read Stress Data File word pairs with cosine similarities between them:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">w2wStressCos2</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span></code></pre></figure>
 
+
 <p><h3>Graph of Combinations of Stress Data File Words </h3>
 Now we can build a graph using words as nodes, {word1, word2} word combinations as edges and cosine similarities between the words as edge weights:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
-
 <span class="k">val</span> <span class="n">graphNodes</span><span class="k">=</span><span class="n">w2wStressCosDF</span><span class="o">.</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">).</span>
    <span class="n">union</span><span class="o">(</span><span class="n">w2wStressCosDF</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)).</span>
@@ -271,7 +284,9 @@ Now we can build a graph using words as nodes, {word1, word2} word combinations 
    <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes</span><span class="o">,</span><span class="n">graphEdges</span><span class="o">)</span></code></pre></figure>
 
+
 <p>We will save graph vertices and edges in Parquet format to use them for future posts:</p>
+
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">graph1</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
    <span class="n">write</span><span class="o">.</span>
@@ -280,7 +295,9 @@ Now we can build a graph using words as nodes, {word1, word2} word combinations 
    <span class="n">write</span><span class="o">.</span>
    <span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressEdges"</span><span class="o">)</span></code></pre></figure>
 
+
 <p> Load vertices and edges and rebuild the same graph:</p>
+
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
 <span class="k">val</span> <span class="n">graphStressNodes</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
@@ -292,7 +309,7 @@ Now we can build a graph using words as nodes, {word1, word2} word combinations 
 <span class="k">val</span> <span class="n">graphStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphStressNodes</span><span class="o">,</span><span class="n">graphStressEdges</span><span class="o">)</span></code></pre></figure>
 
 <p></p>
-<p></p>
+
 <p>
 <h3>Connected Components</h3>
 They are many interesting things we can do with Spark GraphFrames. In this post we will play with connected components.
@@ -306,10 +323,11 @@ They are many interesting things we can do with Spark GraphFrames. In this post 
    <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
    <span class="n">count</span><span class="o">.</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">ccStressCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">))</span>
 
+<span class="n">display</span><span class="o">(</span><span class="n">ccStressCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">))</span>
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
 <span class="mi">0</span><span class="o">,</span><span class="mi">1125</span></code></pre></figure>
+
 
 <p>This graph was built on all {word1, word2} combinations of Stress Data File so all word pairs are in the same large connected component. We will look at connected components of subgraphs with different edge weight thresholds.
 
@@ -325,6 +343,7 @@ For this post we will use edge weight threshold 0.75, i.e. we will use only word
    <span class="n">filter</span><span class="o">(</span><span class="s">"edgeWeight &gt; 0.75"</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">graphHightWeight</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphStress</span><span class="o">.</span><span class="n">vertices</span><span class="o">,</span> <span class="n">edgeHightWeight</span><span class="o">)</span></code></pre></figure>
 
+
 <p>Run connected components for graph with high cosine similarity:
 </p>
 
@@ -335,10 +354,10 @@ For this post we will use edge weight threshold 0.75, i.e. we will use only word
    <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
    <span class="n">count</span><span class="o">.</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCcCount</span><span class="o">.</span>
    <span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">).</span>
    <span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
-
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
 <span class="mi">60129542144</span><span class="o">,</span><span class="mi">17</span>
 <span class="mi">60129542145</span><span class="o">,</span><span class="mi">9</span>
@@ -352,12 +371,12 @@ For this post we will use edge weight threshold 0.75, i.e. we will use only word
 <span class="mi">618475290630</span><span class="o">,</span><span class="mi">2</span>
 <span class="mi">532575944709</span><span class="o">,</span><span class="mi">2</span></code></pre></figure>
 
+
 <p>Words in the biggest component:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
    <span class="n">filter</span><span class="o">(</span><span class="s">"component=60129542144"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
-
 <span class="n">id</span>
 <span class="n">humans</span>
 <span class="n">harmful</span>
@@ -377,12 +396,12 @@ For this post we will use edge weight threshold 0.75, i.e. we will use only word
 <span class="n">tumors</span>
 <span class="n">acute</span></code></pre></figure>
 
+
 <p>Words in the second component:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
    <span class="n">filter</span><span class="o">(</span><span class="s">"component=60129542145"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
-
 <span class="n">id</span>
 <span class="n">capabilities</span>
 <span class="n">governmental</span>
@@ -401,7 +420,6 @@ For this post we will use edge weight threshold 0.75, i.e. we will use only word
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
    <span class="n">filter</span><span class="o">(</span><span class="s">"component=240518168580"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="ss">'id)</span><span class="o">)</span>
-
 <span class="n">id</span>
 <span class="n">increased</span>
 <span class="n">increase</span>
@@ -416,6 +434,7 @@ For this post we will use edge weight threshold 0.75, i.e. we will use only word
 <p>
 <h3>Next Post - Word2Vec2Graph Page Rank</h3>
 Spark GraphFrames library has many interesting functions. In the next post we will look at Page Rank for Word2Vec2Graph.
+</p>
 </p>
 
 

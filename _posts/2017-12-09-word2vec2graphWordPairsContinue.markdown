@@ -69,7 +69,7 @@ val result=w2v2gConnectedComponents(graphNgramStressVertices,
   graphNgramStressEdges,0.5,1.0,4,30)
 result.persist
 
-   display(result.orderBy('component).limit(10))
+display(result.orderBy('component).limit(10))
 component,ccCt,src,dst,edgeWeight
 8589934598,5,effect,mental,0.019197841854283394
 8589934598,5,negative,event,-0.1545046492202531
@@ -85,11 +85,11 @@ component,ccCt,src,dst,edgeWeight
 {% endhighlight %}
 
 <h3>Transform to .DOT Language</h3>
-We described in our previous post how to build graph on Gephi.
+<p>We described in our previous post how to build graph on Gephi.
 This function creates a list of direct edges with labels on .DOT format.
 This function takes an output of the w2v2gConnectedComponents function, component id
 and minimum and maximum of edge weight:
-
+</p>
 {% highlight scala %}
 
 def component2dot(graphComponents: DataFrame, componentId: Long,
@@ -108,7 +108,7 @@ def component2dot(graphComponents: DataFrame, componentId: Long,
 {% highlight scala %}
 val resultDot=component2dot(result,8589934598L,0.5,1.0)
 
-   display(resultDot)
+display(resultDot)
 "negatively" -> "impact" [label="0.62"];
 "negative" -> "impact" [label="0.55"];
 "impact" -> "effect" [label="0.56"];
@@ -119,8 +119,8 @@ val resultDot=component2dot(result,8589934598L,0.5,1.0)
 
 
 <h3>How to Find Topics?</h3>
-
-Do select potentially interesting connected components first we'll look at three most highly connected word pairs of all components. We will start with connected components based on word pairs with cosine similarity >0.5.
+<p>
+Do select potentially interesting connected components first we'll look at three most highly connected word pairs of all components. We will start with connected components based on word pairs with cosine similarity >0.5.</p>
 {% highlight scala %}
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
@@ -128,7 +128,7 @@ val partitionWindow = Window.partitionBy($"component").orderBy($"edgeWeight".des
 val result=w2v2gConnectedComponents(graphNgramStressVertices,graphNgramStressEdges,0.5,1.0,4,30)
 val result2 = result.withColumn("rank", rank().over(partitionWindow))
 
-   display(result2.filter("rank<4").orderBy("component","rank"))
+display(result2.filter("rank<4").orderBy("component","rank"))
 component,ccCt,src,dst,edgeWeight,rank
 8589934598,5,negatively,impact,0.6222451350552916,1
 8589934598,5,impact,effect,0.5603950362283256,2
@@ -150,7 +150,7 @@ component,ccCt,src,dst,edgeWeight,rank
 {% highlight scala %}
 val resultDot=component2dot(result,146028888067L,0.5,1.0)
 
-   display(resultDot)
+display(resultDot)
 "communication" -> "methods" [label="0.57"];
 "techniques" -> "monitoring" [label="0.51"];
 "therapeutic" -> "communication" [label="0.53"];
@@ -171,7 +171,7 @@ val resultDot=component2dot(result,146028888067L,0.5,1.0)
 {% highlight scala %}
 val resultDot=component2dot(result,146028888067L,0.1,0.4)
 
-   display(resultDot)
+display(resultDot)
 "types" -> "communication" [label="0.37"];
 "communication" -> "assertive" [label="0.38"];
 "skill" -> "communication" [label="0.34"];
@@ -200,12 +200,13 @@ val resultDot=component2dot(result,146028888067L,0.1,0.4)
 }
 {% endhighlight %}
 
-<p>Here is the graph for these topics:
+<p>
+Here is the graph for these topics:
 </p>
 <a href="#">
     <img src="{{ site.baseurl }}/img/graph15.jpg" alt="Post Sample Image" width="500" height="500">
 </a>
-We can see in this graph that associations between word pairs with low cosine similarity give us more new ideas then word pairs with high cosine similarity. To find more new associations we will look at connected components based on word pairs with lower cosine similarity.
+<p>We can see in this graph that associations between word pairs with low cosine similarity give us more new ideas then word pairs with high cosine similarity. To find more new associations we will look at connected components based on word pairs with lower cosine similarity.</p>
 
 {% highlight scala %}
 import org.apache.spark.sql.expressions.Window
@@ -220,7 +221,7 @@ result.persist
 val result3edges = result.
    withColumn("rank", rank().over(partitionWindow))
 
-   display(result3edges.filter("rank<4").orderBy("component","rank"))
+display(result3edges.filter("rank<4").orderBy("component","rank"))
 component,ccCt,src,dst,edgeWeight,rank
 60129542144,6,psychological,disorders,0.5963055756093992,1
 60129542144,6,stress,disorders,0.5028157528421987,2
@@ -243,7 +244,7 @@ component,ccCt,src,dst,edgeWeight,rank
 {% highlight scala %}
 val resultDot1=component2dot(result,68719476739L,0.1,0.4)
 
-   display(resultDot1)
+display(resultDot1)
 "imagery" -> "visualization" [label="0.21"];
 "create" -> "relaxing" [label="0.35"];
 "guided" -> "imagery" [label="0.27"];
@@ -259,7 +260,7 @@ val resultDot1=component2dot(result,68719476739L,0.1,0.4)
 {% highlight scala %}
 val resultDot2=component2dot(result,68719476739L,-1.0,1.0)
 
-   display(resultDot2)
+display(resultDot2)
 "imagery" -> "visualization" [label="0.21"];
 "create" -> "relaxing" [label="0.35"];
 "create" -> "pressure" [label="0.01"];
@@ -278,7 +279,7 @@ val resultDot2=component2dot(result,68719476739L,-1.0,1.0)
 {% highlight scala %}
 val resultDot3=component2dot(result,549755813891L,-1.0,1.0)
 
-   display(resultDot3)
+display(resultDot3)
 "laughter" -> "humor" [label="0.45"];
 "laughter" -> "relieve" [label="0.3"];
 "drastically" -> "children" [label="-0.24"];
@@ -300,7 +301,7 @@ val resultDot3=component2dot(result,549755813891L,-1.0,1.0)
 {% highlight scala %}
 val resultDot4=component2dot(result,206158430208L,-1.0,1.0)
 
-   display(resultDot4)
+display(resultDot4)
 "resilience" -> "building" [label="0.09"];
 "adverse" -> "consequences" [label="0.6"];
 "consequences" -> "marked" [label="0.06"];

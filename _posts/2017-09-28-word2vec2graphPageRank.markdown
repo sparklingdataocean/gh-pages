@@ -8,13 +8,12 @@ header-img: "img/pic29.jpg"
 ---
 
 <p><h3>Word2Vec2Graph Model - Page Rank</h3>
-In the previous post we explained how to build Word2Vec2Graph model as combination of Word2vec model and Graph engine in Spark.
-Spark GraphFrames library has many interesting functions. In this post we will look at Page Rank for Word2Vec2Graph.
+
+In the previous post we explained
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/">how to build Word2Vec2Graph model </a></i>. The Word2Vec2Graph model was built based on a small Stress Data File - text file about stress that we extracted from Wikipedia. We used words from Stress Data File as vertices and Word2Vec model cosine similarity as edge weights. The Word2Vec model was trained on the corpus of combined News data and Wiki data. The Word2Vec2Graph model was built as a combination of Word2vec model and Spark GraphFrames library that has many interesting functions. In this post we will look at Page Rank function.
 </p>
 
 
-
-<p>We will use the Word2Vec2Graph model based on a small Stress Data File - text file about stress that we extracted from Wikipedia. We used word from Stress Data File as vertices and Word2Vec model cosine similarity as edge weights. The Word2Vec model was trained on the corpus of combined News data and Wiki data.</p>
 
 <p><h3>Get Data from Data Storage</h3>
 Read word to word Stress Data File combinations with Word2Vec cosine similarities: </p>
@@ -42,8 +41,8 @@ Calculate Page Rank: </p>
 val stressPageRank = graphStress.
    pageRank.
    resetProbability(0.15).
-   maxIter(11).
-   run()
+   maxIter(11).run()
+
 display(stressPageRank.vertices.
    distinct().
    sort($"pagerank".asc).
@@ -63,14 +62,13 @@ val graphHightWeight = GraphFrame(graphStress.vertices, edgeHightWeight)
 val stressHightWeightPageRank = graphHightWeight.
    pageRank.
    resetProbability(0.15).
-   maxIter(11).
-   run()
+   maxIter(11).run()
+
 display(stressHightWeightPageRank.
    vertices.
    distinct().
    sort($"pagerank".desc).
    limit(11))
-
 id,pagerank
 hormones,11.925990421899789
 processes,11.314750484908657
@@ -90,9 +88,9 @@ Graph that we use now is indirect so high Page Rank vertices are similar to high
 {% highlight scala %}
 val vertexInDegrees= graphHightWeight.
    inDegrees
+
 display(vertexInDegrees.
-   orderBy('inDegree.desc).
-   limit(11))
+   orderBy('inDegree.desc).limit(11))
 id,inDegree
 processes,6
 disorders,6
@@ -120,9 +118,9 @@ val graphHightWeightCcCount=graphHightWeightCC.
    groupBy("component").
    count.
    toDF("cc","ccCt")
+
 display(graphHightWeightCcCount.
-   orderBy('ccCt.desc).
-   limit(11))
+   orderBy('ccCt.desc).limit(11))
 cc,ccCt
 60129542144,17
 60129542145,9
@@ -143,6 +141,7 @@ val cc1=graphHightWeightCC.
    filter('component==="60129542144").
    select("id").
    toDF("word")
+
 display(cc1.join(stressHightWeightPageRank.vertices,
    'word==='id).
    select('word,'pagerank).
@@ -173,6 +172,7 @@ val cc1=graphHightWeightCC.
    filter('component==="60129542145").
    select("id").
    toDF("word")
+
 display(cc1.join(stressHightWeightPageRank.vertices,
    'word==='id).
    select('word,'pagerank).

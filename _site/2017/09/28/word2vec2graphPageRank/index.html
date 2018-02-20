@@ -99,11 +99,10 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
 				<p><h3>Word2Vec2Graph Model - Page Rank</h3>
-In the previous post we explained how to build Word2Vec2Graph model as combination of Word2vec model and Graph engine in Spark.
-Spark GraphFrames library has many interesting functions. In this post we will look at Page Rank for Word2Vec2Graph.
-</p>
 
-<p>We will use the Word2Vec2Graph model based on a small Stress Data File - text file about stress that we extracted from Wikipedia. We used word from Stress Data File as vertices and Word2Vec model cosine similarity as edge weights. The Word2Vec model was trained on the corpus of combined News data and Wiki data.</p>
+In the previous post we explained
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/">how to build Word2Vec2Graph model </a></i>. The Word2Vec2Graph model was built based on a small Stress Data File - text file about stress that we extracted from Wikipedia. We used words from Stress Data File as vertices and Word2Vec model cosine similarity as edge weights. The Word2Vec model was trained on the corpus of combined News data and Wiki data. The Word2Vec2Graph model was built as a combination of Word2vec model and Spark GraphFrames library that has many interesting functions. In this post we will look at Page Rank function.
+</p>
 
 <p><h3>Get Data from Data Storage</h3>
 Read word to word Stress Data File combinations with Word2Vec cosine similarities: </p>
@@ -129,8 +128,8 @@ Calculate Page Rank: </p>
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressPageRank</span> <span class="k">=</span> <span class="n">graphStress</span><span class="o">.</span>
    <span class="n">pageRank</span><span class="o">.</span>
    <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
-   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
-   <span class="n">run</span><span class="o">()</span>
+   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">stressPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
    <span class="n">distinct</span><span class="o">().</span>
    <span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">asc</span><span class="o">).</span>
@@ -148,14 +147,13 @@ Calculate Page Rank: </p>
 <figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">val</span> <span class="n">stressHightWeightPageRank</span> <span class="o">=</span> <span class="n">graphHightWeight</span><span class="o">.</span>
    <span class="n">pageRank</span><span class="o">.</span>
    <span class="nf">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
-   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
-   <span class="n">run</span><span class="o">()</span>
+   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="na">run</span><span class="o">()</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">stressHightWeightPageRank</span><span class="o">.</span>
    <span class="n">vertices</span><span class="o">.</span>
    <span class="nf">distinct</span><span class="o">().</span>
    <span class="n">sort</span><span class="o">(</span><span class="err">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="na">desc</span><span class="o">).</span>
    <span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
-
 <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
 <span class="n">hormones</span><span class="o">,</span><span class="mf">11.925990421899789</span>
 <span class="n">processes</span><span class="o">,</span><span class="mf">11.314750484908657</span>
@@ -174,9 +172,9 @@ Graph that we use now is indirect so high Page Rank vertices are similar to high
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">vertexInDegrees</span><span class="k">=</span> <span class="n">graphHightWeight</span><span class="o">.</span>
    <span class="n">inDegrees</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">vertexInDegrees</span><span class="o">.</span>
-   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'inDegree.</span><span class="n">desc</span><span class="o">).</span>
-   <span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'inDegree.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
 <span class="n">id</span><span class="o">,</span><span class="n">inDegree</span>
 <span class="n">processes</span><span class="o">,</span><span class="mi">6</span>
 <span class="n">disorders</span><span class="o">,</span><span class="mi">6</span>
@@ -203,9 +201,9 @@ Connected components: </p>
    <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
    <span class="n">count</span><span class="o">.</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCcCount</span><span class="o">.</span>
-   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">).</span>
-   <span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
 <span class="mi">60129542144</span><span class="o">,</span><span class="mi">17</span>
 <span class="mi">60129542145</span><span class="o">,</span><span class="mi">9</span>
@@ -225,6 +223,7 @@ Connected components: </p>
    <span class="nf">filter</span><span class="o">(</span><span class="err">'</span><span class="n">component</span><span class="o">===</span><span class="s">"60129542144"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">cc1</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">stressHightWeightPageRank</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span>
    <span class="err">'</span><span class="n">word</span><span class="o">===</span><span class="err">'</span><span class="n">id</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="err">'</span><span class="n">word</span><span class="o">,</span><span class="err">'</span><span class="n">pagerank</span><span class="o">).</span>
@@ -254,6 +253,7 @@ Connected components: </p>
    <span class="nf">filter</span><span class="o">(</span><span class="err">'</span><span class="n">component</span><span class="o">===</span><span class="s">"60129542145"</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">).</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">cc1</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">stressHightWeightPageRank</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span>
    <span class="err">'</span><span class="n">word</span><span class="o">===</span><span class="err">'</span><span class="n">id</span><span class="o">).</span>
    <span class="n">select</span><span class="o">(</span><span class="err">'</span><span class="n">word</span><span class="o">,</span><span class="err">'</span><span class="n">pagerank</span><span class="o">).</span>

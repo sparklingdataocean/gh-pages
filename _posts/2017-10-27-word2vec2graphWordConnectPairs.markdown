@@ -38,8 +38,8 @@ val ccStressCount=resultStressCC.
    groupBy("component").
    count.
    toDF("cc","ccCt")
-display(ccStressCount.orderBy('ccCt.desc))
 
+display(ccStressCount.orderBy('ccCt.desc))
 cc,ccCt
 0,1111
 240518168576,2
@@ -58,10 +58,10 @@ val lapelPropId = graphNgramStress.
   maxIter(5).
   run().
   toDF("lpWord","lpLabel")
+
 display(lapelPropId.
   groupBy("lpLabel").count.toDF("label","count").
   orderBy('count.desc).limit(11))
-
   label,count
   386547056642,115
   317827579910,107
@@ -94,7 +94,6 @@ For now we will ignore small groups and look at groups that have at least 3 {wor
 display(pairLabel.
   groupBy("lpLabel").count.toDF("lpLabelCount","pairCount").
   filter("pairCount>2").orderBy('pairCount.desc))
-
 lpLabelCount,pairCount
   386547056642,54
   317827579910,30
@@ -102,15 +101,14 @@ lpLabelCount,pairCount
 {% endhighlight %}
 
 <h3>Word Pair Groups</h3>
-We'll start with the second group - group that contains 30 {word1, word2} pairs.
+<p>We'll start with the second group - group that contains 30 {word1, word2} pairs.
 Here are edges that belong to this group - {word1, word2, word2vec cosine similarity}:
-
+</p>
 {% highlight scala %}
 display(pairLabel.
   filter('lpLabel==="317827579910").
   select('src,'dst,'edgeWeight).
   orderBy('edgeWeight.desc))
-
 src,dst,edgeWeight
 military,combat,0.6585100225253417
 theories,kinds,0.614683170553027
@@ -214,8 +212,8 @@ prevention -> requires
 </a>
 
 <p><h3>High Topics of Label Groups</h3>
-We can see that in the center of the biggest group is the word 'stress' - the word with the highest PageRank. We'll calculate high PageRank words for word pair groups.   </p>
-<p>Calculate PageRank:</p>
+We can see that in the center of the biggest group is the word 'stress' - the word with the highest PageRank. We'll calculate high PageRank words for word pair groups.   
+Calculate PageRank:</p>
 {% highlight scala %}
 val graphNgramStressPageRank =
   graphNgramStress.
@@ -236,12 +234,12 @@ val wordLabel=pairLabel.
     select('dst,'lpLabel)).
   distinct.
   toDF("lpWord","lpLabel")
+
 display(wordLabel.
   groupBy('lpLabel).count.
   toDF("lpLabel","labelCount").
   filter("labelCount>2").
   orderBy('labelCount.desc))
-
 lpLabel,labelCount
 386547056642,47
 317827579910,30
@@ -250,19 +248,20 @@ lpLabel,labelCount
 1675037245443,3
 {% endhighlight %}
 
-<p><h4>Top 10 Words in Label Groups</h4><p>
-The biggest group:</p
+<p><h4>Top 10 Words in Label Groups</h4></p>
+<p>
+The biggest group:</p>
 {% highlight scala %}
 val wordLabelPageRank=wordLabel.
   join(pageRankId,'lpWord==='prWord).
   select('lpLabel,'lpWord,'pageRank)
+
 display(wordLabelPageRank.
   select('lpWord,'pageRank).
   filter('lpLabel==="386547056642").
   orderBy('pageRank.desc).
   limit(10))
-
-  lpWord,pageRank
+lpWord,pageRank
   stress,36.799029843873036
   stressful,7.982561760153138
   anxiety,5.280935662282566
@@ -282,8 +281,7 @@ display(wordLabelPageRank.
   filter('lpLabel==="317827579910").
   orderBy('pageRank.desc).
   limit(10))
-
-  lpWord,pageRank
+lpWord,pageRank
   individual,8.75686668967628
   changes,5.642126628136839
   negative,3.89748211412626
@@ -303,8 +301,7 @@ display(wordLabelPageRank.
   filter('lpLabel==="274877906949").
   orderBy('pageRank.desc).
   limit(10))
-
-  lpWord,pageRank
+lpWord,pageRank
   disease,4.195635531226847
   illness,2.90222622174496
   heart,2.1357113367905662

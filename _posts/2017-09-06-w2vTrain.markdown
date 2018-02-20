@@ -7,13 +7,13 @@ author:     "Melenar"
 header-img: "img/home_sdo4.jpg"
 ---
 <h3>About Word2Vec Model </h3>
-<a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec model</a> was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product.
-Word2Vec model transforms words to vectors. This gives us new insights in text analytics.
+<i><a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec model</a></i> was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product.
+Word2Vec model transforms words to vectors which gives us new insights in text analytics.
 Here is an excellent article about word2vec model:
-<a href="https://blog.acolyer.org/2016/04/21/the-amazing-power-of-word-vectors/">The amazing power of word vectors</a>.
+<i><a href="https://blog.acolyer.org/2016/04/21/the-amazing-power-of-word-vectors/">The amazing power of word vectors</a></i>.
 
-
-<p>Let's look at some examples that help us to understand Word2Vec model. We'll start with well known algorithm - Google pageRank and run it on text file about Word2Vec model. Here are top pageRank words that shows us then Word2Vec model is about words, vectors, training, and so on: </p>
+<p>In our posts we will introduce a new Word2Vec2Graph model - a model that combines Word2Vec and graph functionalities. We will build graphs using words as nodes and Word2Vec cosine similarities and edge weights. Word2Vec graphs will give us new insights like top words in text file - pageRank, word topics - connected components, word neighbors - 'find' function. </p>   
+<p>Let's look at some examples of Word2Vec2Graph model based on text that describes Word2Vec model. We'll start with well known algorithm - Google pageRank. Here are top pageRank words that shows us then Word2Vec model is about words, vectors, training, and so on: </p>
 
 
 {% highlight scala %}
@@ -38,19 +38,19 @@ similar,6.01
 context,5.97
 {% endhighlight %}
 
-<p>Which words in documents about Word2Vec model are located between the words 'words' and 'vectors'?</p>
+<p>Spark GraphFrames 'find' function shows us which words in documents about Word2Vec model are located between the words 'words' and 'vectors'?</p>
 
 <a href="#">
     <img src="{{ site.baseurl }}/img/graphWv.jpg" alt="Post Sample Image" width="600" >
 </a>
 
-<p>This is one of well known Word2Vec examples. It shows Country - Capital associations like France - Germany + Berlin = Paris </p>
+<p>The next few graphs demonstrate one of well known examples about the Word2Vec model: Country - Capital associations like France - Germany + Berlin = Paris: </p>
 
 <a href="#">
     <img src="{{ site.baseurl }}/img/countryCapital.jpg" alt="Post Sample Image" height="600" >
 </a>
 
-<p>These pictures are built on graph of words with high Word2Vec cosine similarities. The first picture shows connected component, the second 'Germany' neighbors and neighbors of neighbors, the third a circle of word pairs. Numbers on edges are Word2Vec cosine similarities  between the words.</p>
+<p>The first picture shows connected component, the second 'Germany' neighbors and neighbors of neighbors, the third a circle of word pairs. Numbers on edges are Word2Vec cosine similarities between the words.</p>
 
 <p>Here are some more examples. We built a graph of words with low Word2Vec cosine similarities, ran connected components (first picture) and looked at neighbors of neighbors for the word 'vectors' (second picture):</p>
 
@@ -63,16 +63,16 @@ context,5.97
 </a>
 
 
-<p>In the next several posts we will show a new Word2Vec2Graph model. This model connects Word2Vec model with Graphs. As a tool we will use Spark. We will run it on Amazon Cloud via Databricks Community. </p>
+<p>In the next several posts we will show how to build and use the Word2Vec2Graph model. As a tool we will use Spark. We will run it on Amazon Cloud via Databricks Community. </p>
 
 <p><h3>Why Spark?</h3>
 Until recently there were no single processing framework that was able to solve several very different analytical problems like statistics and graphs. Spark is the first framework that can do it. It is the fundamental advantage of Spark that provides a framework for advanced analytics right out of the box. This framework includes a tool for accelerated queries, a machine learning library, and graph processing engine.</p>
 <p>
 <h3>Databricks Community </h3>
-Databricks community edition is an entry to Spark Big Data Analytics. It allows to create a cluster on Amazon Cloud and makes it is easy for data scientists and data engineers to write Spark code and debug it.
+<i><a href="https://databricks.com/blog/2016/02/17/introducing-databricks-community-edition-apache-spark-for-all.html">Databricks community edition</a></i> is an entry to Spark Big Data Analytics. It allows to create a cluster on Amazon Cloud and makes it is easy for data scientists and data engineers to write Spark code and debug it.
 And it's free!</p>
 
-<a href="https://databricks.com/blog/2016/02/17/introducing-databricks-community-edition-apache-spark-for-all.html">Databricks community edition</a>.
+
 
 
 <h3>Training a Word2Vec Model </h3>

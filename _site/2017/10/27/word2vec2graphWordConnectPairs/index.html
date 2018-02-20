@@ -127,8 +127,8 @@ Read stored vertices and edges and rebuilt the graph:
    <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
    <span class="n">count</span><span class="o">.</span>
    <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">ccStressCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">))</span>
 
+<span class="n">display</span><span class="o">(</span><span class="n">ccStressCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">))</span>
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
 <span class="mi">0</span><span class="o">,</span><span class="mi">1111</span>
 <span class="mi">240518168576</span><span class="o">,</span><span class="mi">2</span></code></pre></figure>
@@ -144,10 +144,10 @@ Read stored vertices and edges and rebuilt the graph:
   <span class="n">maxIter</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
   <span class="n">run</span><span class="o">().</span>
   <span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord"</span><span class="o">,</span><span class="s">"lpLabel"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">.</span>
   <span class="n">groupBy</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"label"</span><span class="o">,</span><span class="s">"count"</span><span class="o">).</span>
   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'count.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
-
   <span class="n">label</span><span class="o">,</span><span class="n">count</span>
   <span class="mi">386547056642</span><span class="o">,</span><span class="mi">115</span>
   <span class="mi">317827579910</span><span class="o">,</span><span class="mi">107</span>
@@ -181,7 +181,6 @@ For now we will ignore small groups and look at groups that have at least 3 {wor
 <span class="n">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
   <span class="n">groupBy</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"lpLabelCount"</span><span class="o">,</span><span class="s">"pairCount"</span><span class="o">).</span>
   <span class="n">filter</span><span class="o">(</span><span class="s">"pairCount&gt;2"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'pairCount.</span><span class="n">desc</span><span class="o">))</span>
-
 <span class="n">lpLabelCount</span><span class="o">,</span><span class="n">pairCount</span>
   <span class="mi">386547056642</span><span class="o">,</span><span class="mi">54</span>
   <span class="mi">317827579910</span><span class="o">,</span><span class="mi">30</span>
@@ -189,15 +188,14 @@ For now we will ignore small groups and look at groups that have at least 3 {wor
 
 
 <h3>Word Pair Groups</h3>
-We'll start with the second group - group that contains 30 {word1, word2} pairs.
+<p>We'll start with the second group - group that contains 30 {word1, word2} pairs.
 Here are edges that belong to this group - {word1, word2, word2vec cosine similarity}:
-
+</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
   <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"317827579910"</span><span class="o">).</span>
   <span class="n">select</span><span class="o">(</span><span class="ss">'src,'dst,'edgeWeight)</span><span class="o">.</span>
   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">))</span>
-
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
 <span class="n">military</span><span class="o">,</span><span class="n">combat</span><span class="o">,</span><span class="mf">0.6585100225253417</span>
 <span class="n">theories</span><span class="o">,</span><span class="n">kinds</span><span class="o">,</span><span class="mf">0.614683170553027</span>
@@ -301,8 +299,8 @@ We use a semi-manual way on building Gephi graphs. Create a list of direct edges
 </a>
 
 <p><h3>High Topics of Label Groups</h3>
-We can see that in the center of the biggest group is the word 'stress' - the word with the highest PageRank. We'll calculate high PageRank words for word pair groups.   </p>
-<p>Calculate PageRank:</p>
+We can see that in the center of the biggest group is the word 'stress' - the word with the highest PageRank. We'll calculate high PageRank words for word pair groups.   
+Calculate PageRank:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphNgramStressPageRank</span> <span class="k">=</span>
   <span class="n">graphNgramStress</span><span class="o">.</span>
@@ -323,12 +321,12 @@ We can see that in the center of the biggest group is the word 'stress' - the wo
     <span class="n">select</span><span class="o">(</span><span class="ss">'dst,'lpLabel)</span><span class="o">).</span>
   <span class="n">distinct</span><span class="o">.</span>
   <span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord"</span><span class="o">,</span><span class="s">"lpLabel"</span><span class="o">)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">wordLabel</span><span class="o">.</span>
   <span class="n">groupBy</span><span class="o">(</span><span class="ss">'lpLabel)</span><span class="o">.</span><span class="n">count</span><span class="o">.</span>
   <span class="n">toDF</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">,</span><span class="s">"labelCount"</span><span class="o">).</span>
   <span class="n">filter</span><span class="o">(</span><span class="s">"labelCount&gt;2"</span><span class="o">).</span>
   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'labelCount.</span><span class="n">desc</span><span class="o">))</span>
-
 <span class="n">lpLabel</span><span class="o">,</span><span class="n">labelCount</span>
 <span class="mi">386547056642</span><span class="o">,</span><span class="mi">47</span>
 <span class="mi">317827579910</span><span class="o">,</span><span class="mi">30</span>
@@ -337,19 +335,20 @@ We can see that in the center of the biggest group is the word 'stress' - the wo
 <span class="mi">1675037245443</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
 
 
-<p><h4>Top 10 Words in Label Groups</h4><p>
-The biggest group:&lt;/p
+<p><h4>Top 10 Words in Label Groups</h4></p>
+<p>
+The biggest group:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">wordLabelPageRank</span><span class="k">=</span><span class="n">wordLabel</span><span class="o">.</span>
   <span class="n">join</span><span class="o">(</span><span class="n">pageRankId</span><span class="o">,</span><span class="ss">'lpWord=</span><span class="o">=='</span><span class="n">prWord</span><span class="o">).</span>
   <span class="n">select</span><span class="o">(</span><span class="ss">'lpLabel,'lpWord,'pageRank)</span>
+
 <span class="n">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
   <span class="n">select</span><span class="o">(</span><span class="ss">'lpWord,'pageRank)</span><span class="o">.</span>
   <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"386547056642"</span><span class="o">).</span>
   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'pageRank.</span><span class="n">desc</span><span class="o">).</span>
   <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
-
-  <span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
+<span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
   <span class="n">stress</span><span class="o">,</span><span class="mf">36.799029843873036</span>
   <span class="n">stressful</span><span class="o">,</span><span class="mf">7.982561760153138</span>
   <span class="n">anxiety</span><span class="o">,</span><span class="mf">5.280935662282566</span>
@@ -369,8 +368,7 @@ The biggest group:&lt;/p
   <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"317827579910"</span><span class="o">).</span>
   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'pageRank.</span><span class="n">desc</span><span class="o">).</span>
   <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
-
-  <span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
+<span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
   <span class="n">individual</span><span class="o">,</span><span class="mf">8.75686668967628</span>
   <span class="n">changes</span><span class="o">,</span><span class="mf">5.642126628136839</span>
   <span class="n">negative</span><span class="o">,</span><span class="mf">3.89748211412626</span>
@@ -390,8 +388,7 @@ The biggest group:&lt;/p
   <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"274877906949"</span><span class="o">).</span>
   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'pageRank.</span><span class="n">desc</span><span class="o">).</span>
   <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
-
-  <span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
+<span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
   <span class="n">disease</span><span class="o">,</span><span class="mf">4.195635531226847</span>
   <span class="n">illness</span><span class="o">,</span><span class="mf">2.90222622174496</span>
   <span class="n">heart</span><span class="o">,</span><span class="mf">2.1357113367905662</span>
@@ -406,7 +403,7 @@ The biggest group:&lt;/p
 <p><h3>Next Post - More Pair Connections</h3>
 In the next post we will continue playing with Spark GraphFrames library to find more interesting word to word connections.
 </p>
-</p></p></p></p></p>
+</p></p></p>
 
 
                 <hr>

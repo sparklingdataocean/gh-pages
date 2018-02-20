@@ -8,11 +8,11 @@ header-img: "img/sdo14.jpg"
 ---
 
 <p><h3>Graph and Word2Vec Model </h3>
-Word2Vec model maps words to vectors which gives us an opportunity to calculate cosine similarity within pairs of words then translate pairs of words to graph: using words as nodes, word pairs as edges and cosine similarities as edge weights.</p>
-
-<p>We are running a small AWS cluster so we will run a small text file with data about stress that was copied from Wikipedia article. We will call this text file Stress Data File.</p>
-<p>As Word2VecModel we will use the model that was trained on News and Wiki data about psychology. We described this model in our previous post.</p>
-
+Word2Vec model maps words to vectors which gives us an opportunity to calculate cosine similarities within pairs of words then translate pairs of words to graph using words as nodes, word pairs as edges and cosine similarities as edge weights.</p>
+<p>We are running a small AWS cluster
+<i><a href="https://databricks.com/blog/2016/02/17/introducing-databricks-community-edition-apache-spark-for-all.html">on Databricks community edition</a></i>
+and for the Word2Vec2Graph model we will use a small size text file with data about stress taken from a Wikipedia article. We will call this text file Stress Data File.</p>
+<p>As Word2VecModel we will use the model that was trained on News and Wiki data about psychology corpus. <i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/06/w2vTrain/"> We described this model in our previous post.</a></i>
 <p>
 <h3>Read and Clean Stress Data File </h3>
 Read Wiki data file: </p>
@@ -35,6 +35,7 @@ val tokenizer = new RegexTokenizer().
    setGaps(true)
 val tokenizedStress = tokenizer.
    transform(inputStress)
+
 tokenizedStress.count//--274
 {% endhighlight %}
 
@@ -58,6 +59,7 @@ val slpitCleanWordsStress = removedStopWordsStress.
    withColumn("cleanWord",explode($"stopWordFree")).
    select("cleanWord").
    distinct
+
 slpitCleanWordsStress.count//--1233
 
 {% endhighlight %}
@@ -90,6 +92,7 @@ val modelWords=modelNewsWiki.
 val stressWords=slpitCleanWordsStress.
    join(modelWords,'cleanWord === 'word).
    select("word","vector").distinct
+
 stressWords.count//--1125
 
 {% endhighlight %}
@@ -101,6 +104,7 @@ val stressWords2=stressWords.
    toDF("word2","vector2")
 val w2wStress=stressWords.
    join(stressWords2,'word=!='word2)
+
 w2wStress.count//--1264500
 {% endhighlight %}
 
@@ -108,21 +112,20 @@ w2wStress.count//--1264500
 <h3>Word2Vec Cosine Similarity Function</h3>
 Now we want to use Word2Vec cosine similarity to see how words are connected with other words. We will create a function to calculate cosine similarity between vectors from the Word2Vec model</p>
 {% highlight scala %}
-
 import org.apache.spark.ml.linalg.Vector
 def dotVector(vectorX: org.apache.spark.ml.linalg.Vector,
-             vectorY: org.apache.spark.ml.linalg.Vector): Double = {
-  var dot=0.0
-  for (i <-0 to vectorX.size-1) dot += vectorX(i) * vectorY(i)
-  dot
+   vectorY: org.apache.spark.ml.linalg.Vector): Double = {
+   var dot=0.0
+   for (i <-0 to vectorX.size-1) dot += vectorX(i) * vectorY(i)
+   dot
 }
 def cosineVector(vectorX: org.apache.spark.ml.linalg.Vector,
-                 vectorY: org.apache.spark.ml.linalg.Vector): Double = {
-  require(vectorX.size == vectorY.size)
-  val dot=dotVector(vectorX,vectorY)
-  val div=dotVector(vectorX,vectorX) * dotVector(vectorY,vectorY)
-  if (div==0)0
-  else dot/math.sqrt(div)
+   vectorY: org.apache.spark.ml.linalg.Vector): Double = {
+   require(vectorX.size == vectorY.size)
+   val dot=dotVector(vectorX,vectorY)
+   val div=dotVector(vectorX,vectorX) * dotVector(vectorY,vectorY)
+   if (div==0)0
+   else dot/math.sqrt(div)
 }
 
 {% endhighlight %}
@@ -141,18 +144,13 @@ val w2wStressCosDF=w2wStress.
     cosineVector(r.getAs[org.apache.spark.ml.linalg.Vector](1),
     r.getAs[org.apache.spark.ml.linalg.Vector](3)))).
    toDF("word1","word2","cos")
-
-
-
 {% endhighlight %}
 
 <p>Example: Word combinations with high Cosine Similarities:</p>
 {% highlight scala %}
 display(w2wStressCosDF.
    select('word1,'word2,'cos).
-   filter('cos>0.8).
-   limit(7))
-
+   filter('cos>0.8).limit(7))
 word1,word2,cos
 disorders,chronic,0.8239098331266418
 strategies,processes,0.8079603436193109
@@ -168,9 +166,7 @@ second,first,0.8096815780218063
 display(w2wStressCosDF.
    select('word1,'word2,'cos).
    filter('cos<(0.65)).
-   filter('cos>(0.6)).
-   limit(7))
-
+   filter('cos>(0.6)).limit(7))
 word1,word2,cos
 interaction,disorders,0.6114415840642784
 persist,affect,0.6126901072184042
@@ -192,7 +188,6 @@ val w2wStressCos2 = sqlContext.read.parquet("w2wStressCos")
 Now we can build a graph using words as nodes, {word1, word2} word combinations as edges and cosine similarities between the words as edge weights:</p>
 {% highlight scala %}
 import org.graphframes.GraphFrame
-
 val graphNodes=w2wStressCosDF.
    select("word1").
    union(w2wStressCosDF.select("word2")).
@@ -233,7 +228,7 @@ val graphStress = GraphFrame(graphStressNodes,graphStressEdges)
 
 {% endhighlight %}
 <p></p>
-<p></p>
+
 <p>
 <h3>Connected Components</h3>
 They are many interesting things we can do with Spark GraphFrames. In this post we will play with connected components.
@@ -247,8 +242,8 @@ val ccStressCount=resultStressCC.
    groupBy("component").
    count.
    toDF("cc","ccCt")
-display(ccStressCount.orderBy('ccCt.desc))
 
+display(ccStressCount.orderBy('ccCt.desc))
 cc,ccCt
 0,1125
 {% endhighlight %}
@@ -281,10 +276,10 @@ val graphHightWeightCcCount=graphHightWeightCC.
    groupBy("component").
    count.
    toDF("cc","ccCt")
+
 display(graphHightWeightCcCount.
    orderBy('ccCt.desc).
    limit(11))
-
 cc,ccCt
 60129542144,17
 60129542145,9
@@ -306,7 +301,6 @@ cc,ccCt
 display(graphHightWeightCC.
    filter("component=60129542144").
    select('id))
-
 id
 humans
 harmful
@@ -333,7 +327,6 @@ acute
 display(graphHightWeightCC.
    filter("component=60129542145").
    select('id))
-
 id
 capabilities
 governmental
@@ -353,7 +346,6 @@ processes
 display(graphHightWeightCC.
    filter("component=240518168580").
    select('id))
-
 id
 increased
 increase

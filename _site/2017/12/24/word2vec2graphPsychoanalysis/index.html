@@ -99,12 +99,13 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
 				<p><h3>Word2Vec2Graph Model and Free Associations</h3>
-In this post we will show the process of converting text files to Word2Vec2Graph model. As a text file we will use text data about Psychoanalysis from Wikipedia. </p>
-<p>Word2Vec2Graph technique to find topics is similar to Free Association technique used in psychoanalysis. "The importance of free association is that the patients spoke for themselves, rather than repeating the ideas of the analyst; they work through their own material, rather than parroting another's suggestions" (Freud).
+
+<p>Word2Vec2Graph technique to find text topics is similar to Free Association technique used in psychoanalysis: "The importance of free association is that the patients spoke for themselves, rather than repeating the ideas of the analyst; they work through their own material, rather than parroting another's suggestions" (Freud).</p>
+<p>In this post we will show some examples that prove this analogy. As a text file we will use data about Psychoanalysis from Wikipedia.
 </p>
 
 <h3>Read and Clean Psychoanalysis Data File </h3>
-<p>Read Psychoanalysis Data file, tokenize and remove stop words:</p>
+Read Psychoanalysis Data file, tokenize and remove stop words:
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
@@ -127,6 +128,7 @@ In this post we will show the process of converting text files to Word2Vec2Graph
    <span class="n">remover</span><span class="o">.</span><span class="n">getStopWords</span><span class="o">).</span>
    <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedPsychoanalysis</span><span class="o">)</span></code></pre></figure>
 
+
 <p> </p>
 <p>Explode Psychoanalysis word arrays to words:</p>
 
@@ -138,6 +140,8 @@ In this post we will show the process of converting text files to Word2Vec2Graph
 <span class="n">slpitCleanPsychoanalysis</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">4030</span></code></pre></figure>
 
 <p> </p>
+
+
 
 <p><h3>Are Word Pairs in Trained Word2Vec Model? </h3>
 Read trained Word2Vec model that was trained and described in
@@ -154,6 +158,7 @@ Read trained Word2Vec model that was trained and described in
    <span class="n">read</span><span class="o">.</span>
    <span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span></code></pre></figure>
 
+
 <p>Get a set of all words from the Word2Vec model and compare Psychoanalysis file word pairs with words from the Word2Vec model </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">cleanPsychoW2V</span><span class="k">=</span><span class="n">slpitCleanPsychoanalysis</span><span class="o">.</span>
@@ -162,7 +167,8 @@ Read trained Word2Vec model that was trained and described in
    <span class="n">distinct</span>
 <span class="n">cleanPsychoW2V</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">3318</span></code></pre></figure>
 
-<p>The Word2Vec model was trained on corpus based on News and Wikipedia data about psychology but only 82% of Psychoanalysis File word pairs are in the model. To increase this percentage we will include Psychoanalysis file data to training corpus and retrain the Word2Vec model. </p>
+
+<p>The Word2Vec model was trained on corpus based on News and Wikipedia data about psychology but only 82% of Psychoanalysis file word pairs are in the model. To increase this percentage we will include Psychoanalysis file data to training corpus and retrain the Word2Vec model. </p>
 
 <p><h3>Retrain Word2Vec Model</h3>
 
@@ -204,7 +210,7 @@ Read trained Word2Vec model that was trained and described in
 <span class="n">cleanPsychoNewW2V</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">3433</span>    </code></pre></figure>
 
 
-<p>This new Word2Vec model works better: 85% of Psychoanalysis File words are in the model. </p>
+<p>This new Word2Vec model works a little bit better: 85% of Psychoanalysis File words are in the model. </p>
 
 <p><h3>How Word Pairs are Connected?</h3>
 Now we will calculate cosine similarities of words within word pairs.
@@ -262,12 +268,15 @@ Get pairs of words and explode ngrams:</p>
 
 Cosine similarities for pairs of words:</p>
 
+
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">ngramCos</span><span class="k">=</span><span class="n">slpitNgrams</span><span class="o">.</span>
    <span class="n">join</span><span class="o">(</span><span class="n">w2wPsychoCosDF</span><span class="o">,</span><span class="ss">'ngram1=</span><span class="o">=='</span><span class="n">word1</span> <span class="o">&amp;&amp;</span> <span class="ss">'ngram2=</span><span class="o">=='</span><span class="n">word2</span><span class="o">)</span></code></pre></figure>
+
 
 <p><h3>Graph on Word Pairs</h3>
 Now we can build a graph on word pairs: words will be nodes, ngrams - edges and cosine similarities - edge weights.</p>
 <p>We will save graph vertices and edges as Parquet to Databricks locations, load vertices and edges and rebuild the same graph.</p>
+
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
 <span class="k">val</span> <span class="n">graphNodes1</span><span class="k">=</span><span class="n">ngramCos</span><span class="o">.</span>
@@ -291,8 +300,10 @@ Now we can build a graph on word pairs: words will be nodes, ngrams - edges and 
 
 <span class="k">val</span> <span class="n">graphPsychoanalysis</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphPsychoanalysisVertices</span><span class="o">,</span> <span class="n">graphPsychoanalysisEdges</span><span class="o">)</span></code></pre></figure>
 
+
+
 <p><h3>Page Rank</h3>
-Calculate Page Rank : </p>
+Calculate Page Rank:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphPsychoanalysisPageRank</span> <span class="k">=</span> <span class="n">graphPsychoanalysis</span><span class="o">.</span>
    <span class="n">pageRank</span><span class="o">.</span>
@@ -315,6 +326,8 @@ Calculate Page Rank : </p>
    <span class="n">patient</span><span class="o">,</span><span class="mf">12.591079870941268</span>
    <span class="n">analyst</span><span class="o">,</span><span class="mf">11.662939169635427</span>
    <span class="n">treatment</span><span class="o">,</span><span class="mf">11.566778056932069</span></code></pre></figure>
+
+
 
 <p><h3>Finding Topics </h3>
 In the previous post we described
@@ -362,6 +375,7 @@ We created a function to calculate connected components with cosine similarly an
       <span class="n">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
 <span class="o">}</span></code></pre></figure>
 
+
 <p>To select parameters we analyzed cosine similarity distribution. </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">weightDistribution</span><span class="k">=</span><span class="n">graphPsychoanalysisEdges</span><span class="o">.</span>
@@ -369,9 +383,10 @@ We created a function to calculate connected components with cosine similarly an
    <span class="n">toDF</span><span class="o">(</span><span class="s">"cosine1"</span><span class="o">).</span><span class="n">groupBy</span><span class="o">(</span><span class="s">"cosine1"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"cosine1"</span><span class="o">,</span><span class="s">"cosine1Count"</span><span class="o">)</span>
 <span class="n">display</span><span class="o">(</span><span class="n">weightDistribution</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'cosine1)</span><span class="o">)</span></code></pre></figure>
 
-<p><a href="#">
+
+<a href="#">
     <img src="/img/weightDistribution2.jpg" alt="Post Sample Image" width="700" height="700" />
-</a></p>
+</a>
 
 <p>Based on cosine similarity distribution we'll look at topics with high, medium and low cosine similarities. </p>
 
@@ -404,6 +419,7 @@ Connected components with edge weights greater than 0.7: </p>
 <span class="mi">541165879312</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">therapy</span><span class="o">,</span><span class="n">schizophrenia</span><span class="o">,</span><span class="mf">0.7847859437652135</span><span class="o">,</span><span class="mi">2</span>
 <span class="mi">541165879312</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">behavioral</span><span class="o">,</span><span class="n">therapy</span><span class="o">,</span><span class="mf">0.744693173351612</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
 
+
 <p>We selected component '94489280524'. First we'll create a graph with the same cosine similarity parameters them we used to look at connected components, i.e. for word pairs with cosine similarity &gt;0.7:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">94489280524L</span><span class="o">,</span><span class="mf">0.7</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
@@ -416,56 +432,62 @@ Connected components with edge weights greater than 0.7: </p>
 <span class="s">"mental"</span> <span class="o">-&gt;</span> <span class="s">"illness"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">73"</span><span class="o">];</span>
 <span class="s">"patient"</span> <span class="o">-&gt;</span> <span class="s">"outcomes"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">72"</span><span class="o">];</span></code></pre></figure>
 
-<p><a href="#">
+
+
+<a href="#">
     <img src="/img/graph21d.jpg" alt="Post Sample Image" width="400" height="500" />
-</a></p>
+</a>
+
 
 <p>Next we'll expand the topic graph for word pairs with cosine similarity &gt;0.6:</p>
 
-<p><a href="#">
+<a href="#">
     <img src="/img/graph21f.jpg" alt="Post Sample Image" width="600" height="500" />
-</a></p>
+</a>
 
 <p>Then we'll expand the same connected component to cosine similarity &gt;0.5:</p>
 
-<p><a href="#">
+<a href="#">
     <img src="/img/graph21a.jpg" alt="Post Sample Image" width="700" height="500" />
-</a></p>
+</a>
 
 <p><h3>Psychoanalysis Topics with Medium Cosine Similarities</h3>
 Connected components parameters: edge weights in (0.17, 0.2): </p>
 <p>Graph picture parameters: edge weights in (0.1, 0.2):</p>
 
-<p><a href="#">
+<a href="#">
     <img src="/img/graph27.jpg" alt="Post Sample Image" width="600" height="500" />
-</a></p>
+</a>
 
 <p><h3>Psychoanalysis Topics with Low Cosine Similarities</h3>
 Connected components with edge weights in (-0.5, 0.0): </p>
 <p>Graph picture with no parameters: edge weights in (-1.0, 1.0):</p>
 
-<p>Example1:</p>
 
-<p><a href="#">
+<p>Example 1:</p>
+
+<a href="#">
     <img src="/img/graph24.jpg" alt="Post Sample Image" width="500" height="500" />
-</a></p>
+</a>
 
-<p>Example2:</p>
 
-<p><a href="#">
+<p>Example 2:</p>
+
+<a href="#">
     <img src="/img/graph23.jpg" alt="Post Sample Image" width="560" height="500" />
-</a></p>
+</a>
 
-<p>Example3:</p>
+<p>Example 3:</p>
 
-<p><a href="#">
+<a href="#">
     <img src="/img/graph22.jpg" alt="Post Sample Image" width="700" height="500" />
-</a></p>
+</a>
 
-<p>This post example topics with high cosine similarity word pairs are more expected then topics with low cosine similarity word pairs. Lowly correlated word pairs give us more interesting and unpredicted results. The last example shows that within Psychoanalysis text file the word 'association' is associated with unexpected words...</p>
+<p>This post example topics with high cosine similarity word pairs are more expected then topics with low cosine similarity word pairs. Lowly correlated word pairs give us more interesting and unpredicted results. The last example shows that within Psychoanalysis text file the word 'association' is associated with some unexpected words...</p>
 
 <p><h3>Next Post - Associations</h3>
 In the next several posts we will deeper look at data associations.</p>
+</p>
 
 
                 <hr>

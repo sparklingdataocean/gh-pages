@@ -14,11 +14,8 @@ Word2Vec2Graph model connects Word2Vec model with Spark GraphFrames library and 
 
 
 <p>
-As Word2Vec model we will use the same
-<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/06/w2vTrain/">Word2Vec model </a></i> that was trained on the corpus of combined News data and Wiki data files.</p>
-
-<p>
-As a text file we will use the same Stress Data file - a small text file with data about stress that was copied from Wikipedia article. In previous posts we looked at graph for all pairs of words from Stress Data file. Now we will look at pairs of words that stay next to each other in text file and will use these pairs as graph edges.</p>
+In this post as Word2Vec model we will use the same model that was
+<i><a href="https://sparklingdataocean.github.io/gh-pages/2017/09/06/w2vTrain/">trained on the corpus of News and Wiki data</a></i> and as a text file we will use the same Stress Data file. In previous posts we looked at graph for all pairs of words from Stress Data file. Now we will look at pairs of words that stay next to each other in text file and will use these pairs as graph edges.</p>
 
 <h3>Read and Clean Stress Data File </h3>
 Read Stress Data file:
@@ -105,7 +102,10 @@ Stress Data File based on Word2Vec model and saved the results.
 {% highlight scala %}
 
 val w2wStressCos = sqlContext.read.parquet("w2wStressCos")
-display(w2wStressCos.filter('cos< 0.1).filter('cos> 0.0).limit(7))
+
+display(w2wStressCos.
+   filter('cos< 0.1).
+   filter('cos> 0.0).limit(7))
 word1,word2,cos
 conducted,contribute,0.08035969605150468
 association,contribute,0.06940379539008698
@@ -147,7 +147,8 @@ thoughts feelings,0.7000105635150229
 {% highlight scala %}
 display(ngramWord2VecDF.
    select('ngram,'cos).
-   filter('cos>(-0.002)).filter('cos<(0.002)).orderBy('cos))
+   filter('cos>(-0.002)).
+   filter('cos<(0.002)).orderBy('cos))
 ngram,cos
 researchers interested,-0.0019752767768097153
 defense mechanisms,-0.0014974826488316265
@@ -204,11 +205,11 @@ val graphNgramStressPageRank = graphNgramStress.
    resetProbability(0.15).
    maxIter(11).
    run()
+
 display(graphNgramStressPageRank.vertices.
    distinct.
    sort($"pagerank".desc).
    limit(11))
-
    id,pagerank
    stress,36.799029843873065
    social,8.794399876715186
@@ -225,4 +226,4 @@ display(graphNgramStressPageRank.vertices.
 
 
 <p><h3>Next Post - Connected Word Pairs</h3>
-In the next post we will play with Spark GraphFrames library and run Connected Components and Label Propagation functions for direct Word2Vec2Graph model.</p>
+In the next post we will run Connected Components and Label Propagation functions of Spark GraphFrames library to analyze direct Word2Vec2Graph model.</p>
