@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Word2Vec2Graph - Insights - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2018/04/04/word2vec2graphInsights/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/modrn54.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Word2Vec2Graph - Insights</h1>
+                    
+                    <h2 class="subheading">Find New Associations in Text</h2>
+                    
+                    <span class="meta">Posted by Melenar on April 4, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Word2Vec2Graph Model and New Associations</h3>
+<p>In<i><a href="http://sparklingdataocean.com/2017/12/24/word2vec2graphPsychoanalysis/"> our previous post</a></i> we proved that high cosine similarity text topics are already well known and topics with low cosine similarities give us new associations and new ideas. </p>
+<p>In this post we will show another Word2Vec2Graph method to find new word to word associations. This method is similar to psychoanalysis Free Association techniques as well as methods of finding text topics. As a text file in this post we will use data about Creativity and Aha Moments.
+</p>
+
+<p>We will look at word neighbors using 'find' GraphFrames function that we described in <i><a href="http://sparklingdataocean.com/2017/10/03/word2vec2graphNeighbors/">"Word2Vec2Graph Model - Neighbors"</a></i> post.
+
+<h3>Data Preparation</h3>
+Data preparation process for Word2Vec2Graph model in described in several post and summarized in the  <i><a href="http://spa.rklingdataocean.com/2017/12/24/word2vec2graphPsychoanalysis/">"Quick Look at Text"</a></i> post. Here we used the same data preparation process of text data about Creativity and Aha Moments:
+<ul>
+<li>Read text file</li>
+<li>Tokenize</li>
+<li>Remove stop words</li>
+<li>Transform text file to next to each other pairs of words</li>
+<li>Retrain Word2Vec model</li>
+<li>Calculate cosine similarities within pairs of words</li>
+<li>Build a direct graph on pairs of words using words as nodes and cosine similarities as edges weights</li>
+<li>Save graph vertices and edges</li>
+</ul>
+<p></p>
+
+<h3>Build a Graph</h3>
+
+
+<p>Read graph vertices and edges saved as Parquet to Databricks locations and build the graph for Word2Vec2Graph model.</p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
+<span class="k">val</span> <span class="n">graphInsightVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphInsightVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphInsightEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphInsightEdges"</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="n">graphInsight</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span> <span class="n">graphInsightEdges</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p><h3>Page Rank</h3>
+<p>The highest Page Rank words about Creativity and Aha Moments:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphInsightPageRank</span> <span class="k">=</span> <span class="n">graphInsight</span><span class="o">.</span>
+   <span class="n">pageRank</span><span class="o">.</span><span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">graphInsightPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+   <span class="n">distinct</span><span class="o">.</span>
+   <span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
+   <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
+   <span class="n">creative</span><span class="o">,</span><span class="mf">36.427592633298694</span>
+   <span class="n">brain</span><span class="o">,</span><span class="mf">35.64966777994186</span>
+   <span class="n">creativity</span><span class="o">,</span><span class="mf">26.75614299294646</span>
+   <span class="n">insight</span><span class="o">,</span><span class="mf">21.3449149933242</span>
+   <span class="n">cognitive</span><span class="o">,</span><span class="mf">20.66552322641501</span>
+   <span class="n">problem</span><span class="o">,</span><span class="mf">20.291860811528586</span>
+   <span class="n">people</span><span class="o">,</span><span class="mf">18.962734667376907</span>
+   <span class="n">university</span><span class="o">,</span><span class="mf">16.66836572882581</span>
+   <span class="n">social</span><span class="o">,</span><span class="mf">16.540315233753887</span>
+   <span class="n">genius</span><span class="o">,</span><span class="mf">16.250827488029646</span>
+   <span class="n">knowledge</span><span class="o">,</span><span class="mf">15.852328556068747</span>
+   <span class="n">study</span><span class="o">,</span><span class="mf">15.565795496200513</span></code></pre></figure>
+
+
+
+<p><h3>Lines between Words</h3>
+
+<p>To see how word pair are connected we will look at
+<i><a href="https://graphframes.github.io/user-guide.html#motif-finding"> 'find' GraphFrames function</a></i> that we already used in the <i><a href="http://sparklingdataocean.com/2017/10/03/word2vec2graphNeighbors/">"Word2Vec2Graph Model - Neighbors"</a></i> post.</p>
+
+<p>
+We will start with two high Page Ranks words 'insight' and 'brain' and look for lines of words in both directions. </p>
+<p>'insight' -&gt; 'word' -&gt; 'brain':
+</p>
+
+</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
+   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="n">orderBy</span><span class="o">((</span><span class="ss">'ab+'bc)</span><span class="o">.</span><span class="n">desc</span><span class="o">))</span>
+<span class="n">a</span><span class="o">,</span><span class="n">ab</span><span class="o">,</span><span class="n">b</span><span class="o">,</span><span class="n">bc</span><span class="o">,</span><span class="n">c</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.4128722197714052</span><span class="o">,</span><span class="n">invasive</span><span class="o">,</span><span class="mf">0.5830608090075667</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.5926405065153766</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.35538729273722036</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.6265201186962078</span><span class="o">,</span><span class="n">solutions</span><span class="o">,</span><span class="mf">0.13029716155867507</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.20443740746326608</span><span class="o">,</span><span class="n">pattern</span><span class="o">,</span><span class="mf">0.4753597960223179</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.15960073745912792</span><span class="o">,</span><span class="n">occur</span><span class="o">,</span><span class="mf">0.416785760503172</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.32890495067080877</span><span class="o">,</span><span class="k">requires</span><span class="o">,</span><span class="mf">0.19730741846887495</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.11848059507149529</span><span class="o">,</span><span class="n">increase</span><span class="o">,</span><span class="mf">0.1508410859156626</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.10729267923132169</span><span class="o">,</span><span class="n">beeman</span><span class="o">,</span><span class="mf">0.15344660014170144</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.004491484498190776</span><span class="o">,</span><span class="n">suggested</span><span class="o">,</span><span class="mf">0.16421754414027762</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,-</span><span class="mf">0.043810741336856945</span><span class="o">,</span><span class="n">regions</span><span class="o">,-</span><span class="mf">0.02137437192577632</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,-</span><span class="mf">0.14634712420947668</span><span class="o">,</span><span class="n">along</span><span class="o">,-</span><span class="mf">0.02381072199458428</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,-</span><span class="mf">0.13813478755633732</span><span class="o">,</span><span class="n">first</span><span class="o">,-</span><span class="mf">0.1554410765939254</span><span class="o">,</span><span class="n">brain</span></code></pre></figure>
+
+
+'brain' -&gt; 'word' -&gt; 'insight':
+</p>
+
+</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
+   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="n">orderBy</span><span class="o">((</span><span class="ss">'ab+'bc)</span><span class="o">.</span><span class="n">desc</span><span class="o">))</span>
+<span class="n">a</span><span class="o">,</span><span class="n">ab</span><span class="o">,</span><span class="n">b</span><span class="o">,</span><span class="n">bc</span><span class="o">,</span><span class="n">c</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.4486765246697501</span><span class="o">,</span><span class="n">conscious</span><span class="o">,</span><span class="mf">0.22780425594285608</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.30888238508458593</span><span class="o">,</span><span class="n">activity</span><span class="o">,</span><span class="mf">0.2913329808544577</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.1871056077079674</span><span class="o">,</span><span class="n">moments</span><span class="o">,-</span><span class="mf">0.17359890717130036</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.06816500537193591</span><span class="o">,</span><span class="n">right</span><span class="o">,-</span><span class="mf">0.16052900998488828</span><span class="o">,</span><span class="n">insight</span></code></pre></figure>
+
+
+<p>Next we will look for longer lines, i.e. 'word1' -&gt; 'word2' -&gt; 'word3' -&gt; 'word4'. With longer lines the number of word combination is growing fast so we will show only some results.</p>
+<p>'insight' -&gt; 'word1' -&gt; 'word2' -&gt; 'brain' (142  lines):
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
+   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c); (c) - [cd] -&gt; (d)"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"d.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">,</span><span class="s">"cd.edgeWeight"</span><span class="o">,</span><span class="s">"d.id"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">,</span><span class="s">"cd"</span><span class="o">,</span><span class="s">"d"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="n">orderBy</span><span class="o">((</span><span class="ss">'ab+'bc+'cd)</span><span class="o">.</span><span class="n">desc</span><span class="o">))</span>
+<span class="n">a</span><span class="o">,</span><span class="n">ab</span><span class="o">,</span><span class="n">b</span><span class="o">,</span><span class="n">bc</span><span class="o">,</span><span class="n">c</span><span class="o">,</span><span class="n">cd</span><span class="o">,</span><span class="n">d</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.28168782668396153</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mf">0.7644093868324334</span><span class="o">,</span><span class="n">cells</span><span class="o">,</span><span class="mf">0.7644093868324334</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.5873913431733343</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="mf">0.72979093470829</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.35538729273722036</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.5873913431733343</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="mf">0.3978587884107718</span><span class="o">,</span><span class="n">suggests</span><span class="o">,</span><span class="mf">0.540965758459218</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.0695940003338105</span><span class="o">,</span><span class="n">watch</span><span class="o">,</span><span class="mf">0.2189340241873386</span><span class="o">,</span><span class="n">clues</span><span class="o">,</span><span class="mf">0.4328969882637767</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.23392584234097255</span><span class="o">,</span><span class="n">unexpected</span><span class="o">,</span><span class="mf">0.27952840262</span><span class="o">,</span><span class="n">happened</span><span class="o">,</span><span class="mf">0.202974504974</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.1806737835610359</span><span class="o">,</span><span class="n">occurs</span><span class="o">,</span><span class="mf">0.29306721804427444</span><span class="o">,</span><span class="n">various</span><span class="o">,</span><span class="mf">0.23348013916537874</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.004491484498190776</span><span class="o">,</span><span class="n">suggested</span><span class="o">,</span><span class="mf">0.0039846481446</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.355387292737</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">iinsight</span><span class="o">,</span><span class="mf">0.109973700652</span><span class="o">,</span><span class="n">analytically</span><span class="o">,</span><span class="mf">0.091236920188010</span><span class="o">,</span><span class="n">increase</span><span class="o">,</span><span class="mf">0.1508410859156626</span><span class="o">,</span><span class="n">brain</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">0.2537959966753002</span><span class="o">,</span><span class="n">flash</span><span class="o">,</span><span class="mf">0.1505789981661047</span><span class="o">,</span><span class="n">across</span><span class="o">,-</span><span class="mf">0.06288528966788781</span><span class="o">,</span><span class="n">brain</span></code></pre></figure>
+
+
+<p>'brain' -&gt; 'word1' -&gt; 'word2' -&gt; 'insight' (105 lines):</p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
+   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c); (c) - [cd] -&gt; (d)"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"d.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">,</span><span class="s">"cd.edgeWeight"</span><span class="o">,</span><span class="s">"d.id"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">,</span><span class="s">"cd"</span><span class="o">,</span><span class="s">"d"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="n">orderBy</span><span class="o">((</span><span class="ss">'ab+'bc+'cd)</span><span class="o">.</span><span class="n">desc</span><span class="o">))</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.627845334314687</span><span class="o">,</span><span class="n">memory</span><span class="o">,</span><span class="mf">0.5969736849364111</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.5926405065153766</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.5818230817465604</span><span class="o">,</span><span class="n">function</span><span class="o">,</span><span class="mf">0.6050462263809657</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="mf">0.5873913431733343</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.522079405363812</span><span class="o">,</span><span class="n">abilities</span><span class="o">,</span><span class="mf">0.6439093697793404</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.5926405065153766</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.2572351478541803</span><span class="o">,</span><span class="n">thinking</span><span class="o">,</span><span class="mf">0.3586918857219751</span><span class="o">,</span><span class="n">nature</span><span class="o">,</span><span class="mf">0.3236593351220391</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.14564507991393688</span><span class="o">,</span><span class="n">create</span><span class="o">,</span><span class="mf">0.4844363325210495</span><span class="o">,</span><span class="n">ideas</span><span class="o">,</span><span class="mf">0.28877305186266056</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.17086866711570267</span><span class="o">,</span><span class="n">complex</span><span class="o">,</span><span class="mf">0.432425015153635</span><span class="o">,</span><span class="n">system</span><span class="o">,</span><span class="mf">0.2989597664441415</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.133737192411332</span><span class="o">,</span><span class="n">connections</span><span class="o">,</span><span class="mf">0.4770965803506682</span><span class="o">,</span><span class="n">ideas</span><span class="o">,</span><span class="mf">0.28877305186266056</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.0695041528304244</span><span class="o">,</span><span class="n">fundamental</span><span class="o">,</span><span class="mf">0.5521335607322843</span><span class="o">,</span><span class="n">problem</span><span class="o">,</span><span class="mf">0.2315418458136853</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.2091917558421882</span><span class="o">,</span><span class="n">epiphany</span><span class="o">,</span><span class="mf">0.4292848059738405</span><span class="o">,</span><span class="n">moments</span><span class="o">,-</span><span class="mf">0.17359890717130036</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.17280034376836279</span><span class="o">,</span><span class="n">research</span><span class="o">,</span><span class="mf">0.04989028618906677</span><span class="o">,</span><span class="n">problem</span><span class="o">,</span><span class="mf">0.2315418458136853</span><span class="o">,</span><span class="n">insight</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.07751489118586756</span><span class="o">,</span><span class="n">require</span><span class="o">,</span><span class="mf">0.06005363995904192</span><span class="o">,</span><span class="n">spontaneous</span><span class="o">,</span><span class="mf">0.19017912534928294</span><span class="o">,</span><span class="n">insight</span></code></pre></figure>
+
+
+<p><h3>Word2Vec2Graph Model with Lower Cosine Similarities</h3>
+<p>In our results we can see than word pairs with high cosine similarity are well known similar words - they are called "synonyms" in Word2Vec model. Pairs of words with lower cosine similarity are more interesting to look at. This is similar to what we showed in<i><a href="http://sparklingdataocean.com/2017/12/24/word2vec2graphPsychoanalysis/"> our previous post</a></i>: lower cosine similarity text topics are less known then topics with high cosine similarities. </p>
+<p>We will build a graph with lower cosine similarity.
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphInsightLow</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span>
+     <span class="n">graphInsightEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"edgeWeight&lt;0.33"</span><span class="o">))</span></code></pre></figure>
+
+
+<p><h3>Path String for 'Find' Function</h3>
+<p>To look at different word-to-word lines we'll start with function that creates a string for 'find' function. </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="k">def</span> <span class="n">formLine</span><span class="o">(</span><span class="n">steps</span><span class="k">:</span><span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+   <span class="k">var</span> <span class="n">line</span><span class="k">=new</span> <span class="nc">String</span>
+   <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">line</span><span class="o">+=</span><span class="s">"(x"</span><span class="o">+</span><span class="n">lit</span><span class="o">(</span><span class="n">i</span><span class="o">)+</span><span class="s">")-[]-&gt;(x"</span><span class="o">+</span><span class="n">lit</span><span class="o">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">)+</span><span class="s">");"</span>
+   <span class="n">line</span><span class="o">.</span><span class="n">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="n">line</span><span class="o">.</span><span class="n">length</span><span class="o">()</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
+<span class="o">}</span></code></pre></figure>
+
+
+<p>Path line examples:</p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">formLine</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
+<span class="o">(</span><span class="n">x1</span><span class="o">)-[]-&gt;(</span><span class="n">x2</span><span class="o">);(</span><span class="n">x2</span><span class="o">)-[]-&gt;(</span><span class="n">x3</span><span class="o">)</span>
+
+<span class="n">formLine</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
+<span class="o">(</span><span class="n">x1</span><span class="o">)-[]-&gt;(</span><span class="n">x2</span><span class="o">);(</span><span class="n">x2</span><span class="o">)-[]-&gt;(</span><span class="n">x3</span><span class="o">);(</span><span class="n">x3</span><span class="o">)-[]-&gt;(</span><span class="n">x4</span><span class="o">)</span>
+
+<span class="n">formLine</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>
+<span class="o">(</span><span class="n">x1</span><span class="o">)-[]-&gt;(</span><span class="n">x2</span><span class="o">);(</span><span class="n">x2</span><span class="o">)-[]-&gt;(</span><span class="n">x3</span><span class="o">);(</span><span class="n">x3</span><span class="o">)-[]-&gt;(</span><span class="n">x4</span><span class="o">);(</span><span class="n">x4</span><span class="o">)-[]-&gt;(</span><span class="n">x5</span><span class="o">)</span></code></pre></figure>
+
+
+<p>'Find' result examples:
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsightLow</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="n">formLine</span><span class="o">(</span><span class="mi">3</span><span class="o">))</span>
+<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">)</span>
+<span class="n">x1</span><span class="o">,</span><span class="n">x2</span><span class="o">,</span><span class="n">x3</span>
+<span class="s">"{""id"":""answers""}"</span><span class="o">,</span><span class="s">"{""id"":""abandon""}"</span><span class="o">,</span><span class="s">"{""id"":""ideas""}"</span>
+<span class="s">"{""id"":""according""}"</span><span class="o">,</span><span class="s">"{""id"":""internal""}"</span><span class="o">,</span><span class="s">"{""id"":""goals""}"</span>
+<span class="s">"{""id"":""apparent""}"</span><span class="o">,</span><span class="s">"{""id"":""effort""}"</span><span class="o">,</span><span class="s">"{""id"":""takes""}"</span>
+<span class="s">"{""id"":""apparent""}"</span><span class="o">,</span><span class="s">"{""id"":""effort""}"</span><span class="o">,</span><span class="s">"{""id"":""achievement""}"</span>
+
+<span class="n">path</span><span class="o">.</span><span class="n">printSchema</span>
+<span class="n">root</span>
+ <span class="o">|--</span> <span class="n">x1</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span>
+ <span class="o">|--</span> <span class="n">x2</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span>
+ <span class="o">|--</span> <span class="n">x3</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsightLow</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="n">formLine</span><span class="o">(</span><span class="mi">4</span><span class="o">))</span>
+<span class="n">x1</span><span class="o">,</span><span class="n">x2</span><span class="o">,</span><span class="n">x3</span><span class="o">,</span><span class="n">x4</span>
+<span class="s">"{""id"":""according""}"</span><span class="o">,</span><span class="s">"{""id"":""internal""}"</span><span class="o">,</span><span class="s">"{""id"":""goals""}"</span><span class="o">,</span><span class="s">"{""id"":""chapter""}"</span>
+<span class="s">"{""id"":""association""}"</span><span class="o">,</span><span class="s">"{""id"":""brain""}"</span><span class="o">,</span><span class="s">"{""id"":""require""}"</span><span class="o">,</span><span class="s">"{""id"":""spreading""}"</span>
+<span class="s">"{""id"":""association""}"</span><span class="o">,</span><span class="s">"{""id"":""brain""}"</span><span class="o">,</span><span class="s">"{""id"":""dominant""}"</span><span class="o">,</span><span class="s">"{""id"":""problem""}"</span>
+<span class="s">"{""id"":""according""}"</span><span class="o">,</span><span class="s">"{""id"":""internal""}"</span><span class="o">,</span><span class="s">"{""id"":""goals""}"</span><span class="o">,</span><span class="s">"{""id"":""competitiveness""}"</span>
+<span class="s">"{""id"":""according""}"</span><span class="o">,</span><span class="s">"{""id"":""internal""}"</span><span class="o">,</span><span class="s">"{""id"":""goals""}"</span><span class="o">,</span><span class="s">"{""id"":""everyone""}"</span>
+
+<span class="n">path</span><span class="o">.</span><span class="n">printSchema</span>
+<span class="n">root</span>
+ <span class="o">|--</span> <span class="n">x1</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span>
+ <span class="o">|--</span> <span class="n">x2</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span>
+ <span class="o">|--</span> <span class="n">x3</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span>
+ <span class="o">|--</span> <span class="n">x4</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span></code></pre></figure>
+
+
+<p>To change the structure of path first we will get a string of words:  </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path1</span><span class="k">=</span><span class="n">graphInsightLow</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="n">formLine</span><span class="o">(</span><span class="mi">4</span><span class="o">))</span>
+<span class="k">val</span> <span class="n">path2</span><span class="k">=</span><span class="n">path1</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">toString</span><span class="o">)).</span>
+  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">replaceAll</span><span class="o">(</span><span class="s">"\\["</span><span class="o">,</span><span class="s">""</span><span class="o">))).</span>
+  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">replaceAll</span><span class="o">(</span><span class="s">"\\]"</span><span class="o">,</span><span class="s">""</span><span class="o">)))</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">path2</span><span class="o">)</span>
+<span class="n">value</span>
+<span class="s">"according,internal,goals,competitiveness"</span>
+<span class="s">"adult,returns,child,interest"</span>
+<span class="s">"adult,returns,child,ability"</span></code></pre></figure>
+
+
+<p>Next we will transform a string of words to array of words: </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path3</span><span class="k">=</span><span class="n">path2</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">","</span><span class="o">))).</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">toArray</span><span class="o">))</span>
+<span class="n">display</span><span class="o">(</span><span class="n">path3</span><span class="o">)</span>
+<span class="n">value</span>
+<span class="s">"[""according"",""internal"",""goals"",""competitiveness""]"</span>
+<span class="s">"[""adult"",""returns"",""child"",""interest""]"</span>
+<span class="s">"[""adult"",""returns"",""child"",""ability""]"</span></code></pre></figure>
+
+
+<p><h3>Define the Line between Specific Words </h3>
+<p>Now we can specify words for beginning and end of the path. </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">word1</span><span class="o">=</span><span class="s">"insight"</span>
+<span class="k">val</span> <span class="n">word2</span><span class="o">=</span><span class="s">"brain"</span>
+<span class="k">val</span> <span class="n">steps</span><span class="k">=</span><span class="mi">4</span>
+<span class="k">val</span> <span class="n">path4</span><span class="k">=</span><span class="n">path3</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">==</span><span class="n">word1</span><span class="o">)).</span>
+  <span class="n">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">==</span><span class="n">word2</span><span class="o">))</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">path4</span><span class="o">)</span>
+<span class="n">value</span>
+<span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span>
+<span class="s">"[""insight"",""requires"",""different"",""brain""]"</span>
+<span class="s">"[""insight"",""depends"",""higher"",""brain""]"</span>
+<span class="s">"[""insight"",""depends"",""various"",""brain""]"</span>
+<span class="s">"[""insight"",""brain"",""activity"",""brain""]"</span>
+<span class="s">"[""insight"",""brain"",""epiphany"",""brain""]"</span>
+<span class="s">"[""insight"",""brain"",""creations"",""brain""]"</span>
+<span class="s">"[""insight"",""brain"",""active"",""brain""]"</span>
+<span class="s">"[""insight"",""believes"",""different"",""brain""]"</span>
+<span class="s">"[""insight"",""looking"",""specific"",""brain""]"</span></code></pre></figure>
+
+
+<p>We can see that in some lines the same word appears several times, for example:</p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="s">"[""insight"",""brain"",""activity"",""brain""]"</span><span class="err">"</span></code></pre></figure>
+
+
+<p><h3>Clean Word Duplicates </h3>
+<p>Explode words within line: </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
+<span class="k">val</span> <span class="n">path5</span><span class="k">=</span><span class="n">path4</span><span class="o">.</span><span class="n">rdd</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span>
+  <span class="n">withColumn</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"words"</span><span class="o">)).</span><span class="n">distinct</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">path5</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"id"</span><span class="o">))</span>
+<span class="n">words</span><span class="o">,</span><span class="n">id</span><span class="o">,</span><span class="n">word</span>
+<span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">prefrontal</span>
+<span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">insight</span>
+<span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">activity</span>
+<span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">brain</span>
+<span class="s">"[""insight"",""along"",""without"",""brain""]"</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="n">along</span>
+<span class="s">"[""insight"",""along"",""without"",""brain""]"</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="n">without</span>
+<span class="s">"[""insight"",""along"",""without"",""brain""]"</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="n">brain</span>
+<span class="s">"[""insight"",""along"",""without"",""brain""]"</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="n">insight</span>
+<span class="s">"[""insight"",""brain"",""connections"",""brain""]"</span><span class="o">,</span><span class="mi">33</span><span class="o">,</span><span class="n">connections</span>
+<span class="s">"[""insight"",""brain"",""connections"",""brain""]"</span><span class="o">,</span><span class="mi">33</span><span class="o">,</span><span class="n">insight</span>
+<span class="s">"[""insight"",""brain"",""connections"",""brain""]"</span><span class="o">,</span><span class="mi">33</span><span class="o">,</span><span class="n">brain</span></code></pre></figure>
+
+
+<p>Counts of words within each line: </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
+<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"id"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">path6</span> <span class="k">=</span> <span class="n">path5</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"wordCount"</span><span class="o">,</span> <span class="n">count</span><span class="o">(</span><span class="n">$</span><span class="s">"word"</span><span class="o">).</span>
+  <span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">path6</span><span class="o">)</span>
+<span class="n">words</span><span class="o">,</span><span class="n">id</span><span class="o">,</span><span class="n">word</span>
+<span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">activity</span><span class="o">,</span><span class="mi">4</span>
+<span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">prefrontal</span><span class="o">,</span><span class="mi">4</span>
+<span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mi">4</span>
+<span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">insight</span><span class="o">,</span><span class="mi">4</span>
+<span class="s">"[""insight"",""along"",""without"",""brain""]"</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="n">without</span><span class="o">,</span><span class="mi">4</span>
+<span class="s">"[""insight"",""along"",""without"",""brain""]"</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="n">insight</span><span class="o">,</span><span class="mi">4</span>
+<span class="s">"[""insight"",""along"",""without"",""brain""]"</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mi">4</span>
+<span class="s">"[""insight"",""along"",""without"",""brain""]"</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="n">along</span><span class="o">,</span><span class="mi">4</span>
+<span class="s">"[""insight"",""brain"",""connections"",""brain""]"</span><span class="o">,</span><span class="mi">33</span><span class="o">,</span><span class="n">connections</span><span class="o">,</span><span class="mi">3</span>
+<span class="s">"[""insight"",""brain"",""connections"",""brain""]"</span><span class="o">,</span><span class="mi">33</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mi">3</span>
+<span class="s">"[""insight"",""brain"",""connections"",""brain""]"</span><span class="o">,</span><span class="mi">33</span><span class="o">,</span><span class="n">insight</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
+
+
+<p>To exclude line with word duplicates we will filter out lines with count of words smaller then  'steps' - the number of words parameter. If we are calculating circles (like 'brain' -&gt; * -&gt; 'brain' ) we will filter out lines with count of words smaller then 'steps-1': </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">result</span><span class="k">=</span>  
+<span class="k">if</span> <span class="o">(</span><span class="n">word1</span><span class="o">!=</span><span class="n">word2</span><span class="o">)</span><span class="n">path6</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'wordCount=</span><span class="o">==</span><span class="n">steps</span><span class="o">).</span>
+  <span class="n">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="n">distinct</span>
+<span class="k">else</span> <span class="n">path6</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'wordCount=</span><span class="o">==</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span>
+  <span class="n">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="n">distinct</span></code></pre></figure>
+
+
+<p><h3>Function to Find Word Lines</h3>
+<p>Now we can combine all scripts into function:</p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.DataFrame</span>
+<span class="k">def</span> <span class="n">findForm</span><span class="o">(</span><span class="n">graph</span><span class="k">:</span> <span class="kt">GraphFrame</span><span class="o">,</span> <span class="n">word1</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+    <span class="n">word2</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">steps</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">={</span>
+  <span class="k">val</span> <span class="n">path1</span><span class="k">=</span><span class="n">graph</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="n">formLine</span><span class="o">(</span><span class="n">steps</span><span class="o">))</span>
+  <span class="k">val</span> <span class="n">path2</span><span class="k">=</span><span class="n">path1</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">toString</span><span class="o">)).</span>
+    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">replaceAll</span><span class="o">(</span><span class="s">"\\["</span><span class="o">,</span><span class="s">""</span><span class="o">))).</span>
+    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">replaceAll</span><span class="o">(</span><span class="s">"\\]"</span><span class="o">,</span><span class="s">""</span><span class="o">)))</span>
+  <span class="k">val</span> <span class="n">path3</span><span class="k">=</span><span class="n">path2</span><span class="o">.</span>
+    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">","</span><span class="o">))).</span>
+    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">toArray</span><span class="o">))</span>
+  <span class="k">val</span> <span class="n">path4</span><span class="k">=</span><span class="n">path3</span><span class="o">.</span>
+    <span class="n">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">==</span><span class="n">word1</span><span class="o">)).</span>
+    <span class="n">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">==</span><span class="n">word2</span><span class="o">))</span>
+  <span class="k">val</span> <span class="n">path5</span><span class="k">=</span><span class="n">path4</span><span class="o">.</span><span class="n">rdd</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="o">.</span>
+    <span class="n">toDF</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span>
+    <span class="n">withColumn</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"words"</span><span class="o">)).</span><span class="n">distinct</span>
+  <span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"id"</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">path6</span> <span class="k">=</span> <span class="n">path5</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"wordCount"</span><span class="o">,</span><span class="n">count</span><span class="o">(</span><span class="n">$</span><span class="s">"word"</span><span class="o">).</span>
+    <span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">word1</span><span class="o">!=</span><span class="n">word2</span><span class="o">)</span><span class="n">path6</span><span class="o">.</span>
+    <span class="n">filter</span><span class="o">(</span><span class="ss">'wordCount=</span><span class="o">==</span><span class="n">steps</span><span class="o">).</span>
+    <span class="n">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="n">distinct</span>
+  <span class="k">else</span> <span class="n">path6</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'wordCount=</span><span class="o">==</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span>
+    <span class="n">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="n">distinct</span>
+<span class="o">}</span></code></pre></figure>
+
+
+<p><h3>Examples</h3>
+
+<p>Line: 'insight' -&gt; (1 word) -&gt; 'brain' </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">3</span><span class="o">))</span>
+<span class="n">words</span>
+<span class="s">"[""brain"",""right"",""insight""]"</span>
+<span class="s">"[""brain"",""activity"",""insight""]"</span>
+<span class="s">"[""brain"",""moments"",""insight""]"</span></code></pre></figure>
+
+
+<p>Line: 'insight' -&gt; (2 words) -&gt; 'brain' - some examples</p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">4</span><span class="o">))</span>
+<span class="n">words</span>
+<span class="s">"[""brain"",""require"",""spontaneous"",""insight""]"</span>
+<span class="s">"[""brain"",""thought"",""called"",""insight""]"</span>
+<span class="s">"[""brain"",""dominant"",""problem"",""insight""]"</span>
+<span class="s">"[""brain"",""response"",""associated"",""insight""]"</span></code></pre></figure>
+
+
+<p>Line: 'insight' -&gt; (3 words) -&gt; 'brain' </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
+<span class="n">words</span>
+<span class="s">"[""brain"",""require"",""neural"",""activity"",""insight""]"</span>
+<span class="s">"[""brain"",""dominant"",""problem"",""called"",""insight""]"</span>
+<span class="s">"[""brain"",""complex"",""drawing"",""problem"",""insight""]"</span>
+<span class="s">"[""brain"",""functions"",""creator"",""ideas"",""insight""]"</span>
+<span class="s">"[""brain"",""thinking"",""likely"",""solve"",""insight""]"</span></code></pre></figure>
+
+
+<p>Circle: 'insight' -&gt; (3 words) -&gt; 'insight' </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
+<span class="n">words</span>
+<span class="s">"[""insight"",""requires"",""prefrontal"",""activity"",""insight""]"</span>
+<span class="s">"[""insight"",""increase"",""creative"",""moment"",""insight""]"</span>
+<span class="s">"[""insight"",""analytically"",""showed"",""associated"",""insight""]"</span>
+<span class="s">"[""insight"",""revealed"",""surprising"",""power"",""insight""]"</span>
+<span class="s">"[""insight"",""brain"",""activity"",""right"",""insight""]"</span>
+<span class="s">"[""insight"",""positive"",""biases"",""conscious"",""insight""]"</span></code></pre></figure>
+
+
+<p>Circle: 'brain' -&gt; (2 words) -&gt; 'brain' </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">4</span><span class="o">))</span>
+<span class="n">words</span>
+<span class="s">"[""brain"",""right"",""hemisphere"",""brain""]"</span>
+<span class="s">"[""brain"",""develop"",""human"",""brain""]"</span>
+<span class="s">"[""brain"",""thinking"",""active"",""brain""]"</span>
+<span class="s">"[""brain"",""developed"",""different"",""brain""]"</span>
+<span class="s">"[""brain"",""involved"",""executive"",""brain""]"</span></code></pre></figure>
+
+
+<p>Line: 'insight' -&gt; (3 words) -&gt; 'association' </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="s">"association"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
+<span class="n">words</span>
+<span class="s">"[""insight"",""using"",""different"",""sudden"",""association""]"</span>
+<span class="s">"[""insight"",""increase"",""creative"",""process"",""association""]"</span>
+<span class="s">"[""insight"",""combined"",""social"",""psychological"",""association""]"</span>
+<span class="s">"[""insight"",""sometimes"",""analytically"",""sudden"",""association""]"</span>
+<span class="s">"[""insight"",""prefrontal"",""circuits"",""process"",""association""]"</span></code></pre></figure>
+
+
+<p>Line: 'association' -&gt; (4 words) -&gt; 'insight' </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"association"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">6</span><span class="o">))</span>
+<span class="n">words</span>
+<span class="s">"[""association"",""useful"",""elegant"",""ideas"",""without"",""insight""]"</span>
+<span class="s">"[""association"",""brain"",""great"",""knowledge"",""shows"",""insight""]"</span>
+<span class="s">"[""association"",""cortex"",""given"",""creative"",""moment"",""insight""]"</span>
+<span class="s">"[""association"",""likely"",""solve"",""verbal"",""problem"",""insight""]"</span>
+<span class="s">"[""association"",""brain"",""dominant"",""problem"",""called"",""insight""]"</span></code></pre></figure>
+
+
+p&gt;Circle: 'associated' -&gt; (3 words) -&gt; 'associated' </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"associated"</span><span class="o">,</span><span class="s">"associated"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
+<span class="n">words</span>
+<span class="s">"[""associated"",""different"",""prefrontal"",""activity"",""associated""]"</span>
+<span class="s">"[""associated"",""musical"",""ability"",""children"",""associated""]"</span>
+<span class="s">"[""associated"",""mental"",""processing"",""music"",""associated""]"</span>
+<span class="s">"[""associated"",""specific"",""brain"",""activity"",""associated""]"</span>
+<span class="s">"[""associated"",""sustained"",""aerobic"",""activity"",""associated""]"</span>
+<span class="s">"[""associated"",""greater"",""knowledge"",""children"",""associated""]"</span></code></pre></figure>
+
+
+<p><h3>Next Post - Associations (continue)</h3>
+In the next several posts we will deeper look at data associations.</p>
+</p></p></p></p></p></p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2017/12/24/word2vec2graphPsychoanalysis/" data-toggle="tooltip" data-placement="top" title="Word2Vec2Graph - Psychoanalysis Topics">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2018</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
