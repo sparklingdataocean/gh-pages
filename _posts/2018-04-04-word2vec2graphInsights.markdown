@@ -511,7 +511,7 @@ words
 
 
 <a href="#">
-    <img src="{{ site.baseurl }}/img/Insight2.jpg" alt="Post Sample Image" width="333" height="500">
+    <img src="{{ site.baseurl }}/img/Insight2.jpg" alt="Post Sample Image" width="400" height="500">
 </a>
 
 <p><h3>Next Post - Associations (continue)</h3>
