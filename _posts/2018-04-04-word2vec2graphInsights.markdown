@@ -481,20 +481,7 @@ words
 "[""insight"",""prefrontal"",""circuits"",""process"",""association""]"
 {% endhighlight %}
 
-<p>Line: 'association' -> (4 words) -> 'insight' </p>
-
-{% highlight scala %}
-display(findForm(graphInsightLow,"association","insight",6))
-words
-"[""association"",""useful"",""elegant"",""ideas"",""without"",""insight""]"
-"[""association"",""brain"",""great"",""knowledge"",""shows"",""insight""]"
-"[""association"",""cortex"",""given"",""creative"",""moment"",""insight""]"
-"[""association"",""likely"",""solve"",""verbal"",""problem"",""insight""]"
-"[""association"",""brain"",""dominant"",""problem"",""called"",""insight""]"
-
-{% endhighlight %}
-
-p>Circle: 'associated' -> (3 words) -> 'associated' </p>
+<p>Circle: 'associated' -> (3 words) -> 'associated' </p>
 
 {% highlight scala %}
 display(findForm(graphInsightLow,"associated","associated",5))
@@ -507,6 +494,25 @@ words
 "[""associated"",""greater"",""knowledge"",""children"",""associated""]"
 
 {% endhighlight %}
+
+<p>Line: 'association' -> (4 words) -> 'insight' </p>
+
+{% highlight scala %}
+display(findForm(graphInsightLow,"association","insight",6))
+words
+"[""association"",""useful"",""elegant"",""ideas"",""without"",""insight""]"
+"[""association"",""brain"",""great"",""knowledge"",""shows"",""insight""]"
+"[""association"",""cortex"",""given"",""creative"",""moment"",""insight""]"
+"[""association"",""likely"",""solve"",""verbal"",""problem"",""insight""]"
+
+
+{% endhighlight %}
+
+
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/Insight2.jpg" alt="Post Sample Image" width="333" height="500">
+</a>
 
 <p><h3>Next Post - Associations (continue)</h3>
 In the next several posts we will deeper look at data associations.</p>
