@@ -514,5 +514,5 @@ words
     <img src="{{ site.baseurl }}/img/Insight2.jpg" alt="Post Sample Image" width="400" height="500">
 </a>
 
-<p><h3>Next Post - Associations (continue)</h3>
+<p><h3>Next Post - Word2Vec2Graph The Web Conf Presentation</h3>
 In the next post we will talk about Word2Vec2Graph presentation on The Web Conference in Lyon, France.</p>
