@@ -515,4 +515,4 @@ words
 </a>
 
 <p><h3>Next Post - Associations (continue)</h3>
-In the next several posts we will deeper look at data associations.</p>
+In the next post we will talk about Word2Vec2Graph presentation on The Web Conference in Lyon, France.</p>
