@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Word2Vec2Graph - Connections - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2018/05/19/word2vec2graphConnections/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/connect1a.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Word2Vec2Graph - Connections</h1>
+                    
+                    <h2 class="subheading">About Connections</h2>
+                    
+                    <span class="meta">Posted by Melenar on May 19, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Word2Vec2Graph Model and Connections</h3>
+
+<p>In this post we will show how to use Word2Vec2Graph to better understand connections between the words in text files. As text file we will use a combination of text files from previous posts: Stress text file, Psychoanalysis text file, and Creativity and Aha Moments text file. All three text files were related to brain and we will call a new text file Brain Text File.
+</p>
+
+<h3>Building Word2Vec2Graph Model</h3>
+To build the Word2Vec2Graph model in this post we will use slightly different data preparation process than the process that was described in the <i><a href="http://spa.rklingdataocean.com/2017/12/24/word2vec2graphPsychoanalysis/">"Quick Look at Text"</a></i> post:
+<ul>
+<li>Read text files and combine the data to Brain Text File</li>
+<li>Tokenize</li>
+<li>Remove stop words</li>
+<li>Within each line of Brain Text File get trios of words: (word1, word2, word3)</li>
+<li>Get list of all words from trios of words</li>
+<li>Combine Brain Text File with News Text File and train Word2Vec model</li>
+<li>Calculate cosine similarities for all pairs of words from trios of words</li>
+<li>Build a direct graph on trios of words using word1 and word3 as nodes and word2 and cosine similarities between word1 and word3 as edges attributes</li>
+<li>Save graph vertices and edges</li>
+</ul>
+<p></p>
+
+<h3>Data Preparation</h3>
+
+<p>Combine text files about stress, psychoanalysis and aha moments.</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputStress</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/stressWiki.txt"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">inputPsychoanalysis</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/psychoanalisys1.txt"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">inputInsight</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/ahaMoments.txt"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">inputBrain</span><span class="k">=</span><span class="n">inputStress</span><span class="o">.</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">inputPsychoanalysis</span><span class="o">).</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">inputInsight</span><span class="o">)</span>
+<span class="n">inputBrain</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">2422</span></code></pre></figure>
+
+
+<p>Tokenize text file and exclude stop words:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
+<span class="k">val</span> <span class="n">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
+   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
+   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
+   <span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
+   <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">tokenizedInput</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="n">transform</span><span class="o">(</span><span class="n">inputBrain</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
+   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">removedStopWordsInput</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
+   <span class="n">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
+   <span class="n">remover</span><span class="o">.</span><span class="n">getStopWords</span><span class="o">).</span>
+   <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedInput</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p>Get word trios (word1, word2, word3) from lines of inputBrain text file:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">ngramTrio</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NGram</span><span class="o">().</span>
+   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">).</span>
+   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"ngrams"</span><span class="o">).</span>
+   <span class="n">setN</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">ngramTrioCleanWords</span> <span class="k">=</span> <span class="n">ngramTrio</span><span class="o">.</span>
+   <span class="n">transform</span><span class="o">(</span><span class="n">removedStopWordsInput</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p>Explode word trios:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
+<span class="k">val</span> <span class="n">slpitNgramsTrio</span><span class="k">=</span><span class="n">ngramTrioCleanWords</span><span class="o">.</span>
+   <span class="n">withColumn</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"ngrams"</span><span class="o">)).</span><span class="n">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"trioWords"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">slpitNgramsTrio</span><span class="o">.</span><span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<span class="n">trioWords</span>
+<span class="n">differently</span> <span class="n">experiences</span> <span class="n">different</span>
+<span class="n">humor</span> <span class="n">excellent</span> <span class="n">defensive</span>
+<span class="n">behavior</span> <span class="n">brain</span> <span class="n">science</span>
+<span class="n">women</span> <span class="n">exist</span> <span class="n">unfair</span>
+<span class="n">stress</span> <span class="n">desired</span> <span class="n">beneficial</span>
+<span class="n">salaried</span> <span class="n">entitled</span> <span class="n">lectures</span>
+<span class="n">journals</span> <span class="n">pared</span> <span class="n">people</span>
+<span class="n">family</span> <span class="n">balance</span> <span class="n">women</span>
+<span class="n">kinds</span> <span class="n">stress</span> <span class="n">stress</span>
+<span class="n">stress</span> <span class="n">helps</span> <span class="n">improve</span></code></pre></figure>
+
+
+<p>Split word trios to three columns:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">brainTrioWords</span><span class="k">=</span><span class="n">slpitNgramsTrio</span><span class="o">.</span>
+   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span>
+      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
+      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">1</span><span class="o">),</span>     
+      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">2</span><span class="o">))).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"trioWords"</span><span class="o">,</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'word1=</span><span class="o">!='</span><span class="n">word2</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'word1=</span><span class="o">!='</span><span class="n">word3</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'word2=</span><span class="o">!='</span><span class="n">word3</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">brainTrioWords</span><span class="o">.</span><span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<span class="n">trioWords</span><span class="o">,</span><span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">word3</span>
+<span class="n">negative</span> <span class="n">emotions</span> <span class="n">surrounding</span><span class="o">,</span><span class="n">negative</span><span class="o">,</span><span class="n">emotions</span><span class="o">,</span><span class="n">surrounding</span>
+<span class="n">longer</span> <span class="n">periods</span> <span class="n">types</span><span class="o">,</span><span class="n">longer</span><span class="o">,</span><span class="n">periods</span><span class="o">,</span><span class="n">types</span>
+<span class="n">enhancement</span> <span class="n">markers</span> <span class="n">natural</span><span class="o">,</span><span class="n">enhancement</span><span class="o">,</span><span class="n">markers</span><span class="o">,</span><span class="n">natural</span>
+<span class="n">individual</span> <span class="n">differences</span> <span class="n">vulnerability</span><span class="o">,</span><span class="n">individual</span><span class="o">,</span><span class="n">differences</span><span class="o">,</span><span class="n">vulnerability</span>
+<span class="n">inherently</span> <span class="n">neutral</span> <span class="n">meaning</span><span class="o">,</span><span class="n">inherently</span><span class="o">,</span><span class="n">neutral</span><span class="o">,</span><span class="n">meaning</span>
+<span class="n">events</span> <span class="n">occurred</span> <span class="n">within</span><span class="o">,</span><span class="n">events</span><span class="o">,</span><span class="n">occurred</span><span class="o">,</span><span class="n">within</span>
+<span class="n">however</span> <span class="n">positive</span> <span class="n">experiences</span><span class="o">,</span><span class="n">however</span><span class="o">,</span><span class="n">positive</span><span class="o">,</span><span class="n">experiences</span>
+<span class="n">traits</span> <span class="n">whether</span> <span class="n">attend</span><span class="o">,</span><span class="n">traits</span><span class="o">,</span><span class="n">whether</span><span class="o">,</span><span class="n">attend</span>
+<span class="n">grade</span> <span class="n">stressors</span> <span class="n">background</span><span class="o">,</span><span class="n">grade</span><span class="o">,</span><span class="n">stressors</span><span class="o">,</span><span class="n">background</span>
+<span class="n">typical</span> <span class="n">examples</span> <span class="n">ambient</span><span class="o">,</span><span class="n">typical</span><span class="o">,</span><span class="n">examples</span><span class="o">,</span><span class="n">ambient</span></code></pre></figure>
+
+
+
+<p>Get the list of all words from word trios:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">brainAllWords</span><span class="k">=</span><span class="n">brainTrioWords</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">).</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">brainTrioWords</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)).</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">brainTrioWords</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word3"</span><span class="o">)).</span>
+   <span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"wordList"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">brainAllWords</span><span class="o">.</span><span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<span class="n">wordList</span>
+<span class="n">recognize</span>
+<span class="n">persist</span>
+<span class="n">everyday</span>
+<span class="n">still</span>
+<span class="n">connected</span>
+<span class="n">interaction</span>
+<span class="n">travel</span>
+<span class="n">safeguarding</span>
+<span class="n">noncaregivers</span>
+<span class="n">enhancement</span></code></pre></figure>
+
+
+<h3>Train Word2Vec Model</h3>
+<p>Combine News Text File and Brain Text File for Word2Vec model:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.ml.feature.Word2VecModel</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.sql.Row</span>
+<span class="k">val</span> <span class="n">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+  <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/newsTest.txt"</span><span class="o">).</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">tokenizedNewsBrain</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="n">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">inputBrain</span><span class="o">))</span></code></pre></figure>
+
+
+
+<p>Train Word2Vec model and save the results:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">()</span>
+  <span class="o">.</span><span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">)</span>
+  <span class="o">.</span><span class="n">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">w2Vmodel</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span>
+   <span class="n">fit</span><span class="o">(</span><span class="n">tokenizedNewsBrain</span><span class="o">)</span>
+<span class="n">w2Vmodel</span><span class="o">.</span>
+   <span class="n">write</span><span class="o">.</span>
+   <span class="n">overwrite</span><span class="o">.</span>
+   <span class="n">save</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">modelNewsBrain</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+   <span class="n">read</span><span class="o">.</span>
+   <span class="n">load</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">modelNewsBrain</span><span class="o">.</span><span class="n">findSynonyms</span><span class="o">(</span><span class="s">"creativity"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
+<span class="n">diversity</span><span class="o">,</span><span class="mf">0.8130543231964111</span>
+<span class="n">compatible</span><span class="o">,</span><span class="mf">0.8086180090904236</span>
+<span class="n">functions</span><span class="o">,</span><span class="mf">0.7818686366081238</span>
+<span class="n">relationships</span><span class="o">,</span><span class="mf">0.7691928148269653</span>
+<span class="n">mechanisms</span><span class="o">,</span><span class="mf">0.7640953063964844</span>
+<span class="n">environments</span><span class="o">,</span><span class="mf">0.7629551887512207</span>
+<span class="n">expertise</span><span class="o">,</span><span class="mf">0.7596272230148315</span></code></pre></figure>
+
+
+
+<p>Get a set of all words from the modelNewsBrain Word2Vec model and join them with list of words from Brain Text File:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modelWordsBrain</span><span class="k">=</span><span class="n">modelNewsBrain</span><span class="o">.</span>
+   <span class="n">getVectors</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span>   
+<span class="k">val</span> <span class="n">brainWordVector</span><span class="k">=</span><span class="n">brainAllWords</span><span class="o">.</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">modelWordsBrain</span><span class="o">,</span><span class="ss">'wordList=</span><span class="o">=='</span><span class="n">word</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span>
+   <span class="n">distinct</span>
+<span class="n">brainWordVector</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">7794</span></code></pre></figure>
+
+
+<h3>Cosine Similarities</h3>
+<p>Cosine similarity function:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml.linalg.Vector</span>
+<span class="k">def</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+             <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">var</span> <span class="n">dot</span><span class="k">=</span><span class="mf">0.0</span>
+  <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span><span class="mi">0</span> <span class="n">to</span> <span class="n">vectorX</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">dot</span> <span class="o">+=</span> <span class="n">vectorX</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">*</span> <span class="n">vectorY</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
+  <span class="n">dot</span>
+<span class="o">}</span>
+<span class="k">def</span> <span class="n">cosineVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+                 <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="n">require</span><span class="o">(</span><span class="n">vectorX</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">vectorY</span><span class="o">.</span><span class="n">size</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">dot</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">div</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorX</span><span class="o">)</span> <span class="o">*</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorY</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">div</span><span class="o">==</span><span class="mi">0</span><span class="o">)</span><span class="mi">0</span>
+  <span class="k">else</span> <span class="n">dot</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="o">(</span><span class="n">div</span><span class="o">)</span>
+<span class="o">}</span></code></pre></figure>
+
+
+<p>Self-join brainWordVector table to get all pairs of words of Brain Text File:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">brainWordVector2</span><span class="k">=</span><span class="n">brainWordVector</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">w2wBrain</span><span class="k">=</span><span class="n">brainWordVector</span><span class="o">.</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">brainWordVector2</span><span class="o">,</span><span class="ss">'word=</span><span class="o">!='</span><span class="n">word2</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
+<span class="n">w2wBrain</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">60738642</span></code></pre></figure>
+
+
+<p>Calculate Cosine Similarity matrix - Cosine Similarities between all pairs of words of Brain Text File:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wBrainCosMatrix</span><span class="k">=</span><span class="n">w2wBrain</span><span class="o">.</span>
+   <span class="n">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">2</span><span class="o">),</span>
+   <span class="n">cosineVector</span><span class="o">(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">),</span>
+   <span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">3</span><span class="o">)))).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"w1"</span><span class="o">,</span><span class="s">"w2"</span><span class="o">,</span><span class="s">"cos12"</span><span class="o">)</span></code></pre></figure>
+
+
+
+
+<h3>Build a Graph</h3>
+<p>To prepare word triples for graph we will join Brain Text File triples (brainTrioWords table) with cosine similarity matrix:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">trioCos</span><span class="k">=</span><span class="n">brainTrioWords</span><span class="o">.</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">w2wBrainCosMatrix</span><span class="o">,</span> <span class="ss">'word1=</span><span class="o">=='</span><span class="n">w1</span> <span class="o">&amp;&amp;</span> <span class="ss">'word3=</span><span class="o">=='</span><span class="n">w2</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span> <span class="s">"word3"</span><span class="o">,</span> <span class="s">"word2"</span><span class="o">,</span> <span class="s">"cos12"</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p>Build a graph:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
+<span class="k">val</span> <span class="n">graphNodes1</span><span class="k">=</span><span class="n">trioCos</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">).</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">trioCos</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)).</span>
+   <span class="n">distinct</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphEdges1</span><span class="k">=</span><span class="n">trioCos</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos12"</span><span class="o">).</span>
+   <span class="n">distinct</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes1</span><span class="o">,</span><span class="n">graphEdges1</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p>Save graph vertices and edges as Parquet to Databricks locations:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">graph1</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">write</span><span class="o">.</span>
+   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphBrainVertices"</span><span class="o">)</span>
+<span class="n">graph1</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">write</span><span class="o">.</span>
+   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphBrainEdges"</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p>Load vertices and edges and rebuild the same graph:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphBrainVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphBrainVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphBrainEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphBrainEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphBrain</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">graphBrainEdges</span><span class="o">)</span></code></pre></figure>
+
+
+<p>Graph PageRank:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphBrainPageRank</span> <span class="k">=</span> <span class="n">graphBrain</span><span class="o">.</span>
+   <span class="n">pageRank</span><span class="o">.</span>
+   <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">graphBrainPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+   <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">asc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+   <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
+   <span class="n">freud</span><span class="o">,</span><span class="mf">74.31134249545481</span>
+   <span class="n">brain</span><span class="o">,</span><span class="mf">38.13756389088785</span>
+   <span class="n">creative</span><span class="o">,</span><span class="mf">35.10291570480231</span>
+   <span class="n">creativity</span><span class="o">,</span><span class="mf">30.94055809189146</span>
+   <span class="n">insight</span><span class="o">,</span><span class="mf">25.806952787055366</span>
+   <span class="n">psychoanalysis</span><span class="o">,</span><span class="mf">25.514027656136673</span>
+   <span class="n">stress</span><span class="o">,</span><span class="mf">24.445974901156116</span>
+   <span class="n">theory</span><span class="o">,</span><span class="mf">23.87317685853816</span>
+   <span class="n">problem</span><span class="o">,</span><span class="mf">23.737729501554316</span>
+   <span class="n">cognitive</span><span class="o">,</span><span class="mf">22.80768036272832</span>
+   <span class="n">people</span><span class="o">,</span><span class="mf">21.44400068476515</span></code></pre></figure>
+
+
+<p>With the exception of the word 'Freud' the word 'Brain' is the most popular word in our Brain Text File.
+</p>
+
+<h3>Statistics for Edge Name and Edge Weight</h3>
+
+<p>Calculate stats for Edge Weights and Edge Names:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="k">val</span> <span class="n">edgesStats</span><span class="k">=</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+   <span class="n">groupBy</span><span class="o">(</span><span class="s">"edgeName"</span><span class="o">).</span><span class="n">agg</span><span class="o">(</span><span class="n">max</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="s">"max"</span><span class="o">),</span>
+     <span class="n">min</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="s">"min"</span><span class="o">),</span>
+     <span class="n">sum</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="s">"sum"</span><span class="o">),</span>
+     <span class="n">count</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="s">"count"</span><span class="o">)).</span><span class="n">filter</span><span class="o">(</span><span class="s">"count&gt;1"</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p>Highest edge weights:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edgesStats</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'max.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">edgeName</span><span class="o">,</span><span class="n">max</span><span class="o">,</span><span class="n">min</span><span class="o">,</span><span class="n">sum</span><span class="o">,</span><span class="n">count</span>
+<span class="n">child</span><span class="o">,</span><span class="mf">0.8584717249492438</span><span class="o">,-</span><span class="mf">0.30117121433417127</span><span class="o">,</span><span class="mf">7.583085681939111</span><span class="o">,</span><span class="mi">54</span>
+<span class="n">psychology</span><span class="o">,</span><span class="mf">0.8556911081737578</span><span class="o">,-</span><span class="mf">0.37700439365336214</span><span class="o">,</span><span class="mf">9.712497328132436</span><span class="o">,</span><span class="mi">55</span>
+<span class="n">professor</span><span class="o">,</span><span class="mf">0.83394840981085</span><span class="o">,-</span><span class="mf">0.06342301939331417</span><span class="o">,</span><span class="mf">5.958904858793974</span><span class="o">,</span><span class="mi">19</span>
+<span class="n">global</span><span class="o">,</span><span class="mf">0.8335144633411368</span><span class="o">,</span><span class="mf">0.03901084757412033</span><span class="o">,</span><span class="mf">1.927672549812371</span><span class="o">,</span><span class="mi">5</span>
+<span class="n">accomplished</span><span class="o">,</span><span class="mf">0.8329918442983587</span><span class="o">,</span><span class="mf">0.02458739411403451</span><span class="o">,</span><span class="mf">0.8575792384123933</span><span class="o">,</span><span class="mi">2</span>
+<span class="n">austria</span><span class="o">,</span><span class="mf">0.8320654816237527</span><span class="o">,</span><span class="mf">0.02353840399552282</span><span class="o">,</span><span class="mf">1.18496342567388</span><span class="o">,</span><span class="mi">4</span>
+<span class="n">cause</span><span class="o">,</span><span class="mf">0.82675033228016</span><span class="o">,-</span><span class="mf">0.1281579124896022</span><span class="o">,</span><span class="mf">4.965468953366158</span><span class="o">,</span><span class="mi">22</span></code></pre></figure>
+
+
+<p>Lowest edge weights:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edgesStats</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'min.</span><span class="n">asc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">edgeName</span><span class="o">,</span><span class="n">max</span><span class="o">,</span><span class="n">min</span><span class="o">,</span><span class="n">sum</span><span class="o">,</span><span class="n">count</span>
+<span class="n">beeman</span><span class="o">,</span><span class="mf">0.596008130136649</span><span class="o">,-</span><span class="mf">0.5696883342362257</span><span class="o">,</span><span class="mf">4.134895812880752</span><span class="o">,</span><span class="mi">33</span>
+<span class="n">distinctive</span><span class="o">,</span><span class="mf">0.36268952837900825</span><span class="o">,-</span><span class="mf">0.5584905988347715</span><span class="o">,-</span><span class="mf">0.5268212152607737</span><span class="o">,</span><span class="mi">4</span>
+<span class="n">structure</span><span class="o">,</span><span class="mf">0.5352828171045373</span><span class="o">,-</span><span class="mf">0.533270758587534</span><span class="o">,</span><span class="mf">2.0451058016988632</span><span class="o">,</span><span class="mi">17</span>
+<span class="n">prefrontal</span><span class="o">,</span><span class="mf">0.6457235466765552</span><span class="o">,-</span><span class="mf">0.5218483665866732</span><span class="o">,</span><span class="mf">3.4488260817462293</span><span class="o">,</span><span class="mi">69</span>
+<span class="n">suggest</span><span class="o">,</span><span class="mf">0.6282606822240733</span><span class="o">,-</span><span class="mf">0.5171839101516457</span><span class="o">,</span><span class="mf">3.0008698422837994</span><span class="o">,</span><span class="mi">21</span>
+<span class="n">cingulate</span><span class="o">,</span><span class="mf">0.4776771469127971</span><span class="o">,-</span><span class="mf">0.5084109051228789</span><span class="o">,</span><span class="mf">1.163358286123176</span><span class="o">,</span><span class="mi">9</span>
+<span class="n">produced</span><span class="o">,</span><span class="mf">0.479919802776391</span><span class="o">,-</span><span class="mf">0.5033405650712954</span><span class="o">,</span><span class="mf">0.9995211977134678</span><span class="o">,</span><span class="mi">8</span></code></pre></figure>
+
+
+
+<p>Highest summary of edge weights:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edgesStats</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'sum.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">edgeName</span><span class="o">,</span><span class="n">max</span><span class="o">,</span><span class="n">min</span><span class="o">,</span><span class="n">sum</span><span class="o">,</span><span class="n">count</span>
+<span class="n">freud</span><span class="o">,</span><span class="mf">0.7194757332843367</span><span class="o">,-</span><span class="mf">0.3691721677418447</span><span class="o">,</span><span class="mf">45.8165427413474</span><span class="o">,</span><span class="mi">370</span>
+<span class="n">brain</span><span class="o">,</span><span class="mf">0.8077240803083802</span><span class="o">,-</span><span class="mf">0.36925714175395613</span><span class="o">,</span><span class="mf">31.27596725835625</span><span class="o">,</span><span class="mi">159</span>
+<span class="n">creative</span><span class="o">,</span><span class="mf">0.8075588754919899</span><span class="o">,-</span><span class="mf">0.3912535625236597</span><span class="o">,</span><span class="mf">30.41804556365593</span><span class="o">,</span><span class="mi">153</span>
+<span class="n">stress</span><span class="o">,</span><span class="mf">0.7456329713179576</span><span class="o">,-</span><span class="mf">0.3378335788548523</span><span class="o">,</span><span class="mf">25.976193255283377</span><span class="o">,</span><span class="mi">107</span>
+<span class="n">cognitive</span><span class="o">,</span><span class="mf">0.7346515989457058</span><span class="o">,-</span><span class="mf">0.2768635986013295</span><span class="o">,</span><span class="mf">24.798885187478785</span><span class="o">,</span><span class="mi">100</span>
+<span class="n">creativity</span><span class="o">,</span><span class="mf">0.6876949377169064</span><span class="o">,-</span><span class="mf">0.4318553905309646</span><span class="o">,</span><span class="mf">23.906024306364106</span><span class="o">,</span><span class="mi">143</span>
+<span class="n">social</span><span class="o">,</span><span class="mf">0.6502294554038338</span><span class="o">,-</span><span class="mf">0.1882435918776268</span><span class="o">,</span><span class="mf">20.51512625741932</span><span class="o">,</span><span class="mi">85</span></code></pre></figure>
+
+
+<p>Lowest summary of edge weights:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edgesStats</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'sum.</span><span class="n">asc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">edgeName</span><span class="o">,</span><span class="n">max</span><span class="o">,</span><span class="n">min</span><span class="o">,</span><span class="n">sum</span><span class="o">,</span><span class="n">count</span>
+<span class="n">service</span><span class="o">,-</span><span class="mf">0.02717220518964349</span><span class="o">,-</span><span class="mf">0.38409168941265176</span><span class="o">,-</span><span class="mf">0.6042134814366678</span><span class="o">,</span><span class="mi">3</span>
+<span class="n">melcher</span><span class="o">,-</span><span class="mf">0.16486841646031114</span><span class="o">,-</span><span class="mf">0.42791377206009545</span><span class="o">,-</span><span class="mf">0.5927821885204065</span><span class="o">,</span><span class="mi">2</span>
+<span class="n">sound</span><span class="o">,-</span><span class="mf">0.07704349631214606</span><span class="o">,-</span><span class="mf">0.3810539051953722</span><span class="o">,-</span><span class="mf">0.5881283248809397</span><span class="o">,</span><span class="mi">3</span>
+<span class="n">portray</span><span class="o">,-</span><span class="mf">0.22722479093159156</span><span class="o">,-</span><span class="mf">0.30858018841481616</span><span class="o">,-</span><span class="mf">0.5358049793464077</span><span class="o">,</span><span class="mi">2</span>
+<span class="n">fuster</span><span class="o">,</span><span class="mf">0.22664159560782535</span><span class="o">,-</span><span class="mf">0.32616568690672787</span><span class="o">,-</span><span class="mf">0.5292408380732149</span><span class="o">,</span><span class="mi">8</span>
+<span class="n">distinctive</span><span class="o">,</span><span class="mf">0.36268952837900825</span><span class="o">,-</span><span class="mf">0.5584905988347715</span><span class="o">,-</span><span class="mf">0.5268212152607737</span><span class="o">,</span><span class="mi">4</span>
+<span class="n">exploration</span><span class="o">,</span><span class="mf">0.17907177798380738</span><span class="o">,-</span><span class="mf">0.28839304402764093</span><span class="o">,-</span><span class="mf">0.521327555454355</span><span class="o">,</span><span class="mi">6</span></code></pre></figure>
+
+
+
+<h3>Finding Topics via Connections</h3>
+In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">one of the Word2Vec2Graph model posts</a></i> we showed how to find text topics with high, medium and low cosine similarities. In this post we are looking at topics around connections</p>
+
+<p>First, running connected components for the whole graphBrain, we can see that almost all edges are in one large connected component:
+</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graphBrainCC</span> <span class="k">=</span> <span class="n">graphBrain</span><span class="o">.</span>
+   <span class="n">connectedComponents</span><span class="o">.</span>
+   <span class="n">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="n">graphBrainCCCount</span><span class="k">=</span><span class="n">graphBrainCC</span><span class="o">.</span>
+   <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="n">count</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">graphBrainCCCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
+<span class="mi">0</span><span class="o">,</span><span class="mi">7499</span>
+<span class="mi">403726925838</span><span class="o">,</span><span class="mi">4</span>
+<span class="mi">68719476742</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">1005022347271</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">455266533415</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">1494648619034</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">472446402592</span><span class="o">,</span><span class="mi">1</span></code></pre></figure>
+
+<p>Next, we will create functions that are similar to functions described in the  <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">"Detect Topics in Text"</a></i> post. Instead of using cosine similarity thresholds we will use edge name thresholds:
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.DataFrame</span>
+<span class="k">def</span> <span class="n">w2v2gConnectionCC</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
+     <span class="n">connection</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span>
+  <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">val</span> <span class="n">graphEdgesSub</span><span class="k">=</span> <span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName.</span><span class="n">rlike</span><span class="o">(</span><span class="n">connection</span><span class="o">))</span>
+  <span class="k">val</span> <span class="n">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
+  <span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
+     <span class="n">connectedComponents</span><span class="o">.</span>
+     <span class="n">run</span><span class="o">()</span>
+  <span class="k">val</span> <span class="n">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
+     <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+     <span class="n">count</span><span class="o">.</span>
+     <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+ <span class="k">val</span> <span class="n">sizeCC</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component=</span><span class="o">=='</span><span class="n">cc</span><span class="o">).</span>
+     <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="n">distinct</span>
+ <span class="n">graphEdgesSub</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span>
+     <span class="n">union</span><span class="o">(</span><span class="n">graphEdgesSub</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">id</span><span class="o">)).</span>
+     <span class="n">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span>
+<span class="o">}</span></code></pre></figure>
+
+
+
+<p>Calculate connected components with edge names similar to 'creat'</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectionCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"creat"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">9</span><span class="o">))</span>
+<span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeName</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
+<span class="mi">8</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="n">neural</span><span class="o">,</span><span class="n">creations</span><span class="o">,</span><span class="mf">0.6628680134625873</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">8</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="n">neural</span><span class="o">,</span><span class="n">create</span><span class="o">,</span><span class="mf">0.6628680134625873</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">8</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.36624866688242597</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">85899345957</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="n">demonstrated</span><span class="o">,</span><span class="n">productivity</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.45950723748323447</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">85899345957</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="n">gauged</span><span class="o">,</span><span class="n">productivity</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.35849743874315726</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">85899345957</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="n">productivity</span><span class="o">,</span><span class="n">women</span><span class="o">,</span><span class="n">creative</span><span class="o">,-</span><span class="mf">0.01945508374457911</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">111669149707</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">others</span><span class="o">,</span><span class="n">people</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.5717827913275904</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">111669149707</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">people</span><span class="o">,</span><span class="n">experiencing</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.18518242329178428</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">111669149707</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">higher</span><span class="o">,</span><span class="n">people</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.0862673194287232</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
+
+
+<p>Function to convert edge ("src","dst") to .DOT language:</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">cc2dot</span><span class="o">(</span><span class="n">graphComponents</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">componentId</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>  
+ <span class="n">graphComponents</span><span class="o">.</span>
+  <span class="n">filter</span><span class="o">(</span><span class="ss">'component=</span><span class="o">==</span><span class="n">componentId</span><span class="o">).</span>
+  <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
+  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
+        <span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" ;"</span><span class="o">)).</span>
+        <span class="n">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
+<span class="o">}</span></code></pre></figure>
+
+
+<p>Connections like 'creat' - topics examples</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">670014898189L</span><span class="o">))</span>
+<span class="s">"measures"</span> <span class="o">-&gt;</span> <span class="s">"despite"</span> <span class="o">;</span>
+<span class="s">"measures"</span> <span class="o">-&gt;</span> <span class="s">"generally"</span> <span class="o">;</span>
+<span class="s">"correlates"</span> <span class="o">-&gt;</span> <span class="s">"generally"</span> <span class="o">;</span>
+<span class="s">"generally"</span> <span class="o">-&gt;</span> <span class="s">"mental"</span> <span class="o">;</span>
+<span class="s">"direction"</span> <span class="o">-&gt;</span> <span class="s">"mental"</span> <span class="o">;</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">481036337163L</span><span class="o">))</span>
+<span class="s">"ability"</span> <span class="o">-&gt;</span> <span class="s">"gifted"</span> <span class="o">;</span>
+<span class="s">"necessary"</span> <span class="o">-&gt;</span> <span class="s">"ability"</span> <span class="o">;</span>
+<span class="s">"predicts"</span> <span class="o">-&gt;</span> <span class="s">"ability"</span> <span class="o">;</span></code></pre></figure>
+
+
+<p>Connections like 'psycho' - topics examples</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectionCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"psycho"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+<span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span>
+   <span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
+<span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeName</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
+<span class="mi">8</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="mf">0.744622420826979</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">8</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">basic</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="mf">0.6912580242535618</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">8</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">important</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="mf">0.34249288576143416</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">8589934620</span><span class="o">,</span><span class="mi">10</span><span class="o">,</span><span class="n">positive</span><span class="o">,</span><span class="n">stress</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="mf">0.5143877352596108</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">8589934620</span><span class="o">,</span><span class="mi">10</span><span class="o">,</span><span class="n">stress</span><span class="o">,</span><span class="n">demand</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="mf">0.32407394975025483</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">8589934620</span><span class="o">,</span><span class="mi">10</span><span class="o">,</span><span class="n">particularly</span><span class="o">,</span><span class="n">though</span><span class="o">,</span><span class="n">psychotherapy</span><span class="o">,</span><span class="mf">0.17898782193689186</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">670014898183</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="n">applying</span><span class="o">,</span><span class="n">methods</span><span class="o">,</span><span class="n">psychoanalytic</span><span class="o">,</span><span class="mf">0.5223617540907087</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">670014898183</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="n">methods</span><span class="o">,</span><span class="n">investigation</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="mf">0.10814820780186121</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">670014898183</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="n">beginning</span><span class="o">,</span><span class="n">investigation</span><span class="o">,</span><span class="n">psychoanalytic</span><span class="o">,-</span><span class="mf">0.12824049313320524</span><span class="o">,</span><span class="mi">3</span>
+<span class="mi">678604832798</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">scientific</span><span class="o">,</span><span class="n">developed</span><span class="o">,</span><span class="n">psychology</span><span class="o">,</span><span class="mf">0.41018382500362577</span><span class="o">,</span><span class="mi">1</span>
+<span class="mi">678604832798</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">believes</span><span class="o">,</span><span class="n">scientific</span><span class="o">,</span><span class="n">psychoanalysis</span><span class="o">,</span><span class="mf">0.23228341746892528</span><span class="o">,</span><span class="mi">2</span>
+<span class="mi">678604832798</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">scientific</span><span class="o">,</span><span class="n">defined</span><span class="o">,</span><span class="n">psychology</span><span class="o">,</span><span class="mf">0.10015559029020887</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
+
+
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">8L</span><span class="o">))</span>
+<span class="s">"important"</span> <span class="o">-&gt;</span> <span class="s">"processes"</span> <span class="o">;</span>
+<span class="s">"creativity"</span> <span class="o">-&gt;</span> <span class="s">"processes"</span> <span class="o">;</span>
+<span class="s">"correlation"</span> <span class="o">-&gt;</span> <span class="s">"creativity"</span> <span class="o">;</span>
+<span class="s">"basic"</span> <span class="o">-&gt;</span> <span class="s">"processes"</span> <span class="o">;</span>
+<span class="s">"claims"</span> <span class="o">-&gt;</span> <span class="s">"unsupported"</span> <span class="o">;</span>
+<span class="s">"claims"</span> <span class="o">-&gt;</span> <span class="s">"basic"</span> <span class="o">;</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">670014898183L</span><span class="o">))</span>
+<span class="s">"beginning"</span> <span class="o">-&gt;</span> <span class="s">"investigation"</span> <span class="o">;</span>
+<span class="s">"applying"</span> <span class="o">-&gt;</span> <span class="s">"methods"</span> <span class="o">;</span>
+<span class="s">"methods"</span> <span class="o">-&gt;</span> <span class="s">"investigation"</span> <span class="o">;</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">678604832798L</span><span class="o">))</span>
+<span class="s">"believes"</span> <span class="o">-&gt;</span> <span class="s">"contained"</span> <span class="o">;</span>
+<span class="s">"believes"</span> <span class="o">-&gt;</span> <span class="s">"scientific"</span> <span class="o">;</span>
+<span class="s">"scientific"</span> <span class="o">-&gt;</span> <span class="s">"defined"</span> <span class="o">;</span>
+<span class="s">"scientific"</span> <span class="o">-&gt;</span> <span class="s">"developed"</span> <span class="o">;</span></code></pre></figure>
+
+
+
+
+
+<h3>Subgraphs based on Connections</h3>
+<p>As we can see topics built on specific connections show us more information related to these connections. Now we will build Word2Vec2Graph subgraphs based on edge names sililar to specific words.</p>
+
+
+<p>Build subgraph with edge name like 'creat'</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainEdges</span><span class="k">=</span><span class="n">graphBrainEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"creat"</span><span class="o">))</span>
+<span class="k">val</span> <span class="n">subGraphBrain</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainEdges</span><span class="o">)</span></code></pre></figure>
+
+
+<p>Calculate 'creat' subgraph PageRank</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainPageRank</span> <span class="k">=</span> <span class="n">subGraphBrain</span><span class="o">.</span>
+   <span class="n">pageRank</span><span class="o">.</span>
+   <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">subGraphBrainPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+   <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
+<span class="n">insight</span><span class="o">,</span><span class="mf">14.372598514419272</span>
+<span class="n">thinking</span><span class="o">,</span><span class="mf">12.364614660701669</span>
+<span class="n">according</span><span class="o">,</span><span class="mf">11.476433396436777</span>
+<span class="n">insights</span><span class="o">,</span><span class="mf">9.366699097271631</span>
+<span class="n">expression</span><span class="o">,</span><span class="mf">6.783316046665733</span>
+<span class="n">potential</span><span class="o">,</span><span class="mf">6.546098019095852</span>
+<span class="n">research</span><span class="o">,</span><span class="mf">6.402329517538349</span></code></pre></figure>
+
+
+<p>PageRank of subgraph like 'psycho' </p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainEdges</span><span class="k">=</span><span class="n">graphBrainEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"psycho"</span><span class="o">))</span>
+<span class="k">val</span> <span class="n">subGraphBrain</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainEdges</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">subGraphBrainPageRank</span> <span class="k">=</span> <span class="n">subGraphBrain</span><span class="o">.</span>
+   <span class="n">pageRank</span><span class="o">.</span><span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">subGraphBrainPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+    <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+<span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
+<span class="n">theory</span><span class="o">,</span><span class="mf">11.854709255771983</span>
+<span class="n">therapy</span><span class="o">,</span><span class="mf">10.320306649251734</span>
+<span class="n">bring</span><span class="o">,</span><span class="mf">9.72775336458543</span>
+<span class="n">development</span><span class="o">,</span><span class="mf">7.878804653398239</span>
+<span class="n">society</span><span class="o">,</span><span class="mf">7.70065335576441</span>
+<span class="n">movement</span><span class="o">,</span><span class="mf">7.6244138194554125</span>
+<span class="n">renamed</span><span class="o">,</span><span class="mf">7.501048065121205</span>
+<span class="n">psychotherapy</span><span class="o">,</span><span class="mf">7.076733495817173</span>
+<span class="n">treatment</span><span class="o">,</span><span class="mf">6.821927165619394</span>
+<span class="n">science</span><span class="o">,</span><span class="mf">6.821077349405393</span>
+<span class="n">freud</span><span class="o">,</span><span class="mf">5.266755456913399</span></code></pre></figure>
+
+
+<h3>Subgraphs based on Synonyms of Connections</h3>
+<p>To get more flexible view on topics around connections we will look at topics built around word2vec synonyms of connections.</p>
+
+<p>Function to find word synonyms on direct Word2Vec2Graph</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">word</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">numSynonyms</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span>
+  <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'src=</span><span class="o">==</span><span class="n">word</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">union</span><span class="o">(</span>
+  <span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dst=</span><span class="o">==</span><span class="n">word</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)).</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"weight"</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
+  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="n">numSynonyms</span><span class="o">)</span>
+<span class="o">}</span></code></pre></figure>
+
+
+<p>Synonyms of the word 'insight':</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">word2</span>
+<span class="n">analytical</span>
+<span class="n">creativity</span>
+<span class="n">processes</span>
+<span class="n">mechanisms</span>
+<span class="n">solutions</span>
+<span class="n">promote</span>
+<span class="n">creative</span></code></pre></figure>
+
+
+<p>Synonyms of the word 'brain':</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">word2</span>
+<span class="n">disorder</span>
+<span class="n">illness</span>
+<span class="n">weight</span>
+<span class="n">healthy</span>
+<span class="n">cognitive</span>
+<span class="n">neural</span>
+<span class="n">consciousness</span></code></pre></figure>
+
+<p>PageRank of subgraph with connections on 5 top 'insight' synonyms</p>
+
+<p>To calculate a subset of edges with connections on 'insight' synonyms we will combine edges with edge name 'insight' and edges with edge names with 5 top 'insight' synonyms. </p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainSynonymEdges</span><span class="k">=</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">5</span><span class="o">),</span><span class="ss">'edgeName=</span><span class="o">=='</span><span class="n">word2</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName=</span><span class="o">==</span><span class="s">"insight"</span><span class="o">))</span></code></pre></figure>
+
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainSynonym</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainSynonymEdges</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">subGraphBrainSynonymPageRank</span> <span class="k">=</span> <span class="n">subGraphBrainSynonym</span><span class="o">.</span>
+   <span class="n">pageRank</span><span class="o">.</span><span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">subGraphBrainSynonymPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+   <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
+<span class="n">solutions</span><span class="o">,</span><span class="mf">8.15511268601736</span>
+<span class="n">effect</span><span class="o">,</span><span class="mf">6.5060703332388</span>
+<span class="n">tests</span><span class="o">,</span><span class="mf">6.3660488665719415</span>
+<span class="n">stochastic</span><span class="o">,</span><span class="mf">6.341536183190043</span>
+<span class="n">research</span><span class="o">,</span><span class="mf">6.312647154356285</span>
+<span class="n">creativity</span><span class="o">,</span><span class="mf">4.867181190940523</span>
+<span class="n">spontaneous</span><span class="o">,</span><span class="mf">4.468732885667797</span></code></pre></figure>
+
+
+<p>PageRank of subgraph with connections on 7 top 'brain' synonyms</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainSynonymEdges</span><span class="k">=</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">7</span><span class="o">),</span><span class="ss">'edgeName=</span><span class="o">=='</span><span class="n">word2</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName=</span><span class="o">==</span><span class="s">"brain"</span><span class="o">))</span>
+<span class="k">val</span> <span class="n">subGraphBrainSynonym</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainSynonymEdges</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">subGraphBrainSynonymPageRank</span> <span class="k">=</span> <span class="n">subGraphBrainSynonym</span><span class="o">.</span>
+   <span class="n">pageRank</span><span class="o">.</span><span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">subGraphBrainSynonymPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+    <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
+<span class="n">activity</span><span class="o">,</span><span class="mf">11.333038986522027</span>
+<span class="n">flexibility</span><span class="o">,</span><span class="mf">10.252780304836739</span>
+<span class="n">processes</span><span class="o">,</span><span class="mf">7.7963191684322535</span>
+<span class="n">stimulation</span><span class="o">,</span><span class="mf">7.5108416414864125</span>
+<span class="n">structure</span><span class="o">,</span><span class="mf">7.505214528557895</span>
+<span class="n">psychology</span><span class="o">,</span><span class="mf">7.15138848835566</span>
+<span class="n">neuroscience</span><span class="o">,</span><span class="mf">6.692352488247509</span></code></pre></figure>
+
+
+<h3>Topics based on Synonyms of Connections</h3>
+<p>The following function similar to the w2v2gConnectionCC function. It calculates  connected components of subgraph built on synonyms of edge connections.</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">w2v2gConnectionSynCC</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
+     <span class="n">connection</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">numSynonyms</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span>
+  <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">val</span> <span class="n">graphEdgesSub</span><span class="k">=</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+     <span class="n">join</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="n">connection</span><span class="o">,</span><span class="n">numSynonyms</span><span class="o">),</span><span class="ss">'edgeName=</span><span class="o">=='</span><span class="n">word2</span><span class="o">).</span>
+     <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span>
+     <span class="n">union</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName=</span><span class="o">==</span><span class="n">connection</span><span class="o">))</span>   
+  <span class="k">val</span> <span class="n">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
+  <span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
+     <span class="n">connectedComponents</span><span class="o">.</span>
+     <span class="n">run</span><span class="o">()</span>
+  <span class="k">val</span> <span class="n">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
+     <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+     <span class="n">count</span><span class="o">.</span>
+     <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+ <span class="k">val</span> <span class="n">sizeCC</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component=</span><span class="o">=='</span><span class="n">cc</span><span class="o">).</span>
+     <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="n">distinct</span>
+ <span class="n">graphEdgesSub</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span>
+     <span class="n">union</span><span class="o">(</span><span class="n">graphEdgesSub</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">id</span><span class="o">)).</span>
+     <span class="n">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span>
+<span class="o">}</span></code></pre></figure>
+
+
+<h4>
+<p>Topics based on 'Brain' synonyms:</p> </h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectionSynCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">7</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
+   <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeName</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
+   <span class="mi">8589934597</span><span class="o">,</span><span class="mi">8</span><span class="o">,</span><span class="n">science</span><span class="o">,</span><span class="n">explains</span><span class="o">,</span><span class="n">consciousness</span><span class="o">,</span><span class="mf">0.3798126607701545</span><span class="o">,</span><span class="mi">1</span>
+   <span class="mi">8589934597</span><span class="o">,</span><span class="mi">8</span><span class="o">,</span><span class="n">behavior</span><span class="o">,</span><span class="n">anatomy</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mf">0.34740929480845656</span><span class="o">,</span><span class="mi">2</span>
+   <span class="mi">8589934597</span><span class="o">,</span><span class="mi">8</span><span class="o">,</span><span class="n">integral</span><span class="o">,</span><span class="n">science</span><span class="o">,</span><span class="n">cognitive</span><span class="o">,</span><span class="mf">0.3468999563360316</span><span class="o">,</span><span class="mi">3</span>  
+   <span class="mi">111669149711</span><span class="o">,</span><span class="mi">15</span><span class="o">,</span><span class="n">studies</span><span class="o">,</span><span class="n">neuroscience</span><span class="o">,</span><span class="n">cognitive</span><span class="o">,</span><span class="mf">0.6831101846837115</span><span class="o">,</span><span class="mi">1</span>
+   <span class="mi">111669149711</span><span class="o">,</span><span class="mi">15</span><span class="o">,</span><span class="n">neuroscience</span><span class="o">,</span><span class="n">psychology</span><span class="o">,</span><span class="n">cognitive</span><span class="o">,</span><span class="mf">0.6698069278977729</span><span class="o">,</span><span class="mi">2</span>
+   <span class="mi">111669149711</span><span class="o">,</span><span class="mi">15</span><span class="o">,</span><span class="n">journal</span><span class="o">,</span><span class="n">neuroscience</span><span class="o">,</span><span class="n">cognitive</span><span class="o">,</span><span class="mf">0.5176061843022186</span><span class="o">,</span><span class="mi">3</span>
+   <span class="mi">188978561059</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">learning</span><span class="o">,</span><span class="n">memory</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mf">0.5522150156892682</span><span class="o">,</span><span class="mi">1</span>
+   <span class="mi">188978561059</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">memory</span><span class="o">,</span><span class="n">circuitry</span><span class="o">,</span><span class="n">cognitive</span><span class="o">,</span><span class="mf">0.42575403069657436</span><span class="o">,</span><span class="mi">2</span>
+   <span class="mi">188978561059</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">memory</span><span class="o">,</span><span class="n">develop</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mf">0.2921438105505071</span><span class="o">,</span><span class="mi">3</span>
+   <span class="mi">206158430214</span><span class="o">,</span><span class="mi">13</span><span class="o">,</span><span class="n">content</span><span class="o">,</span><span class="n">distinctive</span><span class="o">,</span><span class="n">consciousness</span><span class="o">,</span><span class="mf">0.5081715402806003</span><span class="o">,</span><span class="mi">1</span>
+   <span class="mi">206158430214</span><span class="o">,</span><span class="mi">13</span><span class="o">,</span><span class="n">distinctive</span><span class="o">,</span><span class="n">loops</span><span class="o">,</span><span class="n">neural</span><span class="o">,</span><span class="mf">0.4453281580417894</span><span class="o">,</span><span class="mi">2</span>
+   <span class="mi">206158430214</span><span class="o">,</span><span class="mi">13</span><span class="o">,</span><span class="n">every</span><span class="o">,</span><span class="n">except</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mf">0.4010585422473654</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
+
+
+<h4>
+<p>Examples of topics based on  'Brain' synonyms edge names</p></h4>
+<p>'Brain' synonyms- Example 1</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="s">"recommendations"</span> <span class="o">-&gt;</span> <span class="s">"learning"</span> <span class="o">;</span>
+<span class="s">"learning"</span> <span class="o">-&gt;</span> <span class="s">"memory"</span> <span class="o">;</span>
+<span class="s">"memory"</span> <span class="o">-&gt;</span> <span class="s">"circuitry"</span> <span class="o">;</span>
+<span class="s">"memory"</span> <span class="o">-&gt;</span> <span class="s">"develop"</span> <span class="o">;</span>
+<span class="s">"develop"</span> <span class="o">-&gt;</span> <span class="s">"autonomy"</span> <span class="o">;</span></code></pre></figure>
+
+
+<p>'Brain' synonyms- Example 2</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="s">"thoughts"</span> <span class="o">-&gt;</span> <span class="s">"replacing"</span> <span class="o">;</span>
+<span class="s">"supplies"</span> <span class="o">-&gt;</span> <span class="s">"energy"</span> <span class="o">;</span>
+<span class="s">"thoughts"</span> <span class="o">-&gt;</span> <span class="s">"isolation"</span> <span class="o">;</span>
+<span class="s">"keeping"</span> <span class="o">-&gt;</span> <span class="s">"energy"</span> <span class="o">;</span>
+<span class="s">"thoughts"</span> <span class="o">-&gt;</span> <span class="s">"energy"</span> <span class="o">;</span></code></pre></figure>
+
+
+<p>'Brain' synonyms- Example 3</p>
+<a href="#">
+    <img src="/img/graph63.jpg" alt="Post Sample Image" width="500" height="500" />
+</a>
+<p>'Brain' synonyms- Example 4</p>
+<a href="#">
+    <img src="/img/graph61.jpg" alt="Post Sample Image" width="500" height="500" />
+</a>
+
+
+<h4><p>Topics based on 'Insight' synonyms:</p></h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectionSynCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">7</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
+   <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeName</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
+   <span class="mi">85899345930</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">fundamental</span><span class="o">,</span><span class="n">specifically</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="mf">0.4803744056926936</span><span class="o">,</span><span class="mi">1</span>
+   <span class="mi">85899345930</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">nature</span><span class="o">,</span><span class="n">fundamental</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="mf">0.4465274807724954</span><span class="o">,</span><span class="mi">2</span>
+   <span class="mi">85899345930</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">nature</span><span class="o">,</span><span class="n">sciences</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="mf">0.3524099120698862</span><span class="o">,</span><span class="mi">3</span>
+   <span class="mi">111669149718</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">kinds</span><span class="o">,</span><span class="n">neural</span><span class="o">,</span><span class="n">mechanisms</span><span class="o">,</span><span class="mf">0.4834976180767224</span><span class="o">,</span><span class="mi">1</span>
+   <span class="mi">111669149718</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">though</span><span class="o">,</span><span class="n">occur</span><span class="o">,</span><span class="n">insight</span><span class="o">,</span><span class="mf">0.35452826011513117</span><span class="o">,</span><span class="mi">2</span>
+   <span class="mi">111669149718</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">multiple</span><span class="o">,</span><span class="n">operating</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="mf">0.2071641265872016</span><span class="o">,</span><span class="mi">3</span>
+   <span class="mi">146028888099</span><span class="o">,</span><span class="mi">11</span><span class="o">,</span><span class="n">cascade</span><span class="o">,</span><span class="n">result</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="mf">0.5347460764667417</span><span class="o">,</span><span class="mi">1</span>
+   <span class="mi">146028888099</span><span class="o">,</span><span class="mi">11</span><span class="o">,</span><span class="n">suggesting</span><span class="o">,</span><span class="n">violate</span><span class="o">,</span><span class="n">solutions</span><span class="o">,</span><span class="mf">0.435283925113988</span><span class="o">,</span><span class="mi">2</span>
+   <span class="mi">146028888099</span><span class="o">,</span><span class="mi">11</span><span class="o">,</span><span class="n">potential</span><span class="o">,</span><span class="n">rather</span><span class="o">,</span><span class="n">solutions</span><span class="o">,</span><span class="mf">0.4121330129010489</span><span class="o">,</span><span class="mi">3</span>
+   <span class="mi">206158430215</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="n">executive</span><span class="o">,</span><span class="n">rehearsing</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="mf">0.21712514918034997</span><span class="o">,</span><span class="mi">1</span>
+   <span class="mi">206158430215</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="n">executive</span><span class="o">,</span><span class="n">collapse</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="mf">0.019470471076957454</span><span class="o">,</span><span class="mi">2</span>
+   <span class="mi">206158430215</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="n">executive</span><span class="o">,</span><span class="n">directing</span><span class="o">,</span><span class="n">processes</span><span class="o">,-</span><span class="mf">0.05153457445366107</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
+
+
+
+<p>'Insight' synonyms- Example 1</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="s">"necessary"</span> <span class="o">-&gt;</span> <span class="s">"ability"</span> <span class="o">;</span>
+<span class="s">"predicts"</span> <span class="o">-&gt;</span> <span class="s">"ability"</span> <span class="o">;</span>
+<span class="s">"ability"</span> <span class="o">-&gt;</span> <span class="s">"gifted"</span> <span class="o">;</span></code></pre></figure>
+
+
+<p>'Insight' synonyms- Example 2</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="s">"fundamental"</span> <span class="o">-&gt;</span> <span class="s">"specifically"</span> <span class="o">;</span>
+<span class="s">"nature"</span> <span class="o">-&gt;</span> <span class="s">"conviction"</span> <span class="o">;</span>
+<span class="s">"nature"</span> <span class="o">-&gt;</span> <span class="s">"sciences"</span> <span class="o">;</span>
+<span class="s">"nature"</span> <span class="o">-&gt;</span> <span class="s">"fundamental"</span> <span class="o">;</span></code></pre></figure>
+
+
+<p>'Insight' synonyms- Example 3</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="s">"executive"</span> <span class="o">-&gt;</span> <span class="s">"directing"</span> <span class="o">;</span>
+<span class="s">"executive"</span> <span class="o">-&gt;</span> <span class="s">"collapse"</span> <span class="o">;</span>
+<span class="s">"executive"</span> <span class="o">-&gt;</span> <span class="s">"rehearsing"</span> <span class="o">;</span></code></pre></figure>
+
+
+
+<p>'Insight' synonyms- Example 4</p>
+<a href="#">
+    <img src="/img/graph65.jpg" alt="Post Sample Image" width="400" height="400" />
+</a>
+
+<p>'Insight' synonyms- Example 5</p>
+<a href="#">
+    <img src="/img/graph66.jpg" alt="Post Sample Image" width="500" height="500" />
+</a>
+
+<p><h3>Next Post - Associations (continue)</h3>
+In the next several posts we will continue analyzing data associations.</p>
+</p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2018/04/25/word2vec2graph1slide/" data-toggle="tooltip" data-placement="top" title="Word2Vec2Graph - Minute of Madness">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2018</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>

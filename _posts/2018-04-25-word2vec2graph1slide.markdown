@@ -11,7 +11,7 @@ header-img: "img/Lyon5c.jpg"
 <p><h3>The Web Conf 2018</h3>
 <p><i><a href="https://www2018.thewebconf.org">The Web Conference </a></i>
 (formerly www conference) is a yearly international conference on the topic of the future directions of the World Wide Web. Starting with 2018 edition, the conference series previously known as World Wide Web Conference (WWW) has been rebranded as The Web Conference. </p>
-<p>The Web Conference 2018 was in Lyon, France’s second city. It focused on Web technologies, standards and practices, and will showcase the best of the region’s technology and culture.
+<p>The Web Conference 2018 was in Lyon, France’s second largest city. It focused on Web technologies, standards and practices, and will showcase the best of the region’s technology and culture.
 </p>
 
 <p><h3>The Minute of Madness</h3>
