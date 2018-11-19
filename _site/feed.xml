@@ -1,4 +1,194 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-05-20T20:51:15-04:00</updated><id>http://localhost:4000/</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Word2Vec2Graph - Connections</title><link href="http://localhost:4000/2018/05/19/word2vec2graphConnections/" rel="alternate" type="text/html" title="Word2Vec2Graph - Connections" /><published>2018-05-19T08:00:00-04:00</published><updated>2018-05-19T08:00:00-04:00</updated><id>http://localhost:4000/2018/05/19/word2vec2graphConnections</id><content type="html" xml:base="http://localhost:4000/2018/05/19/word2vec2graphConnections/">&lt;p&gt;&lt;h3&gt;Word2Vec2Graph Model and Connections&lt;/h3&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-11-18T20:24:07-05:00</updated><id>http://localhost:4000/</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Deep Learning Language Model</title><link href="http://localhost:4000/2018/11/09/word2vec2graph4languageModel/" rel="alternate" type="text/html" title="Deep Learning Language Model" /><published>2018-11-09T07:00:00-05:00</published><updated>2018-11-09T07:00:00-05:00</updated><id>http://localhost:4000/2018/11/09/word2vec2graph4languageModel</id><content type="html" xml:base="http://localhost:4000/2018/11/09/word2vec2graph4languageModel/">&lt;p&gt;This post is our first step in finding connections between Word2Vec2Graph model and Deep Learning NLP. &lt;/p&gt;
+&lt;p&gt;&lt;h3&gt;About fast.ai Language Model&lt;/h3&gt;
+&lt;p&gt;In this post we looked at Language Model that predicts the next word given its previous word. This post's Language Model was built based on Jerome Howard's Deep Leaning fast.ai library. We used Python code almost the same as the code described in Jeremy's lesson &lt;i&gt;&lt;a href=&quot;https://course.fast.ai/lessons/lesson10.html&quot;&gt; 10—NLP CLASSIFICATION AND TRANSLATION&lt;/a&gt;&lt;/i&gt;&lt;/p&gt;
+
+&lt;p&gt;Fantastic thing fast.ai Language Model approach provides is Transfer Learning for NLP models. Fast.ai transfer learning is well described in NLP fast.ai post &lt;i&gt;&lt;a href=&quot;http://nlp.fast.ai/classification/2018/05/15/introducting-ulmfit.html&quot;&gt; Introducing state of the art text classification with universal language models&lt;/a&gt;&lt;/i&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;h3&gt;Slightly Modified fast.ai Language Model&lt;/h3&gt;
+&lt;p&gt;In Lesson 10 Jeremy is using Language Model pre-trained on Wikipedia data and then he fine-tunes it by IMDb movie reviews data. For our model instead of IMDb movie reviews we used a combination of text files that we used in our previous posts: Stress text file, Psychoanalysis text file, and Creativity and Aha Moments text file.&lt;/p&gt;
+
+&lt;p&gt;To randomly generate word sequences we used a function from fast.ai Lesson 4: &lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s_toks&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tokenizer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;proc_text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s_nums&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stoi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s_toks&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s_var&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s_nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))[&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s_var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'...'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;multinomial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;c&quot;&gt;#r = torch.topk(res[-1].exp(), 2)[1]&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;word&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;itos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to_np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unsqueeze&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;' '&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bs&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+&lt;p&gt;&lt;p&gt;&lt;h3&gt;Language Model Examples&lt;/h3&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;freud&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;freud&lt;/mark&gt;
+...had given a opinion that that society could support children rather than even women without further research . in many cases transcranial was among the psychoanalytic groups that sought to develop new and
+&lt;/small&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;freud&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;33&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;freud&lt;/mark&gt;...'s thoughts on religious beliefs and the arguments his version of what he describes as &quot; the intrinsically destructive drive &quot; . tom martin explained how the &quot; practicing of the mind &quot;
+&lt;/small&gt;&lt;/p&gt;
+
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;freud was&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;freud was&lt;/mark&gt;...recognized as the center of the research . analytically had entirely improves upon an everyday life with a formal idea by the north american affects of the previous year ; and the non - psychological perspective that it obtained by listening to the eye . the board also asked brentano
+&lt;/small&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;stress&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;stress&lt;/mark&gt;
+...disorder causing ques- eld diffuse patients to become more “ active ” informa- dishonesty or par- martindale time . s. frosch said : “ we can spend a lot of time looking at people 's memory . dr assets are about other things that are a very important side of
+&lt;/small&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;stress&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;stress&lt;/mark&gt;
+...and stress disorder and psychopathology . painful things might be evident when they are under a cold weather after being turned about by old gist jakob ◆ thinker ( nt ) whom he had tests in an reflective lab . an old object that results in a blocking effect is
+&lt;/small&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;stress disorder&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;60&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;stress disorder&lt;/mark&gt;
+...previously rejected &quot; escape &quot; program calls . it resulted in the appearance of a &quot; trajectories &quot; . the new magazine called this book &quot; the universe of future men essays &quot; an &quot; air of openness &quot; for beauty and creativity . david ptsd is some of whom had previously been considered a theorists . in 1999 he&lt;/small&gt;&lt;/p&gt;
+
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;stress disorder&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;stress disorder&lt;/mark&gt;
+...in the to - bulb field ( including the second burst ) in a working group . the best carbon - based work or writing of this period is in the largest prospective sixteen members of european society . for most of the work how for the united states population ] the international business times described and criticized the language
+&lt;/small&gt;&lt;/p&gt;
+
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;creative&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;creative&lt;/mark&gt;
+...power . the presentation was notable for its use of decorative terms &quot; eeg &quot; to describe what are called &quot; other understanding characteristics &quot; . academy of humanities production 's code of conduct results in being written as follows : whether the work from the prior reading is an
+&lt;/small&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;creativity&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;creativity&lt;/mark&gt;
+...is from the three learn how to become an american . we know apparently the best way to develop this method of learning is through really specific courses and studies . the ability to learn provides basic skills . the creative framework requires creative information and intelligence to relax .
+&lt;/small&gt;&lt;/p&gt;
+
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;insight&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;insight&lt;/mark&gt;
+.... anxiety can be a crucial part of mental structure . science research group first 5 november 2012 concluded that the lovell experiment involved &quot; remarkable performance &quot; and noted that despite being highly genius worked out despite having a
+&lt;/small&gt;&lt;/p&gt;
+
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;neural&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;neural&lt;/mark&gt;
+...content needs to be biases and will be able to arise in the now episodic ways . “ the lessons are mundane and cause you to view the expectations . ” this is a goal used to explore mental abilities located on the oceans . in particular these systems interconnected
+&lt;/small&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;neural network&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;neural network&lt;/mark&gt;
+...of a new controlling interest next to the 2012 gold age . information obtained by scientists from various online strategic services has been given to aca- self- ... the most ’’ of these programs .
+ xbos xfld 1 the war is not still widely known since the beginning of
+&lt;/small&gt;&lt;/p&gt;
+
+
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;artificial&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;artificial&lt;/mark&gt;
+...the transference knowledge which has been implemented as an illusion of the future . the assumption that ® wishes people are valuable is not originally written by hans - ernst wilhelm von perls but by von der psychologists who started using classical view as an explanation for how to solve
+&lt;/small&gt;&lt;/p&gt;
+
+
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;intelligence&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;intelligence&lt;/mark&gt;
+...experiments performed by the spontaneously detected latency stress disorder involving inserm at the control room . the patient had been given an extensive account of the surgery with the domains . once the surgery he had had his behavioral network developed to the point where it was able to travel
+&lt;/small&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;artificial intelligence&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;artificial intelligence&lt;/mark&gt;
+...never came into existence . this from history was only a matter of reason . despite more significant arlow — particularly to learn greater details — that key children would lose each year they needed more opportunities for a job . explained by the fact that a 2003 museum of
+&lt;/small&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;big data&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;big data&lt;/mark&gt;
+...from the beginning to end with a strongly natural message from them . a new list of intellectual hints such as those that did not necessarily name this system — one by david ernest duncan and another by daniel a.
+&lt;/small&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample_model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;big data&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;mark&gt;big data&lt;/mark&gt;
+...they were not able to speed up attempts to win phrase for a single objective . overall the writers sought to solve this problem by offering the task of creating additional reflective material for details . today these stuck largely
+&lt;/small&gt;&lt;/p&gt;
+
+&lt;h3&gt;Compare Language Model with Word2Vec Model &lt;/h3&gt;
+&lt;p&gt;On his class Jeremy recommends his students to think about Language Model vs. Word2Vec model. He explains that Word2vec is a single embedding matrix that maps words to vectors and Language Model really understands English. We are absolutely agree with it. &lt;/p&gt;
+&lt;p&gt;
+What is also fantastic in fast.ai library is an ability to use pre-trained Language Model and fine-tune it for specific data domains. In our model of this post we used a very small data file (about 900 KB). Using just this data to understand English would be impossible. However, building it on-top of pre-trained model allowed it to 'speak English' in psychology language. &lt;/p&gt;  
+
+&lt;p&gt;What are other differences between Language Model comparing to Word2Vec model? &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Geometrically these models are very different. Language Model creates a one dimensional line from a word - sequence of words, word2vec model creates multi-dimensional vectors.
+&lt;/li&gt;
+&lt;li&gt;Vectors can be compared via cosine similarity to find similar or not similar words.&lt;/li&gt;
+&lt;li&gt;Cosine similarities within pairs of words can translate pairs of words to graph using words as nodes, word pairs as edges and cosine similarities as edge weights.&lt;/li&gt;
+&lt;li&gt;Word2Vec graphs can combine Word2Vec and graph functionalities - in our previous posts we introduced Word2Vec2Graph model.&lt;/li&gt;
+&lt;li&gt;Word2Vec2Graph gives us new insights about text: top words in text file (pageRank), word topics (communities), word neighbors ('find' function).
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;More Questions&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Can Language Model be built based embedding words to vectors? This would allow us to combine it with graph functionality.   
+&lt;/li&gt;
+
+&lt;li&gt;Can we translate Language Model sequences to numbers (indexes) and combine the numbers to vectors? &lt;/li&gt;
+&lt;li&gt;Let's assume we use single words. For each word we can calculate a sequence of size X, map it to X numbers and combine with the initial word number. These sequences of (X+1) numbers can be transformed to vectors. How cosine similarities would work for finding similar words? &lt;/li&gt;
+&lt;li&gt;Can we get NLP insights from graph functionality built on top of Language   Model?
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;h3&gt;Next Post - Language Model&lt;/h3&gt;
+In the next several posts we will continue analyzing connections between Word2Vec and Language Models.&lt;/p&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">This post is our first step in finding connections between Word2Vec2Graph model and Deep Learning NLP. About fast.ai Language Model In this post we looked at Language Model that predicts the next word given its previous word. This post's Language Model was built based on Jerome Howard's Deep Leaning fast.ai library. We used Python code almost the same as the code described in Jeremy's lesson 10—NLP CLASSIFICATION AND TRANSLATION</summary></entry><entry><title type="html">Word2Vec2Graph - Connections</title><link href="http://localhost:4000/2018/05/19/word2vec2graphConnections/" rel="alternate" type="text/html" title="Word2Vec2Graph - Connections" /><published>2018-05-19T08:00:00-04:00</published><updated>2018-05-19T08:00:00-04:00</updated><id>http://localhost:4000/2018/05/19/word2vec2graphConnections</id><content type="html" xml:base="http://localhost:4000/2018/05/19/word2vec2graphConnections/">&lt;p&gt;&lt;h3&gt;Word2Vec2Graph Model and Connections&lt;/h3&gt;
 
 &lt;p&gt;In this post we will show how to use Word2Vec2Graph to better understand connections between the words in text files. As text file we will use a combination of text files from previous posts: Stress text file, Psychoanalysis text file, and Creativity and Aha Moments text file. All three text files were related to brain and we will call a new text file Brain Text File.
 &lt;/p&gt;
@@ -2314,7 +2504,7 @@ The biggest group:&lt;/p&gt;
 &lt;p&gt;&lt;h3&gt;Next Post - More Pair Connections&lt;/h3&gt;
 In the next post we will continue playing with Spark GraphFrames library to find more interesting word to word connections.
 &lt;/p&gt;
-&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Read Word Pairs Graph In the previous post we built and saved</summary></entry><entry><title type="html">Word2Vec2Graph for Pairs of Words</title><link href="http://localhost:4000/2017/10/14/word2vec2graphWordPairs/" rel="alternate" type="text/html" title="Word2Vec2Graph for Pairs of Words" /><published>2017-10-14T08:00:00-04:00</published><updated>2017-10-14T08:00:00-04:00</updated><id>http://localhost:4000/2017/10/14/word2vec2graphWordPairs</id><content type="html" xml:base="http://localhost:4000/2017/10/14/word2vec2graphWordPairs/">&lt;p&gt;&lt;h3&gt;Word2Vec2Graph Model - Direct Graph&lt;/h3&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Read Word Pairs Graph In the previous post we built and saved</summary></entry><entry><title type="html">Word2vec2graphwordpairscc</title><link href="http://localhost:4000/2017/10/16/word2vec2graphWordPairsCC/" rel="alternate" type="text/html" title="Word2vec2graphwordpairscc" /><published>2017-10-16T00:00:00-04:00</published><updated>2017-10-16T00:00:00-04:00</updated><id>http://localhost:4000/2017/10/16/word2vec2graphWordPairsCC</id><content type="html" xml:base="http://localhost:4000/2017/10/16/word2vec2graphWordPairsCC/"></content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Word2Vec2Graph for Pairs of Words</title><link href="http://localhost:4000/2017/10/14/word2vec2graphWordPairs/" rel="alternate" type="text/html" title="Word2Vec2Graph for Pairs of Words" /><published>2017-10-14T08:00:00-04:00</published><updated>2017-10-14T08:00:00-04:00</updated><id>http://localhost:4000/2017/10/14/word2vec2graphWordPairs</id><content type="html" xml:base="http://localhost:4000/2017/10/14/word2vec2graphWordPairs/">&lt;p&gt;&lt;h3&gt;Word2Vec2Graph Model - Direct Graph&lt;/h3&gt;
 In previous posts we introduced
 &lt;i&gt;&lt;a href=&quot;https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/&quot;&gt;Word2Vec2Graph model in Spark&lt;/a&gt;&lt;/i&gt;.
 Word2Vec2Graph model connects Word2Vec model with Spark GraphFrames library and gives us new opportunities to use graph approach to text mining.&lt;/p&gt;
@@ -2745,514 +2935,4 @@ First we will look GraphFrames 'triangleCount' function  &lt;/p&gt;
 &lt;p&gt;&lt;h3&gt;Next Post - Direct Graph&lt;/h3&gt;
 In the next post we will look at direct Word2Vec2Graph graphs.
 &lt;/p&gt;
-&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Word2Vec2Graph Model - How to Find Neighbors Two posts before we introduced Word2Vec2Graph model. In the previous post we played with Page Rank for Word2Vec2Graph.</summary></entry><entry><title type="html">Word2Vec2Graph Model - Page Rank</title><link href="http://localhost:4000/2017/09/28/word2vec2graphPageRank/" rel="alternate" type="text/html" title="Word2Vec2Graph Model - Page Rank" /><published>2017-09-28T08:00:00-04:00</published><updated>2017-09-28T08:00:00-04:00</updated><id>http://localhost:4000/2017/09/28/word2vec2graphPageRank</id><content type="html" xml:base="http://localhost:4000/2017/09/28/word2vec2graphPageRank/">&lt;p&gt;&lt;h3&gt;Word2Vec2Graph Model - Page Rank&lt;/h3&gt;
-
-In the previous post we explained
-&lt;i&gt;&lt;a href=&quot;https://sparklingdataocean.github.io/gh-pages/2017/09/17/word2vec2graph/&quot;&gt;how to build Word2Vec2Graph model &lt;/a&gt;&lt;/i&gt;. The Word2Vec2Graph model was built based on a small Stress Data File - text file about stress that we extracted from Wikipedia. We used words from Stress Data File as vertices and Word2Vec model cosine similarity as edge weights. The Word2Vec model was trained on the corpus of combined News data and Wiki data. The Word2Vec2Graph model was built as a combination of Word2vec model and Spark GraphFrames library that has many interesting functions. In this post we will look at Page Rank function.
-&lt;/p&gt;
-
-&lt;p&gt;&lt;h3&gt;Get Data from Data Storage&lt;/h3&gt;
-Read word to word Stress Data File combinations with Word2Vec cosine similarities: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2wStressCos&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqlContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;parquet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;w2wStressCos&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Read vertices and edges of Word2Vec2Graph and build a graph: &amp;lt;/p&amp;gt;&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.graphframes.GraphFrame&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStressNodes&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqlContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;parquet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;graphStressNodes&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStressEdges&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqlContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;parquet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;graphStressEdges&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStress&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;GraphFrame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphStressNodes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphStressEdges&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;&lt;h3&gt;Page Rank&lt;/h3&gt;
-Calculate Page Rank: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stressPageRank&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;pageRank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;resetProbability&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.15&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;maxIter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stressPageRank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;distinct&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;sort&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;pagerank&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;asc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;limit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Our graph is built on the full matrix so all words pairs are connected therefore we are getting all Page Ranks equal to 1. Now we will look at Page Rank of a subgraph based on the edge weight threshold. We will use the same threshold (&amp;gt;.075) as we used in the previous post when we calculated graph  connected components.&lt;/p&gt;
-&lt;p&gt;Build subgraph: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;edgeHightWeight&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;edges&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;nf&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;edgeWeight &amp;gt; 0.75&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeight&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GraphFrame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;edgeHightWeight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Calculate Page Rank: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stressHightWeightPageRank&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;pageRank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;nf&quot;&gt;resetProbability&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.15&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;maxIter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stressHightWeightPageRank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;nf&quot;&gt;distinct&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;sort&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;pagerank&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;desc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;limit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pagerank&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;hormones&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;11.925990421899789&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;processes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;11.314750484908657&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;disorders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;10.58017031766379&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;necessarily&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;9.314082346458498&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;decreased&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;7.890450585933449&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;decrease&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;7.7083413274183785&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;worries&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.90389557706388&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;methods&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.90389557706388&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;interact&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.90389557706388&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;second&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.90389557706388&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cardiovascular&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.061954567119659&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;&lt;h3&gt;Page Rank and Degrees&lt;/h3&gt;
-Graph that we use now is indirect so high Page Rank vertices are similar to high in-degree vertices: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vertexInDegrees&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;inDegrees&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertexInDegrees&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;orderBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'inDegree.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;desc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;limit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inDegree&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;processes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;disorders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;decrease&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;decreased&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;hormones&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;necessarily&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;chronic&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cardiovascular&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;decreasing&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;tumors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;strategies&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;In future posts we will look at direct Word2Vec2Graph and the results will be different.&lt;/p&gt;
-
-&lt;p&gt;&lt;h3&gt;Page Rank and Connected Components&lt;/h3&gt;
-Connected components: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setCheckpointDir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/FileStore/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeightCC&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;connectedComponents&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeightCcCount&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphHightWeightCC&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;groupBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;component&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;cc&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ccCt&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphHightWeightCcCount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;orderBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'ccCt.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;desc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;limit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ccCt&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;60129542144&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;17&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;60129542145&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;240518168580&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;575525617665&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;901943132160&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;558345748482&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;901943132166&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;214748364800&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;1108101562370&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;532575944709&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;206158430214&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Combine two connected components with Page Rank. Biggest component: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cc1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphHightWeightCC&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;nf&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;component&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;===&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;60129542144&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;id&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cc1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stressHightWeightPageRank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
-   &lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;===&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pagerank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;orderBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pagerank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;desc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pagerank&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;hormones&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;11.925990421899789&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;disorders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;10.58017031766379&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cardiovascular&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;6.061954567119659&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;chronic&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;5.6632316778829574&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;tumors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;5.03612633319159&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;illnesses&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;5.03612633319159&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;disorder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;4.164508550059325&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;digestive&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;3.821437671845854&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;behavioral&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;3.736942075966831&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;symptoms&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;3.575537714033525&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;syndrome&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.513757392508552&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;humans&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.4015901395309998&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.4015901395309998&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;harmful&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.4015901395309998&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;anxiety&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.4015901395309998&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;acute&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.3538115732380214&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;prevention&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.3170945436519768&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Second component: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cc1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphHightWeightCC&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;nf&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;component&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;===&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;60129542145&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;id&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cc1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stressHightWeightPageRank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
-   &lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;===&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pagerank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;orderBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pagerank&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;desc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pagerank&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;processes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;11.314750484908657&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;strategies&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;5.968773769006186&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;enhance&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;5.9687737690061855&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;capabilities&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;3.960742150950389&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;functions&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;3.960742150950389&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;governmental&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.3657865118684&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;minimize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.3657865118684&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;facilitates&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.269011960232378&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;practices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.269011960232378&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;&lt;h3&gt;Next Post - Word Neighbors&lt;/h3&gt;
-In the next post we will look at word neighbors for Word2Vec2Graph.
-&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Word2Vec2Graph Model - Page Rank</summary></entry><entry><title type="html">Introduction to Word2Vec2Graph Model</title><link href="http://localhost:4000/2017/09/17/word2vec2graph/" rel="alternate" type="text/html" title="Introduction to Word2Vec2Graph Model" /><published>2017-09-17T08:00:00-04:00</published><updated>2017-09-17T08:00:00-04:00</updated><id>http://localhost:4000/2017/09/17/word2vec2graph</id><content type="html" xml:base="http://localhost:4000/2017/09/17/word2vec2graph/">&lt;p&gt;&lt;h3&gt;Graph and Word2Vec Model &lt;/h3&gt;
-Word2Vec model maps words to vectors which gives us an opportunity to calculate cosine similarities within pairs of words then translate pairs of words to graph using words as nodes, word pairs as edges and cosine similarities as edge weights.&lt;/p&gt;
-&lt;p&gt;We are running a small AWS cluster
-&lt;i&gt;&lt;a href=&quot;https://databricks.com/blog/2016/02/17/introducing-databricks-community-edition-apache-spark-for-all.html&quot;&gt;on Databricks community edition&lt;/a&gt;&lt;/i&gt;
-and for the Word2Vec2Graph model we will use a small size text file with data about stress taken from a Wikipedia article. We will call this text file Stress Data File.&lt;/p&gt;
-&lt;p&gt;As Word2VecModel we will use the model that was trained on News and Wiki data about psychology corpus. &lt;i&gt;&lt;a href=&quot;https://sparklingdataocean.github.io/gh-pages/2017/09/06/w2vTrain/&quot;&gt; We described this model in our previous post.&lt;/a&gt;&lt;/i&gt;
-&lt;p&gt;
-&lt;h3&gt;Read and Clean Stress Data File &lt;/h3&gt;
-Read Wiki data file: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inputStress&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;textFile&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/FileStore/tables/stressWiki.txt&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;charLine&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;inputStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;//--&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;247&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;Tokenize Stress data file:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml._&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml.feature._&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokenizer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RegexTokenizer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setInputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;charLine&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setOutputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setPattern&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;[^a-z]+&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setMinTokenLength&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setGaps&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokenizedStress&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokenizer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;nf&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inputStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;tokenizedStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//--274&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;Remove stop words from Stress data file: &lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remover&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;StopWordsRemover&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setInputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setOutputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;stopWordFree&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;removedStopWordsStress&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remover&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;nf&quot;&gt;setStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;none&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;also&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;nope&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;null&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;remover&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tokenizedStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt; &lt;/p&gt;
-&lt;p&gt;Explode Stress word arrays to words:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.sql.functions.explode&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slpitCleanWordsStress&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;removedStopWordsStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;withColumn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;cleanWord&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;explode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;stopWordFree&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;cleanWord&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;distinct&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;slpitCleanWordsStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;//--&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1233&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt; &lt;/p&gt;
-&lt;p&gt;
-&lt;h3&gt;Exclude Words that are not in the Word2Vec Model &lt;/h3&gt;
-We will use our trained Word2Vec model for word pairs cosine similarities. First, we will read our trained Word2VecModel:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml.feature.Word2Vec&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml._&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml.feature.Word2VecModel&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.sql.Row&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;word2vec&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Word2Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setInputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setOutputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;result&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;modelNewsWiki&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;Word2VecModel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;w2vNewsWiki&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;Next we will get the list of all words from the Word2Vec model:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;modelWords&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;modelNewsWiki&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;getVectors&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;To be able to use this Word2Vec model for Stress Data file cosine similarities, we will filter out words from Stress Data file that are not in the Word2Vec list of words:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stressWords&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slpitCleanWordsStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;modelWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'cleanWord &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;===&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;'word)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;distinct&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;stressWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;//--&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1125&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;&lt;/p&gt;
-
-&lt;p&gt;Finally we will create word to word matrix:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stressWords2&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stressWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2wStress&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stressWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stressWords2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'word=&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!='&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;w2wStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;//--&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1264500&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;
-&lt;h3&gt;Word2Vec Cosine Similarity Function&lt;/h3&gt;
-Now we want to use Word2Vec cosine similarity to see how words are connected with other words. We will create a function to calculate cosine similarity between vectors from the Word2Vec model&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml.linalg.Vector&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dotVector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vectorX&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;org.apache.spark.ml.linalg.Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;vectorY&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;org.apache.spark.ml.linalg.Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Double&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vectorX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vectorX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vectorY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cosineVector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vectorX&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;org.apache.spark.ml.linalg.Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;vectorY&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;org.apache.spark.ml.linalg.Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Double&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vectorX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vectorY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dotVector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vectorX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vectorY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;div&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dotVector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vectorX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vectorX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dotVector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vectorY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vectorY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;div&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;math&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;div&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-
-
-&lt;p&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;
-&lt;p&gt;
-&lt;h3&gt;Cosine Similarity between Stress Data File Words&lt;/h3&gt;
-Now we can calculate word to word cosine similarities between word pairs from Stress Data File and save the results.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2wStressCosDF&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2wStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;),&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;cosineVector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;org.apache.spark.ml.linalg.Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;),&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;org.apache.spark.ml.linalg.Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)))).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;cos&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;Example: Word combinations with high Cosine Similarities:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2wStressCosDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'word1,'word2,'cos)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'cos&amp;gt;&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.8&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;limit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;word1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;disorders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chronic&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.8239098331266418&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;strategies&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;processes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.8079603436193109&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;loans&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mortgage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.8055626753867968&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;reduction&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increase&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.8029783072858347&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;capabilities&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;processes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.8165733928557892&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;second&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;third&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.8717226080244964&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;second&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;first&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.8096815780218063&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;Example: Word combinations with low Cosine Similarity:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2wStressCosDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'word1,'word2,'cos)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'cos&amp;lt;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.65&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'cos&amp;gt;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;limit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;word1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;interaction&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;disorders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6114415840642784&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;persist&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;affect&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6126901072184042&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;recognize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;affect&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6309318473017483&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;interaction&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;empathy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6406613207655409&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;persist&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;perceptions&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6048191825219467&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;everyday&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;communicate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6137230335862902&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;recognize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;respond&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6024905770721792&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-
-&lt;p&gt;Store and read Stress Data File word pairs with cosine similarities between them:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;w2wStressCosDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parquet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;w2wStressCos&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2wStressCos2&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqlContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parquet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;w2wStressCos&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;&lt;h3&gt;Graph of Combinations of Stress Data File Words &lt;/h3&gt;
-Now we can build a graph using words as nodes, {word1, word2} word combinations as edges and cosine similarities between the words as edge weights:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.graphframes.GraphFrame&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphNodes&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2wStressCosDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;union&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2wStressCosDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;distinct&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;id&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphEdges&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2wStressCosDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;cos&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;distinct&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;src&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;dst&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;edgeWeight&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graph1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;GraphFrame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphNodes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphEdges&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;We will save graph vertices and edges in Parquet format to use them for future posts:&lt;/p&gt;
-
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;graph1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;parquet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;graphStressNodes&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;graph1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edges&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;parquet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;graphStressEdges&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt; Load vertices and edges and rebuild the same graph:&lt;/p&gt;
-
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.graphframes.GraphFrame&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStressNodes&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqlContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;parquet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;graphStressNodes&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStressEdges&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqlContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;parquet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;graphStressEdges&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStress&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;GraphFrame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphStressNodes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphStressEdges&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;&lt;/p&gt;
-
-&lt;p&gt;
-&lt;h3&gt;Connected Components&lt;/h3&gt;
-They are many interesting things we can do with Spark GraphFrames. In this post we will play with connected components.
-&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;sc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setCheckpointDir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/FileStore/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;resultStressCC&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;connectedComponents&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ccStressCount&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resultStressCC&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;groupBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;component&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;cc&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ccCt&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ccStressCount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orderBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'ccCt.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;desc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ccCt&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1125&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;This graph was built on all {word1, word2} combinations of Stress Data File so all word pairs are in the same large connected component. We will look at connected components of subgraphs with different edge weight thresholds.
-
-&lt;/p&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;p&gt;
-&lt;h3&gt;Connected Components with High Cosine Similarity&lt;/h3&gt;
-For this post we will use edge weight threshold 0.75, i.e. we will use only word pairs with cosine similarity higher than 0.75.
-&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;edgeHightWeight&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edges&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;edgeWeight &amp;gt; 0.75&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeight&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;GraphFrame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphStress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;edgeHightWeight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;Run connected components for graph with high cosine similarity:
-&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeightCC&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;connectedComponents&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;graphHightWeightCcCount&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphHightWeightCC&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;groupBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;component&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;cc&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ccCt&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphHightWeightCcCount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;orderBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'ccCt.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;desc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;limit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ccCt&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;60129542144&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;17&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;60129542145&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;240518168580&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;575525617665&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;901943132160&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;558345748482&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;901943132166&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;214748364800&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;1108101562370&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;618475290630&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;532575944709&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;Words in the biggest component:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphHightWeightCC&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;component=60129542144&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'id)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;humans&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;harmful&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;function&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;illnesses&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;digestive&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;chronic&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;disorder&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;hormones&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;symptoms&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;behavioral&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;anxiety&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cardiovascular&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;syndrome&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;prevention&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;disorders&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;tumors&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;acute&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;Words in the second component:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphHightWeightCC&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;component=60129542145&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'id)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;capabilities&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;governmental&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;practices&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;minimize&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;enhance&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;strategies&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;facilitates&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;functions&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;processes&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;&lt;/p&gt;
-
-&lt;p&gt;And of course some components are not very interesting:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphHightWeightCC&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;component=240518168580&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'id)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;increased&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;increase&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;decreasing&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;reduction&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;decreases&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;versus&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;decrease&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;decreased&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;&lt;/p&gt;
-&lt;p&gt;
-&lt;h3&gt;Next Post - Word2Vec2Graph Page Rank&lt;/h3&gt;
-Spark GraphFrames library has many interesting functions. In the next post we will look at Page Rank for Word2Vec2Graph.
-&lt;/p&gt;
-&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Graph and Word2Vec Model Word2Vec model maps words to vectors which gives us an opportunity to calculate cosine similarities within pairs of words then translate pairs of words to graph using words as nodes, word pairs as edges and cosine similarities as edge weights. We are running a small AWS cluster on Databricks community edition and for the Word2Vec2Graph model we will use a small size text file with data about stress taken from a Wikipedia article. We will call this text file Stress Data File. As Word2VecModel we will use the model that was trained on News and Wiki data about psychology corpus. We described this model in our previous post. Read and Clean Stress Data File Read Wiki data file: val inputStress=sc. textFile(&quot;/FileStore/tables/stressWiki.txt&quot;). toDF(&quot;charLine&quot;) inputStress.count//--247</summary></entry></feed>
+&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Word2Vec2Graph Model - How to Find Neighbors Two posts before we introduced Word2Vec2Graph model. In the previous post we played with Page Rank for Word2Vec2Graph.</summary></entry></feed>
