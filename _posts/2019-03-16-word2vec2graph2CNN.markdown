@@ -260,8 +260,8 @@ imgId = PATH + str(f['class'][i]) + '/'+str(f['classWord'][i]) + '.jpg'
 {% endhighlight %}
 
 <p>
-We tuned the classification model and we've got abound 80% accuracy. Potentially this accuracy can be improved using newer versions of Word2Vec model and not as small text documents that we used in our blog.  
-
+We tuned the classification model and we've got about 91% accuracy.
+Potentially this accuracy can be improved using more advanced Word2Vec model.
 
 
 </p>
@@ -342,6 +342,7 @@ symptoms -> treat; treat -> affects
 <p>
 We used a semi-manual way on building Gephi graphs: created a list of friends of a friends for top PageRank words of each topic on DOT language.
   </p><p>
+
 Top PageRank word - 'funny':</p>
 </p>
 {% highlight scala %}
@@ -349,7 +350,7 @@ display(foaf2dot(graphInsight2,"funny"))
 {% endhighlight %}
 
 <a href="#">
-    <img src="{{ site.baseurl }}/img/graph20b.jpg" alt="Post Sample Image" width="400" height="500">
+    <img src="{{ site.baseurl }}/img/graph20b.jpg" alt="Post Sample Image" width="400">
 </a>
 
 <p>Top PageRank word - 'decrease':</p>
@@ -359,7 +360,7 @@ display(foaf2dot(graphInsight2,"decrease"))
 {% endhighlight %}
 
 <a href="#">
-    <img src="{{ site.baseurl }}/img/graph17b.jpg" alt="Post Sample Image" width="400" height="450">
+    <img src="{{ site.baseurl }}/img/graph17b.jpg" alt="Post Sample Image" width="450" >
 </a>
 
 <p>Top PageRank word -  'integrated':</p>
@@ -369,7 +370,7 @@ display(foaf2dot(graphInsight2,"integrated"))
 {% endhighlight %}
 
 <a href="#">
-    <img src="{{ site.baseurl }}/img/graph15dl.jpg" alt="Post Sample Image" width="400" height="450">
+    <img src="{{ site.baseurl }}/img/graph15dl.jpg" alt="Post Sample Image" width="450" >
 </a>
 
 <p>Top PageRank word - 'symptoms':</p>
@@ -379,9 +380,18 @@ display(foaf2dot(graphInsight2,"symptoms"))
 {% endhighlight %}
 
 <a href="#">
-    <img src="{{ site.baseurl }}/img/graph20d.jpg" alt="Post Sample Image" width="400" height="300">
+    <img src="{{ site.baseurl }}/img/graph20d.jpg" alt="Post Sample Image" width="347" >
 </a>
 
+<p>Top PageRank word - 'emory':</p>
+
+{% highlight scala %}
+display(foaf2dot(graphInsight2,"emory"))
+{% endhighlight %}
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/graph21.jpg" alt="Post Sample Image" width="391" >
+</a>
 
 
 

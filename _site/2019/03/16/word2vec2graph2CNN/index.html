@@ -355,8 +355,8 @@ We splitted the source file to words={class, classWord} and vecString. The 'clas
 
 
 <p>
-We tuned the classification model and we've got abound 80% accuracy. Potentially this accuracy can be improved using newer versions of Word2Vec model and not as small text documents that we used in our blog.  
-
+We tuned the classification model and we've got about 91% accuracy.
+Potentially this accuracy can be improved using more advanced Word2Vec model.
 
 
 </p>
@@ -437,6 +437,7 @@ Calculate two degree neighbors for top PageRank words of connected components.
 <p>
 We used a semi-manual way on building Gephi graphs: created a list of friends of a friends for top PageRank words of each topic on DOT language.
   </p><p>
+
 Top PageRank word - 'funny':</p>
 </p>
 
@@ -444,7 +445,7 @@ Top PageRank word - 'funny':</p>
 
 
 <a href="#">
-    <img src="/img/graph20b.jpg" alt="Post Sample Image" width="400" height="500" />
+    <img src="/img/graph20b.jpg" alt="Post Sample Image" width="400" />
 </a>
 
 <p>Top PageRank word - 'decrease':</p>
@@ -454,7 +455,7 @@ Top PageRank word - 'funny':</p>
 
 
 <a href="#">
-    <img src="/img/graph17b.jpg" alt="Post Sample Image" width="400" height="450" />
+    <img src="/img/graph17b.jpg" alt="Post Sample Image" width="450" />
 </a>
 
 <p>Top PageRank word -  'integrated':</p>
@@ -464,7 +465,7 @@ Top PageRank word - 'funny':</p>
 
 
 <a href="#">
-    <img src="/img/graph15dl.jpg" alt="Post Sample Image" width="400" height="450" />
+    <img src="/img/graph15dl.jpg" alt="Post Sample Image" width="450" />
 </a>
 
 <p>Top PageRank word - 'symptoms':</p>
@@ -474,9 +475,18 @@ Top PageRank word - 'funny':</p>
 
 
 <a href="#">
-    <img src="/img/graph20d.jpg" alt="Post Sample Image" width="400" height="300" />
+    <img src="/img/graph20d.jpg" alt="Post Sample Image" width="347" />
 </a>
 
+<p>Top PageRank word - 'emory':</p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"emory"</span><span class="o">))</span></code></pre></figure>
+
+
+<a href="#">
+    <img src="/img/graph21.jpg" alt="Post Sample Image" width="391" />
+</a>
 
 
 

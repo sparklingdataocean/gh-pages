@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-04-03T07:27:22-04:00</updated><id>http://localhost:4000/</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Word2Vec2Graph to Images to Deep Learning</title><link href="http://localhost:4000/2019/03/16/word2vec2graph2CNN/" rel="alternate" type="text/html" title="Word2Vec2Graph to Images to Deep Learning" /><published>2019-03-16T08:00:00-04:00</published><updated>2019-03-16T08:00:00-04:00</updated><id>http://localhost:4000/2019/03/16/word2vec2graph2CNN</id><content type="html" xml:base="http://localhost:4000/2019/03/16/word2vec2graph2CNN/">&lt;p&gt;&lt;h3&gt;Vector Classification&lt;/h3&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-04-10T20:39:39-04:00</updated><id>http://localhost:4000/</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Word2Vec2Graph to Images to Deep Learning</title><link href="http://localhost:4000/2019/03/16/word2vec2graph2CNN/" rel="alternate" type="text/html" title="Word2Vec2Graph to Images to Deep Learning" /><published>2019-03-16T08:00:00-04:00</published><updated>2019-03-16T08:00:00-04:00</updated><id>http://localhost:4000/2019/03/16/word2vec2graph2CNN</id><content type="html" xml:base="http://localhost:4000/2019/03/16/word2vec2graph2CNN/">&lt;p&gt;&lt;h3&gt;Vector Classification&lt;/h3&gt;
 &lt;p&gt;In this post we will play with another amazing deep learning technique about Time Series classification via CNN Deep Learning. We learned this technique in fast.ai
 &lt;i&gt;&lt;a href=&quot;https://course.fast.ai&quot;&gt; 'Practical Deep Learning for Coders, v3'&lt;/a&gt;&lt;/i&gt;
 class and fast.ai forum   
@@ -247,8 +247,8 @@ We splitted the source file to words={class, classWord} and vecString. The 'clas
 
 
 &lt;p&gt;
-We tuned the classification model and we've got abound 80% accuracy. Potentially this accuracy can be improved using newer versions of Word2Vec model and not as small text documents that we used in our blog.  
-
+We tuned the classification model and we've got about 91% accuracy.
+Potentially this accuracy can be improved using more advanced Word2Vec model.
 
 
 &lt;/p&gt;
@@ -329,6 +329,7 @@ Calculate two degree neighbors for top PageRank words of connected components.
 &lt;p&gt;
 We used a semi-manual way on building Gephi graphs: created a list of friends of a friends for top PageRank words of each topic on DOT language.
   &lt;/p&gt;&lt;p&gt;
+
 Top PageRank word - 'funny':&lt;/p&gt;
 &lt;/p&gt;
 
@@ -336,7 +337,7 @@ Top PageRank word - 'funny':&lt;/p&gt;
 
 
 &lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/graph20b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;400&quot; height=&quot;500&quot; /&gt;
+    &lt;img src=&quot;/img/graph20b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;400&quot; /&gt;
 &lt;/a&gt;
 
 &lt;p&gt;Top PageRank word - 'decrease':&lt;/p&gt;
@@ -346,7 +347,7 @@ Top PageRank word - 'funny':&lt;/p&gt;
 
 
 &lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/graph17b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;400&quot; height=&quot;450&quot; /&gt;
+    &lt;img src=&quot;/img/graph17b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;450&quot; /&gt;
 &lt;/a&gt;
 
 &lt;p&gt;Top PageRank word -  'integrated':&lt;/p&gt;
@@ -356,7 +357,7 @@ Top PageRank word - 'funny':&lt;/p&gt;
 
 
 &lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/graph15dl.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;400&quot; height=&quot;450&quot; /&gt;
+    &lt;img src=&quot;/img/graph15dl.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;450&quot; /&gt;
 &lt;/a&gt;
 
 &lt;p&gt;Top PageRank word - 'symptoms':&lt;/p&gt;
@@ -366,9 +367,18 @@ Top PageRank word - 'funny':&lt;/p&gt;
 
 
 &lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/graph20d.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;400&quot; height=&quot;300&quot; /&gt;
+    &lt;img src=&quot;/img/graph20d.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;347&quot; /&gt;
 &lt;/a&gt;
 
+&lt;p&gt;Top PageRank word - 'emory':&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;foaf2dot&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graphInsight2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;emory&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/graph21.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;391&quot; /&gt;
+&lt;/a&gt;
 
 
 
