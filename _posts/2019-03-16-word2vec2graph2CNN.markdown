@@ -41,7 +41,9 @@ In particular, we will use CNN classification model to prove that topic we disco
 
 <h3>Data Preparation</h3>
 <p>
-Data preparation process for Word2Vec2Graph model in described in previous posts and summarized in the  <i><a href="http://spa.rklingdataocean.com/2017/12/24/word2vec2graphPsychoanalysis/">"Quick Look at Text"</a></i> post. Here we used the same data preparation process of text data about Creativity and Aha Moments:
+Data preparation process for Word2Vec2Graph model in described in previous posts and summarized in the  <i><a href="http://sparklingdataocean.com/2018/04/04/word2vec2graphInsights/
+
+">"Word2Vec2Graph - Insights"</a></i> post. Here we used the same data preparation process of text data about Creativity and Aha Moments:Word2Vec2Graph - Insights
 </p>
 <ul>
 <li>Read text file</li>
