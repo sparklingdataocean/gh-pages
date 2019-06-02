@@ -1,0 +1,376 @@
+---
+layout:     post
+title:      "Free Associations "
+subtitle:   "Find Unexpected Word Pairs via Convolutional Neural Network"
+date:       2019-06-01 12:00:00
+author:     "Melenar"
+header-img: "img/modern110.jpg"
+---
+<p><h3>Finding Free Associations</h3>
+
+
+</p>
+<p>
+
+</p>
+<p>
+Free Associations is a psychoanalytic technique that was developed by Sigmund Freud and still used by some therapists today. Patients relate to whatever thoughts come to mind in order for the therapist to learn more about how the patient thinks and feels. As Freud described it: "The importance of free association is that the patients spoke for themselves, rather than repeating the ideas of the analyst; they work through their own material, rather than parroting another's suggestions"
+</p>
+<p>
+
+</p>
+<p>
+In one of our previous posts - <i><a href="http://sparklingdataocean.com/2017/12/24/word2vec2graphPsychoanalysis/">"Word2Vec2Graph - Psychoanalysis Topics"</a></i>  - we showed how to find free associations using Word2Vec2Graph technique.
+In this post we will show a different method - unsupervised Convolutional Neural Network classification. As a text file we will use data about Psychoanalysis taken from Wikipedia.
+
+</p>
+<p>
+</p>
+<p><h3>Word Pair Classification - Step by Step</h3>
+<p>We will convert word pairs to vectors, than convert vectors to images, than classify images via CNN classification method. To transform pairs of words to images will use method described in Ignacio Oguiza's notebook
+<i><a href="https://gist.github.com/oguiza/c9c373aec07b96047d1ba484f23b7b47"> Time series - Olive oil country</a></i>. Technique we use in this post is different than technique we used in our
+<i><a href="http://sparklingdataocean.com/2019/03/16/word2vec2graph2CNN/">
+previous post</a></i>:
+</p>
+
+<ul>
+<li>Read text file, tokenize, remove stop words</li>
+<li>Transform text file to pairs of words that stay in text next to each other</li>
+<li>Read trained Word2Vec model and map words to vectors</li>
+<li>Concatenate word vectors with themselves reversing the second vector: {word1, word1} pairs will generate symmetrical (mirror) sequences of numbers. Label these sequences as "Same".</li>
+<li>Concatenate word vectors of pairs {word1, word2} reversing the word2 vector. Label these sequences as "Different".</li>
+<li>Randomly select a subset of "Different" pairs. </li>
+<li>Convert vectors to images and run CNN classification model.</li>
+
+</ul>
+<p>
+<p>
+</p>
+<p><h3>Unsupervised Image Classification</h3>
+<p>So we are concatenating pairs of vectors, transforming concatenated vectors to images and classifying images. This CNN image classification compares "Same" - mirror images with "Different" - non-mirror images. Images that are similar to mirror images represent pairs of similar words - common associations. Images that are very different than mirror images represent pair of words that are not expected as pairs, i.e. "free associations" psychoanalysis is looking for.
+</p>
+<p>
+This technique allows us to do unsupervised CNN classification. Of course, this method is not limited to word pair classification. In particularly it can be applied to unsupervised outlier detection.
+</p>
+For example, we can take time series stock prices data, concatenate TS vectors with themselves (reversed) and get 'mirror' vectors/images. Then we can concatenate TS vectors with reversed market index vectors (like S&P 500) and convert them to images. CNN classifier will find {TS vector, S&P 500 vector} images that are very different than mirror images. These images will represent stock price outliers.
+
+
+
+
+<h3>Read and Clean Text File </h3>
+<p></p>
+Read text file, tokenize it and remove stop words:
+<p></p>
+{% highlight scala %}
+
+import org.apache.spark.ml._
+import org.apache.spark.ml.feature._
+import org.apache.spark.sql.functions.explode
+import org.apache.spark.ml.feature.Word2Vec
+import org.apache.spark.ml.feature.Word2VecModel
+import org.apache.spark.sql.Row
+import org.apache.spark.ml.linalg.Vector
+import org.graphframes.GraphFrame
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.explode
+
+val inputPsychoanalysis=sc.textFile("/FileStore/tables/psychoanalisys1.txt").
+   toDF("charLine")
+
+val tokenizer = new RegexTokenizer().
+   setInputCol("charLine").
+   setOutputCol("value").
+   setPattern("[^a-z]+").
+   setMinTokenLength(5).
+   setGaps(true)
+
+val tokenizedPsychoanalysis = tokenizer.
+   transform(inputPsychoanalysis)
+
+val remover = new StopWordsRemover().
+   setInputCol("value").
+   setOutputCol("stopWordFree")
+
+val removedStopWordsPsychoanalysis = remover.
+   setStopWords(Array("none","also","nope","null")++
+   remover.getStopWords).
+   transform(tokenizedPsychoanalysis)
+
+{% endhighlight %}
+
+<p></p>
+<h3>Get Pairs of Words </h3>
+</p>
+
+<p></p>
+</p><p>
+
+Get pairs of words from text than explode ngrams:
+
+<p></p>
+{% highlight scala %}
+
+
+val ngram = new NGram().
+   setInputCol("stopWordFree").
+   setOutputCol("ngrams").
+   setN(2)
+
+val ngramCleanWords = ngram.
+   transform(removedStopWordsPsychoanalysis)
+
+val slpitNgrams=ngramCleanWords.
+   withColumn("ngram",explode($"ngrams")).
+   select("ngram").
+   map(s=>(s(0).toString,
+      s(0).toString.split(" ")(0),
+      s(0).toString.split(" ")(1))).
+   toDF("ngram","ngram1","ngram2").
+   filter('ngram1=!='ngram2)
+
+{% endhighlight %}
+
+<h3>Vectors for Pairs of Words</h3>
+
+</p><p>
+
+<p></p>
+Read trained Word2Vec model:
+</p>
+
+{% highlight scala %}
+
+val word2vec= new Word2Vec().
+   setInputCol("value").
+   setOutputCol("result")
+
+val modelNewsBrain=Word2VecModel.
+   read.
+   load("w2VmodelNewsBrain")
+
+val modelWordsPsychoanalysis=modelNewsBrain.
+   getVectors.
+   select("word","vector")
+
+{% endhighlight %}
+
+<p>
+
+</p>
+<p>
+Map words of word pairs to Word2Vec model and get sets: {word1, vector1, word2, vector2}:
+</p>
+{% highlight scala %}
+
+val ngramW2V=slpitNgrams.
+   join(modelWordsPsychoanalysis,'ngram1==='word).
+   join(modelWordsPsychoanalysis.toDF("word2","vector2"),'ngram2==='word2).
+   select("ngram1","vector","ngram2","vector2").
+   toDF("ngram1","vector1","ngram2","vector2").
+   distinct
+
+{% endhighlight %}
+
+<p>
+Get single words with vectors from word pairs: {word1, vector1}:
+</p>
+{% highlight scala %}
+
+val ngram1W2V=ngramW2V.select("ngram1","vector1").
+   union(ngramW2V.select("ngram2","vector2")).
+   distinct.toDF("word","vector")
+
+{% endhighlight %}
+
+
+<h3>Combine Vectors of Word Pairs</h3>
+<p></p>
+
+<p></p>
+Combine vectors from word pairs {word1, word2} reversing the second vector.
+<p></p>
+{% highlight scala %}
+
+val arrayDFdiff = ngramW2V.rdd.map(x => (x.getAs[String](0) +"~"+  x.getAs[String](2) ,
+   x.getAs[Vector](1).toArray++x.getAs[Vector](3).toArray.reverse)).
+   toDF("word","array").
+   select(col("word") +: (0 until 200).map(i =>  
+   col("array")(i).alias(s"col$i")): *_*).withColumn("pairType",lit("diff"))
+
+{% endhighlight %}
+
+
+<p>Combine vectors from single words with themselves reversing the second vector.</p>
+
+{% highlight scala %}
+
+val arrayDFsame = ngram1W2V.rdd.map(x => (x.getAs[String](0) +"~"+  x.getAs[String](0) ,
+   x.getAs[Vector](1).toArray++x.getAs[Vector](1).toArray.reverse)).
+   toDF("word","array").
+   select(col("word") +: (0 until 200).map(i =>  col("array")(i).alias(s"col$i")): *_*).withColumn("pairType",lit("same"))
+
+{% endhighlight %}
+
+
+<p><h3>CNN Classification </h3>
+<p>
+To convert vectors to images and classify images via CNN we used almost the same code that Ignacio Oguiza shared on fast.ai forum
+<i><a href="https://gist.github.com/oguiza/c9c373aec07b96047d1ba484f23b7b47"> Time series - Olive oil country</a></i>.
+</p><p>
+We splitted the source file to words={pairType, word} and vector. The 'pairType' column was used to define "Same" or "Different" category for images and 'word' column to define word pairs.
+</p>
+
+{% highlight java %}
+
+a = pd.read_csv(PATH + ‘words.csv', sep=',')
+d=a.drop(a.columns[0], axis=1).drop(a.columns[201], axis=1)
+fX=d.fillna(0).values
+image_size = 200
+gasf = GASF(image_size)
+fX_gasf = gasf.fit_transform(fX)
+
+f = a.iloc[:, [0,201]]
+imgId = PATH + str(f['pairType'][i])+'/'+str(f['word'][i])+'.jpg'
+
+
+{% endhighlight %}
+
+<p>
+Tuning classification model we've got abound 96% accuracy.
+Here is a code to display results:
+</p>
+{% highlight java %}
+i=778
+f['word'][i],f['pairType'][i]
+plt.plot(fX[i])
+plt.imshow(fX_gasf[i], cmap='rainbow', origin='lower')
+{% endhighlight %}
+
+
+<h3>Examples: "Mirror" Word Pairs </h3>
+
+<p>Word pair - 'explanations~explanations':</p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/explanations~explanations1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/explanations~explanations1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+
+<p>Word pair - 'requirements~requirements':</p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/requirements~requirement1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/requirements~requirement1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+
+<p>Word pair - 'element~element':</p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/element~element1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/element~element1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+</p>
+<h3>Examples: Pairs of Similar Words</h3>
+
+<p>Word pair - 'thoughts~feelings':</p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/thoughts~feelings1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/thoughts~feelings1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+<p>Word pair - 'source~basic':</p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/source~basic1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/source~basic1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+<p>Word pair - 'eventually~conclusion':</p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/eventually~conclusion1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/eventually~conclusion1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+
+<h3>Examples: Unexpected Free Associations</h3>
+
+<p>Word pair - 'personality~development':</p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/personality~development1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/personality~development1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+
+<p>Word pair - 'societal~restrictions':</p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/societal~restrictions1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/societal~restrictions1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+<p>Word pair - 'contingents~accompanying':</p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/contingents~accompanying1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/contingents~accompanying1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+
+<p>Word pair - 'neurotic~symptoms':</p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/neurotic~symptoms1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/neurotic~symptoms1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+<p>Word pair - 'later~explicitly':</p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/later~explicitly1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/later~explicitly1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+<p>Word pair - 'theory~published':</p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/theory~published1a.jpg" alt="Post Sample Image" width="500" >
+</a>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/theory~published1b.jpg" alt="Post Sample Image" width="333" >
+</a>
+
+
+
+<p><h3>Next Post - Associations and Deep Learning</h3>
+<p>
+In the next post we will deeper look at deep learning for data associations.</p>
