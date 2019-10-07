@@ -4,7 +4,7 @@ title:      "Word2Vec Model Training"
 subtitle:   "Playing with Word2vec Model"
 date:       2017-09-06 12:00:00
 author:     "Melenar"
-header-img: "img/home_sdo4.jpg"
+header-img: "img/mod10.jpg"
 ---
 <h3>About Word2Vec Model </h3>
 <i><a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec model</a></i> was created by a team lead by Tomas Mikolov in Google. In 2015 is became an open source product.

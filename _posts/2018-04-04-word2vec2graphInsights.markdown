@@ -4,7 +4,7 @@ title:      "Word2Vec2Graph - Insights"
 subtitle:   "Find New Associations in Text"
 date:       2018-04-04 12:00:00
 author:     "Melenar"
-header-img: "img/modrn54.jpg"
+header-img: "img/modern54.jpg"
 ---
 
 <p><h3>Word2Vec2Graph Model and New Associations</h3>
