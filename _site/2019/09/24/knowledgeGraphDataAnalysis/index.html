@@ -125,7 +125,7 @@ We will show how to build a knowledge graph in Spark and explore data using Spar
 <h3>Read and Clean the Data</h3>
 <p>For data we use a Kaggle dataset
 <i><a href="https://www.kaggle.com/momanyc/museum-collection">
-‘Museum of Modern Art Collection’</a></i> with information about titles and artists of  MoMA collection. From this dataset we’ve got some data about paintings of several artists.&lt;/p&gt;</p>
+‘Museum of Modern Art Collection’</a></i> with information about titles and artists of  MoMA collection. From this dataset we’ve got some data about paintings of several artists.</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
@@ -179,14 +179,14 @@ We will show how to build a knowledge graph in Spark and explore data using Spar
 <span class="nc">Oskar</span> <span class="nc">Kokoschka</span><span class="o">,</span><span class="s">"(Austrian, 1886–1980)"</span><span class="o">,</span><span class="mi">1886</span><span class="o">,</span><span class="mi">1980</span><span class="o">,</span><span class="nc">Austrian</span><span class="o">,</span><span class="nc">Male</span></code></pre></figure>
 
 
-<p>For the first knowledge graph for data exploration we will use columns 'Artist' and 'Nationality'. Create graph vertices (nodes):  </p>
+<p>For the first knowledge graph for data exploration we will use columns 'Artist' and 'Nationality'. First we'll create graph vertices (nodes):  </p>
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphNodesNationality</span><span class="k">=</span><span class="n">aboutArtist</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">).</span>
   <span class="n">union</span><span class="o">(</span><span class="n">aboutArtist</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Nationality"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span></code></pre></figure>
 
 
-<p>Create graph edges in (subject, object, predicate) form. As a predicate we will use the column name 'Nationality':  </p>
+<p>Next we'll create graph edges in (subject, object, predicate) form. As a predicate we will use the column name 'Nationality':  </p>
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphEdgesNationality</span><span class="k">=</span><span class="n">aboutArtist</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Nationality"</span><span class="o">).</span>
@@ -510,7 +510,7 @@ To put Artists Bio into the same graph we can calculate nodes and edges for Gend
 <span class="nc">Array</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Array</span><span class="o">(</span><span class="nc">Artist</span><span class="o">,</span> <span class="nc">BeginDate</span><span class="o">,</span> <span class="nc">EndDate</span><span class="o">,</span> <span class="nc">Nationality</span><span class="o">,</span> <span class="nc">Gender</span><span class="o">,</span> <span class="n">bornInCountry</span><span class="o">,</span> <span class="n">bornNationality</span><span class="o">)</span></code></pre></figure>
 
 
-<p>Create edges for {'Artist','other column'} pairs and nodes for all columns:</p>
+<p>Create edges for {'Artist', 'other column'} pairs and nodes for all columns:</p>
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">var</span> <span class="n">graphNodes</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span><span class="nc">Seq</span><span class="o">((</span><span class="s">""</span><span class="o">)).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
@@ -797,6 +797,10 @@ In the next several posts we will deeper look at MoMA dataset.</p>
                         <a href="/2019/06/01/word2vec2CNN/" data-toggle="tooltip" data-placement="top" title="Free Associations ">&larr; Previous Post</a>
                     </li>
                     
+                    
+                    <li class="next">
+                        <a href="/2019/12/21/knowledgeGraphSemantics/" data-toggle="tooltip" data-placement="top" title="Knowledge Graph for Semantic Data Mining">Next Post &rarr;</a>
+                    </li>
                     
                 </ul>
 

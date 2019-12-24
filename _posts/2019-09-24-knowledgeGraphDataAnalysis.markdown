@@ -26,7 +26,7 @@ We will show how to build a knowledge graph in Spark and explore data using Spar
 <h3>Read and Clean the Data</h3>
 For data we use a Kaggle dataset
 <i><a href="https://www.kaggle.com/momanyc/museum-collection">
-'Museum of Modern Art Collection'</a></i> with information about titles and artists of  MoMA collection. From this dataset we've got some data about paintings of several artists.</p>
+'Museum of Modern Art Collection'</a></i> with information about titles and artists of  MoMA collection. From this dataset we've got some data about paintings of several artists.
 {% highlight scala %}
 import org.apache.spark.ml._
 import org.apache.spark.ml.feature._
@@ -88,7 +88,7 @@ Oskar Kokoschka,"(Austrian, 1886–1980)",1886,1980,Austrian,Male
 
 {% endhighlight %}
 
-<p>For the first knowledge graph for data exploration we will use columns 'Artist' and 'Nationality'. Create graph vertices (nodes):  </p>
+<p>For the first knowledge graph for data exploration we will use columns 'Artist' and 'Nationality'. First we'll create graph vertices (nodes):  </p>
 
 {% highlight scala %}
 val graphNodesNationality=aboutArtist.select("Artist").
@@ -96,7 +96,7 @@ val graphNodesNationality=aboutArtist.select("Artist").
 
 {% endhighlight %}
 
-<p>Create graph edges in (subject, object, predicate) form. As a predicate we will use the column name 'Nationality':  </p>
+<p>Next we'll create graph edges in (subject, object, predicate) form. As a predicate we will use the column name 'Nationality':  </p>
 
 {% highlight scala %}
 
@@ -429,7 +429,7 @@ val columnList=artistBio.columns
 Array[String] = Array(Artist, BeginDate, EndDate, Nationality, Gender, bornInCountry, bornNationality)
 {% endhighlight %}
 
-<p>Create edges for {'Artist','other column'} pairs and nodes for all columns:</p>
+<p>Create edges for {'Artist', 'other column'} pairs and nodes for all columns:</p>
 
 {% highlight scala %}
 var graphNodes: DataFrame =Seq(("")).toDF("id")
