@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Knowledge Graph for Data Integration - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2020/02/02/knowledgeGraphIntegration/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/modern225.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Knowledge Graph for Data Integration</h1>
+                    
+                    <h2 class="subheading">Connect various datasets via Spark Knowledge Graph</h2>
+                    
+                    <span class="meta">Posted by Melenar on February 2, 2020</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Data Integration </h3>
+
+In this post we will show how to use knowledge graph to integrate data of different data types from multiple data sources.<br />
+We will integrate the following datasets:
+
+<ul>
+<li>
+Kaggle dataset that we used in the previous two posts: <i><a href="https://www.kaggle.com/momanyc/museum-collection">
+'Museum of Modern Art Collection'</a></i>.
+</li>
+<li>
+Data from MoMA exhibition:
+<i><a href="https://www.moma.org/interactives/exhibitions/2012/inventingabstraction/?page=artists"> 'Inventing Abstraction 1910-1925'</a></i>
+
+</li>
+<li>
+Data about a timeline of the
+<i><a href="https://drawpaintacademy.com/modern-art-movements/"> 'Modern Art Movements'</a></i>
+
+</li>
+
+</ul>
+
+<h3>Museum of Modern Art Collection</h3>
+<p></p>
+
+Data in Museum of Modern Art Collection has information about artists, there biographies and there paintings. In two previous posts based on this data we demonstrated how to use Knowledge Graph for data mining and semantics.
+<br />In the <i><a href="
+http://sparklingdataocean.com/2019/09/24/knowledgeGraphDataAnalysis/
+">
+'Knowledge Graph for Data Mining' </a></i> post we created Artist Biography knowledge graph connecting artist names with their nationalities, countries where they were born, genders and life years.
+This knowledge graph allowed us to find different groups of artists, for example artists that were born in the same country or artists that changed their nationalities. <p></p>
+We will start data integration from the Artist Biography knowledge graph nodes and edges:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioNodes</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNodesArtistBio"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">artistBioEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphEdgesArtistBio"</span><span class="o">)</span></code></pre></figure>
+
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span><span class="n">artistBioNodes</span><span class="o">,</span> <span class="n">artistBioEdges</span><span class="o">)</span></code></pre></figure>
+
+
+<a href="#">
+    <img src="/img/moma53.jpg" alt="Post Sample Image" width="655" height="400" />
+</a>
+
+This graph is artist name centric:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">bioArtistList</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span><span class="n">distinct</span>
+<span class="n">display</span><span class="o">(</span><span class="n">bioArtistList</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"src"</span><span class="o">))</span>
+<span class="nc">Claude</span> <span class="nc">Monet</span>
+<span class="nc">Egon</span> <span class="nc">Schiele</span>
+<span class="nc">Franz</span> <span class="nc">Marc</span>
+<span class="nc">Georges</span> <span class="nc">Braque</span>
+<span class="nc">Henri</span> <span class="nc">Matisse</span>
+<span class="nc">Jackson</span> <span class="nc">Pollock</span>
+<span class="nc">Joan</span> <span class="nc">Miró</span>
+<span class="nc">Kazimir</span> <span class="nc">Malevich</span>
+<span class="nc">Marc</span> <span class="nc">Chagall</span>
+<span class="nc">Max</span> <span class="nc">Beckmann</span>
+<span class="nc">Natalia</span> <span class="nc">Goncharova</span>
+<span class="nc">Oskar</span> <span class="nc">Kokoschka</span>
+<span class="nc">Pablo</span> <span class="nc">Picasso</span>
+<span class="nc">Paul</span> <span class="nc">Cézanne</span>
+<span class="nc">Paul</span> <span class="nc">Gauguin</span>
+<span class="nc">Paul</span> <span class="nc">Klee</span>
+<span class="nc">Paul</span> <span class="nc">Signac</span>
+<span class="nc">Piet</span> <span class="nc">Mondrian</span>
+<span class="nc">Vasily</span> <span class="nc">Kandinsky</span>
+<span class="nc">Vincent</span> <span class="n">van</span> <span class="nc">Gogh</span></code></pre></figure>
+
+
+<p></p>
+Edge types in the Artist Biography knowledge graph are the following:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">artistBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeId)</span><span class="o">)</span>
+<span class="nc">BeginDate</span>
+<span class="nc">EndDate</span>
+<span class="nc">Gender</span>
+<span class="nc">Nationality</span>
+<span class="n">bornInCountry</span>
+<span class="n">bornNationality</span></code></pre></figure>
+
+
+<p></p>
+To define edge destination types we will show 3 examples of destinations for all edge types:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
+<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"dst"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">artistBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
+<span class="n">withColumn</span><span class="o">(</span><span class="s">"rn"</span><span class="o">,</span><span class="n">row_number</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">)).</span>
+<span class="n">filter</span><span class="o">(</span><span class="s">"rn&lt;4"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeId,'rn)</span><span class="o">)</span>
+  <span class="mi">1839</span><span class="o">,</span><span class="nc">BeginDate</span><span class="o">,</span><span class="mi">1</span>
+  <span class="mi">1840</span><span class="o">,</span><span class="nc">BeginDate</span><span class="o">,</span><span class="mi">2</span>
+  <span class="mi">1848</span><span class="o">,</span><span class="nc">BeginDate</span><span class="o">,</span><span class="mi">3</span>
+  <span class="mi">1890</span><span class="o">,</span><span class="nc">EndDate</span><span class="o">,</span><span class="mi">1</span>
+  <span class="mi">1903</span><span class="o">,</span><span class="nc">EndDate</span><span class="o">,</span><span class="mi">2</span>
+  <span class="mi">1906</span><span class="o">,</span><span class="nc">EndDate</span><span class="o">,</span><span class="mi">3</span>
+  <span class="nc">Female</span><span class="o">,</span><span class="nc">Gender</span><span class="o">,</span><span class="mi">1</span>
+  <span class="nc">Male</span><span class="o">,</span><span class="nc">Gender</span><span class="o">,</span><span class="mi">2</span>
+  <span class="nc">American</span><span class="o">,</span><span class="nc">Nationality</span><span class="o">,</span><span class="mi">1</span>
+  <span class="nc">Austrian</span><span class="o">,</span><span class="nc">Nationality</span><span class="o">,</span><span class="mi">2</span>
+  <span class="nc">Dutch</span><span class="o">,</span><span class="nc">Nationality</span><span class="o">,</span><span class="mi">3</span>
+  <span class="nc">Austria</span><span class="o">,</span><span class="n">bornInCountry</span><span class="o">,</span><span class="mi">1</span>
+  <span class="nc">France</span><span class="o">,</span><span class="n">bornInCountry</span><span class="o">,</span><span class="mi">2</span>
+  <span class="nc">Germany</span><span class="o">,</span><span class="n">bornInCountry</span><span class="o">,</span><span class="mi">3</span>
+  <span class="nc">American</span><span class="o">,</span><span class="n">bornNationality</span><span class="o">,</span><span class="mi">1</span>
+  <span class="nc">Austrian</span><span class="o">,</span><span class="n">bornNationality</span><span class="o">,</span><span class="mi">2</span>
+  <span class="nc">Dutch</span><span class="o">,</span><span class="n">bornNationality</span><span class="o">,</span><span class="mi">3</span></code></pre></figure>
+
+
+<p></p>
+Ontology graph edges:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioOntoEdged</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span>
+  <span class="o">(</span><span class="s">"Year"</span><span class="o">,</span><span class="s">"BeginDate"</span><span class="o">),(</span><span class="s">"Year"</span><span class="o">,</span><span class="s">"EndDate"</span><span class="o">),</span>
+  <span class="o">(</span><span class="s">"Gender"</span><span class="o">,</span><span class="s">"Gender"</span><span class="o">),(</span><span class="s">"Nationality"</span><span class="o">,</span><span class="s">"Nationality"</span><span class="o">),</span>
+  <span class="o">(</span><span class="s">"Nationality"</span><span class="o">,</span><span class="s">"bornNationality"</span><span class="o">),(</span><span class="s">"Country"</span><span class="o">,</span><span class="s">"bornInCountry"</span><span class="o">))).</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"ArtistName"</span><span class="o">))</span></code></pre></figure>
+
+
+
+<p></p>
+Ontology graph:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioOntoGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="n">artistBioOntoEdged</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">artistBioOntoEdged</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span>
+  <span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="n">artistBioOntoEdged</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span></code></pre></figure>
+
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">artistBioOntoGraph</span><span class="o">))</span>
+<span class="s">"Year"</span> <span class="o">-&gt;</span> <span class="s">"EndDate"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">ArtistName</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Nationality"</span> <span class="o">-&gt;</span> <span class="s">"Nationality"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">ArtistName</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Year"</span> <span class="o">-&gt;</span> <span class="s">"BeginDate"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">ArtistName</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Nationality"</span> <span class="o">-&gt;</span> <span class="s">"bornNationality"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">ArtistName</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Country"</span> <span class="o">-&gt;</span> <span class="s">"bornInCountry"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">ArtistName</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Gender"</span> <span class="o">-&gt;</span> <span class="s">"Gender"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">ArtistName</span><span class="err">"</span><span class="o">];</span></code></pre></figure>
+
+
+<p></p>
+Ontology of Artist Biography knowledge graph:
+
+<a href="#">
+    <img src="/img/moma36.jpg" alt="Post Sample Image" width="601" height="601" />
+</a>
+
+
+<h3>"Inventing Abstraction 1910-1925" MoMA Exhibition Data</h3>
+<p>
+As the next set of data we will use data from MoMA exhibition "Inventing Abstraction 1910-1925"
+<a href="https://www.moma.org/interactives/exhibitions/2012/inventingabstraction/?page=artists"> presented many abstraction artists.</a>
+The following artists from our Artist Biography knowledge graph were presented on that exhibition:
+
+<small><i>
+<br />
+<font style="color:rgb(99, 99, 99);">
+<ul type="circle">
+<li> Vasily Kandinsky
+</li><li> Franz Marc
+</li><li> Kazimir Malevich
+</li><li> Natalia Goncharova
+</li><li> Piet Mondrian
+</li><li> Paul Klee
+</li><li> Pablo Picasso
+</li>
+</ul>
+</font>
+</i></small>
+<p></p>
+MoMA website has a lot of interesting information about this exhibition. In particularly this exhibition's
+<i><a href="https://www.moma.org/interactives/exhibitions/2012/inventingabstraction/?page=connections"> Artist Connections graph</a></i> illustrated productive relationships between artists. From this network we've got pair relationships between artists from the Artist Biography knowledge graph:
+
+<p></p>
+<a href="#">
+    <img src="/img/moma33c.jpg" alt="Post Sample Image" width="888" height="600" />
+</a>
+<p></p>
+Connections between artist pairs:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairsDF</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span>
+  <span class="o">(</span><span class="s">"Vasily Kandinsky"</span><span class="o">,</span><span class="s">"Franz Marc"</span><span class="o">),</span>
+  <span class="o">(</span><span class="s">"Vasily Kandinsky"</span><span class="o">,</span><span class="s">"Kazimir Malevich"</span><span class="o">),</span>
+  <span class="o">(</span><span class="s">"Vasily Kandinsky"</span><span class="o">,</span><span class="s">"Natalia Goncharova"</span><span class="o">),</span>
+  <span class="o">(</span><span class="s">"Vasily Kandinsky"</span><span class="o">,</span><span class="s">"Paul Klee"</span><span class="o">),</span>
+  <span class="o">(</span><span class="s">"Franz Marc"</span><span class="o">,</span><span class="s">"Paul Klee"</span><span class="o">),</span>
+  <span class="o">(</span><span class="s">"Kazimir Malevich"</span><span class="o">,</span><span class="s">"Natalia Goncharova"</span><span class="o">),</span>
+  <span class="o">(</span><span class="s">"Natalia Goncharova"</span><span class="o">,</span><span class="s">"Pablo Picasso"</span><span class="o">),</span>
+  <span class="o">(</span><span class="s">"Paul Klee"</span><span class="o">,</span><span class="s">"Pablo Picasso"</span><span class="o">))).</span>
+<span class="n">toDF</span><span class="o">(</span><span class="s">"col1"</span><span class="o">,</span><span class="s">"col2"</span><span class="o">)</span></code></pre></figure>
+
+
+<p></p>
+Knowledge graph edges:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairEdges</span><span class="k">=</span><span class="n">artistPairsDF</span><span class="o">.</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">artistPairsDF</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"col2"</span><span class="o">,</span><span class="s">"col1"</span><span class="o">)).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span>
+  <span class="n">withColumn</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"relationship"</span><span class="o">))</span></code></pre></figure>
+
+
+<p></p>
+Artist pairs knowledge graph:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="n">artistPairEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">artistPairEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="n">artistPairEdges</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span></code></pre></figure>
+
+
+<p></p>
+Artist pairs knowledge graph:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">artistPairGraph</span><span class="o">))</span>
+<span class="s">"Franz Marc"</span> <span class="o">-&gt;</span> <span class="s">"Vasily Kandinsky"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Natalia Goncharova"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Vasily Kandinsky"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Franz Marc"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Kazimir Malevich"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Klee"</span> <span class="o">-&gt;</span> <span class="s">"Vasily Kandinsky"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Klee"</span> <span class="o">-&gt;</span> <span class="s">"Franz Marc"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Klee"</span> <span class="o">-&gt;</span> <span class="s">"Pablo Picasso"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Pablo Picasso"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Franz Marc"</span> <span class="o">-&gt;</span> <span class="s">"Paul Klee"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Kazimir Malevich"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Paul Klee"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Natalia Goncharova"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Paul Klee"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Vasily Kandinsky"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Natalia Goncharova"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span></code></pre></figure>
+
+
+<p></p>
+<a href="#">
+    <img src="/img/moma41.jpg" alt="Post Sample Image" width="333" height="300" />
+</a>
+<p></p>
+
+<p></p>
+Ontology:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="s">"ArtistName"</span> <span class="o">-&gt;</span> <span class="s">"ArtistName"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span></code></pre></figure>
+
+
+<p></p>
+Ontology of connections between artists:
+
+<a href="#">
+    <img src="/img/moma35.jpg" alt="Post Sample Image" width="333" height="300" />
+</a>
+
+
+<h3>Integrate Artist Biography knowledge graph with artists' relationships</h3>
+<p>
+<p></p>
+
+<p><h4>Metadata integration</h4>
+
+Ontology of integrated graph:
+
+<a href="#">
+    <img src="/img/moma39.jpg" alt="Post Sample Image" width="616" height="616" />
+</a>
+
+<p><h4>Data integration</h4>
+
+There are two ways to integrate Artist Biography knowledge graph with Artists Pairs knowledge graph:
+<ul>
+<li>
+Add Artists Pairs edges to Artist Biography edges
+</li><li>
+Overlap Artists Pairs nodes with Artist Biography nodes
+</li>
+</ul>
+
+Add Artists Pairs edges to Artist Biography edges
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">unionArtistPairBioEdges</span><span class="k">=</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">unionArtistPairBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="n">unionArtistPairBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">unionArtistPairBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="n">unionArtistPairBioEdges</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span></code></pre></figure>
+
+
+Overlap Artists Pairs nodes with Artist Biography nodes
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">overlapArtistPairBioEdges</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">vertices</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span> <span class="o">||</span> <span class="ss">'dst=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span>
+  <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">union</span><span class="o">(</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">overlapArtistPairBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="n">overlapArtistPairBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+    <span class="n">union</span><span class="o">(</span><span class="n">overlapArtistPairBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="n">overlapArtistPairBioEdges</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span>   </code></pre></figure>
+
+
+<a href="#">
+    <img src="/img/moma42.jpg" alt="Post Sample Image" width="471" height="434" />
+</a>
+
+<p></p>
+<h3>Modern Art Movements Timeline Data</h3>
+<p></p>
+Our next dataset is data about a timeline of the
+<i><a href="https://drawpaintacademy.com/modern-art-movements/"> Modern Art Movements:</a></i>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/aboutModerArt"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">))</span></code></pre></figure>
+
+<p></p>
+
+<small>
+<font style="color:rgb(33, 33, 33);">
+  1872 – 1892
+  <br />
+  Impressionism
+  <br />
+  Summary: Masters of color and light. Marked a radical departure from the realistic academic painting that had dominated the eras prior.
+  <br />
+  "Key artists: Claude Monet, Pierre-Auguste Renoir, Camille Pissarro, Edgar Degas, Edouard Manet, Mary Cassatt"
+  <br />
+  """When you go out to paint try to forget what object you have before you - a tree, a house, a field or whatever. Merely think, here is a little square of blue, here an oblong of pink, here a streak of yellow, and paint it just as it looks to you, the exact color and shape, until it emerges as your own naive impression of the scene before you."" Claude Monet"Early
+  <p></p>
+  1880s - 1914
+  <br />
+  Post-Impressionism
+  <br />
+  "Summary: Emphasis on symbolic content and the artist's interpretation of the world. Post-impressionism shared many of the characteristics of Impressionism such as the use of vivid colors, expressive brushwork and everyday subjects. But there seemed to be a focus on distorted forms, geometric shapes and unnaturalistic colors to depict emotions and feelings. Artists often used the pointillism technique, which involved placing small dabs of distinct color."
+<br />
+  "Key artists: Paul Cézanne (the ""father of Post-Impressionism""), Vincent Van Gogh, Paul Gauguin, Georges-Pierre Seurat, Paul Signac"
+<br />
+  """I dream of painting and then I paint my dream."" Vincent van Gogh"  
+<p></p>
+  1907 – 1922
+  <br />
+  Cubism
+  <br />
+  "Summary: Focused on abstraction and geometric shapes, rather than space, perspective and realistic rendering."
+  <br />
+  "Key artists: Pablo Picasso, Georges Braque, Juan Gris, Fernand Léger"
+  <br />
+  """Cubism is not a reality you can take in your hand. It's more like a perfume, in front of you, behind you, to the sides, the scent is everywhere but you don't quite know where it comes from."" Pablo Picasso"
+  <p></p>
+  1924-1966
+  <br />
+  Surrealism
+  <br />
+  "Summary: Depicted dreams, fantasies and the unconscious state. Often incorporated the juxtaposition of incompatible elements."
+  <br />
+  "Key artists: Joan Miró, Salvador Dalí, René Magritte, André Breton, Yves Tanguy, Frida Kahlo, Max Ernst, Méret Oppenheim"
+  <br />
+  """Surrealism is destructive, but it destroys only what it considers to be shackles limiting our vision."" Salvador Dalí"
+  </font>
+</small>
+
+<p></p>
+To convert this data to DataFrame we will do the following:
+<ul type="square">
+<li> Index data by zipping text lines with range from 0 to 84
+</li><li> Transform to DataFrame (index, line)
+</li><li> Calculate reminder index%5 - add a column "rem"
+</li><li> Calculate deviser index/5- add a column "div"
+</li>
+</ul>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="k">val</span> <span class="n">data</span><span class="o">=(</span><span class="nc">Seq</span><span class="o">.</span><span class="n">range</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span><span class="mi">85</span><span class="o">)</span> <span class="n">zip</span>  
+  <span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/aboutModerArt"</span><span class="o">).</span><span class="n">collect</span><span class="o">).</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"inx"</span><span class="o">,</span><span class="s">"charLine"</span><span class="o">).</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rem"</span><span class="o">,</span><span class="n">col</span><span class="o">(</span><span class="s">"inx"</span><span class="o">)%</span><span class="mi">5</span><span class="o">).</span>
+  <span class="n">withColumn</span><span class="o">(</span><span class="s">"div"</span><span class="o">,</span><span class="n">floor</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"inx"</span><span class="o">)/</span><span class="mi">5</span><span class="o">))</span>
+<span class="n">display</span><span class="o">(</span><span class="n">data</span><span class="o">)</span>
+<span class="n">inx</span><span class="o">,</span><span class="n">charLine</span><span class="o">,</span><span class="n">rem</span><span class="o">,</span><span class="n">div</span>
+<span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="mi">0</span>
+<span class="mi">1</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="mi">1</span><span class="o">,</span><span class="mi">0</span>
+<span class="mi">2</span><span class="o">,</span><span class="nc">Summary</span><span class="k">:</span> <span class="kt">Masters</span> <span class="kt">of</span> <span class="kt">color</span> <span class="kt">and</span> <span class="kt">light.</span> <span class="kt">Marked</span> <span class="kt">a</span> <span class="kt">radical</span> <span class="kt">departure</span> <span class="kt">from</span> <span class="kt">the</span> <span class="kt">realistic</span> <span class="kt">academic</span> <span class="kt">painting</span> <span class="kt">that</span> <span class="kt">had</span> <span class="kt">dominated</span> <span class="kt">the</span> <span class="kt">eras</span> <span class="kt">prior.</span><span class="o">,</span><span class="mi">2</span><span class="o">,</span><span class="mi">0</span>
+<span class="mi">3</span><span class="o">,</span><span class="s">"Key artists: Claude Monet, Pierre-Auguste Renoir, Camille Pissarro, Edgar Degas, Edouard Manet, Mary Cassatt"</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="mi">0</span></code></pre></figure>
+
+<p></p>
+Next we will combine data by art movements by self-joining the table several times:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">dataModernArt</span><span class="k">=</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">0</span><span class="o">).</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">1</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">2</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">3</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
+   <span class="n">join</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">4</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
+   <span class="n">drop</span><span class="o">(</span><span class="s">"rem"</span><span class="o">,</span><span class="s">"inx"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"rownumber"</span><span class="o">,</span><span class="s">"time"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"summary"</span><span class="o">,</span><span class="s">"keyArtists"</span><span class="o">,</span><span class="s">"aboutArt"</span><span class="o">)</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">dataModernArt</span><span class="o">)</span></code></pre></figure>
+
+
+<p></p>
+Then we will split "keyArtists" column to Key Artist names:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">dataModernArtArtist</span><span class="k">=</span><span class="n">dataModernArt</span><span class="o">.</span><span class="n">drop</span><span class="o">(</span><span class="s">"summary"</span><span class="o">,</span><span class="s">"aboutArt"</span><span class="o">).</span>
+   <span class="n">withColumn</span><span class="o">(</span><span class="s">"keyArtistList"</span><span class="o">,</span>
+   <span class="n">regexp_replace</span><span class="o">(</span><span class="n">regexp_replace</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"keyArtists"</span><span class="o">),</span><span class="s">"\\(.+?\\)"</span><span class="o">,</span><span class="s">""</span><span class="o">),</span>
+   <span class="s">"Key artists: "</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span>
+   <span class="n">withColumn</span><span class="o">(</span><span class="s">"keyArtistText"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">split</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"keyArtistList"</span><span class="o">),</span><span class="s">","</span><span class="o">))).</span>
+   <span class="n">withColumn</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">,</span><span class="n">trim</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"keyArtistText"</span><span class="o">)))</span>
+
+   <span class="n">display</span><span class="o">(</span><span class="n">dataModernArtArtist</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"rownumber"</span><span class="o">,</span><span class="s">"time"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"keyArtist"</span><span class="o">))</span>
+   <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Claude</span> <span class="nc">Monet</span>
+   <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Pierre</span><span class="o">-</span><span class="nc">Auguste</span> <span class="nc">Renoir</span>
+   <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Camille</span> <span class="nc">Pissarro</span>
+   <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Edgar</span> <span class="nc">Degas</span>
+   <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Edouard</span> <span class="nc">Manet</span>
+   <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Mary</span> <span class="nc">Cassatt</span>
+   <span class="mi">1</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1880</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1914</span><span class="o">,</span><span class="nc">Post</span><span class="o">-</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Paul</span> <span class="nc">Cézanne</span>
+   <span class="mi">1</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1880</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1914</span><span class="o">,</span><span class="nc">Post</span><span class="o">-</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Vincent</span> <span class="nc">Van</span> <span class="nc">Gogh</span>
+   <span class="mi">1</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1880</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1914</span><span class="o">,</span><span class="nc">Post</span><span class="o">-</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Paul</span> <span class="nc">Gauguin</span>
+   <span class="mi">1</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1880</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1914</span><span class="o">,</span><span class="nc">Post</span><span class="o">-</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Georges</span><span class="o">-</span><span class="nc">Pierre</span> <span class="nc">Seurat</span>
+   <span class="mi">1</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1880</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1914</span><span class="o">,</span><span class="nc">Post</span><span class="o">-</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Paul</span> <span class="nc">Signac</span>
+   <span class="mi">2</span><span class="o">,</span><span class="mi">1905</span> <span class="o">-</span> <span class="mi">1910</span><span class="o">,</span><span class="nc">Fauvism</span><span class="o">,</span><span class="nc">Henri</span> <span class="nc">Matisse</span>
+   <span class="mi">2</span><span class="o">,</span><span class="mi">1905</span> <span class="o">-</span> <span class="mi">1910</span><span class="o">,</span><span class="nc">Fauvism</span><span class="o">,</span><span class="nc">André</span> <span class="nc">Derain</span>
+   <span class="mi">2</span><span class="o">,</span><span class="mi">1905</span> <span class="o">-</span> <span class="mi">1910</span><span class="o">,</span><span class="nc">Fauvism</span><span class="o">,</span><span class="nc">Maurice</span> <span class="n">de</span> <span class="nc">Vlaminck</span>
+   <span class="mi">2</span><span class="o">,</span><span class="mi">1905</span> <span class="o">-</span> <span class="mi">1910</span><span class="o">,</span><span class="nc">Fauvism</span><span class="o">,</span><span class="nc">Kees</span> <span class="n">van</span> <span class="nc">Dongen</span>
+   <span class="mi">3</span><span class="o">,</span><span class="mi">1905</span> <span class="err">–</span> <span class="mi">1933</span><span class="o">,</span><span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Ernst</span> <span class="nc">Ludwig</span> <span class="nc">Kirchner</span>
+   <span class="mi">3</span><span class="o">,</span><span class="mi">1905</span> <span class="err">–</span> <span class="mi">1933</span><span class="o">,</span><span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Käthe</span> <span class="nc">Kollwitz</span>
+   <span class="mi">3</span><span class="o">,</span><span class="mi">1905</span> <span class="err">–</span> <span class="mi">1933</span><span class="o">,</span><span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Wassily</span> <span class="nc">Kandinsky</span>
+   <span class="mi">3</span><span class="o">,</span><span class="mi">1905</span> <span class="err">–</span> <span class="mi">1933</span><span class="o">,</span><span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Edvard</span> <span class="nc">Munch</span>
+   <span class="mi">4</span><span class="o">,</span><span class="mi">1907</span> <span class="err">–</span> <span class="mi">1922</span><span class="o">,</span><span class="nc">Cubism</span><span class="o">,</span><span class="nc">Pablo</span> <span class="nc">Picasso</span>
+   <span class="mi">4</span><span class="o">,</span><span class="mi">1907</span> <span class="err">–</span> <span class="mi">1922</span><span class="o">,</span><span class="nc">Cubism</span><span class="o">,</span><span class="nc">Georges</span> <span class="nc">Braque</span>
+   <span class="mi">4</span><span class="o">,</span><span class="mi">1907</span> <span class="err">–</span> <span class="mi">1922</span><span class="o">,</span><span class="nc">Cubism</span><span class="o">,</span><span class="nc">Juan</span> <span class="nc">Gris</span>
+   <span class="mi">4</span><span class="o">,</span><span class="mi">1907</span> <span class="err">–</span> <span class="mi">1922</span><span class="o">,</span><span class="nc">Cubism</span><span class="o">,</span><span class="nc">Fernand</span> <span class="nc">Léger</span>
+   <span class="mi">5</span><span class="o">,</span><span class="mi">1909</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Futurism</span><span class="o">,</span><span class="nc">Umberto</span> <span class="nc">Boccioni</span>
+   <span class="mi">5</span><span class="o">,</span><span class="mi">1909</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Futurism</span><span class="o">,</span><span class="nc">Carlo</span> <span class="nc">Carrà</span>
+   <span class="mi">5</span><span class="o">,</span><span class="mi">1909</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Futurism</span><span class="o">,</span><span class="nc">Giacomo</span> <span class="nc">Balla</span>
+   <span class="mi">5</span><span class="o">,</span><span class="mi">1909</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Futurism</span><span class="o">,</span><span class="nc">Natalia</span> <span class="nc">Goncharova</span>
+   <span class="mi">6</span><span class="o">,</span><span class="mi">1913</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Suprematism</span><span class="o">,</span><span class="nc">Kazimir</span> <span class="nc">Malevich</span>
+   <span class="mi">6</span><span class="o">,</span><span class="mi">1913</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Suprematism</span><span class="o">,</span><span class="nc">El</span> <span class="nc">Lissitzky</span>
+   <span class="mi">6</span><span class="o">,</span><span class="mi">1913</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Suprematism</span><span class="o">,</span><span class="nc">Olga</span> <span class="nc">Rozanova</span>
+   <span class="mi">6</span><span class="o">,</span><span class="mi">1913</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Suprematism</span><span class="o">,</span><span class="nc">Lyubov</span> <span class="nc">Popova</span>
+   <span class="mi">7</span><span class="o">,</span><span class="mi">1917</span> <span class="err">–</span> <span class="mi">1931</span><span class="o">,</span><span class="nc">De</span> <span class="nc">Stijl</span><span class="o">,</span><span class="nc">Theo</span> <span class="n">van</span> <span class="nc">Doesburg</span>
+   <span class="mi">7</span><span class="o">,</span><span class="mi">1917</span> <span class="err">–</span> <span class="mi">1931</span><span class="o">,</span><span class="nc">De</span> <span class="nc">Stijl</span><span class="o">,</span><span class="nc">Piet</span> <span class="nc">Mondrian</span>
+   <span class="mi">7</span><span class="o">,</span><span class="mi">1917</span> <span class="err">–</span> <span class="mi">1931</span><span class="o">,</span><span class="nc">De</span> <span class="nc">Stijl</span><span class="o">,</span><span class="nc">Vilmos</span> <span class="nc">Huszar</span>
+   <span class="mi">7</span><span class="o">,</span><span class="mi">1917</span> <span class="err">–</span> <span class="mi">1931</span><span class="o">,</span><span class="nc">De</span> <span class="nc">Stijl</span><span class="o">,</span><span class="nc">Gerrit</span> <span class="nc">Rietveld</span>
+   <span class="mi">8</span><span class="o">,</span><span class="mi">1915</span><span class="o">-</span><span class="n">late</span> <span class="mi">1930</span><span class="n">s</span><span class="o">,</span><span class="nc">Constructivism</span><span class="o">,</span><span class="nc">Vladimir</span> <span class="nc">Tatlin</span>
+   <span class="mi">8</span><span class="o">,</span><span class="mi">1915</span><span class="o">-</span><span class="n">late</span> <span class="mi">1930</span><span class="n">s</span><span class="o">,</span><span class="nc">Constructivism</span><span class="o">,</span><span class="nc">Alexander</span> <span class="nc">Rodchenko</span>
+   <span class="mi">8</span><span class="o">,</span><span class="mi">1915</span><span class="o">-</span><span class="n">late</span> <span class="mi">1930</span><span class="n">s</span><span class="o">,</span><span class="nc">Constructivism</span><span class="o">,</span><span class="nc">Varvara</span> <span class="nc">Stepanova</span>
+   <span class="mi">8</span><span class="o">,</span><span class="mi">1915</span><span class="o">-</span><span class="n">late</span> <span class="mi">1930</span><span class="n">s</span><span class="o">,</span><span class="nc">Constructivism</span><span class="o">,</span><span class="nc">Aleksandra</span> <span class="nc">Ekster</span>
+   <span class="mi">8</span><span class="o">,</span><span class="mi">1915</span><span class="o">-</span><span class="n">late</span> <span class="mi">1930</span><span class="n">s</span><span class="o">,</span><span class="nc">Constructivism</span><span class="o">,</span><span class="nc">Lyubov</span> <span class="nc">Popova</span>
+   <span class="mi">9</span><span class="o">,</span><span class="mi">1916</span><span class="o">-</span><span class="mi">1924</span><span class="o">,</span><span class="nc">Dada</span><span class="o">,</span><span class="nc">Francis</span> <span class="nc">Picabia</span>
+   <span class="mi">9</span><span class="o">,</span><span class="mi">1916</span><span class="o">-</span><span class="mi">1924</span><span class="o">,</span><span class="nc">Dada</span><span class="o">,</span><span class="nc">Hugo</span> <span class="nc">Ball</span>
+   <span class="mi">9</span><span class="o">,</span><span class="mi">1916</span><span class="o">-</span><span class="mi">1924</span><span class="o">,</span><span class="nc">Dada</span><span class="o">,</span><span class="nc">Hans</span> <span class="nc">Arp</span>
+   <span class="mi">9</span><span class="o">,</span><span class="mi">1916</span><span class="o">-</span><span class="mi">1924</span><span class="o">,</span><span class="nc">Dada</span><span class="o">,</span><span class="nc">Tristan</span> <span class="nc">Tzara</span>
+   <span class="mi">10</span><span class="o">,</span><span class="mi">1924</span><span class="o">-</span><span class="mi">1966</span><span class="o">,</span><span class="nc">Surrealism</span><span class="o">,</span><span class="nc">Joan</span> <span class="nc">Miró</span>
+   <span class="mi">10</span><span class="o">,</span><span class="mi">1924</span><span class="o">-</span><span class="mi">1966</span><span class="o">,</span><span class="nc">Surrealism</span><span class="o">,</span><span class="nc">Salvador</span> <span class="nc">Dalí</span>
+   <span class="mi">10</span><span class="o">,</span><span class="mi">1924</span><span class="o">-</span><span class="mi">1966</span><span class="o">,</span><span class="nc">Surrealism</span><span class="o">,</span><span class="nc">René</span> <span class="nc">Magritte</span>
+   <span class="mi">10</span><span class="o">,</span><span class="mi">1924</span><span class="o">-</span><span class="mi">1966</span><span class="o">,</span><span class="nc">Surrealism</span><span class="o">,</span><span class="nc">André</span> <span class="nc">Breton</span>
+   <span class="mi">10</span><span class="o">,</span><span class="mi">1924</span><span class="o">-</span><span class="mi">1966</span><span class="o">,</span><span class="nc">Surrealism</span><span class="o">,</span><span class="nc">Yves</span> <span class="nc">Tanguy</span>
+   <span class="mi">10</span><span class="o">,</span><span class="mi">1924</span><span class="o">-</span><span class="mi">1966</span><span class="o">,</span><span class="nc">Surrealism</span><span class="o">,</span><span class="nc">Frida</span> <span class="nc">Kahlo</span>
+   <span class="mi">10</span><span class="o">,</span><span class="mi">1924</span><span class="o">-</span><span class="mi">1966</span><span class="o">,</span><span class="nc">Surrealism</span><span class="o">,</span><span class="nc">Max</span> <span class="nc">Ernst</span>
+   <span class="mi">10</span><span class="o">,</span><span class="mi">1924</span><span class="o">-</span><span class="mi">1966</span><span class="o">,</span><span class="nc">Surrealism</span><span class="o">,</span><span class="nc">Méret</span> <span class="nc">Oppenheim</span>
+   <span class="mi">11</span><span class="o">,</span><span class="mi">1943</span> <span class="err">–</span> <span class="mi">1965</span><span class="o">,</span><span class="nc">Abstract</span> <span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Willem</span> <span class="n">de</span> <span class="nc">Kooning</span>
+   <span class="mi">11</span><span class="o">,</span><span class="mi">1943</span> <span class="err">–</span> <span class="mi">1965</span><span class="o">,</span><span class="nc">Abstract</span> <span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Clyfford</span> <span class="nc">Still</span>
+   <span class="mi">11</span><span class="o">,</span><span class="mi">1943</span> <span class="err">–</span> <span class="mi">1965</span><span class="o">,</span><span class="nc">Abstract</span> <span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Mark</span> <span class="nc">Rothko</span>
+   <span class="mi">11</span><span class="o">,</span><span class="mi">1943</span> <span class="err">–</span> <span class="mi">1965</span><span class="o">,</span><span class="nc">Abstract</span> <span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Jackson</span> <span class="nc">Pollock</span>
+   <span class="mi">12</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1950</span><span class="n">s</span> <span class="o">-</span> <span class="n">early</span> <span class="mi">1970</span><span class="n">s</span><span class="o">,</span><span class="nc">Pop</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">Andy</span> <span class="nc">Warhol</span>
+   <span class="mi">12</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1950</span><span class="n">s</span> <span class="o">-</span> <span class="n">early</span> <span class="mi">1970</span><span class="n">s</span><span class="o">,</span><span class="nc">Pop</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">Roy</span> <span class="nc">Lichtenstein</span>
+   <span class="mi">12</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1950</span><span class="n">s</span> <span class="o">-</span> <span class="n">early</span> <span class="mi">1970</span><span class="n">s</span><span class="o">,</span><span class="nc">Pop</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">Claes</span> <span class="nc">Oldenburg</span>
+   <span class="mi">12</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1950</span><span class="n">s</span> <span class="o">-</span> <span class="n">early</span> <span class="mi">1970</span><span class="n">s</span><span class="o">,</span><span class="nc">Pop</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">James</span> <span class="nc">Rosenquist</span>
+   <span class="mi">12</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1950</span><span class="n">s</span> <span class="o">-</span> <span class="n">early</span> <span class="mi">1970</span><span class="n">s</span><span class="o">,</span><span class="nc">Pop</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">Richard</span> <span class="nc">Hamilton</span>
+   <span class="mi">13</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1960</span><span class="n">s</span> <span class="o">-</span> <span class="n">late</span> <span class="mi">1960</span><span class="n">s</span><span class="o">,</span><span class="nc">Minimalism</span><span class="o">,</span><span class="nc">Frank</span> <span class="nc">Stella</span>
+   <span class="mi">13</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1960</span><span class="n">s</span> <span class="o">-</span> <span class="n">late</span> <span class="mi">1960</span><span class="n">s</span><span class="o">,</span><span class="nc">Minimalism</span><span class="o">,</span><span class="nc">Tony</span> <span class="nc">Smith</span>
+   <span class="mi">13</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1960</span><span class="n">s</span> <span class="o">-</span> <span class="n">late</span> <span class="mi">1960</span><span class="n">s</span><span class="o">,</span><span class="nc">Minimalism</span><span class="o">,</span><span class="nc">Carl</span> <span class="nc">Andre</span>
+   <span class="mi">13</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1960</span><span class="n">s</span> <span class="o">-</span> <span class="n">late</span> <span class="mi">1960</span><span class="n">s</span><span class="o">,</span><span class="nc">Minimalism</span><span class="o">,</span><span class="nc">Richard</span> <span class="nc">Serra</span>
+   <span class="mi">13</span><span class="o">,</span><span class="nc">Early</span> <span class="mi">1960</span><span class="n">s</span> <span class="o">-</span> <span class="n">late</span> <span class="mi">1960</span><span class="n">s</span><span class="o">,</span><span class="nc">Minimalism</span><span class="o">,</span><span class="nc">Dan</span> <span class="nc">Flavin</span>
+   <span class="mi">14</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1960</span><span class="n">s</span> <span class="n">onwards</span><span class="o">,</span><span class="nc">Conceptual</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">Joseph</span> <span class="nc">Kosuth</span>
+   <span class="mi">14</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1960</span><span class="n">s</span> <span class="n">onwards</span><span class="o">,</span><span class="nc">Conceptual</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">Walter</span> <span class="n">de</span> <span class="nc">Maria</span>
+   <span class="mi">14</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1960</span><span class="n">s</span> <span class="n">onwards</span><span class="o">,</span><span class="nc">Conceptual</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">John</span> <span class="nc">Baldessari</span>
+   <span class="mi">14</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1960</span><span class="n">s</span> <span class="n">onwards</span><span class="o">,</span><span class="nc">Conceptual</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">Sol</span> <span class="nc">LeWitt</span>
+   <span class="mi">14</span><span class="o">,</span><span class="nc">Mid</span><span class="o">-</span><span class="mi">1960</span><span class="n">s</span> <span class="n">onwards</span><span class="o">,</span><span class="nc">Conceptual</span> <span class="nc">Art</span><span class="o">,</span><span class="nc">Joseph</span> <span class="nc">Beuys</span>
+   <span class="mi">15</span><span class="o">,</span><span class="mi">1974</span><span class="o">-</span><span class="mi">1984</span><span class="o">,</span><span class="nc">Pictures</span> <span class="nc">Generation</span><span class="o">,</span><span class="nc">Cindy</span> <span class="nc">Sherman</span>
+   <span class="mi">15</span><span class="o">,</span><span class="mi">1974</span><span class="o">-</span><span class="mi">1984</span><span class="o">,</span><span class="nc">Pictures</span> <span class="nc">Generation</span><span class="o">,</span><span class="nc">Barbara</span> <span class="nc">Kruger</span>
+   <span class="mi">15</span><span class="o">,</span><span class="mi">1974</span><span class="o">-</span><span class="mi">1984</span><span class="o">,</span><span class="nc">Pictures</span> <span class="nc">Generation</span><span class="o">,</span><span class="nc">Robert</span> <span class="nc">Longo</span>
+   <span class="mi">15</span><span class="o">,</span><span class="mi">1974</span><span class="o">-</span><span class="mi">1984</span><span class="o">,</span><span class="nc">Pictures</span> <span class="nc">Generation</span><span class="o">,</span><span class="nc">Richard</span> <span class="nc">Prince</span>
+   <span class="mi">16</span><span class="o">,</span><span class="nc">Late</span> <span class="mi">1970</span><span class="n">s</span> <span class="o">-</span> <span class="n">early</span> <span class="mi">1990</span><span class="n">s</span><span class="o">,</span><span class="nc">Neo</span><span class="o">-</span><span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Georg</span> <span class="nc">Baselitz</span>
+   <span class="mi">16</span><span class="o">,</span><span class="nc">Late</span> <span class="mi">1970</span><span class="n">s</span> <span class="o">-</span> <span class="n">early</span> <span class="mi">1990</span><span class="n">s</span><span class="o">,</span><span class="nc">Neo</span><span class="o">-</span><span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Julian</span> <span class="nc">Schnabel</span>
+   <span class="mi">16</span><span class="o">,</span><span class="nc">Late</span> <span class="mi">1970</span><span class="n">s</span> <span class="o">-</span> <span class="n">early</span> <span class="mi">1990</span><span class="n">s</span><span class="o">,</span><span class="nc">Neo</span><span class="o">-</span><span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Francesco</span> <span class="nc">Clemente</span>
+   <span class="mi">16</span><span class="o">,</span><span class="nc">Late</span> <span class="mi">1970</span><span class="n">s</span> <span class="o">-</span> <span class="n">early</span> <span class="mi">1990</span><span class="n">s</span><span class="o">,</span><span class="nc">Neo</span><span class="o">-</span><span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Jean</span><span class="o">-</span><span class="nc">Michel</span> <span class="nc">Basquiat</span></code></pre></figure>
+
+
+<p></p>
+From Modern Art Movements Key Artists we will take the list of artists from our Artist Biography knowledge graph:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtData</span> <span class="k">=</span> <span class="n">dataModernArtArtist</span><span class="o">.</span>
+  <span class="n">select</span><span class="o">(</span><span class="s">"time"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"keyArtist"</span><span class="o">).</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">bioArtistList</span><span class="o">,</span><span class="ss">'keyArtist=</span><span class="o">=='</span><span class="n">src</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span><span class="n">distinct</span>
+
+<span class="n">display</span><span class="o">(</span><span class="n">modernArtArtist</span><span class="o">)</span>
+<span class="n">time</span><span class="o">,</span><span class="n">artMovement</span><span class="o">,</span><span class="n">keyArtist</span>
+<span class="mi">1905</span> <span class="o">-</span> <span class="mi">1910</span><span class="o">,</span><span class="nc">Fauvism</span><span class="o">,</span><span class="nc">Henri</span> <span class="nc">Matisse</span>
+<span class="mi">1943</span> <span class="err">–</span> <span class="mi">1965</span><span class="o">,</span><span class="nc">Abstract</span> <span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Jackson</span> <span class="nc">Pollock</span>
+<span class="mi">1924</span><span class="o">-</span><span class="mi">1966</span><span class="o">,</span><span class="nc">Surrealism</span><span class="o">,</span><span class="nc">Joan</span> <span class="nc">Miró</span>
+<span class="nc">Early</span> <span class="mi">1880</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1914</span><span class="o">,</span><span class="nc">Post</span><span class="o">-</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Paul</span> <span class="nc">Gauguin</span>
+<span class="mi">1907</span> <span class="err">–</span> <span class="mi">1922</span><span class="o">,</span><span class="nc">Cubism</span><span class="o">,</span><span class="nc">Georges</span> <span class="nc">Braque</span>
+<span class="nc">Early</span> <span class="mi">1880</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1914</span><span class="o">,</span><span class="nc">Post</span><span class="o">-</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Paul</span> <span class="nc">Cézanne</span>
+<span class="mi">1907</span> <span class="err">–</span> <span class="mi">1922</span><span class="o">,</span><span class="nc">Cubism</span><span class="o">,</span><span class="nc">Pablo</span> <span class="nc">Picasso</span>
+<span class="nc">Early</span> <span class="mi">1880</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1914</span><span class="o">,</span><span class="nc">Post</span><span class="o">-</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Paul</span> <span class="nc">Signac</span>
+<span class="mi">1917</span> <span class="err">–</span> <span class="mi">1931</span><span class="o">,</span><span class="nc">De</span> <span class="nc">Stijl</span><span class="o">,</span><span class="nc">Piet</span> <span class="nc">Mondrian</span>
+<span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Claude</span> <span class="nc">Monet</span>
+<span class="mi">1909</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Futurism</span><span class="o">,</span><span class="nc">Natalia</span> <span class="nc">Goncharova</span>
+<span class="mi">1913</span> <span class="err">–</span> <span class="n">late</span> <span class="mi">1920</span><span class="n">s</span><span class="o">,</span><span class="nc">Suprematism</span><span class="o">,</span><span class="nc">Kazimir</span> <span class="nc">Malevich</span></code></pre></figure>
+
+
+<p></p>
+We will build Modern Art Movement knowledge graph based on ontology:
+
+<a href="#">
+    <img src="/img/moma38b.jpg" alt="Post Sample Image" width="333" height="300" />
+</a>
+
+<p></p>
+Modern Art Movement knowledge graph edges:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtEdges</span><span class="k">=</span>
+  <span class="n">modernArtData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span>
+  <span class="n">withColumn</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"artMovement"</span><span class="o">)).</span><span class="n">union</span><span class="o">(</span>
+  <span class="n">modernArtData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"time"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span>
+  <span class="n">withColumn</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"time"</span><span class="o">))).</span><span class="n">distinct</span></code></pre></figure>
+
+
+<p></p>
+Modern Art Movement knowledge graph:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="n">modernArtEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">modernArtEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="n">modernArtEdges</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span></code></pre></figure>
+
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">))</span>
+<span class="s">"Jackson Pollock"</span> <span class="o">-&gt;</span> <span class="s">"Abstract Expressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Fauvism"</span> <span class="o">-&gt;</span> <span class="s">"1905 - 1910"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Cézanne"</span> <span class="o">-&gt;</span> <span class="s">"Post-Impressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Cubism"</span> <span class="o">-&gt;</span> <span class="s">"1907 – 1922"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Suprematism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Impressionism"</span> <span class="o">-&gt;</span> <span class="s">"1872 – 1892"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Abstract Expressionism"</span> <span class="o">-&gt;</span> <span class="s">"1943 – 1965"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Futurism"</span> <span class="o">-&gt;</span> <span class="s">"1909 – late 1920s"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Signac"</span> <span class="o">-&gt;</span> <span class="s">"Post-Impressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Piet Mondrian"</span> <span class="o">-&gt;</span> <span class="s">"De Stijl"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Henri Matisse"</span> <span class="o">-&gt;</span> <span class="s">"Fauvism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Cubism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Suprematism"</span> <span class="o">-&gt;</span> <span class="s">"1913 – late 1920s"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Futurism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Georges Braque"</span> <span class="o">-&gt;</span> <span class="s">"Cubism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Joan Miró"</span> <span class="o">-&gt;</span> <span class="s">"Surrealism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Post-Impressionism"</span> <span class="o">-&gt;</span> <span class="s">"Early 1880s - 1914"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"De Stijl"</span> <span class="o">-&gt;</span> <span class="s">"1917 – 1931"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Claude Monet"</span> <span class="o">-&gt;</span> <span class="s">"Impressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Surrealism"</span> <span class="o">-&gt;</span> <span class="s">"1924-1966"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Gauguin"</span> <span class="o">-&gt;</span> <span class="s">"Post-Impressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span></code></pre></figure>
+
+
+<a href="#">
+    <img src="/img/moma44b.jpg" alt="Post Sample Image" width="579" height="500" />
+</a>
+<p><h3>Artist Pairs within Modern Art Movement Key Artists list</h3>
+
+<p> </p>
+Ontology of integrated graph:
+<a href="#">
+    <img src="/img/moma50.jpg" alt="Post Sample Image" width="371" height="453" />
+</a>
+<p></p>
+
+<p><h4>Data integration</h4>
+<p></p>
+
+<p>To add artist pair relationship info to modern art movement info we will combine edges of Modern Art Movement and Artist Pairs knowledge graphs:
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtPairGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">)</span>
+<span class="o">)</span></code></pre></figure>
+
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">modernArtPairGraph</span><span class="o">))</span>
+<span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Franz Marc"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Kazimir Malevich"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Klee"</span> <span class="o">-&gt;</span> <span class="s">"Vasily Kandinsky"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Klee"</span> <span class="o">-&gt;</span> <span class="s">"Franz Marc"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Klee"</span> <span class="o">-&gt;</span> <span class="s">"Pablo Picasso"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Abstract Expressionism"</span> <span class="o">-&gt;</span> <span class="s">"1943 – 1965"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Futurism"</span> <span class="o">-&gt;</span> <span class="s">"1909 – late 1920s"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Pablo Picasso"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Signac"</span> <span class="o">-&gt;</span> <span class="s">"Post-Impressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Piet Mondrian"</span> <span class="o">-&gt;</span> <span class="s">"De Stijl"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Franz Marc"</span> <span class="o">-&gt;</span> <span class="s">"Paul Klee"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Kazimir Malevich"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Paul Klee"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Henri Matisse"</span> <span class="o">-&gt;</span> <span class="s">"Fauvism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Natalia Goncharova"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Paul Klee"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Cubism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Suprematism"</span> <span class="o">-&gt;</span> <span class="s">"1913 – late 1920s"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Futurism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Vasily Kandinsky"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Georges Braque"</span> <span class="o">-&gt;</span> <span class="s">"Cubism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Joan Miró"</span> <span class="o">-&gt;</span> <span class="s">"Surrealism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Post-Impressionism"</span> <span class="o">-&gt;</span> <span class="s">"Early 1880s - 1914"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"De Stijl"</span> <span class="o">-&gt;</span> <span class="s">"1917 – 1931"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Claude Monet"</span> <span class="o">-&gt;</span> <span class="s">"Impressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Surrealism"</span> <span class="o">-&gt;</span> <span class="s">"1924-1966"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Natalia Goncharova"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Paul Gauguin"</span> <span class="o">-&gt;</span> <span class="s">"Post-Impressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span></code></pre></figure>
+
+</p><p>
+<a href="#">
+    <img src="/img/moma49c.jpg" alt="Post Sample Image" width="679" height="500" />
+</a>
+<p><h3>Add Artist Biography info to Modern Art Movement key artists</h3>
+
+<p></p>
+Ontology of integrated graph:
+<a href="#">
+    <img src="/img/moma46.jpg" alt="Post Sample Image" width="611" height="471" />
+</a>
+
+<p><h4>Data integration</h4>
+<p></p>
+<p>From Artist Biography knowledge graph we will take information about nationalities and born countries of modern art key artists.
+</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtKeyArtists</span> <span class="k">=</span> <span class="n">modernArtData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">modernArtKeyArtists</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">))</span>
+<span class="nc">Claude</span> <span class="nc">Monet</span>
+<span class="nc">Georges</span> <span class="nc">Braque</span>
+<span class="nc">Henri</span> <span class="nc">Matisse</span>
+<span class="nc">Jackson</span> <span class="nc">Pollock</span>
+<span class="nc">Joan</span> <span class="nc">Miró</span>
+<span class="nc">Kazimir</span> <span class="nc">Malevich</span>
+<span class="nc">Natalia</span> <span class="nc">Goncharova</span>
+<span class="nc">Pablo</span> <span class="nc">Picasso</span>
+<span class="nc">Paul</span> <span class="nc">Cézanne</span>
+<span class="nc">Paul</span> <span class="nc">Gauguin</span>
+<span class="nc">Paul</span> <span class="nc">Signac</span>
+<span class="nc">Piet</span> <span class="nc">Mondrian</span></code></pre></figure>
+
+
+
+<p>Combine edges of Artist Biography knowledge graph and edges of Modern Art Movement knowledge graph and exclude edges related to genders and dates:
+</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtBioEdges</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">modernArtKeyArtists</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">keyArtist</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">).</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">).</span>
+  <span class="n">filter</span><span class="o">(</span><span class="n">not</span><span class="o">(</span><span class="ss">'edgeId.</span><span class="n">isin</span><span class="o">(</span><span class="s">"EndDate"</span><span class="o">,</span><span class="s">"BeginDate"</span><span class="o">,</span><span class="s">"Gender"</span><span class="o">)))</span></code></pre></figure>
+
+
+
+<p>Biographies of Modern Art Movement key artists:
+</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="n">modernArtBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">modernArtBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="n">modernArtBioEdges</span><span class="o">)</span></code></pre></figure>
+
+
+
+<a href="#">
+    <img src="/img/moma45c.jpg" alt="Post Sample Image" width="700" height="471" />
+</a>
+<p></p>
+
+
+<p></p>
+<p><h3>Integrate All Three Knowledge Graphs</h3>
+<p><h4>Metadata integration</h4>
+
+</p><p>
+<p></p>
+Ontology of integrated graph:
+
+<a href="#">
+    <img src="/img/moma40b.jpg" alt="Post Sample Image" width="665" height="471" />
+</a>
+<p></p>
+
+<h4>Data Integration</h4>
+<p>
+First from each graph we will get artist name list then calculate overlap of these artist lists.
+<br />Artist names from Artist Biography knowledge graph: </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioNodes</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id1"</span><span class="o">)</span></code></pre></figure>
+
+</p><p>
+
+Artist names from Artist Pairs knowledge graph: </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairNodes</span><span class="k">=</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id2"</span><span class="o">)</span></code></pre></figure>
+
+</p><p>
+
+Artist names from Modern Art Movement knowledge graph: </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtNodes</span><span class="k">=</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id3"</span><span class="o">)</span></code></pre></figure>
+
+</p><p>
+
+There are only three artist names that are in each of three knowledge graphs: </p>
+
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistNodes</span><span class="k">=</span><span class="n">artistBioNodes</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">artistPairNodes</span><span class="o">,</span><span class="ss">'id1=</span><span class="o">=='</span><span class="n">id2</span><span class="o">).</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">modernArtNodes</span><span class="o">,</span><span class="ss">'id2=</span><span class="o">=='</span><span class="n">id3</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"id2"</span><span class="o">,</span><span class="s">"id3"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">)</span>
+<span class="nc">Pablo</span> <span class="nc">Picasso</span>
+<span class="nc">Kazimir</span> <span class="nc">Malevich</span>
+<span class="nc">Natalia</span> <span class="nc">Goncharova</span></code></pre></figure>
+
+
+</p><p>
+
+<p>
+Next, we need to get edges from knowledge graphs related to overlapping artists.  
+
+<br />As Artist Biography knowledge graph is artist name centric, to get combined graph edges we will filter them by edge 'src': </p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioEdges</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span></code></pre></figure>
+
+</p><p>
+
+<p>
+To get edges from Artist Pairs knowledge graph we need to filter them by both edge parameters - 'src' and edge 'dst': </p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairEdges</span><span class="k">=</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id1</span><span class="o">).</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id2"</span><span class="o">),</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">id2</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"id1"</span><span class="o">,</span><span class="s">"id2"</span><span class="o">).</span><span class="n">distinct</span></code></pre></figure>
+
+</p><p>
+
+<p>
+Modern Art Movement knowledge graph has two types of edges: Artist -&gt; Modern Art Movement and Modern Art Movement -&gt; time period. {Artist, Modern Art Movement} edges :</p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtEdges1</span><span class="k">=</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id1</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"id1"</span><span class="o">)</span></code></pre></figure>
+
+</p><p>
+
+<p>
+{Modern Art Movement, time period} edges: </p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtEdges2</span><span class="k">=</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">modernArtEdges1</span><span class="o">.</span>
+  <span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"dst1"</span><span class="o">),</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">dst1</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"dst1"</span><span class="o">)</span></code></pre></figure>
+
+</p><p>
+
+<p></p>
+Edges of combined graph:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistEdges</span><span class="k">=</span><span class="n">artistBioEdges</span><span class="o">.</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">artistPairEdges</span><span class="o">).</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">modernArtEdges1</span><span class="o">).</span>
+  <span class="n">union</span><span class="o">(</span><span class="n">modernArtEdges2</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p></p>
+Build a combine graph:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="n">artistEdges</span><span class="o">)</span>
+<span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">artistGraph</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span>
+<span class="s">"Cubism"</span> <span class="o">-&gt;</span> <span class="s">"1907 – 1922"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Futurism"</span> <span class="o">-&gt;</span> <span class="s">"1909 – late 1920s"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"1878"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">BeginDate</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"1935"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">EndDate</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Male"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">Gender</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Natalia Goncharova"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Russian Empire"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">bornInCountry</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Russian"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">Nationality</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Russian"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">bornNationality</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"Suprematism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"1881"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">BeginDate</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"1962"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">EndDate</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Female"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">Gender</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Futurism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Kazimir Malevich"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Pablo Picasso"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Russian Empire"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">bornInCountry</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Russian"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">Nationality</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Russian"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">bornNationality</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"1881"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">BeginDate</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"1973"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">EndDate</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Cubism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Male"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">Gender</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Natalia Goncharova"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Spain"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">bornInCountry</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Spanish"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">Nationality</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Spanish"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">bornNationality</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"Suprematism"</span> <span class="o">-&gt;</span> <span class="s">"1913 – late 1920s"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span></code></pre></figure>
+
+
+<p></p>
+
+<a href="#">
+    <img src="/img/moma52.jpg" alt="Post Sample Image" width="665" height="471" />
+</a>
+
+<p><h3>Next Post - Paintings</h3>
+In the next several posts we will continue looking at Knowledge Graphs as more natural way to represent data.</p>
+</p></p></p></p></p></p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2019/12/21/knowledgeGraphSemantics/" data-toggle="tooltip" data-placement="top" title="Knowledge Graph for Semantic Data Mining">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2020</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
