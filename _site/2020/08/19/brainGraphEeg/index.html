@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>EEG Patterns by Deep Learning and Graph Mining - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2020/08/19/brainGraphEeg/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/mod53f.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>EEG Patterns by Deep Learning and Graph Mining</h1>
+                    
+                    <h2 class="subheading">Electroencephalography analysis: how to find patterns of time-series in two-dimensional space</h2>
+                    
+                    <span class="meta">Posted by Melenar on August 19, 2020</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Bridges between AI and Neuroscience</h3>
+
+Interactions between AI and cognitive science rapidly grow. By emulating how the brain acts, Artificial Intelligence became very successful in image recognition, language translation and many other areas. On the other hand, cognitive science is getting benefits from AI power as a model for developing and testing scientific hypothesis and studying patterns of neural activities recorded from the brain. How these two disciplines can help each other is well described by Neil Savage in the article
+<i><a href="
+https://www.nature.com/articles/d41586-019-02212-4"> "How AI and neuroscience drive each other forwards"</a></i>.
+</p>
+<p>
+In this post we will analyze EEG data to distinguish between Alcoholic person behavior and behavior of person from Control group. To find behavior patterns in complex EEG signal data that consists from time series located on two-dimensional space we will:  
+<ul>
+<li>Transform time series to images and use CNN image classifier methods</li>
+<li>Transform time series to adjacency matrix for graph mining techniques</li>
+</ul>
+
+</p>
+<p>
+<p><h4>Why EEG Data?</h4>
+
+EEG tools studying human behaviors are well described in Bryn Farnsworth's blog
+<i><a href="
+https://imotions.com/blog/eeg/">"EEG (Electroencephalography): The Complete Pocket Guide"</a></i>. There are several reasons why EEG is an exceptional tool for studying the neurocognitive processes:
+</p><p>
+<ul>
+<li>EEG has very high time resolution and captures cognitive processes in the time frame in which cognition occurs.
+</li>
+<li>EEG directly measures neural activity.</li>
+<li>EEG is inexpensive, lightweight, and portable.</li>
+<li>EEG data is publically available: we found this dataset in Kaggle.com</li>
+</ul>
+
+
+<p><h4>Machine Learning as EEG Analysis</h4>
+Electroencephalography (EEG) is a complex signal and can require several years of training, as well as advanced signal processing and feature extraction methodologies to be correctly interpreted. Recently, deep learning (DL) has shown great promise in helping make sense of EEG signals due to its capacity to learn good feature representations from raw data. The meta-data analysis paper <i><a href="
+https://arxiv.org/pdf/1901.05498.pdf">"Deep learning-based electroencephalography analysis: a systematic review"</a></i>
+compares EEG deep learning with more traditional EEG processing approaches ans shows what deep learning approaches work and what do not work for EEG data analysis.
+</p><p>
+</p>
+
+<p><h4>Our Method: CNN Classification of EEG Channel Time Series</h4>
+</p><p>
+
+<p>In this post we will use another deep learning technique and make Time Series classification via CNN Deep Learning. We learned this technique in fast.ai
+<i><a href="https://course.fast.ai"> 'Practical Deep Learning for Coders, v3'</a></i>
+class and fast.ai forum   
+<i><a href="https://forums.fast.ai/t/time-series-sequential-data-study-group/29686">'Time series/ sequential data'</a></i> study group.</p>
+<p>
+We employed this technique for Natural Language Processing in our two previous posts - <i><a href="
+http://sparklingdataocean.com/2019/06/01/word2vec2CNN/">"Free Associations -
+Find Unexpected Word Pairs via Convolutional Neural Network"</a></i>  and
+<i><a href="
+http://sparklingdataocean.com/2019/03/16/word2vec2graph2CNN/">"Word2Vec2Graph to Images to Deep Learning."</a></i>
+
+</p>
+<p>
+
+<p><h4>Our Method: Graph Community Detection</h4>
+</p><p>
+To find more explicit EEG channel patterns, we will use graph mining methods. We will transform EEG channel time series to vectors and build graphs on pairs of vectors with high cosine similarly. Using Graph connected components as community detection method will help us to find EEG channel time series patterns.
+</p>
+<p>
+<h3>EEG Data Source</h3>
+<p></p>
+<p></p>
+For this post we used EEG dataset that we found in kaggle.com website: <i><a href="https://www.kaggle.com/nnair25/Alcoholics">'EEG-Alcohol' Kaggle dataset.</a></i> This dataset came from a large study of examining EEG correlates of genetic predisposition to alcoholism. We will classify EEG channel time series data to alcoholic and control person's EEG channels. Note: there are some data quality problems in this dataset.
+<p></p>
+Amount of subjects in each group is 8. The 64 electrodes were placed on subject's scalps to measure the electrical activity of the brain. The response values were sampled at 256 Hz (3.9-msec epoch) for 1 second.
+Each subject was exposed to either a single stimulus (S1) or to two stimuli (S1 and S2) which were pictures of objects chosen from the 1980 Snodgrass and Vanderwart picture set. When two stimuli were shown, they were presented in either a matched condition where S1 was identical to S2 or in a non-matched condition where S1 differed from S2.
+
+
+</p>
+<p><h3>EEG Channel CNN Classification</h3>
+<p><h4>Classification Method</h4>
+<p>We will convert time series of EEG channels to images using Gramian Angular Field (GASF) - a polar coordinate transformation. This method is well described by Ignacio Oguiza in Fast.ai forum
+<i><a href="https://forums.fast.ai/t/share-your-work-here/27676/367"> 'Time series classification: General Transfer Learning with Convolutional Neural Networks'</a></i>. He referenced to paper <i><a href="https://aaai.org/ocs/index.php/WS/AAAIW15/paper/viewFile/10179/10251">Encoding Time Series as Images for Visual Inspection and Classification Using Tiled Convolutional Neural Networks</a></i>.
+
+For data processing we will use ideas and code from Ignacio Oguiza code is in his GitHub notebook
+<i><a href="https://gist.github.com/oguiza/c9c373aec07b96047d1ba484f23b7b47"> Time series - Olive oil country</a></i>.
+<p></p>
+<h4>Transform Raw Data to EEG Channel Time Series (on Kaggle)</h4>
+<p></p>
+Kaggle EEG dataset was well analyzed in
+<i><a href="https://www.kaggle.com/ruslankl/eeg-data-analysis"> 'EEG Data Analysis: Alcoholic vs Control Groups' </a></i>
+Kaggle notebook by Ruslan Klymentiev. We used his code for some parts of our data preparation. Here is raw data:
+<p></p>
+<p></p>
+<a href="#">
+    <img src="/img/dataSource1.jpg" alt="Post Sample Image" width="700" />
+</a>
+<p></p>
+Python code to transform raw data to EEG channel time series data :
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">EEG_data</span><span class="p">[</span><span class="s">'rn'</span><span class="p">]</span><span class="o">=</span><span class="n">EEG_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">'sensor position'</span><span class="p">,</span><span class="s">'trial number'</span><span class="p">,</span>
+   <span class="s">'subject identifier'</span><span class="p">,</span><span class="s">'matching condition'</span><span class="p">,</span><span class="s">'name'</span><span class="p">])</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span>
+<span class="n">EEG_TS</span><span class="o">=</span><span class="n">EEG_data</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'trial number'</span><span class="p">,</span><span class="s">'sensor position'</span><span class="p">,</span>
+    <span class="s">'subject identifier'</span><span class="p">,</span><span class="s">'matching condition'</span><span class="p">,</span><span class="s">'name'</span><span class="p">,</span><span class="s">'channel'</span><span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="s">'rn'</span><span class="p">,</span><span class="n">values</span><span class="o">=</span><span class="s">'sensor value'</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s">'first'</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">EEG_TS</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span></code></pre></figure>
+
+<p></p>
+EEG channels - time series data:
+<p></p>
+
+<p></p>
+<a href="#">
+    <img src="/img/dataSource2.jpg" alt="Post Sample Image" width="700" />
+</a>
+<p>
+
+</p>
+<h4>Transform EEG Channel Time Series Data to Images (on Google Colab)</h4>
+
+<p></p>
+
+
+Python code to split data and transform time series to arrays:
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="n">a</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filePath</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s">','</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">aa</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">f</span><span class="o">=</span><span class="n">aa</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span> <span class="p">]]</span>
+<span class="n">fx</span><span class="o">=</span><span class="n">aa</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">aa</span><span class="o">.</span><span class="n">columns</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span></code></pre></figure>
+
+
+<p></p>
+
+To convert time series to GASF images and classify images via CNN we used Python code that Ignacio Oguiza shared on fast.ai forum
+<i><a href="https://gist.github.com/oguiza/c9c373aec07b96047d1ba484f23b7b47"> Time series - Olive oil country</a></i>.
+</p><p>
+
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">pyts.image</span> <span class="kn">import</span> <span class="n">GramianAngularField</span> <span class="k">as</span> <span class="n">GASF</span>
+<span class="n">image_size</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">gasf</span> <span class="o">=</span> <span class="n">GASF</span><span class="p">(</span><span class="n">image_size</span><span class="p">)</span>
+<span class="n">fX_gasf</span> <span class="o">=</span> <span class="n">gasf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">fX</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span></code></pre></figure>
+
+<p></p>
+
+
+</p>
+<h4>EEG Channel Images - Examples</h4>
+<p></p>
+As image examples we will show line graph pictures and GASF images for EEG channels on F8 and T7 positions of one person from Alcoholic group and one person from Control group. All time series were taken from "two stimuli - match" trial.
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">idxList1</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">index</span><span class="p">[(</span><span class="n">f</span><span class="p">[</span><span class="s">'sensor position'</span><span class="p">]</span> <span class="o">==</span> <span class="s">'F8'</span><span class="p">)</span><span class="o">&amp;</span>
+   <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'matching condition'</span><span class="p">]</span> <span class="o">==</span> <span class="s">'S2 match'</span><span class="p">)</span><span class="o">&amp;</span>   
+   <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'name'</span><span class="p">]</span><span class="o">==</span><span class="s">'co2a0000365'</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fX</span><span class="p">[</span><span class="n">idxList1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">fX_gasf</span><span class="p">[</span><span class="n">idxList1</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'rainbow'</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s">'lower'</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+
+<p></p>
+<a href="#">
+    <img src="/img/dataSource3.jpg" alt="Post Sample Image" width="600" />
+</a>
+<p></p>
+Observations:
+<p></p>
+
+<ul>
+<li>Alcoholic person's F8 and T7 time series look closer than Control person's F8 and T7 time series</li>
+<li>There are more differences between Alcoholic and Control person's time series than between F8 and T7 time series</li>
+</ul>
+
+</p>
+<h4>Generate and Save Images</h4>
+<p></p>
+Generated images of EEG channel time series were stored in classification subdirectories:
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">numRows</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRows</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">IMG_PATH</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">IMG_PATH</span><span class="p">)</span>  
+    <span class="n">idxPath</span> <span class="o">=</span> <span class="n">IMG_PATH</span> <span class="o">+</span><span class="s">'/'</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'subject identifier'</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">idxPath</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">idxPath</span><span class="p">)</span>
+    <span class="n">imgId</span> <span class="o">=</span> <span class="p">(</span><span class="n">IMG_PATH</span> <span class="o">+</span><span class="s">'/'</span> <span class="o">+</span>  
+       <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'subject identifier'</span><span class="p">][</span><span class="n">i</span><span class="p">]))</span> <span class="o">+</span><span class="s">'/'</span> <span class="o">+</span>
+       <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'sensor position'</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s">'~'</span><span class="o">+</span>
+       <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'channel'</span><span class="p">][</span><span class="n">i</span><span class="p">])</span><span class="o">+</span><span class="s">'~'</span><span class="o">+</span><span class="n">f</span><span class="p">[</span><span class="s">'name'</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s">'~'</span><span class="o">+</span>
+       <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'trial number'</span><span class="p">][</span><span class="n">i</span><span class="p">])</span><span class="o">+</span><span class="s">'~'</span><span class="o">+</span><span class="n">f</span><span class="p">[</span><span class="s">'matching condition'</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>    
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">fX_gasf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'rainbow'</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s">'lower'</span><span class="p">)</span>   
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">imgId</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></code></pre></figure>
+
+
+<p></p>
+
+</p>
+<h4>Image Classification</h4>
+<p></p>
+EEG channel time series classification was done on fast.ai transfer learning approach:
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">fastai.text</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">fastai.vision</span> <span class="kn">import</span> <span class="n">learner</span>
+<span class="n">PATH_IMG</span><span class="o">=</span><span class="n">IMG_PATH</span>
+<span class="n">tfms</span> <span class="o">=</span> <span class="n">get_transforms</span><span class="p">(</span><span class="n">do_flip</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">max_rotate</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ImageDataBunch</span><span class="o">.</span><span class="n">from_folder</span><span class="p">(</span><span class="n">PATH_IMG</span><span class="p">,</span>  <span class="n">train</span><span class="o">=</span><span class="s">"."</span><span class="p">,</span> <span class="n">valid_pct</span><span class="o">=</span><span class="mf">0.21</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">cnn_learner</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet34</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">error_rate</span><span class="p">)</span>
+<span class="n">learn</span><span class="o">.</span><span class="n">fit_one_cycle</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+
+<h4>EEG Channels Classification Metrics</h4>
+<p></p>
+Here are cycle metrics for GASF image classification:
+
+<p></p>
+<a href="#">
+    <img src="/img/dataSource4.jpg" alt="Post Sample Image" width="379" />
+</a>
+<p>
+<p></p>
+Tuning classification model we've got about 80.2% accuracy for graph line image classification and 82.5% accuracy for GASF image classification. Accuracy metrics for data separated by different types of stimulus are higher than for all data classifying together. The highest accuracy metric - 91.8% we've got for "two non-matched stimuli".
+<p></p>
+
+<p></p>
+<a href="#">
+    <img src="/img/dataSource7.jpg" alt="Post Sample Image" width="500" />
+</a>
+<p></p>
+
+
+<p><h3>Graph Connections between EEG Channels</h3>
+<p><h4>Building Graph in Spark (on Databricks)</h4>
+<p>
+We will build EEG channel graph in scala Spark using Spark GraphFrames library. We will build graphs and define EEG time series patterns on a subset of data: we will take one person from Alcoholic group and one person from Control group. For each person we will select three trials of different types.
+
+</p><p>
+<p><h4>Data Processing</h4>
+</p><p>
+As raw data we will use the same EEG channel time series data that we generated from Kaggle dataset and used for CNN image classification:
+
+<p></p>
+<a href="#">
+    <img src="/img/dataSource2.jpg" alt="Post Sample Image" width="700" />
+</a>
+<p></p>
+Data processing:
+<p></p>
+<ul>
+<li>Read EEG_TS.csv file</li>
+<li>Transform columns [0, 1, ..., 255] from strings to double. </li>
+<li>Rename these columns as ['arr0', 'arr1', ..., 'arr255']</li>
+<li>Extract from schema all columns with names like 'arr*'</li>
+</ul>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.</span><span class="o">{</span><span class="n">col</span><span class="o">,</span> <span class="n">lit</span><span class="o">,</span> <span class="n">when</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
+<span class="k">import</span> <span class="nn">org.graphframes._</span>
+<span class="k">import</span> <span class="nn">org.graphframes.examples</span>
+
+<span class="k">val</span> <span class="n">dataInput</span><span class="k">=</span><span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">option</span><span class="o">(</span><span class="s">"header"</span><span class="o">,</span><span class="kc">true</span><span class="o">).</span><span class="n">csv</span><span class="o">(</span><span class="s">"FileStore/tables/EEG_TS.csv"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">colList</span><span class="k">=</span><span class="n">dataInput</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">fieldNames</span>
+<span class="k">var</span> <span class="n">dataInputTable</span><span class="k">=</span><span class="n">dataInput</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"arr0"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"#"</span><span class="o">))</span>
+<span class="k">for</span><span class="o">(</span><span class="n">ind</span> <span class="k">&lt;-</span> <span class="o">(</span><span class="mi">0</span> <span class="n">to</span> <span class="mi">255</span><span class="o">)){</span>
+   <span class="n">dataInputTable</span><span class="k">=</span><span class="n">dataInputTable</span><span class="o">.</span>
+     <span class="n">withColumn</span><span class="o">(</span><span class="s">"arr"</span><span class="o">+</span><span class="n">lit</span><span class="o">(</span><span class="n">ind</span><span class="o">),</span><span class="n">col</span><span class="o">(</span><span class="n">ind</span><span class="o">.</span><span class="n">toString</span><span class="o">).</span><span class="n">cast</span><span class="o">(</span><span class="s">"double"</span><span class="o">))</span>
+<span class="o">}</span>
+<span class="k">val</span> <span class="n">arrColList</span><span class="k">=</span><span class="n">dataInputTable</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">fieldNames</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">contains</span><span class="o">(</span><span class="s">"arr"</span><span class="o">)))</span></code></pre></figure>
+
+
+<p></p>
+</p><p>
+<p><h4>Convert to vectors:</h4>
+</p><p>
+
+
+<ul>
+<li>Transform collumns [arr0,...,arr255] to vectors.</li>
+<li>Generate a table as a combination of paramaters
+   "trial number", "sensor position", "subject identifier", "matching condition", "name", "channel" and vectors.</li>
+
+</ul>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.mllib.linalg._</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.mllib.linalg.Vector</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.mllib.linalg.</span><span class="o">{</span><span class="nc">Vectors</span><span class="o">,</span> <span class="nc">Vector</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">org.apache.spark.ml.feature.VectorAssembler</span>
+
+<span class="k">val</span> <span class="n">assembler</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">VectorAssembler</span><span class="o">().</span>
+<span class="n">setInputCols</span><span class="o">(</span><span class="n">arrColList</span><span class="o">).</span>
+<span class="n">setOutputCol</span><span class="o">(</span><span class="s">"vector"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">output</span> <span class="k">=</span> <span class="n">assembler</span><span class="o">.</span><span class="n">transform</span><span class="o">(</span><span class="n">dataInputTable</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">dataVector</span><span class="k">=</span><span class="n">output</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"trial number"</span><span class="o">,</span> <span class="s">"sensor position"</span><span class="o">,</span>
+   <span class="s">"subject identifier"</span><span class="o">,</span> <span class="s">"matching condition"</span><span class="o">,</span> <span class="s">"name"</span><span class="o">,</span> <span class="s">"channel"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">dataVector</span><span class="k">=</span><span class="n">output</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"trial number"</span><span class="o">,</span> <span class="s">"sensor position"</span><span class="o">,</span>
+   <span class="s">"subject identifier"</span><span class="o">,</span> <span class="s">"matching condition"</span><span class="o">,</span> <span class="s">"name"</span><span class="o">,</span> <span class="s">"channel"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span></code></pre></figure>
+
+
+
+</p><p>
+<p><h4>Select Data Subsets</h4>
+</p><p>
+<p></p>
+
+We selected the following data subsets: one person from each group and one trial of each type.
+
+<ul>
+<li>one person from Alcoholic group: "co2a0000364"</li>
+<li>one person from Control group:"co2c0000340"</li>
+
+<li>"S1 obj": single stimulus</li>
+<li>"S2 match": two stimuli - matched</li>
+<li>"S2 nomatch": two stimuli - non-matched</li>
+</ul>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">dataSampleC</span><span class="k">=</span><span class="n">dataVector</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"name"</span><span class="o">).</span><span class="n">isin</span><span class="o">(</span><span class="s">"co2a0000364"</span><span class="o">,</span><span class="s">"co2c0000340"</span><span class="o">)).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"trial number"</span><span class="o">).</span><span class="n">isin</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span><span class="mi">25</span><span class="o">,</span><span class="mi">14</span><span class="o">,</span><span class="mi">31</span><span class="o">,</span><span class="mi">75</span><span class="o">,</span><span class="mi">83</span><span class="o">))</span>
+<span class="n">display</span><span class="o">(</span><span class="n">dataSampleC</span><span class="o">.</span><span class="n">groupBy</span><span class="o">(</span><span class="s">"trial number"</span><span class="o">,</span>
+   <span class="s">"matching condition"</span><span class="o">,</span><span class="s">"name"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span><span class="s">"matching condition"</span><span class="o">))</span>
+   <span class="n">trial</span> <span class="n">number</span><span class="o">,</span><span class="n">matching</span> <span class="n">condition</span><span class="o">,</span><span class="n">name</span><span class="o">,</span><span class="n">count</span>
+   <span class="mi">2</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="n">co2a0000364</span><span class="o">,</span><span class="mi">64</span>
+   <span class="mi">25</span><span class="o">,</span><span class="n">S2</span> <span class="k">match</span><span class="o">,</span><span class="n">co2a0000364</span><span class="o">,</span><span class="mi">64</span>
+   <span class="mi">31</span><span class="o">,</span><span class="n">S2</span> <span class="n">nomatch</span><span class="o">,</span><span class="n">co2a0000364</span><span class="o">,</span><span class="mi">64</span>
+   <span class="mi">14</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="n">co2c0000340</span><span class="o">,</span><span class="mi">64</span>
+   <span class="mi">75</span><span class="o">,</span><span class="n">S2</span> <span class="k">match</span><span class="o">,</span><span class="n">co2c0000340</span><span class="o">,</span><span class="mi">64</span>
+   <span class="mi">83</span><span class="o">,</span><span class="n">S2</span> <span class="n">nomatch</span><span class="o">,</span><span class="n">co2c0000340</span><span class="o">,</span><span class="mi">64</span></code></pre></figure>
+
+
+</p><p>
+<p><h4>Build Graphs and Find Patterns</h4>
+</p><p>
+For each {person, trial} we will:
+<ul>
+<li>create adjacency matrix</li>
+<li>calcultate cosine similarities between vectors</li>
+<li>select pairs with cosines higher than threashold 0.9</li>
+<li>build a graph</li>
+<li>calcultate graph connected components</li>
+</ul>
+<p></p>
+Self-join the vector table:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">dataVectorC1</span><span class="k">=</span><span class="n">dataSampleC</span><span class="o">.</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"matching condition"</span><span class="o">,</span><span class="s">"subject identifier"</span><span class="o">,</span><span class="s">"name"</span><span class="o">,</span>
+   <span class="s">"sensor position"</span><span class="o">,</span><span class="s">"channel"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"condition1"</span><span class="o">,</span><span class="s">"flag1"</span><span class="o">,</span><span class="s">"name1"</span><span class="o">,</span><span class="s">"position1"</span><span class="o">,</span><span class="s">"channel1"</span><span class="o">,</span><span class="s">"vector1"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">dataVectorC2</span><span class="k">=</span><span class="n">dataVectorC1</span><span class="o">.</span>
+  <span class="n">toDF</span><span class="o">(</span><span class="s">"condition2"</span><span class="o">,</span><span class="s">"flag2"</span><span class="o">,</span><span class="s">"name2"</span><span class="o">,</span><span class="s">"position2"</span><span class="o">,</span><span class="s">"channel2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">dataVectorC12</span><span class="k">=</span><span class="n">dataVectorC1</span><span class="o">.</span>
+  <span class="n">join</span><span class="o">(</span><span class="n">dataVectorC2</span><span class="o">,</span><span class="ss">'position1=</span><span class="o">!='</span><span class="n">position2</span>  <span class="o">&amp;&amp;</span>  <span class="ss">'channel1=</span><span class="o">!='</span><span class="n">channel2</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p></p>
+Calcultate adjacency matrix:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+   <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
+   <span class="k">var</span> <span class="n">dot</span><span class="k">=</span><span class="mf">0.0</span>
+   <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span><span class="mi">0</span> <span class="n">to</span> <span class="n">vectorX</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">dot</span> <span class="o">+=</span> <span class="n">vectorX</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">*</span> <span class="n">vectorY</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
+   <span class="n">dot</span>
+<span class="o">}</span>
+<span class="k">def</span> <span class="n">cosineVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+   <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
+   <span class="n">require</span><span class="o">(</span><span class="n">vectorX</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">vectorY</span><span class="o">.</span><span class="n">size</span><span class="o">)</span>
+   <span class="k">val</span> <span class="n">dot</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+   <span class="k">val</span> <span class="n">div</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorX</span><span class="o">)</span> <span class="o">*</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorY</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+   <span class="k">if</span> <span class="o">(</span><span class="n">div</span><span class="o">==</span><span class="mi">0</span><span class="o">)</span><span class="mi">0</span>
+   <span class="k">else</span> <span class="n">dot</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="o">(</span><span class="n">div</span><span class="o">)</span>
+<span class="o">}</span>
+<span class="k">val</span> <span class="n">dataVectorCcosMatrix</span><span class="k">=</span><span class="n">dataVectorC12</span><span class="o">.</span>
+   <span class="n">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">1</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">2</span><span class="o">),</span>
+   <span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">3</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">4</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">6</span><span class="o">),</span>
+   <span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">7</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">8</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">9</span><span class="o">),</span>
+   <span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">10</span><span class="o">),</span><span class="n">cosineVector</span><span class="o">(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">5</span><span class="o">),</span>
+   <span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">11</span><span class="o">)))).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"condition1"</span><span class="o">,</span><span class="s">"flag1"</span><span class="o">,</span><span class="s">"name1"</span><span class="o">,</span><span class="s">"position1"</span><span class="o">,</span><span class="s">"channel1"</span><span class="o">,</span><span class="s">"condition2"</span><span class="o">,</span>
+   <span class="s">"flag2"</span><span class="o">,</span><span class="s">"name2"</span><span class="o">,</span><span class="s">"position2"</span><span class="o">,</span><span class="s">"channel2"</span><span class="o">,</span><span class="s">"cos12"</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p></p>
+Build a graph. Subset example: person name="co2a0000364" and condition="S2 match":
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphEdges</span><span class="k">=</span> <span class="n">dataVectorCcosMatrix</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'condition1=</span><span class="o">=='</span><span class="n">condition2</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'name1=</span><span class="o">=='</span><span class="n">name2</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos12&gt;</span><span class="mf">0.9</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'name1=</span><span class="o">==</span><span class="s">"co2a0000364"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'condition1=</span><span class="o">==</span><span class="s">"S2 match"</span><span class="o">).</span>
+   <span class="n">select</span><span class="o">(</span><span class="s">"position1"</span><span class="o">,</span><span class="s">"position2"</span><span class="o">,</span><span class="s">"condition1"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'position1&lt;'position2)</span><span class="o">.</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">distinct</span>
+<span class="k">val</span> <span class="n">graphNodes</span><span class="k">=</span> <span class="n">graphEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+   <span class="n">union</span><span class="o">(</span><span class="n">graphEdges2</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">graph</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes</span><span class="o">,</span><span class="n">graphEdges</span><span class="o">)</span></code></pre></figure>
+
+
+
+<p></p>
+Calcultate graph connected components and connected component size distribution:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphCC</span> <span class="k">=</span> <span class="n">graph</span><span class="o">.</span>
+     <span class="n">connectedComponents</span><span class="o">.</span><span class="n">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="n">graphCCcount</span><span class="k">=</span><span class="n">graphCC</span><span class="o">.</span>
+     <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span>
+     <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span></code></pre></figure>
+
+
+</p><p>
+<p><h4>Graph Visualization</h4>
+</p><p>
+For graph visualization we use Gephi tool. Gephi takes DOT graph language and allows to authomatically define node and edge colors.
+<p></p>
+Define nodes and edges colors:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dataCC</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span><span class="s">"condition"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span><span class="s">"condition"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"id"</span><span class="o">))</span>
+<span class="n">name</span><span class="o">,</span><span class="n">condition</span><span class="o">,</span><span class="n">component</span><span class="o">,</span><span class="n">id</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AF1</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AF2</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AF7</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AF8</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AFZ</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="n">F1</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="n">F2</span></code></pre></figure>
+
+
+<p></p>
+To compare patterns within the same picture, we will define colors as different colors for different connected components within each graph as well as the same color for similar connected components of different graphs:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">dataColor</span><span class="k">=</span><span class="n">dataCC</span><span class="o">.</span>
+   <span class="n">withColumn</span><span class="o">(</span><span class="s">"minW"</span><span class="o">,</span><span class="n">min</span><span class="o">(</span><span class="s">"id"</span><span class="o">).</span><span class="n">over</span><span class="o">(</span><span class="nc">Window</span><span class="o">.</span>
+     <span class="n">partitionBy</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span><span class="s">"condition"</span><span class="o">,</span><span class="s">"component"</span><span class="o">))).</span>       
+   <span class="n">withColumn</span><span class="o">(</span><span class="s">"rn"</span><span class="o">,</span><span class="n">row_number</span><span class="o">.</span><span class="n">over</span><span class="o">(</span><span class="nc">Window</span><span class="o">.</span>
+     <span class="n">partitionBy</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span><span class="s">"condition"</span><span class="o">,</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"id"</span><span class="o">))).</span>
+   <span class="n">withColumn</span><span class="o">(</span><span class="s">"color"</span><span class="o">,</span><span class="n">when</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"minW"</span><span class="o">).</span><span class="n">rlike</span><span class="o">(</span><span class="s">"AF"</span><span class="o">),</span><span class="n">lit</span><span class="o">(</span><span class="s">"darkorange"</span><span class="o">)).</span>
+   <span class="n">when</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"minW"</span><span class="o">).</span><span class="n">isin</span><span class="o">(</span><span class="s">"CP1"</span><span class="o">,</span><span class="s">"CP4"</span><span class="o">,</span><span class="s">"CZ"</span><span class="o">),</span><span class="n">lit</span><span class="o">(</span><span class="s">"steelblue1"</span><span class="o">)).</span>
+   <span class="n">when</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"minW"</span><span class="o">).</span><span class="n">isin</span><span class="o">(</span><span class="s">"CP6"</span><span class="o">),</span><span class="n">lit</span><span class="o">(</span><span class="s">"azure4"</span><span class="o">)).</span>
+     <span class="n">otherwise</span><span class="o">(</span><span class="n">lit</span><span class="o">(</span><span class="s">"forestgreen"</span><span class="o">)))</span>
+<span class="n">display</span><span class="o">(</span><span class="n">dataColor</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span><span class="s">"condition"</span><span class="o">,</span> <span class="s">"component"</span><span class="o">,</span><span class="s">"minW"</span><span class="o">,</span><span class="s">"color"</span><span class="o">).</span>
+   <span class="n">distinct</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span><span class="s">"condition"</span><span class="o">,</span><span class="s">"minW"</span><span class="o">))</span>
+<span class="n">name</span><span class="o">,</span><span class="n">condition</span><span class="o">,</span><span class="n">component</span><span class="o">,</span><span class="n">minW</span><span class="o">,</span><span class="n">color</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AF1</span><span class="o">,</span><span class="n">darkorange</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">412316860416</span><span class="o">,</span><span class="nc">CP1</span><span class="o">,</span><span class="n">steelblue1</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">51539607552</span><span class="o">,</span><span class="nc">CP2</span><span class="o">,</span><span class="n">forestgreen</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S2</span> <span class="k">match</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AF1</span><span class="o">,</span><span class="n">darkorange</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S2</span> <span class="k">match</span><span class="o">,</span><span class="mi">51539607552</span><span class="o">,</span><span class="nc">CP1</span><span class="o">,</span><span class="n">steelblue1</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S2</span> <span class="n">nomatch</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AF2</span><span class="o">,</span><span class="n">darkorange</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S2</span> <span class="n">nomatch</span><span class="o">,</span><span class="mi">51539607552</span><span class="o">,</span><span class="nc">CP4</span><span class="o">,</span><span class="n">steelblue1</span>
+<span class="n">co2a0000364</span><span class="o">,</span><span class="n">S2</span> <span class="n">nomatch</span><span class="o">,</span><span class="mi">644245094400</span><span class="o">,</span><span class="n">P1</span><span class="o">,</span><span class="n">forestgreen</span>
+<span class="n">co2c0000340</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AF1</span><span class="o">,</span><span class="n">darkorange</span>
+<span class="n">co2c0000340</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">558345748481</span><span class="o">,</span><span class="n">C5</span><span class="o">,</span><span class="n">forestgreen</span>
+<span class="n">co2c0000340</span><span class="o">,</span><span class="n">S1</span> <span class="n">obj</span><span class="o">,</span><span class="mi">51539607552</span><span class="o">,</span><span class="nc">CP1</span><span class="o">,</span><span class="n">steelblue1</span>
+<span class="n">co2c0000340</span><span class="o">,</span><span class="n">S2</span> <span class="k">match</span><span class="o">,</span><span class="mi">103079215104</span><span class="o">,</span><span class="nc">AF1</span><span class="o">,</span><span class="n">darkorange</span>
+<span class="n">co2c0000340</span><span class="o">,</span><span class="n">S2</span> <span class="k">match</span><span class="o">,</span><span class="mi">25769803776</span><span class="o">,</span><span class="n">C6</span><span class="o">,</span><span class="n">forestgreen</span>
+<span class="n">co2c0000340</span><span class="o">,</span><span class="n">S2</span> <span class="k">match</span><span class="o">,</span><span class="mi">1279900254208</span><span class="o">,</span><span class="nc">CP6</span><span class="o">,</span><span class="n">azure4</span>
+<span class="n">co2c0000340</span><span class="o">,</span><span class="n">S2</span> <span class="k">match</span><span class="o">,</span><span class="mi">51539607552</span><span class="o">,</span><span class="nc">CZ</span><span class="o">,</span><span class="n">steelblue1</span>
+<span class="n">co2c0000340</span><span class="o">,</span><span class="n">S2</span> <span class="n">nomatch</span><span class="o">,</span><span class="mi">25769803776</span><span class="o">,</span><span class="nc">AF1</span><span class="o">,</span><span class="n">darkorange</span>
+<span class="n">co2c0000340</span><span class="o">,</span><span class="n">S2</span> <span class="n">nomatch</span><span class="o">,</span><span class="mi">51539607552</span><span class="o">,</span><span class="nc">CP1</span><span class="o">,</span><span class="n">steelblue1</span></code></pre></figure>
+
+
+<p></p>
+Example: node colors for connected components of graph with name="co2a0000364" and condition="S2 match":
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dataColor</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'name=</span><span class="o">==</span><span class="s">"co2a0000364"</span><span class="o">).</span>
+   <span class="n">filter</span><span class="o">(</span><span class="ss">'condition=</span><span class="o">==</span><span class="s">"S2 nomatch"</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"color"</span><span class="o">).</span>
+   <span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"colorId"</span><span class="o">,</span><span class="s">"color"</span><span class="o">).</span>   
+   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [color="</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"];"</span><span class="o">)).</span>
+   <span class="n">toDF</span><span class="o">(</span><span class="s">"colorLine"</span><span class="o">))</span>
+<span class="n">colorLine</span>
+<span class="s">"AF7"</span> <span class="o">[</span><span class="kt">color=darkorange</span><span class="o">];</span>
+<span class="s">"AFZ"</span> <span class="o">[</span><span class="kt">color=darkorange</span><span class="o">];</span>
+<span class="s">"CP4"</span> <span class="o">[</span><span class="kt">color=steelblue1</span><span class="o">];</span>
+<span class="s">"F1"</span> <span class="o">[</span><span class="kt">color=darkorange</span><span class="o">];</span>
+<span class="s">"F2"</span> <span class="o">[</span><span class="kt">color=darkorange</span><span class="o">];</span>
+<span class="s">"P5"</span> <span class="o">[</span><span class="kt">color=forestgreen</span><span class="o">];</span>
+<span class="s">"P6"</span> <span class="o">[</span><span class="kt">color=steelblue1</span><span class="o">];</span>
+<span class="s">"P8"</span> <span class="o">[</span><span class="kt">color=steelblue1</span><span class="o">];</span></code></pre></figure>
+
+
+<p></p>
+Transform graph edges to DOT language:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\" -- \""</span>
+   <span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">+</span><span class="s">"\"];"</span><span class="o">)).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span> <span class="o">)</span>
+<span class="n">dotLine</span>
+<span class="s">"P1"</span> <span class="o">--</span> <span class="s">"POZ"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"P2"</span> <span class="o">--</span> <span class="s">"PO2"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"F1"</span> <span class="o">--</span> <span class="s">"FZ"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"O2"</span> <span class="o">--</span> <span class="s">"POZ"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"AFZ"</span> <span class="o">--</span> <span class="s">"F1"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"F1"</span> <span class="o">--</span> <span class="s">"F3"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"AF1"</span> <span class="o">--</span> <span class="s">"FZ"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"AF7"</span> <span class="o">--</span> <span class="s">"FP1"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"OZ"</span> <span class="o">--</span> <span class="s">"PO2"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span>
+<span class="s">"O2"</span> <span class="o">--</span> <span class="s">"PO1"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">S2</span> <span class="kt">match</span><span class="err">"</span><span class="o">];</span></code></pre></figure>
+
+<p></p>
+<h4>EEG Channel Patterns</h4>
+<p></p>
+All graphs show that time series
+Two stimuli non
+<p></p>
+<a href="#">
+    <img src="/img/dataSource5.jpg" alt="Post Sample Image" width="700" />
+</a>
+<p></p>
+Observations:
+<ul>
+<li>All graphs have separate patters for front and back</li>
+<li>"Single stimulus" patters are not very different between persons from Alcoholic and Control groups </li>
+<li>The biggest difference between Alcoholic and Control person patters is in trial for "two stimuli, non-matched" patterns. This corresponds with image classifier metrics: "two stimuli, non-matched" trial has the highest accuracy in classifying alcoholic verses control group behaviors.</li>
+<li>Control group person's patters for both "two stimuli" trials are much tighter connected then for person from Alcoholic group. </li>
+</ul>
+<p></p>
+<p></p>
+Here is another view: pictures of EEG channel time series for "two stimuli, non-matched" patterns for the same persons that we analyzed through graph mining. It presents images around 'Z' lines. This images show more details on EEG channel time series, not only the fact that pairs of vectors have high cosine similarities.
+<p></p>
+<a href="#">
+    <img src="/img/dataSource6.jpg" alt="Post Sample Image" width="653" />
+</a>
+<p>
+
+<p><h3>AI, Graphs and Neuroscience </h3>
+<p></p>
+
+<p></p>
+
+Why Artificial Intelligence is behind of human brain? Stanislas Dehaene, psychologist and cognitive neuroscientist, in his book
+<i><a href="https://www.amazon.com/How-We-Learn-Brains-Machine/dp/0525559884"> "How We Learn: Why Brains Learn Better Than Any Machine...for Now"</a></i> argues that deep learning algorithms mimic only a small part of our brain’s functioning, the first two or three hundred milliseconds during which our brain operates in an unconscious manner. Only in the subsequent stages, which are much slower, more conscious, and more reflective, does our brain manage to deploy all its abilities of reasoning, inference, and flexibility—features that today’s machines are still far from matching.
+<p></p>
+<p></p>
+<p><h4>Graph Brain Theory</h4>
+<p></p>
+In this post we indicated how graph mining methods can uncover hidden patters. Like human brains, graphs can connect the dots, perform cognitive inference, empower machines to detect hidden patterns, and most importantly, derive insights from the vast amount of heterogeneous data and play significant role in studying the human brain network - connectome.
+
+<p></p>
+More important, graph technology conforms with Konstantin Anokhin's Hypernetwork Brain Theory (HBT):
+<i><a href="https://eagle.sbs.arizona.edu/sc/report_poster_detail.php?abs=3433"> "Cognitome: Neural Hypernetworks and Percolation Hypothesis of Consciousness" </a></i>.
+This theory suggests that evolution, development and learning shape neural networks (connectome)
+into a higher-order structures - cognitive neural hypernetworks (cognitome).
+<p></p>
+Each brain at its maximal causal power is cognitome - a neural hypernetwork with emergent cognitive properties. Vertices of cognitome - GOgnitive Groups (COGs) - are subsets of elements from the underlying neuronal network that are associated by a common experience. Edges between COGs - Links Of Cogs (LOCs) - represent units of causal knowledge of a cognitive agent.
+HBT describes various mental processes as different forms of traffic in this hypernetwork.
+<p></p>
+
+<p></p>
+<p></p>
+<p><h4>Graph Tecnology Trends</h4>
+<p></p>
+<p></p>  
+Two trends of practical graph applications are following the brain - graph relationships: Property Graphs and Knowledge Graphs. Technically property graphs and knowledge graphs can be implemented by analogous techniques, conceptually these trends are quite different. Property graphs usualy considered from graph theory point of view
+representing networks of similar nodes like what we demonstrated in this post. Communitied within these graphs can be seen as COGs.
+<p></p>
+Knowledge graphs are like machine readable "grandmother cells": type "Eiffel Tower" and in Google Knowledge Graph you will see pictures, map, and text about Eiffel Tower as well as links to Paris, Louvre, and so on. If you hear or read the words "Eiffel Tower" you'll imaging it's pictures, think about Paris, and so on. Your COGs and LOCs, your thinking movement will be specific to your experience and depend on many things around you.
+
+
+<p></p>
+<p></p>
+<p><h4>Graphs, AI and Neuroscience</h4>
+<p></p>
+
+Graph trends that are following the brain - graph relationships and act as cognitive inference, are based on traditional programming and far from using deep learning techniques. The reasons why graphs are not in AI yet is well described in Michael Bronstein's article   
+<i><a href="https://towardsdatascience.com/do-we-need-deep-graph-neural-networks-be62d3ec5c59"> "Do we need deep graph neural networks?"</a></i>
+
+</p><p>
+In addition to general graph theory reasons, knowledge graphs are usualy built on conservative Semantic Web style, with SPARQL and OWL languages. This explains why knowledge graphs are only considered as complimentary tools for Artificial Intelligence: they are used either for data integration or for Explainable AI. Even in EU-funded Human Brain Project knowledge graph is only used as a metadata management system built for EBRAINS:
+<i><a href="https://kg.ebrains.eu"> "EBRAINS Knowledge Graph"</a></i>
+
+<p></p>
+
+
+We hope that in the future, when deep learning techniques on graph technology will evolve, graphs will support AI ability for inference and reasoning.
+
+<p><h3>Next Post - EEG analysis</h3>
+In the next several posts we will continue building bridges between AI, graphs and neuroscience.</p>
+</p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2020/02/02/knowledgeGraphIntegration/" data-toggle="tooltip" data-placement="top" title="Knowledge Graph for Data Integration">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2020</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
