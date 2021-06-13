@@ -10,6 +10,7 @@ header-img: "img/page1f.jpg"
 
 Outstanding success of Convolutional Neural Network image classification in the last few years influenced application of this technique to extensive variety of objects.
 
+
 In particularly, deep learning techniques became very powerful after evolutionary model AlexNet was created in 2012 to improve the results of ImageNet challenge. Since the introduction of large-scale visual datasets like ImageNet, most success in computer vision has been primarily driven by supervised learning.
 </p><p>
 CNN image classification methods are getting high accuracies but being based on supervised machine learning, they require labeling of huge volumes of data. One of the solution of this challenge is transfer learning. Fine-tuning a network with transfer learning usually works much faster and has higher accuracy than training CNN image classification models from scratch.
