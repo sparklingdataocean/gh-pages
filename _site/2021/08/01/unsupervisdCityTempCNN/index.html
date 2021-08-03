@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Unsupervised Deep Learning for Climate Data Analysis - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2021/08/01/unsupervisdCityTempCNN/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/pagePic5.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Unsupervised Deep Learning for Climate Data Analysis</h1>
+                    
+                    <h2 class="subheading">How to find climate data anomalies via unsupervised image classifier methods</h2>
+                    
+                    <span class="meta">Posted by Melenar on August 1, 2021</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Unsupervised CNN Deep Learning Classification</h3>
+
+
+</p>
+<p>
+Outstanding success of Convolutional Neural Network image classification in the last few years influenced application of this technique to extensive variety of objects. CNN image classification methods are getting high accuracies but they are based on supervised machine learning, require labeling of input data and do not help to understand unknown data.
+</p>
+<p>
+In this post we apply unsupervised machine learning model that categorizes entity pairs to similar pairs and different pairs classes. This is done by transforming pairs of entities to vectors, then vectors to images and classifying images using CNN transfer learning classification.
+</p>
+<p>
+
+</p>
+<p>
+
+
+</p>
+<p>
+Previously we used this technique for Natural Language Processing in our post - <i><a href="
+http://sparklingdataocean.com/2019/06/01/word2vec2CNN/">"Free Associations -
+Find Unexpected Word Pairs via Convolutional Neural Network"</a></i> to classify word pairs by word similarities. Based on this model we identified word pairs that are unexpected to be next to each other in documents or data streams.
+
+Applying this model to NLP we demonstrated that it works well for classification of entity pairs with one-way relationships. In this post we will show that this model in not reliable to entity pairs with two-way relationships.
+
+To demonstrate this we will use city temperature history and will compare temperatures between city pairs.
+
+</p>
+<p>
+<p><h3>Methods</h3>
+
+<p>
+Steps that we used for data processing, model training and interpreting the results:
+</p>
+<ul>
+<li>Transformed raw data to embedding vectors</li>
+<li>Created pairs of mirror vectors</li>
+<li>Transformed mirror vectors to images for CNN image classification</li>
+<li>Trained CNN image classification model</li>
+<li>Ran mirror vector images through the CNN classification model and analyzed the results</li>
+</ul>
+<p></p>
+
+</p><p>
+<p><h4>Transform Time Series Data to Mirror Vectors</h4>
+</p><p>
+As the first step of time series data processing we transformed data to embedded vectors that was used as basis for image classification.
+</p><p>
+Then we generated training data on vector pairs. Second vector in each pair was reversed and vecors were concatenated. We called these concatenated vectors 'mirror vecors'.
+
+
+For ‘Different’ class training data we combined pairs of vectors of different entities and for the 'Same' class training data we combined pairs of vectors of the same entity.
+
+
+
+
+</p><p>
+<p><h4>Transform Vectors to Images</h4>
+</p><p>
+As a method of vector to image translation we used Gramian Angular Field (GAF) - a polar coordinate transformation based techniques. We learned this technique in fast.ai
+<i><a href="https://course.fast.ai"> 'Practical Deep Learning for Coders'</a></i>
+class and fast.ai forum   
+<i><a href="https://forums.fast.ai/t/time-series-sequential-data-study-group/29686">'Time series/ sequential data'</a></i> study group.
+This method is well described by Ignacio Oguiza in Fast.ai forum
+<i><a href="https://forums.fast.ai/t/share-your-work-here/27676/367"> 'Time series classification: General Transfer Learning with Convolutional Neural Networks'</a></i>.
+</p><p>
+To describe vector to GAF image translation Ignacio Oguiza referenced to paper <i><a href="https://aaai.org/ocs/index.php/WS/AAAIW15/paper/viewFile/10179/10251">Encoding Time Series as Images for Visual Inspection and Classification Using Tiled Convolutional Neural Networks</a></i>.
+
+</p><p>
+We employed this technique for Natural Language Processing in our two previous posts - <i><a href="
+http://sparklingdataocean.com/2019/06/01/word2vec2CNN/">"Free Associations -
+Find Unexpected Word Pairs via Convolutional Neural Network"</a></i>  and
+<i><a href="
+http://sparklingdataocean.com/2019/03/16/word2vec2graph2CNN/">"Word2Vec2Graph to Images to Deep Learning."</a></i>
+
+</p><p>
+<p><h4>Training of Unsupervised Vector Classification Model</h4>
+</p><p>
+
+For this study we used fast.ai CNN transfer learning image classification. To deal with comparatively small set of training data, instead of training the model from scratch, we followed ResNet-50 transfer learning: loaded the results of model trained on images from the ImageNet database and fine tuned it with data of interest. Python code for transforming vectors to GAF images and fine tuning ResNet-50 is described in fast.ai forum.
+
+</p><p>
+Python code for transforming vectors to GAF images and fine tuning ResNet-50 is described in Ignacio Oguiza code in his GitHub notebook
+<i><a href="https://gist.github.com/oguiza/c9c373aec07b96047d1ba484f23b7b47"> Time series - Olive oil country</a></i>.
+<p></p>
+</p><p>
+</p>
+
+
+<p>
+<h3>Data Preparation for Classification</h3>
+<p></p>
+
+<p><h4>Raw Data</h4>
+
+As data Source we will use climate data from Kaggle data sets:
+<i><a href="
+https://www.kaggle.com/hansukyang/temperature-history-of-1000-cities-1980-to-2020">"Temperature History of 1000 cities 1980 to 2020"</a></i> - daily temperature for 1980 to 2020 years from 1000 most populous cities in the world.
+
+
+In our previous post <i><a href="
+http://127.0.0.1:4000/2021/04/04/cityTempCNN/">"CNN Image Classification for Climate Data"</a></i> we described the process of raw data transformation to {city, year} time series:
+<p></p>
+<ul>
+<li>Metadata columns: city, latitude, longitude, country, zone, year</li>
+<li>365 columns with average daily temperatures</li>
+</ul>
+<p></p>
+
+<p></p>
+<a href="#">
+    <img src="/img/scr1b.jpg" alt="Post Sample Image" width="800" />
+</a>
+<p></p>
+<p><h4>Distances Between City Pairs</h4>
+
+To analyze results of vector classification we will look for different pairs of vectors from geographically nearby cities and similar pairs for geographically far away cities. First, we will get metadata into cityMetadata table:
+<p></p>
+<a href="#">
+    <img src="/img/scr3a.jpg" alt="Post Sample Image" width="322" />
+</a>
+<p></p>
+Function to calculate the distance in kilometers by geographic coordinates:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">atan2</span><span class="p">,</span> <span class="n">radians</span>
+<span class="k">def</span> <span class="nf">dist</span><span class="p">(</span><span class="n">lat1</span><span class="p">,</span><span class="n">lon1</span><span class="p">,</span><span class="n">lat2</span><span class="p">,</span><span class="n">lon2</span><span class="p">):</span>
+  <span class="n">rlat1</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lat1</span><span class="p">))</span>
+  <span class="n">rlon1</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lon1</span><span class="p">))</span>
+  <span class="n">rlat2</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lat2</span><span class="p">))</span>
+  <span class="n">rlon2</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lon2</span><span class="p">))</span>
+  <span class="n">dlon</span> <span class="o">=</span> <span class="n">rlon2</span> <span class="o">-</span> <span class="n">rlon1</span>
+  <span class="n">dlat</span> <span class="o">=</span> <span class="n">rlat2</span> <span class="o">-</span> <span class="n">rlat1</span>
+  <span class="n">a</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">dlat</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">cos</span><span class="p">(</span><span class="n">rlat1</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">rlat2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">dlon</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">atan2</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a</span><span class="p">))</span>
+  <span class="n">R</span><span class="o">=</span><span class="mf">6371.0</span>
+  <span class="k">return</span> <span class="n">R</span> <span class="o">*</span> <span class="n">c</span></code></pre></figure>
+
+<p></p>
+
+Distance between two cities by city metadata and distance fuction:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">cityDist</span><span class="p">(</span><span class="n">city1</span><span class="p">,</span><span class="n">country1</span><span class="p">,</span><span class="n">city2</span><span class="p">,</span><span class="n">country2</span><span class="p">):</span>
+  <span class="n">lat1</span><span class="o">=</span><span class="n">cityMetadata</span><span class="p">[(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span><span class="o">==</span><span class="n">city1</span><span class="p">)</span>
+    <span class="o">&amp;</span> <span class="p">(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span><span class="o">==</span><span class="n">country1</span><span class="p">)][</span><span class="s">'lat'</span><span class="p">]</span>
+  <span class="n">lat2</span><span class="o">=</span><span class="n">cityMetadata</span><span class="p">[(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span><span class="o">==</span><span class="n">city2</span><span class="p">)</span>
+    <span class="o">&amp;</span> <span class="p">(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span><span class="o">==</span><span class="n">country2</span><span class="p">)][</span><span class="s">'lat'</span><span class="p">]</span>
+  <span class="n">lon1</span><span class="o">=</span><span class="n">cityMetadata</span><span class="p">[(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span><span class="o">==</span><span class="n">city1</span><span class="p">)</span>
+    <span class="o">&amp;</span> <span class="p">(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span><span class="o">==</span><span class="n">country1</span><span class="p">)][</span><span class="s">'lng'</span><span class="p">]</span>
+  <span class="n">lon2</span><span class="o">=</span><span class="n">cityMetadata</span><span class="p">[(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span><span class="o">==</span><span class="n">city2</span><span class="p">)</span>
+    <span class="o">&amp;</span> <span class="p">(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span><span class="o">==</span><span class="n">country2</span><span class="p">)][</span><span class="s">'lng'</span><span class="p">]</span>
+  <span class="k">return</span> <span class="n">dist</span><span class="p">(</span><span class="n">lat1</span><span class="p">,</span><span class="n">lon1</span><span class="p">,</span><span class="n">lat2</span><span class="p">,</span><span class="n">lon2</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+Examples of city distances in km:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cityDist</span><span class="p">(</span><span class="s">'Tokyo'</span><span class="p">,</span><span class="s">'Japan'</span><span class="p">,</span><span class="s">'Mexico City'</span><span class="p">,</span><span class="s">'Mexico'</span><span class="p">)</span>
+<span class="mf">11301.1797</span>
+
+<span class="n">cityDist</span><span class="p">(</span><span class="s">'Paris'</span><span class="p">,</span><span class="s">'France'</span><span class="p">,</span><span class="s">'London'</span><span class="p">,</span><span class="s">'United Kingdom'</span><span class="p">)</span>
+<span class="mf">340.7889</span></code></pre></figure>
+
+<p></p>
+
+<p><h4>Prepare Vector Pairs</h4>
+For training data we will create a set 'same' class mirror vecors and 'different' class mirror vectors:
+<ul>
+<li>For the 'same' class we will combine vectors with their mirrors</li>
+<li>For the 'different' class we will combine random pairs of vectors with temperatures of different years and different cities.</li>
+<li>In each pair the second vector will be reversed.</li>
+</ul>
+
+<p><h5>'Same' Class: Coalesce Vectors with their Mirrors</h5>
+To generate training data images for the 'same' class we will combine vecors with reversed themselves. For each vector we will create a label 'city~year'. For vector pairs we will combine these labels to 'city~year~city~year' labels and will use these labels as file names.
+
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dataSet1</span> <span class="o">=</span> <span class="n">dataSet</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">dataSet2</span><span class="o">=</span> <span class="n">dataSet1</span><span class="p">[</span><span class="n">dataSet1</span><span class="o">.</span><span class="n">columns</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">dataSet1</span><span class="p">[</span><span class="s">'fileName1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataSet1</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span> <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span> <span class="n">dataSet1</span><span class="p">[</span><span class="s">'year'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">dataSet1</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'city_ascii'</span><span class="p">,</span> <span class="s">'lat'</span><span class="p">,</span> <span class="s">'lng'</span><span class="p">,</span><span class="s">'country'</span><span class="p">,</span><span class="s">'zone'</span><span class="p">,</span><span class="s">'year'</span><span class="p">],</span>
+  <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">dataSet2</span><span class="p">[</span><span class="s">'fileName2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataSet2</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span> <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span> <span class="n">dataSet2</span><span class="p">[</span><span class="s">'year'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">dataSet2</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'city_ascii'</span><span class="p">,</span> <span class="s">'lat'</span><span class="p">,</span> <span class="s">'lng'</span><span class="p">,</span><span class="s">'country'</span><span class="p">,</span><span class="s">'zone'</span><span class="p">,</span><span class="s">'year'</span><span class="p">],</span>
+  <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<ul>
+<li>Concatenate vectors with reversed themselves</li>
+<li>Concatenate 'city~year' labels to 'city~year~city~year' labels</li>
+<li>Mark image class type as 'same'.</li>
+</ul>
+
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dataSetSameValues</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dataSet1</span><span class="p">,</span> <span class="n">dataSet2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dataSetSameValues</span><span class="p">[</span><span class="s">'fileName'</span><span class="p">]</span> <span class="o">=</span>
+  <span class="n">dataSetSameValues</span><span class="p">[</span><span class="s">'fileName1'</span><span class="p">]</span> <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span> <span class="n">dataSetSameValues</span><span class="p">[</span><span class="s">'fileName2'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">dataSetSameValues</span><span class="p">[</span><span class="s">'type'</span><span class="p">]</span> <span class="o">=</span><span class="s">'same'</span>
+<span class="n">dataSetSameValues</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'fileName1'</span><span class="p">,</span><span class="s">'fileName2'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p><h5>'Different' Class: Coalesce Vectors with Reversed Other Vectors</h5>
+To generate training data images for the 'different' class we will do the following steps:
+
+<ul>
+<li>To randomly select different pairs of vectors (dataSet1) we will shuffle vectors and reversed vectors (dataSet2)</li>
+<li>For first vectors we will create a label 'city1~year1' and for second (reversed) vectors - label 'city2~year2'</li>
+<li>Concatenate vector pairs</li>
+<li>Concatenate 'city1~year1' and 'city2~year2' labels to 'city1~year1~city2~year2' labels</li>
+<li>Mark image class type as 'different'.</li>
+</ul>
+
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">shuffle</span>
+<span class="n">dataSet11</span><span class="o">=</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataSet1</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">dataSet12</span><span class="o">=</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataSet2</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">dataSetDiffValues</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dataSet11</span><span class="p">,</span> <span class="n">dataSet12</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">dataSetDiffValues</span><span class="p">[</span><span class="s">'fileName'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataSetDiffValues</span><span class="p">[</span><span class="s">'fileName1'</span><span class="p">]</span> <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span>
+  <span class="n">dataSetDiffValues</span><span class="p">[</span><span class="s">'fileName2'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">dataSetDiffValues</span><span class="p">[</span><span class="s">'type'</span><span class="p">]</span> <span class="o">=</span><span class="s">'diff'</span>
+<span class="n">dataSetDiffValues</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'fileName1'</span><span class="p">,</span><span class="s">'fileName2'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+
+<p><h4>Transform Vectors to Images</h4>
+<p></p>
+Then we will transform mirror vectors to pictures - see more code details in our previous post.
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">pyts.image</span> <span class="kn">import</span> <span class="n">GramianAngularField</span> <span class="k">as</span> <span class="n">GASF</span>
+<span class="n">image_size</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">gasf</span> <span class="o">=</span> <span class="n">GASF</span><span class="p">(</span><span class="n">image_size</span><span class="p">)</span>
+<span class="n">fXcity_gasf</span> <span class="o">=</span> <span class="n">gasf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">fXcity</span><span class="p">)</span>
+<span class="n">dplt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span></code></pre></figure>
+
+
+
+<p></p>
+'Same' class example: daily weather in Auckland, New Zealand in 1983.
+<p></p>
+<a href="#">
+    <img src="/img/scr3g.jpg" alt="Post Sample Image" width="678" />
+</a>
+<p></p>
+<p></p>
+'Different' class example: daily weather in Quang Ha, Vietnam in 2007 and Lima, Peru in 2013.
+<p></p>
+<p></p>
+<a href="#">
+    <img src="/img/scr3f.jpg" alt="Post Sample Image" width="678" />
+</a>
+<p></p>
+<p></p>
+
+For CNN training we will store GAF pictures to 'same' and 'different' subdirectories. Image file names will be defined as labels 'city1~year1~city2~year2'. These file names we will use later for data analysis based on the model results.
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">imgPath</span><span class="o">=</span><span class="s">'/content/drive/My Drive/city2'</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">"ignore"</span><span class="p">)</span>
+<span class="n">IMG_PATH</span> <span class="o">=</span> <span class="n">imgPath</span> <span class="o">+</span><span class="s">'/'</span><span class="o">+</span> <span class="s">"img4"</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">IMG_PATH</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">IMG_PATH</span><span class="p">)</span>
+<span class="n">numRows</span><span class="o">=</span><span class="n">metadataSet</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRows</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">IMG_PATH</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">IMG_PATH</span><span class="p">)</span>  
+    <span class="n">idxPath</span> <span class="o">=</span> <span class="n">IMG_PATH</span> <span class="o">+</span><span class="s">'/'</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'type'</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">idxPath</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">idxPath</span><span class="p">)</span>
+    <span class="n">imgId</span> <span class="o">=</span> <span class="p">(</span><span class="n">IMG_PATH</span> <span class="o">+</span><span class="s">'/'</span> <span class="o">+</span>  <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'type'</span><span class="p">][</span><span class="n">i</span><span class="p">]))</span> <span class="o">+</span><span class="s">'/'</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'fileName'</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">fXpair_gasf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'rainbow'</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s">'lower'</span><span class="p">)</span>  
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">imgId</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></code></pre></figure>
+
+<p></p>
+
+<p><h3>Image Classification Model</h3>
+<p></p>
+
+<p><h4>Training Data</h4>
+<p></p>
+<p></p>
+Prepare data for training and show some 'same' and 'different' class examples.
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">PATH_IMG</span><span class="o">=</span><span class="n">IMG_PATH</span>
+<span class="n">tfms</span> <span class="o">=</span> <span class="n">get_transforms</span><span class="p">(</span><span class="n">do_flip</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">max_rotate</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">41</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ImageDataBunch</span><span class="o">.</span><span class="n">from_folder</span><span class="p">(</span><span class="n">PATH_IMG</span><span class="p">,</span>  <span class="n">train</span><span class="o">=</span><span class="s">"."</span><span class="p">,</span> <span class="n">valid_pct</span><span class="o">=</span><span class="mf">0.20</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">show_batch</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<p></p>
+Examples: 'same' class:
+<a href="#">
+    <img src="/img/scr3e.jpg" alt="Post Sample Image" width="374" />
+</a>
+<p></p>
+<p></p>
+Examples: 'different' class:
+<a href="#">
+    <img src="/img/scr3d.jpg" alt="Post Sample Image" width="374" />
+</a>
+<p></p>
+
+
+<p></p>
+<p><h4>Train the Model</h4>
+<p></p>
+Time series classification model training was done on fast.ai transfer learning approach:
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">fastai.text</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">fastai.vision</span> <span class="kn">import</span> <span class="n">learner</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">cnn_learner</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet34</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">error_rate</span><span class="p">)</span>
+<span class="n">learn</span><span class="o">.</span><span class="n">fit_one_cycle</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">learn</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">'stage-1a'</span><span class="p">)</span>
+<span class="n">interp</span> <span class="o">=</span> <span class="n">ClassificationInterpretation</span><span class="o">.</span><span class="n">from_learner</span><span class="p">(</span><span class="n">learn</span><span class="p">)</span>
+<span class="n">losses</span><span class="p">,</span><span class="n">idxs</span> <span class="o">=</span> <span class="n">interp</span><span class="o">.</span><span class="n">top_losses</span><span class="p">()</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">valid_ds</span><span class="p">)</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span>
+<span class="n">interp</span><span class="o">.</span><span class="n">plot_top_losses</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span></code></pre></figure>
+
+<p></p>
+Accuracy was about 96.5%:
+
+<a href="#">
+    <img src="/img/scr3j.jpg" alt="Post Sample Image" width="311" />
+</a>
+<p></p>
+<p></p>
+
+<p><h3>Pairs with Two-way Relationships</h3>
+<p></p>
+
+Transforming mirror vectors to GAF images technique is based on polar coordinates and therefore it might generate not similar results for turn around pairs. We will test this hypothesis based on the following data:
+
+<ul>
+<li>We will select 66 cities from contitental West Europe and for each city we will take daily temperature data for the year 1992.</li>
+<li>For all city pairs we will create mirror vectors in both directions, i.e. Paris - Berlin and Berlin - Paris.</li>
+<li>We will transform mirror vectors to GAF images.</li>
+<li>Then we will run these images through the model and classify them as 'Similar' or 'Different'.</li>
+<li>Finally, we will compare model results for reversed city pairs.</li>
+</ul>
+<p></p>
+
+<p></p>
+<p><h4>Select Daily Temperature Data for Year 1992 for West European Cities.</h4>
+<p></p>
+
+Get 1992 year daily temperature data for cities from the following country list:
+<p></p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">countryList</span><span class="o">=</span><span class="p">[</span><span class="s">'Belgium'</span><span class="p">,</span> <span class="s">'Germany'</span><span class="p">,</span> <span class="s">'France'</span><span class="p">,</span><span class="s">'Austria'</span><span class="p">,</span><span class="s">'Netherlands'</span><span class="p">,</span><span class="s">'Switzerland'</span><span class="p">,</span>
+              <span class="s">'Spain'</span><span class="p">,</span><span class="s">'Italy'</span><span class="p">,</span><span class="s">'Denmark'</span><span class="p">,</span><span class="s">'Finland'</span><span class="p">,</span><span class="s">'Greece'</span><span class="p">,</span><span class="s">'Italy'</span><span class="p">,</span><span class="s">'Monaco'</span><span class="p">,</span>
+              <span class="s">'Netherlands'</span><span class="p">,</span><span class="s">'Norway'</span><span class="p">,</span><span class="s">'Portugal'</span><span class="p">,</span><span class="s">'Sweden'</span><span class="p">,</span><span class="s">'Switzerland'</span><span class="p">]</span></code></pre></figure>
+
+
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dataSetEurope</span> <span class="o">=</span> <span class="n">dataSet</span><span class="p">[(</span><span class="n">dataSet</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">countryList</span><span class="p">))]</span>
+<span class="n">dataSet1992</span> <span class="o">=</span> <span class="n">dataSetEurope</span><span class="p">[(</span><span class="n">dataSetEurope</span><span class="p">[</span><span class="s">'year'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s">'1992'</span><span class="p">]))]</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<p><h4>Combine Pairs of Vectors</h4>
+<p></p>
+Get set of vectors (dataSet21) and transform to reversed vectors (dataSet22).
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dataSet21</span> <span class="o">=</span> <span class="n">dataSet1992</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">dataSet22</span> <span class="o">=</span> <span class="n">dataSet11</span><span class="p">[</span><span class="n">dataSet21</span><span class="o">.</span><span class="n">columns</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+Attach metadata labels as 'city'~'country'~'year'. To not use the same column names when merging vectors, change dataSet22 column names by adding 'b' prefix.
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dataSet21</span><span class="p">[</span><span class="s">'fileName1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataSet21</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span> <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span> <span class="n">dataSet21</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span>
+  <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span> <span class="n">dataSet21</span><span class="p">[</span><span class="s">'year'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">dataSet21</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'city_ascii'</span><span class="p">,</span> <span class="s">'lat'</span><span class="p">,</span> <span class="s">'lng'</span><span class="p">,</span><span class="s">'country'</span><span class="p">,</span><span class="s">'datetime'</span> <span class="p">,</span><span class="s">'capital'</span><span class="p">,</span><span class="s">'zone'</span><span class="p">,</span><span class="s">'year'</span><span class="p">],</span>
+  <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">dataSet22</span><span class="p">[</span><span class="s">'fileName2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataSet22</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span> <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span> <span class="n">dataSet22</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span>
+  <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span> <span class="n">dataSet22</span><span class="p">[</span><span class="s">'year'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">dataSet22</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'city_ascii'</span><span class="p">,</span> <span class="s">'lat'</span><span class="p">,</span> <span class="s">'lng'</span><span class="p">,</span><span class="s">'country'</span><span class="p">,</span><span class="s">'datetime'</span><span class="p">,</span> <span class="s">'capital'</span><span class="p">,</span><span class="s">'zone'</span><span class="p">,</span><span class="s">'year'</span><span class="p">],</span>
+  <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">dataSet23</span><span class="o">=</span><span class="n">dataSet22</span><span class="o">.</span><span class="n">add_prefix</span><span class="p">(</span><span class="s">'b'</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+Merge data frames by keys, exclude self-joined vectors and merge label columns to 'city1'~'country1'~'year1'~'city2'~'country2'~'year2':
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dataSet21</span><span class="p">[</span><span class="s">'key'</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">dataSet23</span><span class="p">[</span><span class="s">'key'</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">pairDataSet</span> <span class="o">=</span> <span class="n">dataSet21</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">dataSet23</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="s">'key'</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'outer'</span><span class="p">)</span>
+<span class="n">pairDataSet2</span> <span class="o">=</span> <span class="n">pairDataSet</span><span class="p">[</span><span class="n">pairDataSet</span><span class="p">[</span><span class="s">'fileName1'</span><span class="p">]</span><span class="o">!=</span><span class="n">pairDataSet</span><span class="p">[</span><span class="s">'bfileName2'</span><span class="p">]]</span>
+<span class="n">pairDataSet2</span><span class="p">[</span><span class="s">'fileName'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pairDataSet2</span><span class="p">[</span><span class="s">'fileName1'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+  <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span> <span class="n">pairDataSet2</span><span class="p">[</span><span class="s">'bfileName2'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">pairDataSet2</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'fileName1'</span><span class="p">,</span><span class="s">'bfileName2'</span><span class="p">,</span><span class="s">'key'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+<p><h4>Transform Vectors to GAF Images</h4>
+<p></p>
+Split data set to vectors and labels:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">mirrorDiffColumns</span> <span class="o">=</span> <span class="n">pairDataSet2</span><span class="p">[[</span><span class="s">'fileName'</span><span class="p">]]</span>
+<span class="n">dataSetPairValues</span> <span class="o">=</span> <span class="n">pairDataSet2</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">pairDataSet3</span><span class="o">.</span><span class="n">columns</span><span class="p">[[</span><span class="mi">730</span><span class="p">]],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+Transform vectors to images and save images using label (fileName) as image name:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">fXpair</span><span class="o">=</span><span class="n">dataSetPairValues</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">image_size</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">gasf</span> <span class="o">=</span> <span class="n">GASF</span><span class="p">(</span><span class="n">image_size</span><span class="p">)</span>
+<span class="n">fXpair_gasf</span> <span class="o">=</span> <span class="n">gasf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">fXpair</span><span class="p">)</span>
+<span class="n">IMG_PATH</span> <span class="o">=</span> <span class="s">'/content/drive/My Drive/city2/img9'</span>
+<span class="n">numRows</span> <span class="o">=</span> <span class="n">mirrorDiffColumns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRows</span><span class="p">):</span>
+   <span class="n">imgId</span> <span class="o">=</span> <span class="p">(</span><span class="n">IMG_PATH</span> <span class="o">+</span><span class="s">'/'</span> <span class="o">+</span>  <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">'fileName'</span><span class="p">][</span><span class="n">i</span><span class="p">]))</span>
+   <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">fXpair_gasf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'rainbow'</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s">'lower'</span><span class="p">)</span>  
+   <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">imgId</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+   <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+<p><h4>Vector Classification Based on the Model</h4>
+<p></p>
+To predict vector similarities based on the trained model, we will use fast.ai function 'learn.predict':
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">PATH_IMG</span><span class="o">=</span><span class="s">'/content/drive/My Drive/city2/img4'</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ImageDataBunch</span><span class="o">.</span><span class="n">from_folder</span><span class="p">(</span><span class="n">PATH_IMG</span><span class="p">,</span>  <span class="n">train</span><span class="o">=</span><span class="s">"."</span><span class="p">,</span> <span class="n">valid_pct</span><span class="o">=</span><span class="mf">0.23</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">cnn_learner</span><span class="p">(</span><span class="n">data2</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet34</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">error_rate</span><span class="p">)</span>
+<span class="n">learn</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">'stage-1a'</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+Here are two examples of city pairs. The first number shows 'different' probability and second number - 'same' probability:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">pred_class</span><span class="p">,</span><span class="n">pred_idx</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">learn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">open_image</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span>
+  <span class="s">'/content/drive/MyDrive/city2/img9/Marseille~France~1992~Paris~France~1992.png'</span><span class="p">)))</span>
+<span class="n">pred_class</span><span class="p">,</span><span class="n">pred_idx</span><span class="p">,</span><span class="n">out</span>
+<span class="p">(</span><span class="n">Category</span> <span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">tensor</span><span class="p">([</span><span class="mf">0.8589</span><span class="p">,</span> <span class="mf">0.1411</span><span class="p">]))</span>
+
+<span class="n">pred_class</span><span class="p">,</span><span class="n">pred_idx</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">learn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">open_image</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span>
+  <span class="s">'/content/drive/MyDrive/city2/img9/Turin~Italy~1992~Monaco~Monaco~1992.png'</span><span class="p">)))</span>
+<span class="n">pred_class</span><span class="p">,</span><span class="n">pred_idx</span><span class="p">,</span><span class="n">out</span>
+<span class="p">(</span><span class="n">Category</span> <span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">tensor</span><span class="p">([</span><span class="mf">0.5276</span><span class="p">,</span> <span class="mf">0.4724</span><span class="p">]))</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+The following example shows that temperature similarities depend on city order. In the first result vectors in Naples and Porto are 'same' but vectors between Porto and Naples are 'different':
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">pred_class</span><span class="p">,</span><span class="n">pred_idx</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">learn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">open_image</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span>
+  <span class="s">'/content/drive/MyDrive/city2/img9/Naples~Italy~1992~Porto~Portugal~1992.png'</span><span class="p">)))</span>
+<span class="n">pred_class</span><span class="p">,</span><span class="n">pred_idx</span><span class="p">,</span><span class="n">out</span>
+<span class="p">(</span><span class="n">Category</span> <span class="n">tensor</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">tensor</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">tensor</span><span class="p">([</span><span class="mf">0.3950</span><span class="p">,</span> <span class="mf">0.6050</span><span class="p">]))</span>
+
+<span class="n">pred_class</span><span class="p">,</span><span class="n">pred_idx</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">learn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">open_image</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span>
+  <span class="s">'/content/drive/MyDrive/city2/img9/Porto~Portugal~1992~Naples~Italy~1992.png'</span><span class="p">)))</span>
+<span class="n">pred_class</span><span class="p">,</span><span class="n">pred_idx</span><span class="p">,</span><span class="n">out</span>
+<span class="p">(</span><span class="n">Category</span> <span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">tensor</span><span class="p">([</span><span class="mf">0.6303</span><span class="p">,</span> <span class="mf">0.3697</span><span class="p">]))</span></code></pre></figure>
+
+<p></p>
+
+To calculate how many inconsistent pairs we have, first, we will run all images through the model:
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">pathPair</span><span class="o">=</span><span class="s">'/content/drive/MyDrive/city2/img9/'</span>
+<span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">pathPair</span><span class="p">)</span>
+<span class="n">resEI1992</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+  <span class="n">pred_class</span><span class="p">,</span><span class="n">pred_idx</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">learn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">open_image</span><span class="p">(</span><span class="n">pathPair</span> <span class="o">+</span>  <span class="s">'/'</span> <span class="o">+</span><span class="nb">file</span><span class="p">))</span>
+  <span class="n">resEI1992</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">file</span><span class="p">,</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
+<span class="n">dfRes1992EIdata</span> <span class="o">=</span> <span class="n">DataFrame</span> <span class="p">(</span><span class="n">resEI1992</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'cityPair'</span><span class="p">,</span><span class="s">'probDiff'</span><span class="p">,</span><span class="s">'probSame'</span><span class="p">])</span>
+
+<span class="n">dfRes1992EIdata</span><span class="o">.</span><span class="n">shape</span>
+<span class="p">(</span><span class="mi">4290</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<p></p>
+Next, we will split 'cityPair' column to {city, country, year} pairs:
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dfRes1992EIdata</span><span class="p">[[</span><span class="s">'city1'</span><span class="p">,</span><span class="s">'country1'</span><span class="p">,</span><span class="s">'year'</span><span class="p">,</span><span class="s">'city2'</span><span class="p">,</span><span class="s">'country2'</span><span class="p">,</span><span class="s">'xx'</span><span class="p">]]</span> <span class="o">=</span>
+  <span class="n">dfRes1992EIdata</span><span class="o">.</span><span class="n">cityPair</span><span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">"~"</span><span class="p">)))</span></code></pre></figure>
+
+<p></p>
+<p></p>
+
+Calculate distances (in kilometers) between cities:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cityMetadataPath</span><span class="o">=</span><span class="s">'/content/drive/MyDrive/city1/img6/cityMetadata.csv'</span>
+<span class="n">cityMetadata</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">cityMetadataPath</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s">','</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span>
+  <span class="n">drop</span><span class="p">([</span><span class="s">'Unnamed: 0'</span><span class="p">,</span><span class="s">'datetime'</span><span class="p">,</span><span class="s">'zone'</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dfRes1992EIdata</span><span class="p">[</span><span class="s">'dist'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfRes1992EIdata</span><span class="o">.</span>
+  <span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">cityDist</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">city1</span><span class="p">,</span><span class="n">x</span><span class="o">.</span><span class="n">country1</span><span class="p">,</span><span class="n">x</span><span class="o">.</span><span class="n">city2</span><span class="p">,</span><span class="n">x</span><span class="o">.</span><span class="n">country2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dfRes1992EIdata</span><span class="o">=</span><span class="n">dfRes1992EIdata</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'Unnamed: 0'</span><span class="p">,</span><span class="s">'cityPair'</span><span class="p">,</span><span class="s">'xx'</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+Finally, the total number of city pairs we have is 4290 and there are 630 inconsisted city pairs, therefore about 14.7% of city pairs get inconsisted model results.
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dfRes1992EIdata</span><span class="p">[</span><span class="s">'same'</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="o">-</span><span class="n">dfRes1992EIdata</span><span class="o">.</span><span class="n">probSame</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">0.5</span><span class="o">-</span><span class="n">dfRes1992EIdata</span><span class="o">.</span><span class="n">probSame2</span><span class="p">)</span>
+
+<span class="nb">len</span><span class="p">(</span><span class="n">dfRes1992EIdata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dfRes1992EIdata</span><span class="p">[</span><span class="s">'same'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">])</span>
+<span class="mi">630</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+Inconsistency of city pairs similarity predictions are not dependent of distances between the cities: this problem occurs for city pairs that are located nearby and faraway.
+For example, here are city pairs with inconsisted similarity predictions and longest distances:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dfRes1992EIdata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dfRes1992EIdata</span><span class="p">[</span><span class="s">'same'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'dist'</span><span class="p">)</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">18</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<a href="#">
+    <img src="/img/scr3m.jpg" alt="Post Sample Image" width="700" />
+</a>
+<p></p>
+Examples of city pairs with inconsisted similarity predictions and shortest distances:
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dfRes1992EIdata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dfRes1992EIdata</span><span class="p">[</span><span class="s">'same'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'dist'</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">18</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<a href="#">
+    <img src="/img/scr3n.jpg" alt="Post Sample Image" width="700" />
+</a>
+<p></p>
+
+<p></p>
+<p><h3>Find Outliers</h3>
+<p></p>
+
+</p><p>
+We proved the hypothesis that mirror vectors classification model is not reliable for similarity prediction of pairs with two-way relationships and therefore this model should be used only for classifcation of entity pairs with one-way relationships.
+</p><p>
+Here we will show scenarios of using this model to compare daily temperatures of pairs with one-way relationships. First, we will calculate average vector of all yearly temperatures vectors for cities in Western Europe and compare it with yearly temperature vectors for all cities. Second, we will find a city located in the center of Western Europe and compare this city temperatures for years 2008 and 2016 with other cities.
+<p></p>
+
+<p></p>
+<p><h4>Compare {City, Year} Temperature Vectors with Average of All Yearly Temperatures</h4>
+<p></p>
+To find cities with yearly temperatures similar to average temperatures for years from 1980 to 2019 in Western Europe we calculated average time series for 2640 daily temperature time series (40 years and 66 cities).
+<p></p>
+As average of average temperature vectors provides a very smooth line, we don't expect that many city-year temperature vectors will be similar to it.
+In fact only 33 of city-year temperature time series (1.25%) had higher than 0.5 'same' probability. Here are top 22 pairs with 'same' probability higher than 0.65:   
+</p><p>
+<a href="#">
+    <img src="/img/scr3o.jpg" alt="Post Sample Image" width="333" />
+</a>
+<p></p>
+It's interesting that most of cities with high probabilities to be similar to average temperature are located on Mediterranean Sea not far from each other. Here is a clockwise city list: Marseille (France), Nice (France), Monako (Monako), Genoa (Italy), Rome (Italy), Naples (Italy), and Salerno (Italy).
+
+<p></p>
+<p></p>
+<p><h4>Compare {City, Year} Temperature Vectors with Central City</h4>
+<p></p>
+<p>
+Here is another scenario of using mirror vector model to compare daily temperatures of pairs with one-way relationships. From Western Europe city list the most cetrally located city is Stuttgart, Germany.
+<p></p>
+
+<p></p>
+<ul>
+<li>Concatenated temperature vector pairs {city, Stuttgart} for years 2008 and 2016</li>
+<li>Transformed mirror vectors to GAF images</li>
+<li>Analyzed 'same' or 'different' probabilities by running images through trained model.</li>
+</ul>
+
+Based on the model, for both years, cities located close to Stuttgart had high probability of similar temperature vectors and cities located far from Stuttgart had high probabilities of different temperature vectors. Here we show two cities that had very different temperatures in both 2008 and 2016 years:
+</p><p>
+</p><p>
+<a href="#">
+    <img src="/img/scr3s.jpg" alt="Post Sample Image" width="628" />
+</a>
+<p></p>
+Less easy was to predict which cities had temperature vector similarities on the border between 'different' and 'same'. Here are cities for the year 2008:
+<p></p>
+<a href="#">
+    <img src="/img/scr3q.jpg" alt="Post Sample Image" width="371" />
+</a>
+
+
+<p></p>
+And here are cities for the year 2016:
+</p><p>
+<a href="#">
+    <img src="/img/scr3p.jpg" alt="Post Sample Image" width="371" />
+</a>
+<p></p>
+
+Here are two cities that were 'on the border' in years 2008 and 2016. In both years Stockholm, Sweden was on the 'same' side and Nice, France was on 'different' side.
+
+
+</p><p>
+<a href="#">
+    <img src="/img/scr3t.jpg" alt="Post Sample Image" width="628" />
+</a>
+<p></p>
+
+
+<p></p>
+<p></p>
+<p><h4>Stop here</h4>
+<p></p>
+
+
+<p></p>
+</p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2021/04/04/cityTempCNN/" data-toggle="tooltip" data-placement="top" title="CNN Image Classification for Climate Data">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2021</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
