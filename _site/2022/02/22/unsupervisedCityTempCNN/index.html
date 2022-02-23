@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Symmetry Metrics for High Dimensional Vector Similarity - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2022/02/22/unsupervisedCityTempCNN/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/page2b3.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Symmetry Metrics for High Dimensional Vector Similarity</h1>
+                    
+                    <h2 class="subheading">How to use GAF image similarity metrics like cosine similarities</h2>
+                    
+                    <span class="meta">Posted by Melenar on February 22, 2022</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>From Unsupervised CNN Deep Learning Classification to Vector Similarity Metrics</h3>
+
+Vector similarity measures on large amounts of high-dimensional data has become essential in solving many machine learning problems such as classification, clustering or information retrieval.
+
+Traditional methods of vector similarity calculations are cosine similarities or dot products. In this post we propose a new method based on transforming vectors to images, classifying pairwise images and getting metric as model probability.
+<p></p>
+
+For image classification we rely on outstanding success of Convolutional Neural Network image classification that in the last few years influenced application of this technique to extensive variety of objects.
+Our method takes advantages of CNN transfer learning image classification.
+To build a model for symmetry metrics, we concatenate vector pairs by reversing right vectors. If vectors are very similar the joint vectors will look like mirror vectors.
+Joint vectors will be transformed to GAF images that proved to get higher accuracy metrics for image classification than plot pictures of joint vectors [*].   
+</p>
+<p>
+
+
+<p></p>
+
+To distinguish between similar and dissimilar vector pairs we will generate training data as “same” and “different” classes. For the “same” class we will generate self-reflected, mirror vectors and for “different” class we will generate joint vectors as a random combination of non-equal pairs. Mirror vectors of the “same” class transformed to GAF images represent symmetric images and GAF images of the “different” class  - asymmetric images.  CNN image classification model is trained to distinguish between symmetric and asymmetric images.  Similarity metric of this model is a probability for joint vectors converted to GAF image to get into the “same” class.
+<p></p>
+<a href="#">
+    <img src="/img/nldl_img6.jpg" alt="Post Sample Image" width="500" />
+</a>
+</p>
+<p>
+In this post we will compare effectiveness of symmetry metrics and cosine similarity metrics for climate data analysis scenarios.
+
+</p>
+<p>
+<p><h3>Introduction</h3>
+</p><p>
+Vector similarity measures on large amounts of high-dimensional data has become essential in solving many machine learning problems such as classification, clustering or information retrieval.
+</p><p>
+
+In the previous post <i><a href="
+http://sparklingdataocean.com/2021/08/01/unsupervisdCityTempCNN/">"Unsupervised Deep Learning for Climate Data Analysis"</a></i>
+we applied unsupervised machine learning model to categorize entity pairs to classes of similar and different pairs. This was done by transforming pairs of entities to pairwise vectors, transforming vectors to Gramian Angular Fields (GAF) images and classifying images by CNN transfer learning.
+
+That model allowed us to indicate metrics of GAF images visual similarity to symmetric or asymmetric classes.
+</p><p>
+In this post we will show how that model can be used to get 'same' probability metric for measuring similarities or dissimilarities between vectors. We will compare effectiveness of these metrics with effectiveness of cosine similarities.
+</p><p>
+
+In the previous post for experiments we selected climate data. In particular, we indicated when the model in not very reliable and illustrated several model reliable scenarios. Those reliable scenarios we will use in this post.
+</p><p>
+
+Unsupervised classification method that we introduced in <i><a href="
+http://sparklingdataocean.com/2021/08/01/unsupervisdCityTempCNN/">"Unsupervised Deep Learning for Climate Data Analysis"</a></i> to determine whether two vectors are similar or not to each other, we followed the steps:
+
+Created reflected pairwise vectors by concatenating pairs of vectors
+Transformed pairwise vectors to GAF images  
+Train CNN transfer learning for image classification.
+
+</p><p>
+<p><h3>Methods</h3>
+In our previous post we introduced a novel unsupervised time series classification model. This model is embedding entities to vectors and combining entity pairs to pairwise vectors. Pairwise vectors are transformed to Gramian Angular Fields (GAF) im- ages and GAF images are classified to symmetric or asymmetric classes using transfer learning CNN image classification.
+We examined how this model works for entity pairs with two-way and one-way relationships and indicated that it is not reliable for classification of entity pairs with two-way relationships.
+<p>
+<p><h4>Data Preparation</h4>
+For data processing, model training and interpreting the results we will use the following steps:
+
+</p>
+<ul>
+<li>Create pairs of pairwise vectors: self-reflected, mirror vectors for ’same’ class and concatenated different vectors for ’different’ class</li>
+<li>Transform joint vectors to GAF images for image classification</li>
+<li>Train CNN image classification on transfer learning to distinguish between symmetric and asymmetric images</li>
+<li>Get similarity metrics based on interpretation of trained model results</li>
+</ul>
+
+Data preparation, training and interpretation techniques are described in details in our previous posts.
+
+
+</p><p>
+<p><h4>Transform Vectors to Images</h4>
+</p><p>
+As a method of vector to image translation we used Gramian Angular Field (GAF) - a polar coordinate transformation based techniques. We learned this technique in fast.ai
+<i><a href="https://course.fast.ai"> 'Practical Deep Learning for Coders'</a></i>
+class and fast.ai forum   
+<i><a href="https://forums.fast.ai/t/time-series-sequential-data-study-group/29686">'Time series/ sequential data'</a></i> study group.
+
+</p><p>
+
+<p><h4>Training of Unsupervised Vector Classification Model</h4>
+</p><p>
+
+For this study we used fast.ai CNN transfer learning image classification. To deal with comparatively small set of training data, instead of training the model from scratch, we followed ResNet-50 transfer learning: loaded the results of model trained on images from the ImageNet database and fine tuned it with data of interest. Python code for transforming vectors to GAF images and fine tuning ResNet-50 is described in fast.ai forum.
+
+</p><p>
+
+<p><h4>Use Results of Trained Models</h4>
+To calculate how similar are vectors to each other we will combine them as joint vectors and transform to GAF images. Then we will run GAF images through trained image classification model and use probabilities of getting to the ’same’ class as symmetry metrics.
+To predict vector similarities based on the trained model, we will use fast.ai function 'learn.predict'.
+
+
+
+
+<h3>Experiments</h3>
+<p></p>
+
+<p><h4>Climate Data</h4>
+
+As a data source we will use climate data from Kaggle data sets:
+<i><a href="
+https://www.kaggle.com/hansukyang/temperature-history-of-1000-cities-1980-to-2020">"Temperature History of 1000 cities 1980 to 2020"</a></i> - daily temperature from 1980 to 2020 years for 1000 most populous cities in the world.
+
+In our previous posts [18, 19] we described the process of data preparation for pairwise vector method, model training and interpretation techniques are described in details in another post of our technical blog.  
+
+In our post [19] we proved the hypothesis that pairwise vector classification model is not reliable to predict similarity of pairs with two-way relationships. This hypothesis is based on the fact that GAF images being based on polar coordinates might generate inconsistent results for turned around entity pairs.  
+<p></p>
+In this post we will use two data sets that in the previous post we used as similarity prediction scenarios for pairs with one-way relationships.
+<p></p>
+First, we will select daily temperature data for cities located in Western Europe, find a city located in the center of these cities and compare center city temperatures with other cities for years 2008 and 2016. For these combinations we will compare symmetry metrics, cosine similarities and distances between the cities.
+<p></p>
+Second, we will calculate average vector of all yearly temperatures vectors for cities in Western Europe and compare it with yearly temperature vectors for all cities.
+
+<p></p>
+<p><h4>Compare {City, Year} Temperature Vectors with Central City</h4>
+<p></p>
+The dataset for the first scenario consists of daily temperature time series for years 2008 and 2016 for cities in the contitental part of Western Europe. We selected 66 highly populous cities from the following countries:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">countryList</span><span class="o">=</span><span class="p">[</span><span class="s">'Belgium'</span><span class="p">,</span> <span class="s">'Germany'</span><span class="p">,</span> <span class="s">'France'</span><span class="p">,</span><span class="s">'Austria'</span><span class="p">,</span><span class="s">'Netherlands'</span><span class="p">,</span><span class="s">'Switzerland'</span><span class="p">,</span>
+              <span class="s">'Spain'</span><span class="p">,</span><span class="s">'Italy'</span><span class="p">,</span><span class="s">'Denmark'</span><span class="p">,</span><span class="s">'Finland'</span><span class="p">,</span><span class="s">'Greece'</span><span class="p">,</span><span class="s">'Italy'</span><span class="p">,</span><span class="s">'Monaco'</span><span class="p">,</span>
+              <span class="s">'Netherlands'</span><span class="p">,</span><span class="s">'Norway'</span><span class="p">,</span><span class="s">'Portugal'</span><span class="p">,</span><span class="s">'Sweden'</span><span class="p">,</span><span class="s">'Switzerland'</span><span class="p">]</span></code></pre></figure>
+
+<p></p>
+The most centrally located city for this region is Stuttgart (Germany). To analyze effectiveness of Symmetry Metric will follow the steps:
+
+</p>
+<ul>
+<li>To calculate symmetry metrics we will use the model trained on the whole climate data set for 1000 cities and years 1980 - 2019. </li>
+<li>For each city from our list we will create pairwise {City, Stuttgart} vectors for the years 2008 and 2016.</li>
+<li>Pairwise vectors will be transformed to GAF images and based on the trained model we will calculate probability of symmetric, i.e. 'same' class.</li>
+<li>We will calculate cosines between cities and Stuttgart daily temperature time series to compare metrics with cosine similarities.</li>
+<li>We will compare symmetry metrics and cosine similarities with distances between cities.</li>
+</ul>
+
+<p></p>
+
+
+
+<p><h5>Training Model</h5>
+Time series classification model training was done on fast.ai transfer learning method.
+For training data we used full data set about daily temperature for 1980 to 2020 years from 1000 most populous cities in the world. We created classes of symmetric images and asymmetric GAF images as:
+
+<ul>
+<li>For the ’same’ or 'symmetric' class we combined vectors with themselves reversing right side vectors.</li>
+<li>For the ’different’ or 'asymmetric' class we combined random pairs of vectors with temperatures of different years and different cities with reversed right vectors.</li>
+</ul>
+
+<p></p>
+<a href="#">
+    <img src="/img/nldl_img3.jpg" alt="Post Sample Image" width="600" />
+</a>
+<p></p>
+
+To estimate the results we calculated accuracy metrics as the proportion of the total number of predictions that were correct. The training model accuracy metric was about 96.5 percent.
+
+<p><h5>Symmetry Metrics based on Results of Trained Models</h5>
+
+To calculate symmetry metrics for Western Europe city list we created pairwise vectors by concatenating temperature vector pairs {City, Stuttgart} for the years 2008 and 2016 and transform joint vectors to GAF images. Then will run GAF images through the trained image classification model and use probabilities of getting to the ’same’ class as symmetry metrics.
+
+To predict vector similarities based on the trained model, we will use fast.ai function 'learn.predict':
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">PATH_IMG</span><span class="o">=</span><span class="s">'/content/drive/My Drive/city2/img4'</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ImageDataBunch</span><span class="o">.</span><span class="n">from_folder</span><span class="p">(</span><span class="n">PATH_IMG</span><span class="p">,</span>  <span class="n">train</span><span class="o">=</span><span class="s">"."</span><span class="p">,</span> <span class="n">valid_pct</span><span class="o">=</span><span class="mf">0.23</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">cnn_learner</span><span class="p">(</span><span class="n">data2</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet34</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">error_rate</span><span class="p">)</span>
+<span class="n">learn</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">'stage-1a'</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+
+<p></p>
+<p><h5>Cosine Similarities</h5>
+
+To compare with symmetry metrics we calculated cosine similarities between Stuttgart and other city daily temperatures for 2008 and 2016. For cosine similarities we used the following functions:
+
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">torch</span>
+<span class="k">def</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">a_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">b_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">a_norm</span><span class="p">,</span> <span class="n">b_norm</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+<p><h5>Distances Between City Pairs</h5>
+
+To analyze symmetry metrics and cosine similarities we will compare these metrics with distances between the cities.
+Here are functions to calculate the distance in kilometers by geographic coordinates:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">atan2</span><span class="p">,</span> <span class="n">radians</span>
+<span class="k">def</span> <span class="nf">dist</span><span class="p">(</span><span class="n">lat1</span><span class="p">,</span><span class="n">lon1</span><span class="p">,</span><span class="n">lat2</span><span class="p">,</span><span class="n">lon2</span><span class="p">):</span>
+  <span class="n">rlat1</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lat1</span><span class="p">))</span>
+  <span class="n">rlon1</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lon1</span><span class="p">))</span>
+  <span class="n">rlat2</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lat2</span><span class="p">))</span>
+  <span class="n">rlon2</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lon2</span><span class="p">))</span>
+  <span class="n">dlon</span> <span class="o">=</span> <span class="n">rlon2</span> <span class="o">-</span> <span class="n">rlon1</span>
+  <span class="n">dlat</span> <span class="o">=</span> <span class="n">rlat2</span> <span class="o">-</span> <span class="n">rlat1</span>
+  <span class="n">a</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">dlat</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">cos</span><span class="p">(</span><span class="n">rlat1</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">rlat2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">dlon</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">atan2</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a</span><span class="p">))</span>
+  <span class="n">R</span><span class="o">=</span><span class="mf">6371.0</span>
+  <span class="k">return</span> <span class="n">R</span> <span class="o">*</span> <span class="n">c</span></code></pre></figure>
+
+<p></p>
+
+Distance between two cities:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">cityDist</span><span class="p">(</span><span class="n">city1</span><span class="p">,</span><span class="n">country1</span><span class="p">,</span><span class="n">city2</span><span class="p">,</span><span class="n">country2</span><span class="p">):</span>
+  <span class="n">lat1</span><span class="o">=</span><span class="n">cityMetadata</span><span class="p">[(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span><span class="o">==</span><span class="n">city1</span><span class="p">)</span>
+    <span class="o">&amp;</span> <span class="p">(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span><span class="o">==</span><span class="n">country1</span><span class="p">)][</span><span class="s">'lat'</span><span class="p">]</span>
+  <span class="n">lat2</span><span class="o">=</span><span class="n">cityMetadata</span><span class="p">[(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span><span class="o">==</span><span class="n">city2</span><span class="p">)</span>
+    <span class="o">&amp;</span> <span class="p">(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span><span class="o">==</span><span class="n">country2</span><span class="p">)][</span><span class="s">'lat'</span><span class="p">]</span>
+  <span class="n">lon1</span><span class="o">=</span><span class="n">cityMetadata</span><span class="p">[(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span><span class="o">==</span><span class="n">city1</span><span class="p">)</span>
+    <span class="o">&amp;</span> <span class="p">(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span><span class="o">==</span><span class="n">country1</span><span class="p">)][</span><span class="s">'lng'</span><span class="p">]</span>
+  <span class="n">lon2</span><span class="o">=</span><span class="n">cityMetadata</span><span class="p">[(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'city_ascii'</span><span class="p">]</span><span class="o">==</span><span class="n">city2</span><span class="p">)</span>
+    <span class="o">&amp;</span> <span class="p">(</span><span class="n">cityMetadata</span><span class="p">[</span><span class="s">'country'</span><span class="p">]</span><span class="o">==</span><span class="n">country2</span><span class="p">)][</span><span class="s">'lng'</span><span class="p">]</span>
+  <span class="k">return</span> <span class="n">dist</span><span class="p">(</span><span class="n">lat1</span><span class="p">,</span><span class="n">lon1</span><span class="p">,</span><span class="n">lat2</span><span class="p">,</span><span class="n">lon2</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+
+</p><p>
+
+
+
+<p></p>
+<p><h5>Compare Symmetry Metrics and Cosine Similarities with Distances between Cities</h5>
+<p></p>
+<p>
+As expected, for both years, cities located close to Stuttgart have high cosine similarities and high probability of getting into the 'same' class by symmetry metrics. Here are correlation coefficients between distances and metrics for years 2008 and 2016:  
+
+<p></p>
+</p><p>
+<a href="#">
+    <img src="/img/nldl_img8.jpg" alt="Post Sample Image" width="431" />
+</a>
+<p></p>
+
+The correlation between distances between the cities and daily temperature similarities depends on the geographical region. As you can see, in the cities that are not far from Stuttgart both cosine similarities and symmetry metrics are very high. Cosine similarities and symmetry metrics between daily temperatures for years 2008 and 2016 in Stuttgart and other cities ordered by distances:
+<p></p>
+<a href="#">
+    <img src="/img/nldl_img1a.jpg" alt="Post Sample Image" width="444" />
+</a>
+<p></p>
+</p><p>
+For most cities located far from Stuttgart daily temperature vectors have higher probabilities and lower cosine similarities than nearby cities. However by looking at symmetry metrics we can see that some cities located far from Stuttgart have rather similar daily temperature vectors.
+
+For example, daily weather in Oslo was similar to daily weather in Stuttgart with probability 0.942 in 2008 and with probability 0.498 in 2016.
+<p></p>
+<a href="#">
+    <img src="/img/nldl_img1b.jpg" alt="Post Sample Image" width="444" />
+</a>
+<p></p>
+So for both years cities located close to Stuttgart had high cosine similarities and high probability of similar temperature vectors and cities located far from Stuttgart had low cosine similarities and low probabilities of similar temperature vectors.
+<p></p>
+
+Not so easy was to predict which cities had similarities with Stuttgart temperatures on the border between ’different’ and ’same’. Here are two cities that in both years 2008 and 2016 have symmetry metrics close to 0.5. In the figure we also show cosine similarity metrics that don't look usefull to find {city, year} time series that are on the border between ’different’ and ’same’ classes.   
+</p><p>
+<a href="#">
+    <img src="/img/nldl_img7.jpg" alt="Post Sample Image" width="628" />
+</a>
+<p></p>
+By looking at symmetry metrics you can notice that in both years Stockholm (Sweden) was on the ’same’ side and Nice (France) was on ’different’ side which we would not notice by looking at cosine similarity metrics.
+
+<p></p>
+To see more examples of {city, year} time series 'on the border', we ordered the table by formula:
+<p style="font-family: times, serif; font-size:13pt; font-style:italic">
+    ABS(0.5 - same probability for 2008) * ABS(0.5 - same probability for 2016)
+</p>
+
+<a href="#">
+    <img src="/img/nldl_img1d.jpg" alt="Post Sample Image" width="511" />
+</a>
+<p></p>
+Here you can see that symmetry metrics help to find 'on the border' {city, year} time series and cosine similarity metrics are not helpfull to find such time series.
+
+
+
+<p></p>
+<p><h4>Compare {City, Year} Temperature Vectors with Average of All Yearly Temperatures</h4>
+<p></p>
+For another scenario we calculated average vector for 2640 daily temperature time series - for years from 1980 to 2019 for 66 Western Europen cities and compared this vector it with yearly temperature vectors for all cities.
+
+<p></p>
+Average of 2460 city-year temperature vectors provides a very smooth line, we did not expect many similar city-year temperature vectors. With symmetry metrics we found that most of cities with high similarities to a smooth line are located on Mediterranean Sea not far from each other. Here is a clockwise city list: Marseille (France), Nice (France), Monako (Monako), Genoa (Italy), Rome (Italy), Naples (Italy), and Salerno (Italy):
+<p></p>
+<a href="#">
+    <img src="/img/nldl_img9.jpg" alt="Post Sample Image" width="444" />
+</a>
+
+<p></p>
+Coutries with daily temperature statistically similar to the average of average.
+
+
+<p></p>
+<a href="#">
+    <img src="/img/nldl_img10a.jpg" alt="Post Sample Image" width="333" />
+</a>
+
+<p></p>
+Coutries with daily temperature statistically sfar from the average of average.
+
+<p></p>
+<a href="#">
+    <img src="/img/nldl_img10b.jpg" alt="Post Sample Image" width="333" />
+</a>
+
+<p></p>
+
+
+<p><h3>Conclusion</h3>
+In this post we introduced symmetry metrics for high dimensional vector similarity based on unsupervised pairwise vector classification model. This model is implemented through transforming joint vectors to GAF images and classifying images as symmetric or asymmetric.
+Symmetry metric is defined as a probability of GAF image ran through trained model and get to the ’same’, i.e. 'symmetric' class.
+<p></p>
+In this post we demonstrated how the symmetry metric can be used to measure differences between vectors instead of measuring them through traditional cosine similarity approach. We examined effectiveness of symmetry metrics for entity pair analysis and compared the results with cosine similarity metrics.
+<p></p>
+<p><h3>Broader Impact and Future Work</h3>
+
+<p></p>
+In the future we are planning to experiment with symmetry metrics for different aspects.
+<p></p>
+<ul>
+<li>So far our research about symmetry metrics was limited to time series data mining. In addition to time series, symmetry metrics can be applied to a variety of embeddable entity pairs such as words, documents, images, videos, etc. [14]. For example, symmetry metrics can be used for unsupervised outlier detection in finding stock price that are very different from average stock prices.</li>
+<li>Potentially pairwise vectors model trained on symmetric and asymmetric GAF images can be trained on some data domain and used for other data domains. For example, we are planning to evaluate how the model trained on time series data can be used for word similarity classification.</li>
+<li>Furthermore, as direct graphs can be built through symmetry metrics, we are planning to experiment on using these metrics for Graph Neural Network research.</li>
+</ul>
+
+<p></p>
+
+
+<p></p>
+<p></p>
+</p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2021/08/01/unsupervisdCityTempCNN-copy/" data-toggle="tooltip" data-placement="top" title="Unsupervised Deep Learning for Climate Data Analysis">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2022</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
