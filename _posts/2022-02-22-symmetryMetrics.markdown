@@ -16,13 +16,13 @@ Traditional methods of vector similarity calculations are cosine similarities or
 For image classification we rely on outstanding success of Convolutional Neural Network image classification that in the last few years influenced application of this technique to extensive variety of objects.
 Our method takes advantages of CNN transfer learning image classification.
 To build a model for symmetry metrics, we concatenate vector pairs by reversing right vectors. If vectors are very similar the joint vectors will look like mirror vectors.
-Joint vectors will be transformed to GAF images that proved to get higher accuracy metrics for image classification than plot pictures of joint vectors [*].   
+Joint vectors will be transformed to GAF images that proved to get higher accuracy metrics for image classification than plot pictures of joint vectors.   
 </p><p>
 
 
 <p></p>
 
-To distinguish between similar and dissimilar vector pairs we will generate training data as “same” and “different” classes. For the “same” class we will generate self-reflected, mirror vectors and for “different” class we will generate joint vectors as a random combination of non-equal pairs. Mirror vectors of the “same” class transformed to GAF images represent symmetric images and GAF images of the “different” class  - asymmetric images.  CNN image classification model is trained to distinguish between symmetric and asymmetric images.  Similarity metric of this model is a probability for joint vectors converted to GAF image to get into the “same” class.
+To distinguish between similar and dissimilar vector pairs we will generate training data as 'same' and 'different' classes. For the 'same' class we will generate self-reflected, mirror vectors and for 'different' class we will generate joint vectors as a random combination of non-equal pairs. Mirror vectors of the 'same' class transformed to GAF images represent symmetric images and GAF images of the 'different' class  - asymmetric images.  CNN image classification model is trained to distinguish between symmetric and asymmetric images.  Similarity metric of this model is a probability for joint vectors converted to GAF image to get into the 'same' class.
 <p></p>
 <a href="#">
     <img src="{{ site.baseurl }}/img/nldl_img6.jpg" alt="Post Sample Image" width="500" >
@@ -33,7 +33,7 @@ In this post we will compare effectiveness of symmetry metrics and cosine simila
 </p><p>
 <p><h3>Introduction</h3>
 </p><p>
-Vector similarity measures on large amounts of high-dimensional data has become essential in solving many machine learning problems such as classification, clustering or information retrieval.
+Vector similarity measures on large amounts of high-dimensional data has become essential for solving many machine learning problems such as classification, clustering or information retrieval.
 </p><p>
 
 In the previous post <i><a href="
@@ -51,15 +51,20 @@ In the previous post for experiments we selected climate data. In particular, we
 Unsupervised classification method that we introduced in <i><a href="
 http://sparklingdataocean.com/2021/08/01/unsupervisdCityTempCNN/">"Unsupervised Deep Learning for Climate Data Analysis"</a></i> to determine whether two vectors are similar or not to each other, we followed the steps:
 
-Created reflected pairwise vectors by concatenating pairs of vectors
-Transformed pairwise vectors to GAF images  
-Train CNN transfer learning for image classification.
+<ul>
+<li>Created reflected pairwise vectors by concatenating pairs of vectors</li>
+<li>Transformed pairwise vectors to GAF images </li>
+<li>Train CNN transfer learning for image classification</li>
+</ul>
+
 
 </p><p>
 <p><h3>Methods</h3>
-In our previous post we introduced a novel unsupervised time series classification model. This model is embedding entities to vectors and combining entity pairs to pairwise vectors. Pairwise vectors are transformed to Gramian Angular Fields (GAF) im- ages and GAF images are classified to symmetric or asymmetric classes using transfer learning CNN image classification.
+In our previous post we introduced a novel unsupervised time series classification model. This model is embedding entities to vectors and combining entity pairs to pairwise vectors. Pairwise vectors are transformed to Gramian Angular Fields (GAF) images and GAF images are classified to symmetric or asymmetric classes using transfer learning CNN image classification.
 We examined how this model works for entity pairs with two-way and one-way relationships and indicated that it is not reliable for classification of entity pairs with two-way relationships.
+
 <p>
+
 <p><h4>Data Preparation</h4>
 For data processing, model training and interpreting the results we will use the following steps:
 
@@ -107,9 +112,9 @@ As a data source we will use climate data from Kaggle data sets:
 <i><a href="
 https://www.kaggle.com/hansukyang/temperature-history-of-1000-cities-1980-to-2020">"Temperature History of 1000 cities 1980 to 2020"</a></i> - daily temperature from 1980 to 2020 years for 1000 most populous cities in the world.
 
-In our previous posts [18, 19] we described the process of data preparation for pairwise vector method, model training and interpretation techniques are described in details in another post of our technical blog.  
+In our previous posts we described the process of data preparation for pairwise vector method, model training and interpretation techniques are described in details in another post of our technical blog.  
 
-In our post [19] we proved the hypothesis that pairwise vector classification model is not reliable to predict similarity of pairs with two-way relationships. This hypothesis is based on the fact that GAF images being based on polar coordinates might generate inconsistent results for turned around entity pairs.  
+In our post we proved the hypothesis that pairwise vector classification model is not reliable to predict similarity of pairs with two-way relationships. This hypothesis is based on the fact that GAF images being based on polar coordinates might generate inconsistent results for turned around entity pairs.  
 <p></p>
 In this post we will use two data sets that in the previous post we used as similarity prediction scenarios for pairs with one-way relationships.
 <p></p>
@@ -142,7 +147,6 @@ The most centrally located city for this region is Stuttgart (Germany). To analy
 <p></p>
 
 
-
 <p><h5>Training Model</h5>
 Time series classification model training was done on fast.ai transfer learning method.
 For training data we used full data set about daily temperature for 1980 to 2020 years from 1000 most populous cities in the world. We created classes of symmetric images and asymmetric GAF images as:
@@ -162,9 +166,9 @@ To estimate the results we calculated accuracy metrics as the proportion of the 
 
 <p><h5>Symmetry Metrics based on Results of Trained Models</h5>
 
-To calculate symmetry metrics for Western Europe city list we created pairwise vectors by concatenating temperature vector pairs {City, Stuttgart} for the years 2008 and 2016 and transform joint vectors to GAF images. Then will run GAF images through the trained image classification model and use probabilities of getting to the ’same’ class as symmetry metrics.
+To calculate symmetry metrics for Western Europe city list we created pairwise vectors by concatenating temperature vector pairs {City, Stuttgart} for the years 2008 and 2016 and transforming joint vectors to GAF images. Then we ran GAF images through the trained image classification model and used probabilities of getting to the ’same’ class as symmetry metrics.
 
-To predict vector similarities based on the trained model, we will use fast.ai function 'learn.predict':
+To predict vector similarities based on the trained model, we used fast.ai function 'learn.predict':
 <p></p>
 {% highlight python %}
 PATH_IMG='/content/drive/My Drive/city2/img4'
@@ -204,7 +208,7 @@ def cos_sim(a: Tensor, b: Tensor):
 <p></p>
 <p><h5>Distances Between City Pairs</h5>
 
-To analyze symmetry metrics and cosine similarities we will compare these metrics with distances between the cities.
+To analyze symmetry metrics and cosine similarities we compared these metrics with distances between the cities.
 Here are functions to calculate the distance in kilometers by geographic coordinates:
 <p></p>
 {% highlight python %}
@@ -297,14 +301,13 @@ To see more examples of {city, year} time series 'on the border', we ordered the
 Here you can see that symmetry metrics help to find 'on the border' {city, year} time series and cosine similarity metrics are not helpfull to find such time series.
 
 
-
 <p></p>
 <p><h4>Compare {City, Year} Temperature Vectors with Average of All Yearly Temperatures</h4>
 <p></p>
 For another scenario we calculated average vector for 2640 daily temperature time series - for years from 1980 to 2019 for 66 Western Europen cities and compared this vector it with yearly temperature vectors for all cities.
 
 <p></p>
-Average of 2460 city-year temperature vectors provides a very smooth line, we did not expect many similar city-year temperature vectors. With symmetry metrics we found that most of cities with high similarities to a smooth line are located on Mediterranean Sea not far from each other. Here is a clockwise city list: Marseille (France), Nice (France), Monako (Monako), Genoa (Italy), Rome (Italy), Naples (Italy), and Salerno (Italy):
+Average of 2460 city-year temperature vectors provides a very smooth line, we did not expect many similar city-year temperature vectors. With symmetry metrics we found that most of cities with high similarities to a smooth line are located on Mediterranean Sea not far from each other. Here is a clockwise city list: Marseille (France), Nice (France), Monaco (Monaco), Genoa (Italy), Rome (Italy), Naples (Italy), and Salerno (Italy):
 <p></p>
 <a href="#">
     <img src="{{ site.baseurl }}/img/nldl_img9.jpg" alt="Post Sample Image" width="444" >
@@ -342,8 +345,10 @@ In this post we demonstrated how the symmetry metric can be used to measure diff
 In the future we are planning to experiment with symmetry metrics for different aspects.
 <p></p>
 <ul>
-<li>So far our research about symmetry metrics was limited to time series data mining. In addition to time series, symmetry metrics can be applied to a variety of embeddable entity pairs such as words, documents, images, videos, etc. [14]. For example, symmetry metrics can be used for unsupervised outlier detection in finding stock price that are very different from average stock prices.</li>
-<li>Potentially pairwise vectors model trained on symmetric and asymmetric GAF images can be trained on some data domain and used for other data domains. For example, we are planning to evaluate how the model trained on time series data can be used for word similarity classification.</li>
+<li>So far our research about symmetry metrics was limited to time series data mining. In addition to time series, symmetry metrics can be applied to a variety of embeddable entity pairs such as words, documents, images, videos, etc. For example, symmetry metrics can be used for unsupervised outlier detection in finding stock price that are very different from average stock prices.</li>
+<li>Potentially pairwise vectors model trained on symmetric and asymmetric GAF images can be trained on some data domain and used for other data domains. For example, we are planning to evaluate how the model trained on time series data can be used for word similarity classification.
+
+</li>
 <li>Furthermore, as direct graphs can be built through symmetry metrics, we are planning to experiment on using these metrics for Graph Neural Network research.</li>
 </ul>
 
