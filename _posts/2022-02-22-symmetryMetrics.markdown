@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Symmetry Metrics for High Dimensional Vector Similarity"
-subtitle:   "How to use GAF image similarity metrics like cosine similarities"
+subtitle:   "How to use unsupervised CNN deep learning classification for vector Similarity Metrics"
 date:       2022-02-22 12:00:00
 author:     "Melenar"
 header-img: "img/page2b3.jpg"
@@ -314,7 +314,7 @@ Average of 2460 city-year temperature vectors provides a very smooth line, we di
 </a>
 
 <p></p>
-Coutries with daily temperature statistically similar to the average of average.
+Countries with daily temperature statistically similar to the average of average.
 
 
 <p></p>
@@ -323,7 +323,7 @@ Coutries with daily temperature statistically similar to the average of average.
 </a>
 
 <p></p>
-Coutries with daily temperature statistically sfar from the average of average.
+Countries with daily temperature statistically sfar from the average of average.
 
 <p></p>
 <a href="#">
@@ -339,6 +339,7 @@ Symmetry metric is defined as a probability of GAF image ran through trained mod
 <p></p>
 In this post we demonstrated how the symmetry metric can be used to measure differences between vectors instead of measuring them through traditional cosine similarity approach. We examined effectiveness of symmetry metrics for entity pair analysis and compared the results with cosine similarity metrics.
 <p></p>
+
 <p><h3>Broader Impact and Future Work</h3>
 
 <p></p>
@@ -346,6 +347,7 @@ In the future we are planning to experiment with symmetry metrics for different 
 <p></p>
 <ul>
 <li>So far our research about symmetry metrics was limited to time series data mining. In addition to time series, symmetry metrics can be applied to a variety of embeddable entity pairs such as words, documents, images, videos, etc. For example, symmetry metrics can be used for unsupervised outlier detection in finding stock price that are very different from average stock prices.</li>
+
 <li>Potentially pairwise vectors model trained on symmetric and asymmetric GAF images can be trained on some data domain and used for other data domains. For example, we are planning to evaluate how the model trained on time series data can be used for word similarity classification.
 
 </li>

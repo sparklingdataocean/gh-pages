@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Find Unexpected Word Pairs by Symmetry Metrics - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2022/04/22/symmetryMetricsNLP/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/pagePicNlp2a.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Find Unexpected Word Pairs by Symmetry Metrics</h1>
+                    
+                    <h2 class="subheading">How to use CNN deep learning symmetry metrics for NLP</h2>
+                    
+                    <span class="meta">Posted by Melenar on April 22, 2022</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>From Unsupervised CNN Deep Learning Classification to Vector Similarity Metrics</h3>
+
+Pairwise vector similarity measures play significant roles in various data mining tasks. Finding matching pairs supports solving problems such classification, clustering or community detection and finding diversified pairs problems like outlier detection.
+</p>
+<p>
+One of the problems related to word pair dissimilarities is called in psychology 'free associations'. This is psychoanalysis method that is being used to get into unconscious process. In this study we will show how to find unexpected free associations by symmetry metrics.  
+</p>
+<p>
+We introduced a nontraditional vector similarity measure, symmetry metrics in
+our previous post <i><a href="http://sparklingdataocean.com/2022/02/22/symmetryMetrics/">"Symmetry Metrics for High Dimensional Vector Similarity"</a></i>. These metrics are based on transforming pairwise vectors to GAF images and classifying images through CNN image classifcation. In this post we will demonstrate how to use symmetry metrics to find dissimilar words pairs.
+</p>
+<p>
+<p><h3>Introduction</h3>
+</p><p>
+
+</p><p>
+
+<p><h4>Free Associations</h4>
+
+</p>
+<p>
+
+</p>
+<p>
+Free Associations is a psychoanalytic technique that was developed by Sigmund Freud and still used by some therapists today. Patients relate to whatever thoughts come to mind in order for the therapist to learn more about how the patient thinks and feels. As Freud described it: "The importance of free association is that the patients spoke for themselves, rather than repeating the ideas of the analyst; they work through their own material, rather than parroting another's suggestions"
+</p><p>
+In our posts to detect semantically similar or dissimilar word pairs we experimented with data about Psychoanalysis taken from Wikipedia and used different techniques that all start with the following steps:
+</p><p>
+<ul>
+<li>Tokenize text file and removed stop words </li>
+<li>Transform words to embedded vectors through models like Word2Vec, Glove, BERT or other. </li>
+<li>Select pairs of words that stay next to each other in the document.</li>
+</ul>
+
+<p>
+In our post <i><a href="http://sparklingdataocean.com/2017/12/24/word2vec2graphPsychoanalysis/">"Word2Vec2Graph - Psychoanalysis Topics"</a></i> we showed how to find free associations using Word2Vec2Graph techniques. For vector similarity measures we used cosine similarities. To create Word2Vec2Graph model we selected pairs of words located next to each other in the document and built a direct graph on word pairs with words as nodes, word pairs as edges and vector cosine similarities as edge weights. This method was publiched in 2021:  
+<i><a href="https://aircconline.com/ijdkp/V11N4/11421ijdkp01.pdf">"SEMANTICS GRAPH MINING FOR TOPIC
+DISCOVERY AND WORD ASSOCIATIONS"</a></i>
+
+</p><p>
+In another post -
+<i><a href="http://sparklingdataocean.com/2019/06/01/word2vec2CNN/">"Free Associations"</a></i>  -
+we demonstrated a different method - word pair similarity based on unsupervised Convolutional Neural Network image classification. We joined word vector pairs reversing right vectors, tranformed joint vectors to GAF images and classified them as 'similar' and 'different'.  
+</p><p>
+In this post we will show how to predict word similarity measures using a novel technique -  symmetry metrics.
+</p>
+<p><h4>Symmetry Metrics</h4>
+Vector similarity measures on large amounts of high-dimensional data has become essential in solving many machine learning problems such as classification, clustering or information retrieval. Vector similarity measures are being used for solving problems such as classification or clustering that usually looking for pairs that are closed to each other.
+<p></p>
+
+In the previous post <i><a href="http://sparklingdataocean.com/2022/02/22/symmetryMetrics/">"Symmetry Metrics for High Dimensional Vector Similarity"</a></i>
+we introduced symmetry metrics for high dimensional vector similarity. These metrics are based on unsupervised pairwise vector classification model -
+<i><a href="http://sparklingdataocean.com/2021/08/01/unsupervisdCityTempCNN/">"Unsupervised Deep Learning for Climate Data Analysis"</a></i> - that is implemented through transforming joint vectors to GAF images and classifying images as symmetric or asymmetric. Symmetry metric is defined as a probability of GAF image ran through trained model and get to the ’same’, i.e. 'symmetric' class.
+<p></p>
+
+
+
+<a href="#">
+    <img src="/img/nldl_img6.jpg" alt="Post Sample Image" width="333" />
+</a>
+</p><p>
+<p></p>
+
+To distinguish between similar and dissimilar vector pairs this mode classifies data to 'same' and 'different' classes. Trained data for the 'same' class consists of self-reflected, mirror vectors and 'different' class of non-equal pairs. Visually mirror vectors are represented as symmetric images and 'different' pairwise vector as asymmetric images. Similarity metric is defined as a probability of pairwise vectors to get into the 'same' class.
+<p></p>
+</p><p>
+In this post we will show how to apply trained unsupervised GAF image classification model to find vector similarities for entities taken from different domain. We will experiment with model trained on daily temperature time series data and apply it to word pair similarities.
+</p><p>
+
+
+
+</p><p>
+<p><h3>Methods</h3>
+<p><h4>Unsupervised Vector Classification Model</h4>
+In one of our previous posts we introduced a
+<i><a href="http://sparklingdataocean.com/2021/08/01/unsupervisdCityTempCNN/">novel unsupervised time series classification model</a></i>.
+For this model we are embedding entities to vectors and combining entity pairs to pairwise vectors. Pairwise vectors are transformed to Gramian Angular Fields (GAF) images and GAF images are classified to symmetric or asymmetric classes using transfer learning CNN image classification.
+We examined how this model works for entity pairs with two-way and one-way relationships and indicated that it is not reliable for classification of entity pairs with two-way relationships.
+</p><p>
+In this post we will use this method for one-way related pairs of words that are located next to each other in the document. We will generate pairwise word vectors for left and right words, transform joint vectors to GAF images and run these images through trained model to predict word similaritites through symmetry metrics.
+<p>
+
+<p><h4>Data Preparation</h4>
+For data processing, model training and interpreting the results we will use the following steps:
+
+</p>
+<ul>
+<li>Tokenize text and transform tokens to vectors</li>
+<li>Get pairs of co-located words and create joint vectors</li>
+<li>Transform joint vectors to GAF images</li>
+<li>Get similarity metrics based on interpretation of trained CNN image classification model </li>
+</ul>
+
+Data preparation, training and interpretation techniques are described in details in our previous posts.
+
+
+
+
+</p><p>
+<p><h4>Transform Vectors to Images</h4>
+</p><p>
+As a method of vector to image translation we used Gramian Angular Field (GAF) - a polar coordinate transformation based techniques. We learned this technique in fast.ai
+<i><a href="https://course.fast.ai"> 'Practical Deep Learning for Coders'</a></i>
+class and fast.ai forum   
+<i><a href="https://forums.fast.ai/t/time-series-sequential-data-study-group/29686">'Time series/ sequential data'</a></i> study group.
+This method is well described by Ignacio Oguiza in Fast.ai forum
+<i><a href="https://forums.fast.ai/t/share-your-work-here/27676/367"> 'Time series classification: General Transfer Learning with Convolutional Neural Networks'</a></i>.
+</p><p>
+To describe vector to GAF image translation Ignacio Oguiza referenced to paper <i><a href="https://aaai.org/ocs/index.php/WS/AAAIW15/paper/viewFile/10179/10251">Encoding Time Series as Images for Visual Inspection and Classification Using Tiled Convolutional Neural Networks</a></i>.
+
+
+
+</p><p>
+<p><h4>Training of Unsupervised Vector Classification Model</h4>
+</p><p>
+
+For model training we used fast.ai CNN transfer learning image classification. To deal with comparatively small set of training data, instead of training the model from scratch, we followed ResNet-50 transfer learning: loaded the results of model trained on images from the ImageNet database and fine tuned it with data of interest. Python code for transforming vectors to GAF images and fine tuning ResNet-50 is described in fast.ai forum.
+
+</p><p>
+
+<p><h4>Use Results of Trained Models</h4>
+To calculate how similar are vectors to each other we will combine them as joint vectors and transform to GAF images. Then we will run GAF images through trained image classification model and use probabilities of getting to the ’same’ class as symmetry metrics.
+To predict vector similarities based on the trained model, we will use fast.ai function 'learn.predict'.
+
+
+<h3>Experiments</h3>
+<p></p>
+
+<p><h4>Transform Text Data to Words</h4>
+
+As a data source we will use data about Psychoanalysis taken from Wikipedia. First, we will tokenize text data and exclude stop words:
+</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">modelWV</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">"glove-wiki-gigaword-100"</span><span class="p">)</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">RegexpTokenizer</span><span class="p">(</span><span class="s">r'</span><span class="err">\</span><span class="s">w+'</span><span class="p">)</span>
+<span class="n">tokenizer</span> <span class="o">=</span><span class="n">RegexpTokenizer</span><span class="p">(</span><span class="s">r'[A-Za-z]+'</span><span class="p">)</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">file_content</span><span class="p">)</span>
+<span class="n">STOPWORDS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s">'english'</span><span class="p">))</span>
+<span class="n">dfStopWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="p">(</span><span class="n">STOPWORDS</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'words'</span><span class="p">])</span>
+<span class="n">dfTokens</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'token'</span><span class="p">])</span>
+<span class="n">dfTokens</span><span class="p">[</span><span class="s">'token'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfTokens</span><span class="p">[</span><span class="s">'token'</span><span class="p">]</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="n">dfTokens</span><span class="p">[</span><span class="s">'len'</span><span class="p">]</span><span class="o">=</span><span class="n">dfTokens</span><span class="p">[</span><span class="s">'token'</span><span class="p">]</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="nb">len</span><span class="p">()</span>
+<span class="n">dfTokens</span><span class="o">=</span><span class="n">dfTokens</span><span class="p">[</span><span class="n">dfTokens</span><span class="p">[</span><span class="s">'len'</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">dfTokens</span><span class="o">=</span><span class="n">dfTokens</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s">'token'</span><span class="p">:</span> <span class="p">{</span><span class="s">'/'</span><span class="p">:</span> <span class="s">' '</span><span class="p">}},</span> <span class="n">regex</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">df_excluded</span> <span class="o">=</span> <span class="n">dfTokens</span><span class="p">[</span><span class="o">~</span><span class="n">dfTokens</span><span class="p">[</span><span class="s">'token'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">dfStopWords</span><span class="p">[</span><span class="s">'words'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">tokenz</span> <span class="o">=</span> <span class="n">df_excluded</span><span class="o">.</span><span class="nb">filter</span><span class="p">([</span><span class="s">'token'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code></pre></figure>
+
+
+<p>
+<p><h4>Transform Words to Vectors</h4>
+Next, we will transform words to vectors through Glove model:
+</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">modelWV</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">"glove-wiki-gigaword-100"</span><span class="p">)</span>
+<span class="n">token</span><span class="o">=</span><span class="n">tokenz</span><span class="p">[</span><span class="s">'token'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">listWords</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">listVectors</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">token</span><span class="p">:</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">listVectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modelWV</span><span class="p">[</span><span class="n">word</span><span class="p">])</span>
+    <span class="n">listWords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+  <span class="k">except</span> <span class="nb">KeyError</span><span class="p">:</span>
+    <span class="n">x</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">dfWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">listWords</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'word'</span><span class="p">])</span>
+<span class="n">dfVectors</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">listVectors</span><span class="p">)</span>
+<span class="n">dfWordVec</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dfWords</span><span class="p">,</span><span class="n">dfVectors</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code></pre></figure>
+
+
+<p><h4>Create Pairwise Vectors</h4>
+In our previous posts we described the process of data preparation for pairwise vector method, model training and interpretation techniques are described in details in another post of our technical blog. In this post we followed the steps:
+<ul>
+<li>Create Left vectors with column 'word1' and Right vectors with column 'word2'</li>
+<li>Delete the first row from Right vectors and reverse them</li>
+<li>Delete the last row from Left vectors</li>
+<li>Concatenate Left and Right vectors</li>
+<li>Concatenate word1 and word2 to column pair as 'word1'~'word2'</li>
+<li>Drop duplicates</li>
+<li>Split to metadata [word1,word2,pair] and numeric arrays</li>
+</ul>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dfWordVec1</span><span class="o">=</span><span class="n">dfWordVec</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'word'</span><span class="p">:</span><span class="s">'word1'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dfWordVec2</span><span class="o">=</span><span class="n">dfWordVec</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'word'</span><span class="p">:</span><span class="s">'word2'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">leftVecWV</span><span class="o">=</span><span class="n">dfWordVec1</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span>
+<span class="n">leftVecWV</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">rightVecWV</span><span class="o">=</span><span class="n">dfWordVec2</span><span class="p">[</span><span class="n">dfWordVec2</span><span class="o">.</span><span class="n">columns</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">rightVecWV</span> <span class="o">=</span> <span class="n">rightVecWV</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">pairVecWV0</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">leftVecWV</span><span class="p">,</span> <span class="n">rightVecWV</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pairVecWV0</span><span class="p">[</span><span class="s">'pair'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pairVecWV0</span><span class="p">[</span><span class="s">'word1'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s">'~'</span> <span class="o">+</span> <span class="n">pairVecWV0</span><span class="p">[</span><span class="s">'word2'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">pairVecWV</span><span class="o">=</span><span class="n">pairVecWV0</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+<span class="n">pairVecWV</span><span class="o">=</span><span class="n">pairVecWV</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">pairMetadata</span><span class="o">=</span> <span class="n">pairVecWV</span><span class="p">[[</span><span class="s">'word1'</span><span class="p">,</span><span class="s">'word2'</span><span class="p">,</span><span class="s">'pair'</span><span class="p">]]</span>
+<span class="n">pairVecWVvalues</span><span class="o">=</span><span class="n">pairVecWV</span>
+<span class="n">pairVecWVvalues</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'word1'</span><span class="p">,</span><span class="s">'word2'</span><span class="p">,</span><span class="s">'pair'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">fXpairWV</span><span class="o">=</span><span class="n">pairVecWVvalues</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span></code></pre></figure>
+
+
+<p><h4>Transform Vectors to Images</h4>
+</p><p>
+As a method of vector to image translation we used Gramian Angular Field (GAF) - a polar coordinate transformation based techniques. We learned this technique in fast.ai
+<i><a href="https://course.fast.ai"> 'Practical Deep Learning for Coders'</a></i>
+class and fast.ai forum   
+<i><a href="https://forums.fast.ai/t/time-series-sequential-data-study-group/29686">'Time series/ sequential data'</a></i> study group.
+</p><p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">pyts.image</span> <span class="kn">import</span> <span class="n">GramianAngularField</span> <span class="k">as</span> <span class="n">GASF</span>
+<span class="n">image_size</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">gasf</span> <span class="o">=</span> <span class="n">GASF</span><span class="p">(</span><span class="n">image_size</span><span class="p">)</span>
+<span class="n">fXpair_gasfWV</span> <span class="o">=</span> <span class="n">gasf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">fXpairWV</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fXpairWV</span><span class="p">[</span><span class="mi">2073</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">fXpair_gasfWV</span><span class="p">[</span><span class="mi">2073</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'rainbow'</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s">'lower'</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+Here are examples that show that self-reflected vectors are represented as symmetric plots and GAF images and semantically different joint word vectors are represented as asymmetric plots and GAF images.
+</p><p>
+<a href="#">
+    <img src="/img/symNlp1a.jpg" alt="Post Sample Image" width="314" />
+</a>
+<p></p>
+<p></p>
+
+
+<p><h4>Train the Model</h4>
+Time series classification model training was done on fast.ai transfer learning method. This model is described in detail in
+<i><a href="http://sparklingdataocean.com/2021/08/01/unsupervisdCityTempCNN/">"Unsupervised Deep Learning for Climate Data Analysis"</a></i> post.
+
+Model was trained on data about daily temperature for 1980 to 2020 years from 1000 most populous cities in the world.  The training model accuracy metric was about 96.5 percent.
+
+
+<p></p>
+<a href="#">
+    <img src="/img/nldl_img3.jpg" alt="Post Sample Image" width="444" />
+</a>
+<p></p>
+
+
+
+
+<p></p>
+
+<p><h4>Symmetry Metrics based on Results of Trained Models</h4>
+
+To calculate symmetry metrics we will create pairwise vectors by concatenating word vector pairs. Then we ran GAF images through the trained image classification model and used probabilities of getting to the ’same’ class as symmetry metrics.
+
+To predict vector similarities based on the trained model, we used fast.ai function 'learn.predict':
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">PATH_IMG</span><span class="o">=</span><span class="s">'/content/drive/My Drive/city2/img4'</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ImageDataBunch</span><span class="o">.</span><span class="n">from_folder</span><span class="p">(</span><span class="n">PATH_IMG</span><span class="p">,</span>  <span class="n">train</span><span class="o">=</span><span class="s">"."</span><span class="p">,</span> <span class="n">valid_pct</span><span class="o">=</span><span class="mf">0.23</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">cnn_learner</span><span class="p">(</span><span class="n">data2</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet34</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">error_rate</span><span class="p">)</span>
+<span class="n">learn</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">'stage-1a'</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+
+<p><h4>Symmetry Metrics on Pairs of Words</h4>
+
+We calculated symmetry metrics on pairs of co-located words or 2-grams from Psychoanalysis Wikipedia data. The distribution of statistics on word pair similarities shows that there are much less dissimilar word pairs that similar word pairs:
+
+<p></p>
+
+<p></p>
+<a href="#">
+    <img src="/img/symNlp2a.jpg" alt="Post Sample Image" width="222" />
+</a>
+
+<p></p>
+Here are some word pair examples of dissimilar and similar neighbors for the word 'infant' - {infant - word} pairs
+
+
+<p></p>
+<a href="#">
+    <img src="/img/symNlp2d.jpg" alt="Post Sample Image" width="333" />
+</a>
+
+<p></p>
+Here are word pairs taken in opposite direction: {word - infant} pairs:
+
+<p></p>
+<a href="#">
+    <img src="/img/symNlp2c.jpg" alt="Post Sample Image" width="333" />
+</a>
+
+<p></p>
+
+
+<p><h3>Conclusion</h3>
+In this post we demonstrated how to use symmetry metrics for predictions of pairwise word semantic similarities. We mapped word to vectors through Glove model, transformed joint word vectors to GAF images and classifyed images as symmetric or asymmetric.
+<p></p>
+Model that we used for symmetry metrics was trained on different data domain - daily temperature time series data.
+
+We demonstrated that pairwise vectors model trained on symmetric and asymmetric GAF images trained on some data domain can be used for other data domains.
+
+
+<p></p>
+
+In the future we are planning to experiment with building direct graphs through symmetry metrics for graph mining and Graph Neural Network research.
+
+
+<p></p>
+
+
+<p></p>
+<p></p>
+</p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2022/02/22/symmetryMetrics/" data-toggle="tooltip" data-placement="top" title="Symmetry Metrics for High Dimensional Vector Similarity">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2022</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>

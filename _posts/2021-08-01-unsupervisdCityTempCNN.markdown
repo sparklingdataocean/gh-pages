@@ -639,8 +639,18 @@ Here are two cities that were 'on the border' in years 2008 and 2016. In both ye
 
 <p></p>
 <p></p>
-<p><h4>Stop here</h4>
+<p><h3>Presentation on NLDL2022 Conference</h3>
 <p></p>
+This study was presented on <i><a href="
+https://www.nldl.org/program2022">"Northern Lights Deep Learning Conference (NLDL2022)"</a></i> conference.
 
+
+
+
+</p><p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/poster2022.jpg" alt="Post Sample Image" width="628" >
+</a>
+<p></p>
 
 <p></p>
