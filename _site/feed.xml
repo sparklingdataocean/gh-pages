@@ -1,12 +1,488 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-07-31T20:22:49-04:00</updated><id>http://localhost:4000/</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Rewiring Knowledge Graphs by Link Predictions</title><link href="http://localhost:4000/2022/07/23/knowledgeGraph4GNN/" rel="alternate" type="text/html" title="Rewiring Knowledge Graphs by Link Predictions" /><published>2022-07-23T08:00:00-04:00</published><updated>2022-07-23T08:00:00-04:00</updated><id>http://localhost:4000/2022/07/23/knowledgeGraph4GNN</id><content type="html" xml:base="http://localhost:4000/2022/07/23/knowledgeGraph4GNN/">&lt;p&gt;&lt;h3&gt;Link Prediction for Knowledge Graphs&lt;/h3&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-11-12T18:21:43-05:00</updated><id>http://localhost:4000/</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Find Semantic Similarities by GNN Link Predictions</title><link href="http://localhost:4000/2022/11/09/knowledgeGraph4NlpGnn/" rel="alternate" type="text/html" title="Find Semantic Similarities by GNN Link Predictions" /><published>2022-11-09T07:00:00-05:00</published><updated>2022-11-09T07:00:00-05:00</updated><id>http://localhost:4000/2022/11/09/knowledgeGraph4NlpGnn</id><content type="html" xml:base="http://localhost:4000/2022/11/09/knowledgeGraph4NlpGnn/">&lt;p&gt;&lt;h3&gt;Link Prediction for Knowledge Graphs&lt;/h3&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;
+In our previous post &lt;i&gt;&lt;a href=&quot;http://sparklingdataocean.com/2022/07/23/knowledgeGraph4GNN/&quot;&gt; 'Rewiring Knowledge Graphs by Link Predictions'&lt;/a&gt;&lt;/i&gt; we showed how to rewire knowledge graph through GNN Link Prediction models. In this post we will continue discussion of applications of GNN Link Prediction techniques to rewiring knowledge graphs.
+&lt;p&gt;&lt;/p&gt;
+The goal of this post is the same as the goal of previous post: we want to find unknown relationships between modern art artists. We will continue exploring text data from Wikipedia articles about the same 20 modern art artists as we used in the previous post, but we will use a different approach to building initial knowledge graph: instead of building it on artist names and full text of corresponding Wikipedia articles we will build it on co-located word pairs.
+
+
+&lt;/p&gt;&lt;p&gt;
+&lt;p&gt;&lt;h3&gt;Methods&lt;/h3&gt;
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;p&gt;&lt;h4&gt;Building initial Knowledge Graph&lt;/h4&gt;
+&lt;p&gt;&lt;/p&gt;
+To build initial knowledge graph we will use the following steps:
+
+&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Tokenize Wikipedia text and exclude stop words.&lt;/li&gt;
+&lt;li&gt;Get nodes as word pairs that are co-located within articles.&lt;/li&gt;
+&lt;li&gt;Get edges as pair to pair neighbors following text sequences within articles.&lt;/li&gt;
+&lt;li&gt;Get edges as joint pairs that have common words. These edges will represent word chains within articles and across them.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pair1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;leftWord1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rightWord1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;pair2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;leftWord2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rightWord2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+   &lt;span class=&quot;ow&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rightWord1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;leftWord2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;there&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;edge12&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pair2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+Graph edges built based of these rules will cover word to word sequences and word to word chains within articles. More important, they will connect different articles by covering word to word chains across articles.
+&lt;/p&gt;&lt;p&gt;
+On nodes and edges described above we will built an initial knowledge graph.
+
+&lt;/p&gt;&lt;p&gt;
+&lt;p&gt;&lt;h4&gt;Transform Text to Vectors&lt;/h4&gt;
+&lt;/p&gt;&lt;p&gt;
+As a method of text to vector translation we will use &lt;i&gt;&lt;a href=&quot;https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2&quot;&gt; 'all-MiniLM-L6-v2'&lt;/a&gt;&lt;/i&gt; transformer model from Hugging Face. This is a sentence-transformers model that maps text to a 384 dimensional vector space.
+
+&lt;/p&gt;&lt;p&gt;
+
+&lt;p&gt;&lt;h4&gt;Run GNN Link Prediction Model&lt;/h4&gt;
+&lt;/p&gt;&lt;p&gt;
+
+As Graph Neural Networks link prediction model we will use a GraphSAGE link prediction model from Deep Graph Library (DGL). The model is built on two GrapgSAGE layers  and computes node representations by averaging neighbor information.
+
+The code for this model is provided by DGL tutorial &lt;i&gt;&lt;a href=&quot;https://docs.dgl.ai/en/0.8.x/tutorials/blitz/4_link_predict.html&quot;&gt;DGL Link Prediction using Graph Neural Networks&lt;/a&gt;&lt;/i&gt;.
+
+&lt;/p&gt;&lt;p&gt;
+
+The results of this model are embedded nodes that can be used for further analysis such as node classification, k-means clustering, link prediction and so on. In this particular post we will calculate average vectors by artists and estimate link predictions by cosine similarities between them.
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Cosine Similarities function:
+
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;torch&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;pytorch_cos_sim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cos_sim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;cos_sim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;isinstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;isinstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unsqueeze&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unsqueeze&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;a_norm&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;functional&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dim&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;b_norm&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;functional&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dim&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b_norm&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transpose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h3&gt;Experiments&lt;/h3&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;h4&gt;Data Source Analysis&lt;/h4&gt;
+&lt;p&gt;&lt;/p&gt;
+
+As the data source for this study we used text data from Wikipedia articles about  the same 20 artists that we used in our previous study  
+&lt;i&gt;&lt;a href=&quot;https://www.researchgate.net/publication/344329097_Building_Knowledge_Graph_in_Spark_Without_SPARQL&quot;&gt;&quot;Building Knowledge Graph in Spark without SPARQL&quot;&lt;/a&gt;&lt;/i&gt;.
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;To estimate the size distribution of Wikipedia text data we tokenized the text and exploded the tokens: &lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;nltk.tokenize&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RegexpTokenizer&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;tokenizer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RegexpTokenizer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;r'[A-Za-z]+'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;wikiArtWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wikiArtists&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Wiki'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;apply&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;lambda&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RegexpTokenizer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;r'[A-Za-z]+'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tokenize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reset_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;wikiArtWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wikiArtWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;explode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;wordStats&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;merge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wikiArtWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;listArtists&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;artistWordStats&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wordStats&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;groupby&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Artist'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sort_values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ascending&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+
+&lt;p&gt;Based on Wikipedia text size distribution, the most well known artist in our artist list is Vincent van Gogh and the most unknown artist is Franz Marc:&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/artImg1.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;275&quot; /&gt;
+&lt;/a&gt;
+
+&lt;p&gt;&lt;/p&gt;
+&lt;h4&gt;Select Subsets of Words&lt;/h4&gt;
+&lt;p&gt;&lt;/p&gt;
+Exclude stop words and short words woth length&amp;lt;4:
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;nltk&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nltk&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;download&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'stopwords'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;nltk.corpus&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stopwords&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;STOPWORDS&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stopwords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;words&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'english'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;dfStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DataFrame&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;STOPWORDS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;columns&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;dfStopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'stop'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;stopWord&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;stopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;merge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wikiArtWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dfStopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;how&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'left'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'stop'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;isna&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'stop'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'stop'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lower&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reset_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inplace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+
+The goal of this study is to find relationships between the artists. As Wikipedia articles about these artists have very different sizes,  if we would use full Wikipedia text data, well-known artists who have longest articles would get more word pairs and much more connections than artists with shorter corresponding articles.
+
+&lt;p&gt;&lt;/p&gt;
+To balance artist to artist relationship distribution we selected subsets of articles with approximately the same word pair counts. As Wikipedia articles about artists all start with high level artist biography descriptions, from each article we selected the first 800 words.
+
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;nonStopWordsSubset&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nonStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;groupby&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;800&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nonStopWordsSubset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reset_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inplace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nonStopWordsSubset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nonStopWordsSubset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+&lt;h4&gt;Get Pairs of Co-located Words&lt;/h4&gt;
+&lt;p&gt;&lt;/p&gt;
+Exclude stop words and short words woth length&amp;lt;4:
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;bagOfWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DataFrame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nonStopWordsSubset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;bagOfWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reset_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inplace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;bagOfWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bagOfWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;indexWords&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;merge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nonStopWordsSubset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bagOfWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;idxWord1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexWords&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'word1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;idxWord2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;indexWords&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'word2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;leftWord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idxWord1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;iloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,:]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;leftWord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reset_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inplace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;rightWord&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;idxWord2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;iloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reset_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  
+
+&lt;span class=&quot;n&quot;&gt;pairWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;concat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;leftWord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rightWord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pairWords&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pairWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pairWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pairWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pairWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pairWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reset_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inplace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+Drop duplicates {artist, word1, word2}
+
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pairWords&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop_duplicates&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;subset&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'word1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'word2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keep&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'last'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reset_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wordpair'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;astype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;astype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'nodeIdx'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;14933&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+Node examples:
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;nodeList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nodeList&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodeList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxWord2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nodeList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;idxArtist1&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;word1&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;word2&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;wordpair&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;nodeIdx&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;braque&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;french&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;braque&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;french&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;french&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;august&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;french&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;august&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;august&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;major&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;august&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;major&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;major&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;century&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;major&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;century&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;century&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;french&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;century&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;french&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+&lt;h4&gt;Get Edges&lt;/h4&gt;
+&lt;p&gt;&lt;/p&gt;
+Index data:
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;nodeList1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodeList&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'word2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'theWord'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wordpair'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wordpair1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'nodeIdx'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'nodeIdx1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nodeList2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodeList&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'word1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'theWord'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxArtist2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wordpair'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wordpair2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;'nodeIdx'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'nodeIdx2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;allNodes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;merge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodeList1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodeList2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'theWord'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;how&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'inner'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;allNodes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;231699&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+Save edges in Google Drive:
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;allNodes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'nodeIdx1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'nodeIdx2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to_csv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drivePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;edges.csv&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+&lt;h4&gt;Transform Text to Vectors&lt;/h4&gt;
+&lt;p&gt;&lt;/p&gt;
+Transform node features to vectors and store in Google drive:
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SentenceTransformer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'all-MiniLM-L6-v2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;wordpair_embeddings&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;encode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cleanPairWords&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;wordpair&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;convert_to_tensor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;wordpair_embeddings&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;14933&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;384&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+Save nodes in Google Drive:
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;imgPath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wordpairs4.pkl'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;wb&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fOut&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;pickle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dump&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idx'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nodeList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;nodeIdx&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nodeList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;wordpair&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;'idxArtist'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nodeList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;idxArtist1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;'embeddings'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wordpair_embeddings&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()},&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fOut&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pickle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HIGHEST_PROTOCOL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h4&gt;Run GNN Link Prediction Model&lt;/h4&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;As Graph Neural Networks (GNN) link prediction model we used a model from Deep Graph Library (DGL). The model code was provided by DGL tutorial and we only had to transform nodes and edges data from our data format to DGL data format.
+&lt;p&gt;&lt;/p&gt;
+Read embedded nodes and edges from Google Drive:  &lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drivePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wordpairs.pkl'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;rb&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fIn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;stored_data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pickle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fIn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;gnn_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stored_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idx'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;gnn_words&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stored_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'words'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;gnn_embeddings&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stored_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'embeddings'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;edges&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read_csv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drivePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'edges.csv'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Convert data to DGL format and add self-loop edges:&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;unpickEdges&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edges&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;edge_index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unpickEdges&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idx'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idxNode'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edge_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edge_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dgl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;graph&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ndata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'feat'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gnn_embeddings&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dgl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_self_loop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+
+
+We used the model with the following parameters:
+
+&lt;ul&gt;
+&lt;li&gt;14933 nodes.&lt;/li&gt;
+&lt;li&gt;231699 edges.&lt;/li&gt;
+&lt;li&gt;PyTorch tensor of size [14933, 384] for embedded nodes.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Graph&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;num_nodes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;14933&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num_edges&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;246632&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;ndata_schemes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'feat'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Scheme&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;384&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dtype&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;float32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)}&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;edata_schemes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{})&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+For GraphSAGE model output vector size we experimented with sizes 32, 64 and 128:
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GraphSAGE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;train_g&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ndata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'feat'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;128&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+The model, loss function, and evaluation metric were defined the following way:
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;pred&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DotPredictor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;compute_loss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pos_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;neg_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pos_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;neg_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;labels&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ones&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pos_score&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;neg_score&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])])&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;binary_cross_entropy_with_logits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scores&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;compute_auc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pos_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;neg_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pos_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;neg_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;numpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;labels&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ones&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pos_score&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;neg_score&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;numpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;roc_auc_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scores&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+To estimate the results we calculated accuracy metrics as Area Under Curve (AUC). For all three output vector sizes the model accuracy metrics were about 96 percents.
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;h4&gt;Rewiring Knowledge Graph by Predicted Links&lt;/h4&gt;
+&lt;p&gt;&lt;/p&gt;
+
+The results of the GraphSAGE model from DGL library are not actually ‘predicted links’ but node vectors that were re-embedded by the model based on input node vectors and messages passed from the neighbors. They can be used for further analysis steps to predict graph edges.
+&lt;p&gt;&lt;/p&gt;
+The results of this scenario are 14933 reembedded nodes and to detect relationships between artists first, we calculated average node vectors by artists and then we estimated link predictions by cosine similarities between them.
+
+
+&lt;p&gt;&lt;/p&gt;
+
+
+As we mentioned above we experimented with GraphSAGE model output vector sizes of 32, 64 and 128 and compared distributions of cosine similarities between artist pairs.
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+First we looked at cosine similarity matrix for pairs of nodes embedded by GNN link prediction model:&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;cosine_scores_gnn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pytorch_cos_sim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pairs_gnn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cosine_scores_gnn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)):&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cosine_scores_gnn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;pairs_gnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idx1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'idx2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;'score'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cosine_scores_gnn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;detach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;numpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()})&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;dfArtistPairs_gnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DataFrame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pairs_gnn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dfArtistPairs_gnn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;190&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+The number of cosine similarity pairs for 20 artists is 190 and the picture below illustrates cosine similarity distributions for model outputs of sizes 128, 64 and 32. For knowledge graph rewiring we selected the model results with output size 128 that reflects the most smooth cosine similarity distribution.
+
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/artImg4.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;444&quot; /&gt;
+&lt;/a&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;h4&gt;Results of Rewiring Knowledge Graph&lt;/h4&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+Artist pairs with cosine similarities &amp;gt; 0.5:
+&lt;p&gt;&lt;/p&gt;
+
+&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/artImg5.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
+&lt;/a&gt;
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+Graph illustration of artist pairs with hign cosine similarities &amp;gt; 0.5:
+&lt;p&gt;&lt;/p&gt;
+&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/artImg3.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;616&quot; /&gt;
+&lt;/a&gt;
+&lt;p&gt;&lt;/p&gt;
+
+
+&lt;p&gt;&lt;/p&gt;
+Pairs of artists with low cosine similarities &amp;lt; -0.5:
+&lt;p&gt;&lt;/p&gt;
+&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/artImg2.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
+&lt;/a&gt;
+
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;h3&gt;Observasions&lt;/h3&gt;
+Node pairs with high cosine similarities, also known as high weight edges, are actively used for graph mining techniques such as node classification, community detection or for analyzing node relationships.
+&lt;p&gt;&lt;/p&gt;
+In experiments of this study artist pairs with high cosine similarities can be considered as artist pairs with high semantic relationships through corresponding Wikipedia articles. Some of these relationships are well known: both Pablo Picasso and Georges Braque were pioneers of cubism art movement. Specialists in biographies of Paul Gauguin or Vincent van Gogh will not be surprised to find that these artists had high relationship regardless of their different art styles. Some undiscovered semantic connections such as between artists Egon Schiele and Marc Chagall might be interesting for modern art researchers.
+
+&lt;p&gt;&lt;/p&gt;
+
+Rewiring knowledge graph and finding high weight links between artists can be applied to recommender systems. If a customer is interested in Pablo Picasso art, it might be interesting for this customer to look at Georges Braque paintings or if a customer is interested in biography of Vincent van Gogh the recommender system can suggest to look at Paul Gauguin biography.
+
+&lt;p&gt;&lt;/p&gt;
+
+Applications of node pairs with high cosine similarities (or high weight edges) for graph mining techniques are well known: they are widely used for node classification, community detection and so on. On the other hand, node pairs with low cosine similarities (or negative weight edges) are not actively used. Based on our observations, dissimilar node pairs can be used for graph mining techniques in quite different way that similar node pairs or weakly connected node pairs.
+
+&lt;p&gt;&lt;/p&gt;
+For community detection validation strongly dissimilar node pairs act as more reliable indicators than weakly dissimilar node pairs: negative weight edges can validate that corresponding node pairs should belong to different communities.
+
+&lt;p&gt;&lt;/p&gt;
+Graphs with very dissimilar node pairs cover much bigger spaces that graphs with similar or weakly connected node pairs. For example, in this study we found low cosine similarities between key artists from not overlapping modern art movements: Futurism - Natalia Goncharova, Impressionism - Claude Monet and De Stijl - Piet Mondrian.
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;a href=&quot;#&quot;&gt;
+    &lt;img src=&quot;/img/moma44b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;567&quot; /&gt;
+&lt;/a&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+Links with very low cosine similarities can be used by recommender systems. If a customer is very familiar with Claude Monet’s style and is interested in learning about different modern art movements the recommender system might suggest to look at Piet Mondrian’s paintings or Natalia Goncharova’s paintings.
+
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;h3&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;&lt;/p&gt;
+In this study we propose methods of rewiring knowledge graphs to detect hidden relationships between graph nodes by using GNN link prediction models.
+&lt;p&gt;&lt;/p&gt;
+In our experiments we looked at semantic similarities and dissimilarities between biographies of modern art artists by applying traditional and novel methods to their Wikipedia articles. Traditional method was implemented on full test of articles and cosine similarities between re-embedded nodes.
+&lt;p&gt;&lt;/p&gt;
+The novel method was based on distribution of co-located words within and across articles. The output vectors from GNN link prediction model were aggregated by artists and link predictions were estimated by cosine similarities between them.
+&lt;p&gt;&lt;/p&gt;
+We explored advantages for graph mining techniques of using not only highly connected node pairs but also highly disconnected node pairs.
+
+We denoted that level of disconnected word pairs can be used to define boundaries of a space covered by graph: existence of node pairs with very low cosine similarities shows that a graph covers much bigger space than a graph with only high and medium cosine similarities. Also highly disconnected node pairs are good indicators for validation of community detection.
+&lt;p&gt;&lt;/p&gt;
+We demonstrated applications of rewired knowledge graphs for recommender systems. Based on high similarity pairs recommender systems can suggest to look at paintings on biographies of artists that are similar to the artist of interest. Based on high dissimilarity pairs recommender systems can advice to look at very different art movements.
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Link Prediction for Knowledge Graphs In our previous post 'Rewiring Knowledge Graphs by Link Predictions' we showed how to rewire knowledge graph through GNN Link Prediction models. In this post we will continue discussion of applications of GNN Link Prediction techniques to rewiring knowledge graphs. The goal of this post is the same as the goal of previous post: we want to find unknown relationships between modern art artists. We will continue exploring text data from Wikipedia articles about the same 20 modern art artists as we used in the previous post, but we will use a different approach to building initial knowledge graph: instead of building it on artist names and full text of corresponding Wikipedia articles we will build it on co-located word pairs.</summary></entry><entry><title type="html">Rewiring Knowledge Graphs by Link Predictions</title><link href="http://localhost:4000/2022/07/23/knowledgeGraph4GNN/" rel="alternate" type="text/html" title="Rewiring Knowledge Graphs by Link Predictions" /><published>2022-07-23T08:00:00-04:00</published><updated>2022-07-23T08:00:00-04:00</updated><id>http://localhost:4000/2022/07/23/knowledgeGraph4GNN</id><content type="html" xml:base="http://localhost:4000/2022/07/23/knowledgeGraph4GNN/">&lt;p&gt;&lt;h3&gt;Link Prediction for Knowledge Graphs&lt;/h3&gt;
 &lt;p&gt;&lt;/p&gt;
 &lt;p&gt;
 In our previous post &lt;i&gt;&lt;a href=&quot;http://sparklingdataocean.com/2019/09/24/knowledgeGraphDataAnalysis/&quot;&gt;
 'Knowledge Graph for Data Mining'&lt;/a&gt;&lt;/i&gt; we discussed knowledge graph building and mining techniques. These techniques were presented in 2020 in DEXA conference &quot;Machine Learning and Knowledge Graphs&quot; workshop and published as &lt;i&gt;&lt;a href=&quot;https://link.springer.com/chapter/10.1007/978-3-030-59028-4_9&quot;&gt;
 'Building Knowledge Graph in Spark without SPARQL'&lt;/a&gt;&lt;/i&gt; paper.
 &lt;p&gt;&lt;/p&gt;
-The goal of that study was to demonstrate that knowledge graph area is much wider that traditional semantic web SPARQL approach and there are non-traditional ways to build and explore knowledge graphs. In that study we demonstrated how knowledge graph techniques can be accomplished by Spark GraphFrames library. In this study we will show other techniques that can be applied to creating and rewiring knowledge graphs. We will explore building knowledge graphs based on Wikipedia data and Graph Neural Networks (GNN) link prediction model.
+The goal of that study was to demonstrate that knowledge graph area is much wider that traditional semantic web SPARQL approach and there are non-traditional ways to build and explore knowledge graphs. In that study we demonstrated how knowledge graph techniques can be accomplished by Spark GraphFrames library.
 &lt;p&gt;&lt;/p&gt;
+In this study we will show other techniques that can be applied to creating and rewiring knowledge graphs. We will explore building knowledge graphs based on Wikipedia data and Graph Neural Networks (GNN) link prediction model.
+
 To compare results of this study with results of our previous study we will use data about the same list of modern art artists.
 
 
@@ -22,7 +498,7 @@ where we showed how to build knowledge graph in Spark without SPARQL and how con
 
 As a data source for that study we used data about paintings of several artists from MoMA collection taken from kaggle dataset
 &lt;i&gt;&lt;a href=&quot;https://www.kaggle.com/momanyc/museum-collection&quot;&gt;
-'Museum of Modern Art Collection'&lt;/a&gt;&lt;/i&gt;. Through knowledge graph we explored how artists are conneted and how they influensed each other:
+'Museum of Modern Art Collection'&lt;/a&gt;&lt;/i&gt;. Through knowledge graph we explored how artists were conneted and how they influensed each other:
 &lt;p&gt;&lt;/p&gt;
 
 
@@ -38,7 +514,7 @@ In that study we explored knowledge graph using Spark DataFrames library techniq
 
 &lt;/p&gt;
 
-In this post as data source we will use Wikipedia text data about the same 20 artists that we used in the previous study. Connections between the artists we will investigate through GNN link prediction model.
+In this post as data source we will use Wikipedia text data about the same 20 artists that we used in the previous study and we will investigate semantic connections between the artists through GNN link prediction model.
 
 &lt;/p&gt;&lt;p&gt;
 &lt;p&gt;&lt;h3&gt;Methods&lt;/h3&gt;
@@ -76,8 +552,8 @@ As a method of text to vector translation we used &lt;i&gt;&lt;a href=&quot;http
 &lt;/p&gt;&lt;p&gt;
 There are two advantages of embedding text nodes:
 &lt;ul&gt;
-&lt;li&gt;Vectors generated by transformers will be used for GNN link prediction model as node features&lt;/li&gt;
-&lt;li&gt;Based on highly connected vector pairs we will generate additional graph edges.&lt;/li&gt;
+&lt;li&gt;Vectors generated by transformers can be used for GNN link prediction model as node features&lt;/li&gt;
+&lt;li&gt;Based on highly connected vector pairs additional graph edges can be generated.&lt;/li&gt;
 &lt;/ul&gt;
 
 To generate additional graph edges we will calculate cosine simmilarity matrix for vectors generated by transformers and select sevaral highly connected pairs.
@@ -465,11 +941,12 @@ In this post we demonstrated how to use transformers and GNN link predictions to
 &lt;li&gt;Trough transformers we mapped Wikipedia articles to vectors and added pairs of highly connected artists as edges to the knowledge graph.&lt;/li&gt;
 &lt;li&gt;On top of the renovated knowledge graph we ran GNN link prediction model.&lt;/li&gt;
 &lt;li&gt;We used cosine similarities between GNN embedded nodes to estimate knowledge graph predicted edges.&lt;/li&gt;
-&lt;li&gt;We demonstrated how to apply these techniques to find groups of artists that are highly connected or lowly connected.&lt;/li&gt;
+&lt;li&gt;We demonstrated how to apply these techniques to find pairs of artists that are highly connected or lowly connected.&lt;/li&gt;
 &lt;/ul&gt;
 
-In the future we are planning to experiment with graph mining and Graph Neural Networks by exploring directed graphs. Directed graph will allow us to calculate pairwise similarities not only by cosines but also by symmetry metrics.&lt;/p&gt;
-&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Link Prediction for Knowledge Graphs In our previous post 'Knowledge Graph for Data Mining' we discussed knowledge graph building and mining techniques. These techniques were presented in 2020 in DEXA conference &quot;Machine Learning and Knowledge Graphs&quot; workshop and published as 'Building Knowledge Graph in Spark without SPARQL' paper. The goal of that study was to demonstrate that knowledge graph area is much wider that traditional semantic web SPARQL approach and there are non-traditional ways to build and explore knowledge graphs. In that study we demonstrated how knowledge graph techniques can be accomplished by Spark GraphFrames library. In this study we will show other techniques that can be applied to creating and rewiring knowledge graphs. We will explore building knowledge graphs based on Wikipedia data and Graph Neural Networks (GNN) link prediction model. To compare results of this study with results of our previous study we will use data about the same list of modern art artists.</summary></entry><entry><title type="html">Find Unexpected Word Pairs by Symmetry Metrics</title><link href="http://localhost:4000/2022/04/22/symmetryMetricsNLP/" rel="alternate" type="text/html" title="Find Unexpected Word Pairs by Symmetry Metrics" /><published>2022-04-22T00:00:00-04:00</published><updated>2022-04-22T00:00:00-04:00</updated><id>http://localhost:4000/2022/04/22/symmetryMetricsNLP</id><content type="html" xml:base="http://localhost:4000/2022/04/22/symmetryMetricsNLP/">&lt;p&gt;&lt;h3&gt;From Unsupervised CNN Deep Learning Classification to Vector Similarity Metrics&lt;/h3&gt;
+In the next post we will continue exploring GNN link prediction models for knowledge graph rewiring. We will use a different semantic graph mining approach to build initial knowledge graph: instead of building it on artist names and full text of corresponding Wikipedia articles we will build it on co-located word pairs.
+ &lt;/p&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Link Prediction for Knowledge Graphs In our previous post 'Knowledge Graph for Data Mining' we discussed knowledge graph building and mining techniques. These techniques were presented in 2020 in DEXA conference &quot;Machine Learning and Knowledge Graphs&quot; workshop and published as 'Building Knowledge Graph in Spark without SPARQL' paper. The goal of that study was to demonstrate that knowledge graph area is much wider that traditional semantic web SPARQL approach and there are non-traditional ways to build and explore knowledge graphs. In that study we demonstrated how knowledge graph techniques can be accomplished by Spark GraphFrames library. In this study we will show other techniques that can be applied to creating and rewiring knowledge graphs. We will explore building knowledge graphs based on Wikipedia data and Graph Neural Networks (GNN) link prediction model.</summary></entry><entry><title type="html">Find Unexpected Word Pairs by Symmetry Metrics</title><link href="http://localhost:4000/2022/04/22/symmetryMetricsNLP/" rel="alternate" type="text/html" title="Find Unexpected Word Pairs by Symmetry Metrics" /><published>2022-04-22T00:00:00-04:00</published><updated>2022-04-22T00:00:00-04:00</updated><id>http://localhost:4000/2022/04/22/symmetryMetricsNLP</id><content type="html" xml:base="http://localhost:4000/2022/04/22/symmetryMetricsNLP/">&lt;p&gt;&lt;h3&gt;From Unsupervised CNN Deep Learning Classification to Vector Similarity Metrics&lt;/h3&gt;
 
 Pairwise vector similarity measures play significant roles in various data mining tasks. Finding matching pairs supports solving problems such classification, clustering or community detection and finding diversified pairs problems like outlier detection.
 &lt;/p&gt;
@@ -5309,354 +5786,4 @@ Traditionally knowledge graph data analysis is using SPARQL language. Instead of
 
 &lt;p&gt;&lt;h3&gt;Next Post - Paintings&lt;/h3&gt;
 In the next several posts we will deeper look at MoMA dataset.&lt;/p&gt;
-&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Why Knowledge Graphs?</summary></entry><entry><title type="html">Free Associations</title><link href="http://localhost:4000/2019/06/01/word2vec2CNN/" rel="alternate" type="text/html" title="Free Associations " /><published>2019-06-01T08:00:00-04:00</published><updated>2019-06-01T08:00:00-04:00</updated><id>http://localhost:4000/2019/06/01/word2vec2CNN</id><content type="html" xml:base="http://localhost:4000/2019/06/01/word2vec2CNN/">&lt;p&gt;&lt;h3&gt;Finding Free Associations&lt;/h3&gt;
-
-
-&lt;/p&gt;
-&lt;p&gt;
-
-&lt;/p&gt;
-&lt;p&gt;
-Free Associations is a psychoanalytic technique that was developed by Sigmund Freud and still used by some therapists today. Patients relate to whatever thoughts come to mind in order for the therapist to learn more about how the patient thinks and feels. As Freud described it: &quot;The importance of free association is that the patients spoke for themselves, rather than repeating the ideas of the analyst; they work through their own material, rather than parroting another's suggestions&quot;
-&lt;/p&gt;
-&lt;p&gt;
-
-&lt;/p&gt;
-&lt;p&gt;
-In one of our previous posts - &lt;i&gt;&lt;a href=&quot;http://sparklingdataocean.com/2017/12/24/word2vec2graphPsychoanalysis/&quot;&gt;&quot;Word2Vec2Graph - Psychoanalysis Topics&quot;&lt;/a&gt;&lt;/i&gt;  - we showed how to find free associations using Word2Vec2Graph technique.
-In this post we will show a different method - unsupervised Convolutional Neural Network classification. As a text file we will use data about Psychoanalysis taken from Wikipedia.
-
-&lt;/p&gt;
-&lt;p&gt;
-&lt;/p&gt;
-&lt;p&gt;&lt;h3&gt;Word Pair Classification - Step by Step&lt;/h3&gt;
-&lt;p&gt;We will convert word pairs to vectors, than convert vectors to images, than classify images via CNN classification method. To transform pairs of words to images will use method described in Ignacio Oguiza's notebook
-&lt;i&gt;&lt;a href=&quot;https://gist.github.com/oguiza/c9c373aec07b96047d1ba484f23b7b47&quot;&gt; Time series - Olive oil country&lt;/a&gt;&lt;/i&gt;. Technique we use in this post is different than technique we used in our
-&lt;i&gt;&lt;a href=&quot;http://sparklingdataocean.com/2019/03/16/word2vec2graph2CNN/&quot;&gt;
-previous post&lt;/a&gt;&lt;/i&gt;:
-&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Read text file, tokenize, remove stop words&lt;/li&gt;
-&lt;li&gt;Transform text file to pairs of words that stay in text next to each other&lt;/li&gt;
-&lt;li&gt;Read trained Word2Vec model and map words to vectors&lt;/li&gt;
-&lt;li&gt;Concatenate word vectors with themselves reversing the second vector: {word1, word1} pairs will generate symmetrical (mirror) sequences of numbers. Label these sequences as &quot;Same&quot;.&lt;/li&gt;
-&lt;li&gt;Concatenate word vectors of pairs {word1, word2} reversing the word2 vector. Label these sequences as &quot;Different&quot;.&lt;/li&gt;
-&lt;li&gt;Randomly select a subset of &quot;Different&quot; pairs. &lt;/li&gt;
-&lt;li&gt;Convert vectors to images and run CNN classification model.&lt;/li&gt;
-
-&lt;/ul&gt;
-&lt;p&gt;
-&lt;p&gt;
-&lt;/p&gt;
-&lt;p&gt;&lt;h3&gt;Unsupervised Image Classification&lt;/h3&gt;
-&lt;p&gt;So we are concatenating pairs of vectors, transforming concatenated vectors to images and classifying images. This CNN image classification compares &quot;Same&quot; - mirror images with &quot;Different&quot; - non-mirror images. Images that are similar to mirror images represent pairs of similar words - common associations. Images that are very different than mirror images represent pair of words that are not expected as pairs, i.e. &quot;free associations&quot; psychoanalysis is looking for.
-&lt;/p&gt;
-&lt;p&gt;
-This technique allows us to do unsupervised CNN classification. Of course, this method is not limited to word pair classification. In particularly it can be applied to unsupervised outlier detection.
-&lt;/p&gt;
-For example, we can take time series stock prices data, concatenate TS vectors with themselves (reversed) and get 'mirror' vectors/images. Then we can concatenate TS vectors with reversed market index vectors (like S&amp;amp;P 500) and convert them to images. CNN classifier will find {TS vector, S&amp;amp;P 500 vector} images that are very different than mirror images. These images will represent stock price outliers.
-
-
-
-
-&lt;h3&gt;Read and Clean Text File &lt;/h3&gt;
-&lt;p&gt;&lt;/p&gt;
-Read text file, tokenize it and remove stop words:
-&lt;p&gt;&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml._&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml.feature._&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.sql.functions.explode&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml.feature.Word2Vec&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml.feature.Word2VecModel&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.sql.Row&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.ml.linalg.Vector&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.graphframes.GraphFrame&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.sql.DataFrame&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.sql.expressions.Window&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.sql.functions._&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.spark.sql.functions.explode&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inputPsychoanalysis&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;textFile&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/FileStore/tables/psychoanalisys1.txt&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;charLine&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokenizer&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;RegexTokenizer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setInputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;charLine&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setOutputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setPattern&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;[^a-z]+&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setMinTokenLength&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setGaps&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokenizedPsychoanalysis&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokenizer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inputPsychoanalysis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remover&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StopWordsRemover&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setInputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setOutputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;stopWordFree&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;removedStopWordsPsychoanalysis&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remover&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;none&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;also&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;nope&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;null&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)++&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;remover&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getStopWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tokenizedPsychoanalysis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;&lt;/p&gt;
-&lt;h3&gt;Get Pairs of Words &lt;/h3&gt;
-&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;
-&lt;/p&gt;&lt;p&gt;
-
-Get pairs of words from text than explode ngrams:
-
-&lt;p&gt;&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngram&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;NGram&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setInputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;stopWordFree&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setOutputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngrams&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setN&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngramCleanWords&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngram&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;removedStopWordsPsychoanalysis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;slpitNgrams&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ngramCleanWords&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;withColumn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;explode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngrams&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;),&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'ngram1=&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!='&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ngram2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;h3&gt;Vectors for Pairs of Words&lt;/h3&gt;
-
-&lt;/p&gt;&lt;p&gt;
-
-&lt;p&gt;&lt;/p&gt;
-Read trained Word2Vec model:
-&lt;/p&gt;
-
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;word2vec&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Word2Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setInputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;setOutputCol&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;result&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;modelNewsBrain&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;Word2VecModel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;w2VmodelNewsBrain&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;modelWordsPsychoanalysis&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;modelNewsBrain&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;getVectors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;
-
-&lt;/p&gt;
-&lt;p&gt;
-Map words of word pairs to Word2Vec model and get sets: {word1, vector1, word2, vector2}:
-&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngramW2V&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slpitNgrams&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;modelWordsPsychoanalysis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'ngram1=&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=='&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;modelWordsPsychoanalysis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;'ngram2=&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=='&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;distinct&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;
-Get single words with vectors from word pairs: {word1, vector1}:
-&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngram1W2V&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ngramW2V&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;union&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ngramW2V&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ngram2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector2&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;distinct&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vector&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-
-&lt;h3&gt;Combine Vectors of Word Pairs&lt;/h3&gt;
-&lt;p&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;
-Combine vectors from word pairs {word1, word2} reversing the second vector.
-&lt;p&gt;&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arrayDFdiff&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngramW2V&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rdd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;~&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toArray&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toArray&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reverse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;array&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;until&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt;  
-   &lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;array&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;col$i&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;withColumn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;pairType&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;diff&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-
-&lt;p&gt;Combine vectors from single words with themselves reversing the second vector.&lt;/p&gt;
-
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arrayDFsame&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngram1W2V&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rdd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;~&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toArray&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getAs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toArray&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reverse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;toDF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;array&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;word&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;until&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;array&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;col$i&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;withColumn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;pairType&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;same&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-
-&lt;p&gt;&lt;h3&gt;CNN Classification &lt;/h3&gt;
-&lt;p&gt;
-To convert vectors to images and classify images via CNN we used almost the same code that Ignacio Oguiza shared on fast.ai forum
-&lt;i&gt;&lt;a href=&quot;https://gist.github.com/oguiza/c9c373aec07b96047d1ba484f23b7b47&quot;&gt; Time series - Olive oil country&lt;/a&gt;&lt;/i&gt;.
-&lt;/p&gt;&lt;p&gt;
-We splitted the source file to words={pairType, word} and vector. The 'pairType' column was used to define &quot;Same&quot; or &quot;Different&quot; category for images and 'word' column to define word pairs.
-&lt;/p&gt;
-
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;read_csv&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PATH&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;‘&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;words&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;csv&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;','&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;201&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;fX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;fillna&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;image_size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;gasf&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GASF&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image_size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;fX_gasf&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gasf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;fit_transform&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;iloc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[:,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;201&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;imgId&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PATH&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pairType&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])+&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;'/'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])+&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;jpg&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-&lt;p&gt;
-Tuning classification model we've got abound 96% accuracy.
-Here is a code to display results:
-&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;778&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;word&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pairType&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;imshow&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fX_gasf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rainbow&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;origin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lower&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-
-
-&lt;h3&gt;Examples: &quot;Mirror&quot; Word Pairs &lt;/h3&gt;
-
-&lt;p&gt;Word pair - 'explanations~explanations':&lt;/p&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/explanations~explanations1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/explanations~explanations1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-
-&lt;p&gt;Word pair - 'requirements~requirements':&lt;/p&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/requirements~requirement1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/requirements~requirement1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-
-&lt;p&gt;Word pair - 'element~element':&lt;/p&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/element~element1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/element~element1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-&lt;/p&gt;
-&lt;h3&gt;Examples: Pairs of Similar Words&lt;/h3&gt;
-
-&lt;p&gt;Word pair - 'thoughts~feelings':&lt;/p&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/thoughts~feelings1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/thoughts~feelings1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-&lt;p&gt;Word pair - 'source~basic':&lt;/p&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/source~basic1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/source~basic1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-&lt;p&gt;Word pair - 'eventually~conclusion':&lt;/p&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/eventually~conclusion1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/eventually~conclusion1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-
-&lt;h3&gt;Examples: Unexpected Free Associations&lt;/h3&gt;
-
-&lt;p&gt;Word pair - 'personality~development':&lt;/p&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/personality~development1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/personality~development1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-
-&lt;p&gt;Word pair - 'societal~restrictions':&lt;/p&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/societal~restrictions1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/societal~restrictions1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-&lt;p&gt;Word pair - 'contingents~accompanying':&lt;/p&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/contingents~accompanying1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/contingents~accompanying1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-
-&lt;p&gt;Word pair - 'neurotic~symptoms':&lt;/p&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/neurotic~symptoms1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/neurotic~symptoms1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-&lt;p&gt;Word pair - 'later~explicitly':&lt;/p&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/later~explicitly1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/later~explicitly1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-&lt;p&gt;Word pair - 'theory~published':&lt;/p&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/theory~published1a.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;500&quot; /&gt;
-&lt;/a&gt;
-&lt;a href=&quot;#&quot;&gt;
-    &lt;img src=&quot;/img/theory~published1b.jpg&quot; alt=&quot;Post Sample Image&quot; width=&quot;333&quot; /&gt;
-&lt;/a&gt;
-
-
-
-&lt;p&gt;&lt;h3&gt;Next Post - Associations and Deep Learning&lt;/h3&gt;
-&lt;p&gt;
-In the next post we will deeper look at deep learning for data associations.&lt;/p&gt;
-&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Finding Free Associations</summary></entry></feed>
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;</content><author><name>Melenar</name></author><summary type="html">Why Knowledge Graphs?</summary></entry></feed>

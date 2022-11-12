@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Find Semantic Similarities by GNN Link Predictions - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2022/11/09/knowledgeGraph4NlpGnn/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/page1w.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Find Semantic Similarities by GNN Link Predictions</h1>
+                    
+                    <h2 class="subheading">Continue rewiring knowledge graphs</h2>
+                    
+                    <span class="meta">Posted by Melenar on November 9, 2022</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Link Prediction for Knowledge Graphs</h3>
+<p></p>
+<p>
+In our previous post <i><a href="http://sparklingdataocean.com/2022/07/23/knowledgeGraph4GNN/"> 'Rewiring Knowledge Graphs by Link Predictions'</a></i> we showed how to rewire knowledge graph through GNN Link Prediction models. In this post we will continue discussion of applications of GNN Link Prediction techniques to rewiring knowledge graphs.
+<p></p>
+The goal of this post is the same as the goal of previous post: we want to find unknown relationships between modern art artists. We will continue exploring text data from Wikipedia articles about the same 20 modern art artists as we used in the previous post, but we will use a different approach to building initial knowledge graph: instead of building it on artist names and full text of corresponding Wikipedia articles we will build it on co-located word pairs.
+
+
+</p><p>
+<p><h3>Methods</h3>
+<p></p>
+
+
+<p><h4>Building initial Knowledge Graph</h4>
+<p></p>
+To build initial knowledge graph we will use the following steps:
+
+</p>
+<ul>
+<li>Tokenize Wikipedia text and exclude stop words.</li>
+<li>Get nodes as word pairs that are co-located within articles.</li>
+<li>Get edges as pair to pair neighbors following text sequences within articles.</li>
+<li>Get edges as joint pairs that have common words. These edges will represent word chains within articles and across them.</li>
+</ul>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">if</span> <span class="n">pair1</span><span class="o">=</span><span class="p">[</span><span class="n">leftWord1</span><span class="p">,</span> <span class="n">rightWord1</span><span class="p">],</span>
+   <span class="n">pair2</span><span class="o">=</span><span class="p">[</span><span class="n">leftWord2</span><span class="p">,</span> <span class="n">rightWord2</span><span class="p">]</span>
+   <span class="ow">and</span> <span class="n">rightWord1</span><span class="o">=</span><span class="n">leftWord2</span><span class="p">,</span>
+<span class="n">then</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">edge12</span><span class="o">=</span><span class="p">{</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="p">}</span></code></pre></figure>
+
+<p></p>
+
+Graph edges built based of these rules will cover word to word sequences and word to word chains within articles. More important, they will connect different articles by covering word to word chains across articles.
+</p><p>
+On nodes and edges described above we will built an initial knowledge graph.
+
+</p><p>
+<p><h4>Transform Text to Vectors</h4>
+</p><p>
+As a method of text to vector translation we will use <i><a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2"> 'all-MiniLM-L6-v2'</a></i> transformer model from Hugging Face. This is a sentence-transformers model that maps text to a 384 dimensional vector space.
+
+</p><p>
+
+<p><h4>Run GNN Link Prediction Model</h4>
+</p><p>
+
+As Graph Neural Networks link prediction model we will use a GraphSAGE link prediction model from Deep Graph Library (DGL). The model is built on two GrapgSAGE layers  and computes node representations by averaging neighbor information.
+
+The code for this model is provided by DGL tutorial <i><a href="https://docs.dgl.ai/en/0.8.x/tutorials/blitz/4_link_predict.html">DGL Link Prediction using Graph Neural Networks</a></i>.
+
+</p><p>
+
+The results of this model are embedded nodes that can be used for further analysis such as node classification, k-means clustering, link prediction and so on. In this particular post we will calculate average vectors by artists and estimate link predictions by cosine similarities between them.
+<p></p>
+
+
+<p></p>
+<p>Cosine Similarities function:
+
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">torch</span>
+<span class="k">def</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">a_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">b_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">a_norm</span><span class="p">,</span> <span class="n">b_norm</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></code></pre></figure>
+
+<p></p>
+
+<h3>Experiments</h3>
+<p></p>
+<h4>Data Source Analysis</h4>
+<p></p>
+
+As the data source for this study we used text data from Wikipedia articles about  the same 20 artists that we used in our previous study  
+<i><a href="https://www.researchgate.net/publication/344329097_Building_Knowledge_Graph_in_Spark_Without_SPARQL">"Building Knowledge Graph in Spark without SPARQL"</a></i>.
+<p></p>
+
+
+<p></p>
+<p>To estimate the size distribution of Wikipedia text data we tokenized the text and exploded the tokens: </p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">RegexpTokenizer</span>
+<span class="n">tokenizer</span> <span class="o">=</span><span class="n">RegexpTokenizer</span><span class="p">(</span><span class="s">r'[A-Za-z]+'</span><span class="p">)</span>
+
+<span class="n">wikiArtWords</span><span class="o">=</span><span class="n">wikiArtists</span><span class="p">[</span><span class="s">'Wiki'</span><span class="p">]</span>
+  <span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">RegexpTokenizer</span><span class="p">(</span><span class="s">r'[A-Za-z]+'</span><span class="p">)</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+<span class="n">wikiArtWords</span><span class="o">=</span><span class="n">wikiArtWords</span><span class="o">.</span><span class="n">explode</span><span class="p">([</span><span class="s">'words'</span><span class="p">])</span>
+<span class="n">wordStats</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">wikiArtWords</span><span class="p">,</span><span class="n">listArtists</span><span class="p">)</span>
+
+<span class="n">artistWordStats</span><span class="o">=</span><span class="n">wordStats</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'Artist'</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+  <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'words'</span><span class="p">,</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></code></pre></figure>
+
+
+
+<p>Based on Wikipedia text size distribution, the most well known artist in our artist list is Vincent van Gogh and the most unknown artist is Franz Marc:</p>
+<p></p>
+<a href="#">
+    <img src="/img/artImg1.jpg" alt="Post Sample Image" width="275" />
+</a>
+
+<p></p>
+<h4>Select Subsets of Words</h4>
+<p></p>
+Exclude stop words and short words woth length&lt;4:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">nltk</span>
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s">'stopwords'</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+<span class="n">STOPWORDS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s">'english'</span><span class="p">))</span>
+<span class="n">dfStopWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="p">(</span><span class="n">STOPWORDS</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'words'</span><span class="p">])</span>
+<span class="n">dfStopWords</span><span class="p">[</span><span class="s">'stop'</span><span class="p">]</span><span class="o">=</span><span class="s">"stopWord"</span>
+<span class="n">stopWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">wikiArtWords</span><span class="p">,</span><span class="n">dfStopWords</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s">'words'</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s">'left'</span><span class="p">)</span>
+
+<span class="n">nonStopWords</span><span class="o">=</span><span class="n">stopWords</span><span class="p">[</span><span class="n">stopWords</span><span class="p">[</span><span class="s">'stop'</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()]</span>
+<span class="n">nonStopWords</span><span class="p">[</span><span class="s">'stop'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nonStopWords</span><span class="p">[</span><span class="s">'words'</span><span class="p">]</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="nb">len</span><span class="p">()</span>
+<span class="n">nonStopWords</span><span class="o">=</span><span class="n">nonStopWords</span><span class="p">[</span><span class="n">nonStopWords</span><span class="p">[</span><span class="s">'stop'</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">nonStopWords</span><span class="p">[</span><span class="s">'words'</span><span class="p">]</span><span class="o">=</span> <span class="n">nonStopWords</span><span class="p">[</span><span class="s">'words'</span><span class="p">]</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="n">nonStopWords</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">nonStopWords</span><span class="p">[</span><span class="s">'idxWord'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nonStopWords</span><span class="o">.</span><span class="n">index</span></code></pre></figure>
+
+
+<p></p>
+
+The goal of this study is to find relationships between the artists. As Wikipedia articles about these artists have very different sizes,  if we would use full Wikipedia text data, well-known artists who have longest articles would get more word pairs and much more connections than artists with shorter corresponding articles.
+
+<p></p>
+To balance artist to artist relationship distribution we selected subsets of articles with approximately the same word pair counts. As Wikipedia articles about artists all start with high level artist biography descriptions, from each article we selected the first 800 words.
+
+<p></p>
+
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">nonStopWordsSubset</span> <span class="o">=</span> <span class="n">nonStopWords</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'idxArtist'</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">800</span><span class="p">)</span>
+<span class="n">nonStopWordsSubset</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">nonStopWordsSubset</span><span class="p">[</span><span class="s">'idxWord'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nonStopWordsSubset</span><span class="o">.</span><span class="n">index</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+<h4>Get Pairs of Co-located Words</h4>
+<p></p>
+Exclude stop words and short words woth length&lt;4:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">bagOfWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">nonStopWordsSubset</span><span class="p">[</span><span class="s">'words'</span><span class="p">])</span>
+<span class="n">bagOfWords</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">bagOfWords</span><span class="p">[</span><span class="s">'idxWord'</span><span class="p">]</span> <span class="o">=</span> <span class="n">bagOfWords</span><span class="o">.</span><span class="n">index</span>
+
+<span class="n">indexWords</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">nonStopWordsSubset</span><span class="p">,</span><span class="n">bagOfWords</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s">'words'</span><span class="p">,</span><span class="s">'idxWord'</span><span class="p">])</span>
+<span class="n">idxWord1</span><span class="o">=</span><span class="n">indexWords</span>
+  <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'words'</span><span class="p">:</span><span class="s">'word1'</span><span class="p">,</span><span class="s">'idxArtist'</span><span class="p">:</span><span class="s">'idxArtist1'</span><span class="p">,</span><span class="s">'idxWord'</span><span class="p">:</span><span class="s">'idxWord1'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">idxWord2</span><span class="o">=</span><span class="n">indexWords</span>
+  <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'words'</span><span class="p">:</span><span class="s">'word2'</span><span class="p">,</span><span class="s">'idxArtist'</span><span class="p">:</span><span class="s">'idxArtist2'</span><span class="p">,</span><span class="s">'idxWord'</span><span class="p">:</span><span class="s">'idxWord2'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">leftWord</span><span class="o">=</span><span class="n">idxWord1</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span>
+<span class="n">leftWord</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">rightWord</span> <span class="o">=</span> <span class="n">idxWord2</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  
+
+<span class="n">pairWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">leftWord</span><span class="p">,</span><span class="n">rightWord</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pairWords</span> <span class="o">=</span> <span class="n">pairWords</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">pairWords</span><span class="p">[</span><span class="n">pairWords</span><span class="p">[</span><span class="s">'idxArtist1'</span><span class="p">]</span><span class="o">!=</span><span class="n">pairWords</span><span class="p">[</span><span class="s">'idxArtist2'</span><span class="p">]]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">pairWords</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+Drop duplicates {artist, word1, word2}
+
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cleanPairWords</span> <span class="o">=</span> <span class="n">pairWords</span>
+<span class="n">cleanPairWords</span> <span class="o">=</span> <span class="n">cleanPairWords</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span>
+  <span class="n">subset</span> <span class="o">=</span> <span class="p">[</span><span class="s">'idxArtist1'</span><span class="p">,</span> <span class="s">'word1'</span><span class="p">,</span> <span class="s">'word2'</span><span class="p">],</span> <span class="n">keep</span> <span class="o">=</span> <span class="s">'last'</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">cleanPairWords</span><span class="p">[</span><span class="s">'wordpair'</span><span class="p">]</span> <span class="o">=</span>
+  <span class="n">cleanPairWords</span><span class="p">[</span><span class="s">"word1"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s">" "</span> <span class="o">+</span> <span class="n">cleanPairWords</span><span class="p">[</span><span class="s">"word2"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">cleanPairWords</span><span class="p">[</span><span class="s">'nodeIdx'</span><span class="p">]</span><span class="o">=</span><span class="n">cleanPairWords</span><span class="o">.</span><span class="n">index</span>
+<span class="n">cleanPairWords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="mi">14933</span></code></pre></figure>
+
+<p></p>
+
+Node examples:
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">nodeList</span><span class="o">=</span><span class="n">cleanPairWords</span>
+<span class="n">nodeList</span> <span class="o">=</span><span class="n">nodeList</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'idxWord1'</span><span class="p">,</span><span class="s">'idxWord2'</span><span class="p">,</span><span class="s">'idxArtist2'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">nodeList</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">idxArtist1</span>	<span class="n">word1</span>	<span class="n">word2</span>	<span class="n">wordpair</span>	<span class="n">nodeIdx</span>
+<span class="mi">0</span>	<span class="mi">0</span>	<span class="n">braque</span>	<span class="n">french</span>	<span class="n">braque</span> <span class="n">french</span>	<span class="mi">0</span>
+<span class="mi">1</span>	<span class="mi">0</span>	<span class="n">french</span>	<span class="n">august</span>	<span class="n">french</span> <span class="n">august</span>	<span class="mi">1</span>
+<span class="mi">2</span>	<span class="mi">0</span>	<span class="n">august</span>	<span class="n">major</span>	<span class="n">august</span> <span class="n">major</span>	<span class="mi">2</span>
+<span class="mi">3</span>	<span class="mi">0</span>	<span class="n">major</span>	<span class="n">century</span>	<span class="n">major</span> <span class="n">century</span>	<span class="mi">3</span>
+<span class="mi">4</span>	<span class="mi">0</span>	<span class="n">century</span>	<span class="n">french</span>	<span class="n">century</span> <span class="n">french</span>	<span class="mi">4</span></code></pre></figure>
+
+
+<p></p>
+<h4>Get Edges</h4>
+<p></p>
+Index data:
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">nodeList1</span><span class="o">=</span><span class="n">nodeList</span>
+  <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'word2'</span><span class="p">:</span><span class="s">'theWord'</span><span class="p">,</span><span class="s">'wordpair'</span><span class="p">:</span><span class="s">'wordpair1'</span><span class="p">,</span><span class="s">'nodeIdx'</span><span class="p">:</span><span class="s">'nodeIdx1'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">nodeList2</span><span class="o">=</span><span class="n">nodeList</span>
+  <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'word1'</span><span class="p">:</span><span class="s">'theWord'</span><span class="p">,</span><span class="s">'idxArtist1'</span><span class="p">:</span><span class="s">'idxArtist2'</span><span class="p">,</span><span class="s">'wordpair'</span><span class="p">:</span><span class="s">'wordpair2'</span><span class="p">,</span>
+  <span class="s">'nodeIdx'</span><span class="p">:</span><span class="s">'nodeIdx2'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">allNodes</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">nodeList1</span><span class="p">,</span><span class="n">nodeList2</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s">'theWord'</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s">'inner'</span><span class="p">)</span>
+<span class="n">allNodes</span><span class="o">.</span><span class="n">shape</span>
+<span class="p">(</span><span class="mi">231699</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+Save edges in Google Drive:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">allNodes</span><span class="p">[[</span><span class="s">'nodeIdx1'</span><span class="p">,</span><span class="s">'nodeIdx2'</span><span class="p">]]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">drivePath</span><span class="o">+</span><span class="s">"edges.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+<h4>Transform Text to Vectors</h4>
+<p></p>
+Transform node features to vectors and store in Google drive:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s">'all-MiniLM-L6-v2'</span><span class="p">)</span>
+<span class="n">wordpair_embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">cleanPairWords</span><span class="p">[</span><span class="s">"wordpair"</span><span class="p">],</span><span class="n">convert_to_tensor</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">wordpair_embeddings</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span class="p">([</span><span class="mi">14933</span><span class="p">,</span> <span class="mi">384</span><span class="p">])</span></code></pre></figure>
+
+
+<p></p>
+Save nodes in Google Drive:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">imgPath</span><span class="o">+</span><span class="s">'wordpairs4.pkl'</span><span class="p">,</span> <span class="s">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fOut</span><span class="p">:</span>
+   <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s">'idx'</span><span class="p">:</span> <span class="n">nodeList</span><span class="p">[</span><span class="s">"nodeIdx"</span><span class="p">],</span>
+      <span class="s">'words'</span><span class="p">:</span> <span class="n">nodeList</span><span class="p">[</span><span class="s">"wordpair"</span><span class="p">],</span>
+      <span class="s">'idxArtist'</span><span class="p">:</span> <span class="n">nodeList</span><span class="p">[</span><span class="s">"idxArtist1"</span><span class="p">],</span>
+      <span class="s">'embeddings'</span><span class="p">:</span> <span class="n">wordpair_embeddings</span><span class="o">.</span><span class="n">cpu</span><span class="p">()},</span> <span class="n">fOut</span><span class="p">,</span>
+      <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+
+<p></p>
+<p></p>
+
+<h4>Run GNN Link Prediction Model</h4>
+<p></p>
+<p>As Graph Neural Networks (GNN) link prediction model we used a model from Deep Graph Library (DGL). The model code was provided by DGL tutorial and we only had to transform nodes and edges data from our data format to DGL data format.
+<p></p>
+Read embedded nodes and edges from Google Drive:  </p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">drivePath</span><span class="o">+</span><span class="s">'wordpairs.pkl'</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fIn</span><span class="p">:</span>
+    <span class="n">stored_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fIn</span><span class="p">)</span>
+    <span class="n">gnn_index</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="s">'idx'</span><span class="p">]</span>
+    <span class="n">gnn_words</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="s">'words'</span><span class="p">]</span>
+    <span class="n">gnn_embeddings</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="s">'embeddings'</span><span class="p">]</span>
+
+<span class="n">edges</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">drivePath</span> <span class="o">+</span> <span class="s">'edges.csv'</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+<p>Convert data to DGL format and add self-loop edges:</p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">unpickEdges</span><span class="o">=</span><span class="n">edges</span>
+<span class="n">edge_index</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">unpickEdges</span><span class="p">[[</span><span class="s">'idx'</span><span class="p">,</span><span class="s">'idxNode'</span><span class="p">]]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="o">=</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">g</span><span class="o">=</span><span class="n">dgl</span><span class="o">.</span><span class="n">graph</span><span class="p">((</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
+<span class="n">g</span><span class="o">.</span><span class="n">ndata</span><span class="p">[</span><span class="s">'feat'</span><span class="p">]</span><span class="o">=</span><span class="n">gnn_embeddings</span>
+<span class="n">g</span><span class="o">=</span><span class="n">dgl</span><span class="o">.</span><span class="n">add_self_loop</span><span class="p">(</span><span class="n">g</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+
+
+We used the model with the following parameters:
+
+<ul>
+<li>14933 nodes.</li>
+<li>231699 edges.</li>
+<li>PyTorch tensor of size [14933, 384] for embedded nodes.</li>
+</ul>
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">g</span>
+<span class="n">Graph</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">14933</span><span class="p">,</span> <span class="n">num_edges</span><span class="o">=</span><span class="mi">246632</span><span class="p">,</span>
+      <span class="n">ndata_schemes</span><span class="o">=</span><span class="p">{</span><span class="s">'feat'</span><span class="p">:</span> <span class="n">Scheme</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">384</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)}</span>
+      <span class="n">edata_schemes</span><span class="o">=</span><span class="p">{})</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+For GraphSAGE model output vector size we experimented with sizes 32, 64 and 128:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">model</span> <span class="o">=</span> <span class="n">GraphSAGE</span><span class="p">(</span><span class="n">train_g</span><span class="o">.</span><span class="n">ndata</span><span class="p">[</span><span class="s">'feat'</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">128</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+The model, loss function, and evaluation metric were defined the following way:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">pred</span> <span class="o">=</span> <span class="n">DotPredictor</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">])</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">pos_score</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">neg_score</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+    <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">binary_cross_entropy_with_logits</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compute_auc</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">])</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">pos_score</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">neg_score</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">scores</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+To estimate the results we calculated accuracy metrics as Area Under Curve (AUC). For all three output vector sizes the model accuracy metrics were about 96 percents.
+
+<p></p>
+
+<p><h4>Rewiring Knowledge Graph by Predicted Links</h4>
+<p></p>
+
+The results of the GraphSAGE model from DGL library are not actually ‘predicted links’ but node vectors that were re-embedded by the model based on input node vectors and messages passed from the neighbors. They can be used for further analysis steps to predict graph edges.
+<p></p>
+The results of this scenario are 14933 reembedded nodes and to detect relationships between artists first, we calculated average node vectors by artists and then we estimated link predictions by cosine similarities between them.
+
+
+<p></p>
+
+
+As we mentioned above we experimented with GraphSAGE model output vector sizes of 32, 64 and 128 and compared distributions of cosine similarities between artist pairs.
+
+<p></p>
+
+<p></p>
+
+First we looked at cosine similarity matrix for pairs of nodes embedded by GNN link prediction model:</p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cosine_scores_gnn</span> <span class="o">=</span> <span class="n">pytorch_cos_sim</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+<span class="n">pairs_gnn</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cosine_scores_gnn</span><span class="p">)):</span>
+  <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cosine_scores_gnn</span><span class="p">)):</span>
+    <span class="n">pairs_gnn</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">'idx1'</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span><span class="s">'idx2'</span><span class="p">:</span> <span class="n">j</span><span class="p">,</span>
+      <span class="s">'score'</span><span class="p">:</span> <span class="n">cosine_scores_gnn</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()})</span>
+
+    <span class="n">dfArtistPairs_gnn</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pairs_gnn</span><span class="p">)</span>
+    <span class="n">dfArtistPairs_gnn</span><span class="o">.</span><span class="n">shape</span>
+    <span class="p">(</span><span class="mi">190</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+The number of cosine similarity pairs for 20 artists is 190 and the picture below illustrates cosine similarity distributions for model outputs of sizes 128, 64 and 32. For knowledge graph rewiring we selected the model results with output size 128 that reflects the most smooth cosine similarity distribution.
+
+
+<p></p>
+
+<a href="#">
+    <img src="/img/artImg4.jpg" alt="Post Sample Image" width="444" />
+</a>
+<p></p>
+<p></p>
+
+<p></p>
+
+<p><h4>Results of Rewiring Knowledge Graph</h4>
+<p></p>
+<p></p>
+
+<p></p>
+Artist pairs with cosine similarities &gt; 0.5:
+<p></p>
+
+<a href="#">
+    <img src="/img/artImg5.jpg" alt="Post Sample Image" width="333" />
+</a>
+<p></p>
+
+
+<p></p>
+Graph illustration of artist pairs with hign cosine similarities &gt; 0.5:
+<p></p>
+<a href="#">
+    <img src="/img/artImg3.jpg" alt="Post Sample Image" width="616" />
+</a>
+<p></p>
+
+
+<p></p>
+Pairs of artists with low cosine similarities &lt; -0.5:
+<p></p>
+<a href="#">
+    <img src="/img/artImg2.jpg" alt="Post Sample Image" width="333" />
+</a>
+
+<p></p>
+<p><h3>Observasions</h3>
+Node pairs with high cosine similarities, also known as high weight edges, are actively used for graph mining techniques such as node classification, community detection or for analyzing node relationships.
+<p></p>
+In experiments of this study artist pairs with high cosine similarities can be considered as artist pairs with high semantic relationships through corresponding Wikipedia articles. Some of these relationships are well known: both Pablo Picasso and Georges Braque were pioneers of cubism art movement. Specialists in biographies of Paul Gauguin or Vincent van Gogh will not be surprised to find that these artists had high relationship regardless of their different art styles. Some undiscovered semantic connections such as between artists Egon Schiele and Marc Chagall might be interesting for modern art researchers.
+
+<p></p>
+
+Rewiring knowledge graph and finding high weight links between artists can be applied to recommender systems. If a customer is interested in Pablo Picasso art, it might be interesting for this customer to look at Georges Braque paintings or if a customer is interested in biography of Vincent van Gogh the recommender system can suggest to look at Paul Gauguin biography.
+
+<p></p>
+
+Applications of node pairs with high cosine similarities (or high weight edges) for graph mining techniques are well known: they are widely used for node classification, community detection and so on. On the other hand, node pairs with low cosine similarities (or negative weight edges) are not actively used. Based on our observations, dissimilar node pairs can be used for graph mining techniques in quite different way that similar node pairs or weakly connected node pairs.
+
+<p></p>
+For community detection validation strongly dissimilar node pairs act as more reliable indicators than weakly dissimilar node pairs: negative weight edges can validate that corresponding node pairs should belong to different communities.
+
+<p></p>
+Graphs with very dissimilar node pairs cover much bigger spaces that graphs with similar or weakly connected node pairs. For example, in this study we found low cosine similarities between key artists from not overlapping modern art movements: Futurism - Natalia Goncharova, Impressionism - Claude Monet and De Stijl - Piet Mondrian.
+<p></p>
+<p></p>
+<a href="#">
+    <img src="/img/moma44b.jpg" alt="Post Sample Image" width="567" />
+</a>
+
+<p></p>
+
+Links with very low cosine similarities can be used by recommender systems. If a customer is very familiar with Claude Monet’s style and is interested in learning about different modern art movements the recommender system might suggest to look at Piet Mondrian’s paintings or Natalia Goncharova’s paintings.
+
+<p></p>
+<p></p>
+<p><h3>Conclusion</h3>
+
+<p></p>
+In this study we propose methods of rewiring knowledge graphs to detect hidden relationships between graph nodes by using GNN link prediction models.
+<p></p>
+In our experiments we looked at semantic similarities and dissimilarities between biographies of modern art artists by applying traditional and novel methods to their Wikipedia articles. Traditional method was implemented on full test of articles and cosine similarities between re-embedded nodes.
+<p></p>
+The novel method was based on distribution of co-located words within and across articles. The output vectors from GNN link prediction model were aggregated by artists and link predictions were estimated by cosine similarities between them.
+<p></p>
+We explored advantages for graph mining techniques of using not only highly connected node pairs but also highly disconnected node pairs.
+
+We denoted that level of disconnected word pairs can be used to define boundaries of a space covered by graph: existence of node pairs with very low cosine similarities shows that a graph covers much bigger space than a graph with only high and medium cosine similarities. Also highly disconnected node pairs are good indicators for validation of community detection.
+<p></p>
+We demonstrated applications of rewired knowledge graphs for recommender systems. Based on high similarity pairs recommender systems can suggest to look at paintings on biographies of artists that are similar to the artist of interest. Based on high dissimilarity pairs recommender systems can advice to look at very different art movements.
+
+<p></p>
+
+<p></p>
+
+<p></p>
+<p></p>
+</p></p></p></p></p></p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2022/07/23/knowledgeGraph4GNN/" data-toggle="tooltip" data-placement="top" title="Rewiring Knowledge Graphs by Link Predictions">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2022</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
