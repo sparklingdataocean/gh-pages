@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>GNN Graph Classification for Climate Change Patterns - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2023/02/11/cityTempGNNgraphs/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/pageGnnClimate9.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>GNN Graph Classification for Climate Change Patterns</h1>
+                    
+                    <h2 class="subheading">Graph Neural Network (GNN) graph classification - a novel method for analyzing time series data</h2>
+                    
+                    <span class="meta">Posted by Melenar on February 11, 2023</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>GNN Graph Classification for Climate Data Analysis</h3>
+
+This post represents Graph Neural Network (GNN) graph classification model as a novel method for analyzing stability of temperature patterns over time. Our method involves building graphs based on cosine similarities between daily temperature vectors, training graph classification model and making predictions about temperature stability by graph location.
+
+</p>
+<p>
+This study highlights GNN graph classifications as powerful tools for analyzing and modeling the complex relationships and dependencies in data that is represented as graphs. They are enabling to uncover hidden patterns, making more accurate predictions and improving the understanding of the Earth's climate.
+</p>
+<p>
+
+</p>
+<p>
+<p><h3>Introduction</h3>
+2012 was a breakthrough year for both deep learning and knowledge graph: in 2012 the evolutionary model AlexNet was created and in 2012 Google introduced knowledge graph. Convolutional Neural Network (CNN) image classification techniques demonstrated great success outperforming previous state-of-the-art machine learning techniques in various domains. Knowledge graph became essential as a new era in data integra- tion and data management that drive many products and make them more intelligent and ”magical”.
+</p><p>
+For several years deep learning and knowledge graph were growing in parallel with a gap between them. This gap made it challenging to apply deep learning to graph-structured data and to leverage the strength of both approaches. In the late 2010s, Graph Neural Network (GNN) emerged as a powerful tool for processing graph-structured data and bridged the gap between them.
+<p></p>
+<a href="#">
+    <img src="/img/climateGnnGc1.jpg" alt="Post Sample Image" width="479" />
+</a>
+<p></p>
+(Picture from a book: Bronstein, M., Bruna, J., Cohen, T., and Velickovic ́, P.
+“Geometric deep learning: Grids, groups, graphs, geodesics, and gauges”)
+</p><p>
+CNN and GNN models have a lot in common: both CNN and GNN models are realizations of Geometric Deep Learning. But GNN models are designed specifically for graph-structured data and can leverage the geometric relationships between nodes and combine node features with graph topology. GNN models represent powerful tools for analyzing and modeling the complex relationships and dependencies in data enabling to uncover and understand hidden patterns and making more accurate predictions.
+</p><p>
+
+</p><p>
+In this post we will investigate how GNN graph classification models can be used to detect abnormal climate change patters.
+For experiments of this study we will use climate data from kaggle.com data sets:
+<i><a href="
+https://www.kaggle.com/hansukyang/temperature-history-of-1000-cities-1980-to-2020">"Temperature History of 1000 cities 1980 to 2020"</a></i> - average daily temperature data for years 1980 - 2019 for 1000 most populous cities in the world.
+</p><p>
+</p><p>
+
+</p><p>
+
+</p><p>
+
+To track long-term climate trend and patterns we will start with estimation of average daily temperature for consecutive years. For each city weather station we will calculate sequence of cosines between daily temperature vectors for consecutive years to identify changes in temperature patterns over time. This can be used to understand the effects of climate change and natural variability in weather patterns. Average values of these sequences will show effect of climate change in temperature over time.  By tracking these average values, we can identify trends and changes in the temperature patterns and determine how they are related to climate change. A decrease in the average cosine similarity between consecutive years can indicate an increase in the variance or difference in daily temperature patterns, which could be a sign of climate change. On the other hand, an increase in average cosine similarity could indicate a more stable climate with less variance in daily temperature patterns.
+
+</p><p>
+To deeper understand the effects of climate change over a longer period of time we will calculate cosine similarity matrices between daily temperature vectors for non-consecutive years. Then by taking vector pairs with a cosine similarity higher than a threshold, we will transform cosine matrices into graph adja- cency matrices. These adjacency matrices will represent city graphs that will be used as input into a graph classification model.  
+</p><p>
+
+If a city graph produced from the cosine similarity matrix shows high degree of connectivity, it could indicate that the climate patterns in that location are relatively stable over time (Fig. 1), while a city graph with low degree of connectivity may suggest that the climate patterns in that location are more unstable or unpredictable (Fig. 2).
+<p></p>
+Graph 1: Stable climate in Malaga, Spain represented in graph with high degree of connectivity:
+<p></p>
+<a href="#">
+    <img src="/img/graphMalaga.jpg" alt="Post Sample Image" width="398" />
+</a>
+<p></p>
+Graph 2: Graph with low degree of connectivity at Oren- burg, Russia shows that the climate patterns in that location are unstable and unpredictable:
+</p><p>
+
+<p></p>
+<a href="#">
+    <img src="/img/graphOrenburg.jpg" alt="Post Sample Image" width="398" />
+</a>
+<p></p>
+
+City graphs will be used as input to GNN graph classification model that will identify graph classes as stable or unstable to understand how temperature patterns change over time.
+</p><p>
+
+
+In this post we will demonstrate the following:
+
+</p><p>
+<ul>
+<li>Describe related work. </li>
+<li>Describe methods of data preparation, model training and interpreting model results. </li>
+<li>Describe the process of transforming temperature time series to vectors, calculating average values of corresponding sequences of consecutive years, and calculating cosine similarity matrices.</li>
+<li>Describe transformation of cosine similarity matrices to graph adjacency matrices and input data preparation for GNN graph classification model. </li>
+<li>Describe how to train GNN graph classification model.</li>
+
+<li>Interpret model results by identifying regions that are more vulnerable to climate change and to detect ubnormal climate change patters.</li>
+</ul>
+
+<p><h3>Related Work</h3>
+GNN graph classification is an emerging area in recent years in GNN architectures, as well as node and graph representations.
+
+In GNN architectures effective for graph classification tasks are Graph Convolutional Networks (GCNs), Graph Attention Networks (GATs) and GraphSAGE.
+</p><p>
+In practice GNN graph classification in mostly used for drug discovery and protein function prediction.
+It can be applied to other areas where data can be represented as graph with graph labels.
+</p><p>
+
+
+</p><p>
+
+<p><h3>Methods</h3>
+
+In this post we will describe data processing and model training methods is the following order:
+
+<ul>
+<li>
+Process of calculating sequences of cosines between daily temperature vectors between consecutive years.
+</li><li>
+Process of transforming cosine similarity matrices to graphs.
+</li><li>
+Process of training GNN graph classification model.
+
+</li>
+</ul>
+
+
+</p><p>
+</p><p>
+<h4>Cosines between Consecutive Years</h4>
+
+To detect abnormal climate change patterns, the first step will be to calculate and analyze the average cosine similarity between consecutive years. This can be done by comparing temperature vectors of each {city, year} and computing average cosine similarities by city. This will give us a general idea of how the temperature patterns are changing over time. The results of this analysis can be used to detect any abnormal climate change patterns and provide valuable insights into the impact of global warming.
+</p><p>
+For cosine similarities we used the following functions:
+
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">torch</span>
+<span class="k">def</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">a_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">b_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">a_norm</span><span class="p">,</span> <span class="n">b_norm</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></code></pre></figure>
+
+
+<p></p>
+
+Values of average cosines between consecutive years will be used as graph labels for GNN graph classification model.
+<p></p>
+<h4>Cosine Similarity Matrices to Graphs</h4>
+</p><p>
+Next, for each city we will calculate cosine similarity matrices and transform them into graphs by taking only vector pairs with cosine similarities higher than a threshold.
+</p><p>
+For each graph we will add a virtual node to transform disconnected graphs into single connected components. This process makes it is easier for graph classification models to process and analyze the relationships between nodes. On graph visualizations pictures in Graph1 and Graph2 virtual nodes are represented with number 40 and all nodes for other years with numbers from 0 to 39.
+</p><p>
+<h4>Train the Model</h4>
+</p><p>
+As Graph Neural Networks (GNN) link prediction model we used a GCNConv (Graph Convolutional Network Convolution) model from tutorial of the PyTorch Geometric Library (PyG).
+<p></p>
+The GCNConv model is a type of graph convolutional network that uses convolution operations to aggregate information from neighboring nodes in a graph. The model is trained on the input graph data, including the edges and node features, and the graph-level labels and it's based on the following input data structure:
+
+<p></p>
+<ul>
+<li>
+Edges: A graph adjacency matrix representing the relationships between the nodes in the graph. In this case, the graph would be the relationships between daily temperature vectors for different years.
+</li><li>
+Nodes with embedded features: The node features, such as the average values of the corresponding sequences of consecutive years, would be embedded into the nodes to provide additional information to the GNN graph classification model.
+</li><li>
+Labels on graph level: The labels, such as stable or unstable, would be assigned to the graph as a whole, indicating the stability of the temperature patterns over time. These graph-level labels would be used by the GNN graph classification model to make predictions about the stability of the temperature patterns.
+</li></ul>
+
+<p></p>
+
+
+
+
+
+<p>
+<h3>Experiments</h3>
+<p></p>
+
+
+<p><h4>Data Source</h4>
+
+To demonstrate how this methods work we will use climate data from kaggle.com data sets:
+<i><a href="
+https://www.kaggle.com/hansukyang/temperature-history-of-1000-cities-1980-to-2020">"Temperature History of 1000 cities 1980 to 2020"</a></i>.
+</p><p>
+This data has average daily temperature in Celsius degrees for years from January 1, 1980 to September 30, 2020 for 1000 most populous cities in the world.
+
+</p><p>
+
+
+<h4>Transform Raw Data to Vectors of Daily Temperature by Year </h4>
+<p></p>
+
+<p></p>
+
+The raw data of average daily temperature for 1000 cities is represented in 1001 columns - city metadata and average temperature rows for all dates from 1980, January 1 to September 30, 2020.    
+<p></p>
+<a href="#">
+    <img src="/img/scr1a.jpg" alt="Post Sample Image" width="800" />
+</a>
+<p></p>
+
+<p></p>
+As city metadata we will use the following columns:
+<p></p>
+<ul>
+<li>City</li>
+<li>Country</li>
+<li>Latitude</li>
+<li>Longitude</li>
+</ul>
+
+<p></p>
+Next, we will convert raw data to set of embedded vectors {city, year}:
+<p></p>
+
+<ul>
+<li>To get the same data format for each time series from raw data we excluded February 29 rows</li>
+<li>As we had data only until September 30, 2020, we excluded data for year 2020</li>
+<li>From dates formated as 'mm/dd/yyyy' strings we extracted year as 'yyyy' strings</li>
+
+</ul>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">tempCity3</span><span class="o">=</span><span class="n">tempCity2</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">tempCity2</span><span class="p">[</span><span class="s">'metadata'</span><span class="p">]</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s">"2020-"</span><span class="p">))]</span>
+<span class="n">tempCity4</span><span class="o">=</span><span class="n">tempCity3</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">tempCity3</span><span class="p">[</span><span class="s">'metadata'</span><span class="p">]</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s">"-02-29"</span><span class="p">))]</span>
+<span class="n">tempCity4</span><span class="p">[</span><span class="s">'metadata'</span><span class="p">]</span><span class="o">=</span><span class="n">tempCity4</span><span class="p">[</span><span class="s">'metadata'</span><span class="p">]</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">r"-"</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">expand</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">tempCity4</span><span class="o">=</span><span class="n">tempCity4</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+Next, we transformed data to the following structure:
+<ul>
+<li>Metadata columns: city, latitude, longitude, country, zone, year</li>
+<li>365 columns with average daily temperatures</li>
+</ul>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">tempCityGroups</span><span class="o">=</span><span class="n">tempCity5</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">'metadata'</span><span class="p">])</span>
+<span class="n">dataSet</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1980</span><span class="p">,</span> <span class="mi">2020</span><span class="p">):</span>
+  <span class="n">tmpX</span><span class="o">=</span><span class="n">tempCityGroups</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">tmpX</span><span class="o">=</span><span class="n">tmpX</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">tmpX</span><span class="o">.</span><span class="n">columns</span><span class="p">[[</span><span class="mi">0</span><span class="p">]],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+  <span class="n">cityMetadata</span><span class="p">[</span><span class="s">'year'</span><span class="p">]</span><span class="o">=</span><span class="n">x</span>  
+  <span class="n">cityMetadata</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">tmpX</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span> <span class="p">[</span><span class="n">cityMetadata</span><span class="p">,</span> <span class="n">tmpX</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+  <span class="n">dataSet</span><span class="o">=</span><span class="n">dataSet</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+Data example:
+<p></p>
+<a href="#">
+    <img src="/img/scr1b.jpg" alt="Post Sample Image" width="800" />
+</a>
+
+</p><p>
+
+
+<p></p>
+<p><h4>Average Cosines between Consecutive Years.</h4>
+<p></p>
+Calculate cosine sequence {year, year+1} for all cities:
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cosPairs</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+  <span class="n">cityName</span><span class="o">=</span><span class="n">metaCity</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">city</span><span class="p">][</span><span class="s">'city_ascii'</span><span class="p">]</span>
+  <span class="n">country</span><span class="o">=</span><span class="n">metaCity</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">city</span><span class="p">][</span><span class="s">'country'</span><span class="p">]</span>
+  <span class="n">cityIndex</span><span class="o">=</span><span class="n">metaCity</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">city</span><span class="p">][</span><span class="s">'cityInd'</span><span class="p">]</span>
+  <span class="n">data1</span><span class="o">=</span><span class="n">dataSet</span><span class="p">[(</span><span class="n">dataSet</span><span class="p">[</span><span class="s">'cityInd'</span><span class="p">]</span><span class="o">==</span><span class="n">city</span><span class="p">)]</span>
+  <span class="n">values1</span><span class="o">=</span><span class="n">data1</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">8</span><span class="p">:</span><span class="mi">373</span><span class="p">]</span>
+  <span class="n">fXValues1</span><span class="o">=</span> <span class="n">values1</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+  <span class="n">fXValuesPT1</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">fXValues1</span><span class="p">)</span>
+  <span class="n">cosine_scores1</span> <span class="o">=</span> <span class="n">pytorch_cos_sim</span><span class="p">(</span><span class="n">fXValuesPT1</span><span class="p">,</span> <span class="n">fXValuesPT1</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">39</span><span class="p">):</span>
+    <span class="n">score</span><span class="o">=</span><span class="n">cosine_scores1</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>   
+    <span class="n">cosPairs</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">'cityIndex'</span><span class="p">:</span><span class="n">city</span><span class="p">,</span><span class="s">'cityName'</span><span class="p">:</span><span class="n">cityName</span><span class="p">,</span> <span class="s">'country'</span><span class="p">:</span><span class="n">country</span><span class="p">,</span>
+                            <span class="s">'score'</span><span class="p">:</span> <span class="n">score</span><span class="p">})</span></code></pre></figure>
+
+
+<p></p>
+Calculate average for each city and order by scores:
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cosPairs_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cosPairs</span><span class="p">)</span>
+<span class="n">cosAverage</span><span class="o">=</span><span class="n">cosPairs_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">'cityName'</span><span class="p">,</span><span class="s">'country'</span><span class="p">,</span><span class="s">'cityIndex'</span><span class="p">])[</span><span class="s">'score'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">lineScore</span><span class="o">=</span><span class="n">cosAverage</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'score'</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+A decrease in the average cosine similarity between consecutive years can indicate an increase in the variance or difference in daily temperature patterns, which could be a sign of climate change:
+<p></p>
+<p></p>
+<a href="#">
+    <img src="/img/cosLine1.jpg" alt="Post Sample Image" width="400" />
+</a>
+
+</p><p>
+
+
+<p></p>
+<p></p>
+
+Very high average cosine similarities indicate stable climate with less variance in daily temperature patterns.
+<p></p>
+
+<p></p>
+<a href="#">
+    <img src="/img/cosLine2.jpg" alt="Post Sample Image" width="400" />
+</a>
+<p></p>
+<h4>Prepare Input Data for GNN Graph Classification Model</h4>
+<p></p>
+</p><p>
+Average cosines between consecutive years were used as graph labels for GNN graph classification. The set of graphs was divided in half and marked with stable and unstable labels:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">lineScore</span><span class="p">[</span><span class="s">'label'</span><span class="p">][</span><span class="n">lineScore</span><span class="p">[</span><span class="s">'labelIndex'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">499</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">lineScore</span><span class="p">[</span><span class="s">'label'</span><span class="p">][</span><span class="n">lineScore</span><span class="p">[</span><span class="s">'labelIndex'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">500</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">lineScore</span><span class="o">=</span><span class="n">lineScore</span><span class="p">[[</span><span class="s">'cityIndex'</span><span class="p">,</span><span class="s">'label'</span><span class="p">]]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s">'cityIndex'</span><span class="p">:</span> <span class="s">'cityInd'</span><span class="p">})</span>
+<span class="n">lineScore</span><span class="o">=</span><span class="n">lineScore</span><span class="p">[</span><span class="n">lineScore</span><span class="p">[</span><span class="s">'label'</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">]</span></code></pre></figure>
+
+
+<p></p>
+Join scores and labels to the dataSet:
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">subData</span><span class="o">=</span><span class="n">dataSet</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">lineScore</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="s">'cityInd'</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s">'inner'</span><span class="p">)</span>
+<span class="n">subData</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+Split data to metadata and values:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">metaGroups</span><span class="o">=</span><span class="n">subData</span><span class="p">[(</span><span class="n">subData</span><span class="p">[</span><span class="s">'nextYear'</span><span class="p">]</span><span class="o">==</span><span class="mi">1980</span><span class="p">)]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">374</span><span class="p">]]</span>
+<span class="n">metaGroups</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">metaGroups</span><span class="p">[</span><span class="s">'index'</span><span class="p">]</span><span class="o">=</span><span class="n">metaGroups</span><span class="o">.</span><span class="n">index</span>
+<span class="n">values1</span><span class="o">=</span><span class="n">subData</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">9</span><span class="p">:</span><span class="mi">374</span><span class="p">]</span>
+<span class="n">values1</span><span class="o">.</span><span class="n">shape</span>
+<span class="p">(</span><span class="mi">40000</span><span class="p">,</span> <span class="mi">365</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+The following code prepares input data for GNN graph classification model:
+
+<ul>
+<li>
+Calculating cosine similarity matrix by cities
+</li><li>Transforming cosine similarity matries to graph adjacency matrices based on treashold cos=.975
+</li><li>Transforming data to PyTorch Geometric data format
+</li>
+</ul>
+<p></p>
+<p></p>
+
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">torch_geometric.loader</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="n">datasetTest</span><span class="o">=</span><span class="nb">list</span><span class="p">()</span>
+<span class="n">datasetModel</span><span class="o">=</span><span class="nb">list</span><span class="p">()</span>
+<span class="n">cosList</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.975</span><span class="p">]</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.loader</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="n">datasetTest</span><span class="o">=</span><span class="nb">list</span><span class="p">()</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="k">for</span> <span class="n">cos</span> <span class="ow">in</span> <span class="n">cosList</span><span class="p">:</span>
+  <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">cityName</span><span class="o">=</span><span class="n">metaGroups</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="s">'city_ascii'</span><span class="p">]</span>
+    <span class="n">country</span><span class="o">=</span><span class="n">metaGroups</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="s">'country'</span><span class="p">]</span>
+    <span class="n">label</span><span class="o">=</span><span class="n">metaGroups</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="s">'label'</span><span class="p">]</span>
+    <span class="n">cityInd</span><span class="o">=</span><span class="n">metaGroups</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="s">'cityInd'</span><span class="p">]</span>
+    <span class="n">data1</span><span class="o">=</span><span class="n">subData</span><span class="p">[(</span><span class="n">subData</span><span class="p">[</span><span class="s">'cityInd'</span><span class="p">]</span><span class="o">==</span><span class="n">cityInd</span><span class="p">)]</span>
+    <span class="n">values1</span><span class="o">=</span><span class="n">data1</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">9</span><span class="p">:</span><span class="mi">374</span><span class="p">]</span>
+    <span class="n">fXValues1</span><span class="o">=</span> <span class="n">values1</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">fXValuesPT1</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">fXValues1</span><span class="p">)</span>
+    <span class="n">fXValuesPT1avg</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">fXValuesPT1</span><span class="p">,</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fXValuesPT1union</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">fXValuesPT1</span><span class="p">,</span><span class="n">fXValuesPT1avg</span><span class="p">),</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">cosine_scores1</span> <span class="o">=</span> <span class="n">pytorch_cos_sim</span><span class="p">(</span><span class="n">fXValuesPT1</span><span class="p">,</span> <span class="n">fXValuesPT1</span><span class="p">)</span>
+    <span class="n">cosPairs1</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">score0</span><span class="o">=</span><span class="n">cosine_scores1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">):</span>
+      <span class="n">year1</span><span class="o">=</span><span class="n">data1</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">'nextYear'</span><span class="p">]</span>
+      <span class="n">cosPairs1</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">'cos'</span><span class="p">:</span><span class="n">score0</span><span class="p">,</span> <span class="s">'cityName'</span><span class="p">:</span><span class="n">cityName</span><span class="p">,</span> <span class="s">'country'</span><span class="p">:</span><span class="n">country</span><span class="p">,</span><span class="s">'label'</span><span class="p">:</span><span class="n">label</span><span class="p">,</span>
+                      <span class="s">'k1'</span><span class="p">:</span><span class="n">i</span><span class="p">,</span> <span class="s">'k2'</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="s">'year1'</span><span class="p">:</span><span class="n">year1</span><span class="p">,</span> <span class="s">'year2'</span><span class="p">:</span><span class="s">'XXX'</span><span class="p">,</span>
+                      <span class="s">'score'</span><span class="p">:</span> <span class="n">score0</span><span class="p">})</span>
+      <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">j</span><span class="p">:</span>
+          <span class="n">score</span><span class="o">=</span><span class="n">cosine_scores1</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>   
+          <span class="k">if</span> <span class="n">score</span><span class="o">&gt;</span><span class="n">cos</span><span class="p">:</span>
+            <span class="n">year2</span><span class="o">=</span><span class="n">data1</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s">'nextYear'</span><span class="p">]</span>
+            <span class="n">cosPairs1</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">'cos'</span><span class="p">:</span><span class="n">cos</span><span class="p">,</span> <span class="s">'cityName'</span><span class="p">:</span><span class="n">cityName</span><span class="p">,</span> <span class="s">'country'</span><span class="p">:</span><span class="n">country</span><span class="p">,</span><span class="s">'label'</span><span class="p">:</span><span class="n">label</span><span class="p">,</span>
+                            <span class="s">'k1'</span><span class="p">:</span><span class="n">i</span><span class="p">,</span> <span class="s">'k2'</span><span class="p">:</span><span class="n">j</span><span class="p">,</span> <span class="s">'year1'</span><span class="p">:</span><span class="n">year1</span><span class="p">,</span> <span class="s">'year2'</span><span class="p">:</span><span class="n">year2</span><span class="p">,</span>
+                            <span class="s">'score'</span><span class="p">:</span> <span class="n">score</span><span class="p">})</span>
+    <span class="n">dfCosPairs1</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cosPairs1</span><span class="p">)</span>
+    <span class="n">edge1</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">dfCosPairs1</span><span class="p">[[</span><span class="s">'k1'</span><span class="p">,</span>	<span class="s">'k2'</span><span class="p">]]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">dataset1</span> <span class="o">=</span> <span class="n">Data</span><span class="p">(</span><span class="n">edge_index</span><span class="o">=</span><span class="n">edge1</span><span class="p">)</span>
+    <span class="n">dataset1</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">label</span><span class="p">])</span>
+    <span class="n">dataset1</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="n">fXValuesPT1union</span>
+    <span class="n">datasetTest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">label</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">:</span>
+      <span class="n">datasetModel</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset1</span><span class="p">)</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">datasetModel</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">datasetTest</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dataset</span><span class="o">=</span><span class="n">datasetModel</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="mi">1000</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+
+
+<p></p>
+
+<p></p>
+
+<p><h4>Training GNN Graph Classification Model</h4>
+
+<p></p>
+Split input data to training and tesing:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+<span class="n">train_dataset</span> <span class="o">=</span>  <span class="n">dataset</span><span class="p">[:</span><span class="mi">888</span><span class="p">]</span>
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">888</span><span class="p">:]</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.loader</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+For this study we used the code provided by PyTorch Geometric as tutorial on GCNConv graph classification models - we just slightly tuned it for our data:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Linear</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">GCNConv</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">global_mean_pool</span>
+
+
+<span class="k">class</span> <span class="nc">GCN</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GCN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="mi">365</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="c"># 1. Obtain node embeddings</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">relu</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">relu</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+
+        <span class="c"># 2. Readout layer</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">global_mean_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>  <span class="c"># [batch_size, hidden_channels]</span>
+
+        <span class="c"># 3. Apply a final classifier</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">GCN</span><span class="p">(</span><span class="n">hidden_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Javascript</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Javascript</span><span class="p">(</span><span class="s">'''google.colab.output.setIframeHeight(0, true, {maxHeight: 300})'''</span><span class="p">))</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">GCN</span><span class="p">(</span><span class="n">hidden_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">():</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>  <span class="c"># Iterate in batches over the training dataset.</span>
+         <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="nb">float</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>  <span class="c"># Perform a single forward pass.</span>
+         <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>  <span class="c"># Compute the loss.</span>
+         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c"># Derive gradients.</span>
+         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  <span class="c"># Update parameters based on gradients.</span>
+         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>  <span class="c"># Clear gradients.</span>
+
+<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">loader</span><span class="p">):</span>
+     <span class="n">model</span><span class="o">.</span><span class="nb">eval</span><span class="p">()</span>
+
+     <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
+     <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>  <span class="c"># Iterate in batches over the training/test dataset.</span>
+         <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="nb">float</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>  
+         <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c"># Use the class with highest probability.</span>
+         <span class="n">correct</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pred</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span>  <span class="c"># Check against ground-truth labels.</span>
+     <span class="k">return</span> <span class="n">correct</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>  <span class="c"># Derive ratio of correct predictions.</span>
+
+
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">117</span><span class="p">):</span>
+    <span class="n">train</span><span class="p">()</span>
+    <span class="n">train_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+    <span class="n">test_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'Epoch: {epoch:03d}, Train Acc: {train_acc:.4f}, Test Acc: {test_acc:.4f}'</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<a href="#">
+    <img src="/img/cosLine4.jpg" alt="Post Sample Image" width="700" />
+</a>
+<p></p>
+<p></p>
+To estimate the model results we used the same model accuracy metrics as in the PyG tutorial: training data accuracy was about 96 percents and testing data accuracy was about 99 percents.
+<p></p>
+
+
+
+<h4>Interpretation of GNN Graph Classification Model results</h4>
+</p><p>
+In the output of the graph classification model we have 36 outliers with the model's predictions not equal to the input labels.
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">softmax</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">graph1</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+  <span class="n">label</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+  <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="nb">float</span><span class="p">(),</span> <span class="n">dataset</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">dataset</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>
+  <span class="n">output</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+  <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+  <span class="n">graph1</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">'index'</span><span class="p">:</span><span class="n">g</span><span class="p">,</span>
+                 <span class="s">'label'</span><span class="p">:</span><span class="n">label</span><span class="p">,</span><span class="s">'pred'</span><span class="p">:</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                 <span class="s">'prob0'</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">4</span><span class="p">),</span><span class="s">'prob1'</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)})</span>
+
+<span class="n">graph2_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">graph1</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">graph2_df</span><span class="p">[</span><span class="n">graph2_df</span><span class="p">[</span><span class="s">'label'</span><span class="p">]</span><span class="o">!=</span><span class="n">graph2_df</span><span class="p">[</span><span class="s">'pred'</span><span class="p">]])</span>
+<span class="mi">36</span></code></pre></figure>
+
+<p></p>
+Here is detail information about these outliers:
+<p></p>
+<a href="#">
+    <img src="/img/cosLine5.jpg" alt="Post Sample Image" width="444" />
+</a>
+<p></p>
+The goal of this study is to identify whether a given graph represents a stable or an unstable climate pattern, based on the temperature data in the corresponding city and the GNN graph classification model was used to learn about the relationships between the nodes within graphs and make predictions about the stability of the temperature patterns over time. The output of the GNN graph classification model would be class labels, such as stable or unstable, indicating the stability of the temperature patterns by graph locations.
+<p></p>
+Based on our observations of average cosines in consecutive years, for cities close to the equator have very high cosine similarity values which indicates that the temperature patterns in these cities are stable and consistent over time. On the contrary, cities located at higher latitudes may experience more variability in temperature patterns, making them less stable.
+
+These observations correspond with GNN graph classification model results: most of graphs for cities located in lower latitude are classified as stable and graphs of cities located in higher latitude are classified as unstable.
+
+<p></p>
+However, the GNN graph classification model results capture some outliers: there are some cities located in higher latitudes that have stable temperature patterns and some cities located in lower latitudes that have unstable temperature patterns. In the table below you can see outliers where the model's predictions do not match the actual temperature stability of these cities.
+
+<p></p>
+<a href="#">
+    <img src="/img/cosLine6.jpg" alt="Post Sample Image" width="398" />
+</a>
+<p></p>
+European cities located in higher latitude correspond with the results of our
+<i><a href="http://sparklingdataocean.com/2022/02/22/symmetryMetrics/">previous climate time series study</a></i> where they were indicated as cities with very stable and consistent temperature patterns.
+<p></p>
+
+<p></p>
+The results of our previous climate time series study showed that cities located near the Mediterranean Sea had high similarity to a smooth line, indicating stable and consistent temperature patterns.  In one of climate analysis scenarios we found that most of cities with high similarities to a smooth line are located on Mediterranean Sea not far from each other. Here is a clockwise city list: Marseille (France), Nice (France), Monaco (Monaco), Genoa (Italy), Rome (Italy), Naples (Italy), and Salerno (Italy):
+<p></p>
+<a href="#">
+    <img src="/img/nldl_img9.jpg" alt="Post Sample Image" width="333" />
+</a>
+<p></p>
+In the next table below you can see city outliers with the highest outlier probabilities
+<p></p>
+<a href="#">
+    <img src="/img/cosLine7.jpg" alt="Post Sample Image" width="398" />
+</a>
+<p></p>
+
+In the table below you can see outliers with probabilities close to the classification boundary.
+<p></p>
+<a href="#">
+    <img src="/img/cosLine8.jpg" alt="Post Sample Image" width="398" />
+</a>
+<p></p>
+<p><h3>Conclusion</h3>
+<p></p>
+In this study we introduced a novel method for detecting abnormal climate change patterns using GNN graph classification models. Our method involves calculating cosine similarity matrices between daily temperature vectors, transforming matrices into graphs, and using GCNConv graph classification model to classify graphs into stable and unstable classes and identify abnormal climate change patterns.
+<p></p>
+The results of this study showed that the GNN graph classification model was effective in learning the relationships between nodes within graphs and making predictions about the stability of the temperature patterns over time. The model results corresponded with the observed stability of temperature patterns in cities located near the equator being more stable compared to those in higher latitudes.
+<p></p>
+The study also highlighted some outliers where the predicted results did not match the input labels and explained the reasons of outliers.
+
+
+
+<p></p>
+
+
+<p></p>
+<p></p>
+
+<p></p>
+
+
+<p></p>
+<p></p>
+
+<p><h3>Next Post - GNN Graph Classification for Time Series Analysis</h3>
+In the next post we will describe how to apply GNN graph classification models to other time series scenarios.</p>
+<p></p>
+
+<p></p>
+</p></p></p></p></p></p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2022/11/09/knowledgeGraph4NlpGnn/" data-toggle="tooltip" data-placement="top" title="Find Semantic Similarities by GNN Link Predictions">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2023</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
