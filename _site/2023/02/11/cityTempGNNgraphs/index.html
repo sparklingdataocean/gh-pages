@@ -119,7 +119,7 @@ This study highlights GNN graph classifications as powerful tools for analyzing 
 </p>
 <p>
 <p><h3>Introduction</h3>
-2012 was a breakthrough year for both deep learning and knowledge graph: in 2012 the evolutionary model AlexNet was created and in 2012 Google introduced knowledge graph. Convolutional Neural Network (CNN) image classification techniques demonstrated great success outperforming previous state-of-the-art machine learning techniques in various domains. Knowledge graph became essential as a new era in data integra- tion and data management that drive many products and make them more intelligent and ”magical”.
+2012 was a breakthrough year for both deep learning and knowledge graph: in 2012 the evolutionary model AlexNet was created and in 2012 Google introduced knowledge graph. Convolutional Neural Network (CNN) image classification techniques demonstrated great success outperforming previous state-of-the-art machine learning techniques in various domains. Knowledge graph became essential as a new era in data integration and data management that drive many products and make them more intelligent and ”magical”.
 </p><p>
 For several years deep learning and knowledge graph were growing in parallel with a gap between them. This gap made it challenging to apply deep learning to graph-structured data and to leverage the strength of both approaches. In the late 2010s, Graph Neural Network (GNN) emerged as a powerful tool for processing graph-structured data and bridged the gap between them.
 <p></p>
@@ -148,7 +148,7 @@ https://www.kaggle.com/hansukyang/temperature-history-of-1000-cities-1980-to-202
 To track long-term climate trend and patterns we will start with estimation of average daily temperature for consecutive years. For each city weather station we will calculate sequence of cosines between daily temperature vectors for consecutive years to identify changes in temperature patterns over time. This can be used to understand the effects of climate change and natural variability in weather patterns. Average values of these sequences will show effect of climate change in temperature over time.  By tracking these average values, we can identify trends and changes in the temperature patterns and determine how they are related to climate change. A decrease in the average cosine similarity between consecutive years can indicate an increase in the variance or difference in daily temperature patterns, which could be a sign of climate change. On the other hand, an increase in average cosine similarity could indicate a more stable climate with less variance in daily temperature patterns.
 
 </p><p>
-To deeper understand the effects of climate change over a longer period of time we will calculate cosine similarity matrices between daily temperature vectors for non-consecutive years. Then by taking vector pairs with a cosine similarity higher than a threshold, we will transform cosine matrices into graph adja- cency matrices. These adjacency matrices will represent city graphs that will be used as input into a graph classification model.  
+To deeper understand the effects of climate change over a longer period of time we will calculate cosine similarity matrices between daily temperature vectors for non-consecutive years. Then by taking vector pairs with a cosine similarity higher than a threshold, we will transform cosine matrices into graph adjacency matrices. These adjacency matrices will represent city graphs that will be used as input into a graph classification model.  
 </p><p>
 
 If a city graph produced from the cosine similarity matrix shows high degree of connectivity, it could indicate that the climate patterns in that location are relatively stable over time (Fig. 1), while a city graph with low degree of connectivity may suggest that the climate patterns in that location are more unstable or unpredictable (Fig. 2).
@@ -159,7 +159,7 @@ Graph 1: Stable climate in Malaga, Spain represented in graph with high degree o
     <img src="/img/graphMalaga.jpg" alt="Post Sample Image" width="398" />
 </a>
 <p></p>
-Graph 2: Graph with low degree of connectivity at Oren- burg, Russia shows that the climate patterns in that location are unstable and unpredictable:
+Graph 2: Graph with low degree of connectivity at Orenburg, Russia shows that the climate patterns in that location are unstable and unpredictable:
 </p><p>
 
 <p></p>
@@ -733,6 +733,10 @@ In the next post we will describe how to apply GNN graph classification models t
                         <a href="/2022/11/09/knowledgeGraph4NlpGnn/" data-toggle="tooltip" data-placement="top" title="Find Semantic Similarities by GNN Link Predictions">&larr; Previous Post</a>
                     </li>
                     
+                    
+                    <li class="next">
+                        <a href="/2023/05/08/classGraphEeg/" data-toggle="tooltip" data-placement="top" title="GNN Graph Classification for EEG Pattern Analysis">Next Post &rarr;</a>
+                    </li>
                     
                 </ul>
 
