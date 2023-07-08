@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Exploring Document Comparison with GNN Graph Classification - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2023/07/07/knowledgeGraph4NlpGnn2/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/pageNlpGc1e.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Exploring Document Comparison with GNN Graph Classification</h1>
+                    
+                    <h2 class="subheading">Extracting Subgraphs from Semantic Graphs and Applying GNN Graph Classification</h2>
+                    
+                    <span class="meta">Posted by Melenar on July 7, 2023</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>GNN Graph Classification for Semantic Graphs</h3>
+<p></p>
+In our previous studies, we focused on the exploration of knowledge graph rewiring to uncover unknown relationships between modern art artists. In one study
+<u><a href="https://www.springerprofessional.de/en/building-knowledge-graph-in-spark-without-sparql/18375090">'Building Knowledge Graph in Spark Without SPARQL'</a></u>, we utilized artist biographies, known artist relationships, and data on modern art movements to employ graph-specific techniques, revealing hidden patterns within the knowledge graph.
+</p>
+<p>
+In more recent study <u><a href="https://www.scitepress.org/Link.aspx?doi=10.5220/0011664400003393">'Rewiring Knowledge Graphs by Link Predictions'</a></u> our approach involved the application of GNN link prediction models. We trained these models on Wikipedia articles, specifically focusing on biographies of modern art artists. By leveraging GNN, we successfully identified previously unknown relationships between artists.
+
+
+</p>
+<p>
+
+This study aims to extend earlier research by applying GNN graph classification models for document comparison, specifically using Wikipedia articles on modern art artists. Our methodology will involve transforming the text into semantic graphs based on co-located word pairs, then generating subsets of these semantic subgraphs as input data for GNN graph classification models. Finally, we will employ GNN graph classification models for a comparative analysis of the articles.
+
+</p>
+<p>
+<p><h3>Introduction</h3>
+
+The year 2012 marked a significant breakthrough in the fields of deep learning and knowledge graphs. It was during this year that Convolutional Neural Networks (CNN) gained prominence in image classification with the introduction of AlexNet. At the same time, Google introduced knowledge graphs, which revolutionized data integration and management. This breakthrough highlighted the superiority of CNN techniques over traditional machine learning approaches across various domains. Knowledge graphs enriched data products with intelligent and magical capabilities, transforming the way information is organized, connected, and understood.
+</p><p>
+For several years, deep learning and knowledge graphs progressed in parallel paths. CNN deep learning excelled at processing grid-structured data but faced challenges when dealing with graph-structured data. Graph techniques effectively represented and reasoned about graph structured data but lacked the powerful capabilities of deep learning. In the late 2010s, the emergence of Graph Neural Networks (GNN) bridged this gap and combined the strengths of deep learning and graphs. GNN became a powerful tool for processing graph- structured data through deep learning techniques.
+
+
+<p></p>
+
+</p><p>
+GNN models allow to use deep learning algorithms for graph structured data by modeling entity relationships and capturing structures and dynamics of graphs. GNN models are being used for the following tasks to analyze graph-structured data: node classification, link prediction, and graph classification. Node classification models predict label or category of a node in a graph based on its local and global neighborhood structures. Link prediction models predict whether a link should exist between two nodes based on node attributes and graph topology. Graph classification models classify entire graphs into different categories based on their graph structure and attributes: edges, nodes with features, and labels on graph level.
+
+</p><p>
+
+</p><p>
+
+GNN graph classification models are developed to classify small graphs and in practice they are commonly used in the fields of chemistry and medicine. For example, chemical molecular structures can be represented as graphs, with atoms as nodes, chemical bonds as edges, and graphs labeled by categories.
+
+</p><p>
+One of the challenges in GNN graph classification models lies in their sensitivity, where detecting differences between classes is often easier than identifying outliers or incorrectly predicted results. Currently, we are actively engaged in two studies that focus on the application of GNN graph classification models to time series classification tasks:
+
+<u><a href="http://sparklingdataocean.com/2023/02/11/cityTempGNNgraphs/"> 'GNN Graph Classification for Climate Change Patterns'</a></u> and <u><a href="http://sparklingdataocean.com/2023/05/08/classGraphEeg/"> 'GNN Graph Classification for EEG Pattern Analysis'</a></u>.
+
+</p><p>
+In this post, we address the challenges of GNN graph classification on semantic graphs for document comparison. We demonstrate effective techniques to harness graph topology and node features in order to enhance document analysis and comparison. Our approach leverages the power of GNN models in handling semantic graph data, contributing to improved document understanding and similarity assessment.
+</p><p>
+
+
+</p><p>
+To create semantic graph from documents we will use method that we introduced in our post
+<u><a href="http://sparklingdataocean.com/2022/11/09/knowledgeGraph4NlpGnn/"> 'Find Semantic Similarities by GNN Link Predictions'</a></u>. In that post we demonstrated how to use GNN link prediction models to revire knowledge graphs.
+For experiments of that study we looked at semantic similarities and dissimilarities between biographies of 20 modern art artists based on corresponding Wikipedia articles. One experiment was based on traditional method implemented on full test of articles and cosine similarities between reembedded nodes. In another scenario, GNN link prediction model ran on top of articles represented as semantic graphs with nodes as pairs of co-located words and edges as pairs of nodes with common words.
+</p><p>
+In this study, we expand on our previous research by leveraging the same data source and employing similar graph representation techniques. However, we introduce a new approach by constructing separate semantic graphs dedicated to each individual artist. This departure from considering the entire set of articles as a single knowledge graph enables us to focus on the specific relationships and patterns related to each artist. By adopting this approach, we aim to capture more targeted insights into the connections and dynamics within the knowledge graph, allowing for a deeper exploration of the relationships encoded within the biographies of these artists.
+</p><p>
+
+
+
+<p><h3>Methods</h3>
+<p></p>
+
+The input data for GNN graph classification models consists of a collection of labeled small graphs composed of edges and nodes with associated features. In this section we will describe data processing and model training in the following order:
+
+<ul>
+<li>Text preprocessing to transform raw data to semantic graphs. </li>
+<li>Node embedding process.</li>
+<li>The process of semantic subgraph extraction.</li>
+<li>Training GNN graph classification model.</li>
+</ul>
+
+
+
+<p><h4>From Raw Data to Semantic Graph</h4>
+<p></p>
+To transform text data to semantic graph with nodes as co-located word pairs we will do the following:
+
+
+
+</p>
+<ul>
+<li>Tokenize Wikipedia text and exclude stop words.</li>
+<li>Get nodes as co-located word pairs.</li>
+<li>Get edges between nodes.</li>
+<li>Build semantic graph.</li>
+</ul>
+<p></p>
+To generate edges we will find pair to pair neighbors following text sequences within articles and joint pairs that have common words.
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">if</span> <span class="n">pair1</span><span class="o">=</span><span class="p">[</span><span class="n">leftWord1</span><span class="p">,</span> <span class="n">rightWord1</span><span class="p">],</span>
+   <span class="n">pair2</span><span class="o">=</span><span class="p">[</span><span class="n">leftWord2</span><span class="p">,</span> <span class="n">rightWord2</span><span class="p">]</span>
+   <span class="ow">and</span> <span class="n">rightWord1</span><span class="o">=</span><span class="n">leftWord2</span><span class="p">,</span>
+<span class="n">then</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">edge12</span><span class="o">=</span><span class="p">{</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="p">}</span></code></pre></figure>
+
+<p></p>
+
+Graph edges built based of these rules will cover word to word sequences and word to word chains within articles. On nodes and edges described above we will built an semantic graphs.
+</p><p>
+</p><p>
+<h4>Node Embedding</h4>
+</p><p>
+To translate text of pairs of co-located to vectors we will use transformer model from Hugging Face: <u><a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2"> 'all-MiniLM-L6-v2'</a></u>. This is a sentence-transformers model that maps text to a 384 dimensional vector space.
+
+
+</p><p>
+<p><h4>Extract Semantic Subgraphs</h4>
+</p><p>
+
+
+As input data for GNN graph classification model we need a set of labeled small graphs. In this study from each document of interest we will extract a set of subgraphs. By extracting relevant subgraphs from both documents, GNN graph classification models can compare the structural relationships and contextual information within the subgraphs to assess their similarity or dissimilarity. One of the ways to extract is getting subgraphs as neighbors and neighbors of neighbors of nodes with high centralities. In this study we will use betweenness centrality metrics.
+
+</p><p>
+
+</p><p>
+<h4>Train the Model</h4>
+</p><p>
+The GNN graph classification model is designed to process input graph data, including both the edges and node features, and is trained on graph-level labels. In this case, the input data structure consists of the following components:
+</p><p>
+<ul>
+<li>
+Edges in a graph capture the relationships between nodes.
+</li><li>
+Nodes with embedded features would be embedded into the nodes to provide additional information to the GNN graph classification model.
+</li><li>
+Graph-level labels are assigned to the entire graph, and the GNN graph classification model leverages these labels to identify and predict patterns specific to each label category.
+</li></ul>
+<p></p>
+
+As GNN graph classification model we will use a GCNConv (Graph Convolutional Network Convolution) activation model. The model code is taken from tutorial of the <u><a href="https://pytorch-geometric.readthedocs.io/en/latest/"> 'PyTorch Geometric Library (PyG)'</a></u>. The GCNConv graph classification model is a type of graph convolutional network that uses convolution operations to aggregate information from neighboring nodes in a graph. It takes as input graph data (edges, node features, and the graph-level labels) and applies graph convolutional operations to extract meaningful features from the graph structure.
+<p></p>
+The Python code for the GCNConv model is provided by the PyG library. The code for converting data to the PyG data format, model training and interpretation techniques are described below.
+<p></p>
+
+
+<h3>Experiments</h3>
+<p></p>
+<h4>Data Source</h4>
+<p></p>
+
+As the data source for this study we used text data from Wikipedia articles about 20 modern art artists. Here is the list of artists and Wikipedia text size distribution:
+<p></p>
+<a href="#">
+    <img src="/img/artStats.jpg" alt="Post Sample Image" width="1000" />
+</a>
+<p></p>
+
+<p>Based on Wikipedia text size distribution, the most well known artist in our artist list is Vincent van Gogh and the most unknown artist is Franz Marc:</p>
+
+<p></p>
+<a href="#">
+    <img src="/img/artImg1.jpg" alt="Post Sample Image" width="345" />
+</a>
+<p></p>
+
+<p></p>
+More detail information is available in our post <u><a href="http://sparklingdataocean.com/2022/07/23/knowledgeGraph4GNN/">'Rewiring Knowledge Graphs by Link Predictions'</a></u>.
+
+<p></p>
+
+To estimate document similarities based on GNN graph classification model, we experimented with pairs of highly connected artists and highly disconnected artists.
+
+Pairs of artists were selected based on our study <u><a href="https://www.springerprofessional.de/en/building-knowledge-graph-in-spark-without-sparql/18375090">"Building Knowledge Graph in Spark without SPARQL"</a></u>.
+This picture illustrates relationships between modern art artists based on their biographies and art movements:
+
+<p></p>
+<a href="#">
+    <img src="/img/artStats2b.jpg" alt="Post Sample Image" width="1000" />
+</a>
+<p></p>
+
+<p>As highly connected artists, we selected Pablo Picasso and Georges Braque, artists with well known strong relationships between them: both Pablo Picasso and Georges Braque were pioneers of cubism art movement.
+<p></p>
+As highly disconnected artists, we selected Claude Monet and Kazimir Male- vich who were notably distant from each other: they lived in different time peri- ods, resided in separate countries, and belonged to contrasting art movements: Claude Monet was a key artist of impressionism and Kazimir Malevich a key artist of Suprematism.</p>
+
+<p></p>
+
+For a more detailed exploration of the relationships between modern art artists discovered through knowledge graph techniques, you can refer to our post:
+
+<u><a href="http://sparklingdataocean.com/2020/02/02/knowledgeGraphIntegration/">"Knowledge Graph for Data Integration"</a></u>.
+
+
+<p></p>
+
+
+<p></p>
+
+<p></p>
+
+<p></p>
+<h4>Transform Text Document to Semantic Graph</h4>
+<p></p>
+For each selected Wikipedia article we transformed text to semantic graphs by the following steps:
+
+<ul>
+<li>Tokenize Wikipedia text and excluded stop words.</li>
+<li>Generate nodes as co-located word pairs.</li>
+<li>Calculate edges as joint pairs that have common words. These edges represente word sequences and word chains within articles.</li>
+</ul>
+
+
+<p></p>
+<h5>Tokenize Wikipedia text</h5>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">RegexpTokenizer</span>
+<span class="n">tokenizer</span> <span class="o">=</span><span class="n">RegexpTokenizer</span><span class="p">(</span><span class="s">r'[A-Za-z]+'</span><span class="p">)</span>
+
+<span class="n">wikiArtWords</span><span class="o">=</span><span class="n">wikiArtists</span><span class="p">[</span><span class="s">'Wiki'</span><span class="p">]</span>
+  <span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">RegexpTokenizer</span><span class="p">(</span><span class="s">r'[A-Za-z]+'</span><span class="p">)</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+<span class="n">wikiArtWords</span><span class="o">=</span><span class="n">wikiArtWords</span><span class="o">.</span><span class="n">explode</span><span class="p">([</span><span class="s">'words'</span><span class="p">])</span>
+<span class="n">wordStats</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">wikiArtWords</span><span class="p">,</span><span class="n">listArtists</span><span class="p">)</span>
+
+<span class="n">artistWordStats</span><span class="o">=</span><span class="n">wordStats</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'Artist'</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+  <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'words'</span><span class="p">,</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></code></pre></figure>
+
+
+
+
+<p></p>
+<h5>Exclude stop words</h5>
+<p></p>
+
+Exclude stop words and short words woth length&lt;4:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">nltk</span>
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s">'stopwords'</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+<span class="n">STOPWORDS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s">'english'</span><span class="p">))</span>
+<span class="n">dfStopWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="p">(</span><span class="n">STOPWORDS</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'words'</span><span class="p">])</span>
+<span class="n">dfStopWords</span><span class="p">[</span><span class="s">'stop'</span><span class="p">]</span><span class="o">=</span><span class="s">"stopWord"</span>
+<span class="n">stopWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">wikiArtWords</span><span class="p">,</span><span class="n">dfStopWords</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s">'words'</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s">'left'</span><span class="p">)</span>
+
+<span class="n">nonStopWords</span><span class="o">=</span><span class="n">stopWords</span><span class="p">[</span><span class="n">stopWords</span><span class="p">[</span><span class="s">'stop'</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()]</span>
+<span class="n">nonStopWords</span><span class="p">[</span><span class="s">'stop'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nonStopWords</span><span class="p">[</span><span class="s">'words'</span><span class="p">]</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="nb">len</span><span class="p">()</span>
+<span class="n">nonStopWords</span><span class="o">=</span><span class="n">nonStopWords</span><span class="p">[</span><span class="n">nonStopWords</span><span class="p">[</span><span class="s">'stop'</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">nonStopWords</span><span class="p">[</span><span class="s">'words'</span><span class="p">]</span><span class="o">=</span> <span class="n">nonStopWords</span><span class="p">[</span><span class="s">'words'</span><span class="p">]</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="n">nonStopWords</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">nonStopWords</span><span class="p">[</span><span class="s">'idxWord'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nonStopWords</span><span class="o">.</span><span class="n">index</span></code></pre></figure>
+
+
+<p></p>
+
+<p></p>
+
+
+<p></p>
+
+<p></p>
+
+<p></p>
+<h5>Generated nodes as co-located word pairs</h5>
+<p></p>
+Get pairs of co-located words:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">bagOfWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">nonStopWordsSubset</span><span class="p">[</span><span class="s">'words'</span><span class="p">])</span>
+<span class="n">bagOfWords</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">bagOfWords</span><span class="p">[</span><span class="s">'idxWord'</span><span class="p">]</span> <span class="o">=</span> <span class="n">bagOfWords</span><span class="o">.</span><span class="n">index</span>
+
+<span class="n">indexWords</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">nonStopWordsSubset</span><span class="p">,</span><span class="n">bagOfWords</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s">'words'</span><span class="p">,</span><span class="s">'idxWord'</span><span class="p">])</span>
+<span class="n">idxWord1</span><span class="o">=</span><span class="n">indexWords</span>
+  <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'words'</span><span class="p">:</span><span class="s">'word1'</span><span class="p">,</span><span class="s">'idxArtist'</span><span class="p">:</span><span class="s">'idxArtist1'</span><span class="p">,</span><span class="s">'idxWord'</span><span class="p">:</span><span class="s">'idxWord1'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">idxWord2</span><span class="o">=</span><span class="n">indexWords</span>
+  <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'words'</span><span class="p">:</span><span class="s">'word2'</span><span class="p">,</span><span class="s">'idxArtist'</span><span class="p">:</span><span class="s">'idxArtist2'</span><span class="p">,</span><span class="s">'idxWord'</span><span class="p">:</span><span class="s">'idxWord2'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">leftWord</span><span class="o">=</span><span class="n">idxWord1</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span>
+<span class="n">leftWord</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">rightWord</span> <span class="o">=</span> <span class="n">idxWord2</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  
+
+<span class="n">pairWords</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">leftWord</span><span class="p">,</span><span class="n">rightWord</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pairWords</span> <span class="o">=</span> <span class="n">pairWords</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">pairWords</span><span class="p">[</span><span class="n">pairWords</span><span class="p">[</span><span class="s">'idxArtist1'</span><span class="p">]</span><span class="o">!=</span><span class="n">pairWords</span><span class="p">[</span><span class="s">'idxArtist2'</span><span class="p">]]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">pairWords</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+Drop duplicates {artist, word1, word2}
+
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cleanPairWords</span> <span class="o">=</span> <span class="n">pairWords</span>
+<span class="n">cleanPairWords</span> <span class="o">=</span> <span class="n">cleanPairWords</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span>
+  <span class="n">subset</span> <span class="o">=</span> <span class="p">[</span><span class="s">'idxArtist1'</span><span class="p">,</span> <span class="s">'word1'</span><span class="p">,</span> <span class="s">'word2'</span><span class="p">],</span> <span class="n">keep</span> <span class="o">=</span> <span class="s">'last'</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">cleanPairWords</span><span class="p">[</span><span class="s">'wordpair'</span><span class="p">]</span> <span class="o">=</span>
+  <span class="n">cleanPairWords</span><span class="p">[</span><span class="s">"word1"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s">" "</span> <span class="o">+</span> <span class="n">cleanPairWords</span><span class="p">[</span><span class="s">"word2"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">cleanPairWords</span><span class="p">[</span><span class="s">'nodeIdx'</span><span class="p">]</span><span class="o">=</span><span class="n">cleanPairWords</span><span class="o">.</span><span class="n">index</span></code></pre></figure>
+
+<p></p>
+
+
+
+<p></p>
+
+
+<p></p>
+<h5>Calculated edges as joint pairs that have common words.</h5>
+<p></p>
+Index data:
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">nodeList1</span><span class="o">=</span><span class="n">nodeList</span>
+  <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'word2'</span><span class="p">:</span><span class="s">'theWord'</span><span class="p">,</span><span class="s">'wordpair'</span><span class="p">:</span><span class="s">'wordpair1'</span><span class="p">,</span><span class="s">'nodeIdx'</span><span class="p">:</span><span class="s">'nodeIdx1'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">nodeList2</span><span class="o">=</span><span class="n">nodeList</span>
+  <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'word1'</span><span class="p">:</span><span class="s">'theWord'</span><span class="p">,</span><span class="s">'idxArtist1'</span><span class="p">:</span><span class="s">'idxArtist2'</span><span class="p">,</span><span class="s">'wordpair'</span><span class="p">:</span><span class="s">'wordpair2'</span><span class="p">,</span>
+  <span class="s">'nodeIdx'</span><span class="p">:</span><span class="s">'nodeIdx2'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">allNodes</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">nodeList1</span><span class="p">,</span><span class="n">nodeList2</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s">'theWord'</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s">'inner'</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+
+<p></p>
+<h4>Input Data Preparation</h4>
+<p></p>
+<h5>Transform Text to Vectors</h5>
+As mentioned above, for text to vector translation we used ’all- MiniLM-L6- v2’ transformer model from Hugging Face.
+<p></p>
+Get unique word pairs for embedding
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">bagOfPairWords</span><span class="o">=</span><span class="n">nodeList</span>
+<span class="n">bagOfPairWords</span> <span class="o">=</span> <span class="n">bagOfPairWords</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s">'wordpair'</span><span class="p">)</span>
+<span class="n">bagOfPairWords</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">bagOfPairWords</span><span class="p">[</span><span class="s">'bagPairWordsIdx'</span><span class="p">]</span><span class="o">=</span><span class="n">bagOfPairWords</span><span class="o">.</span><span class="n">index</span></code></pre></figure>
+
+<p></p>
+<p></p>
+Transform node features to vectors:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s">'all-MiniLM-L6-v2'</span><span class="p">)</span>
+<span class="n">wordpair_embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">cleanPairWords</span><span class="p">[</span><span class="s">"wordpair"</span><span class="p">],</span><span class="n">convert_to_tensor</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+
+
+<p></p>
+<h5>Prepare Input Data for GNN Graph Classification Model</h5>
+<p></p>
+
+In GNN graph classification, the input to the model is typically a set of small graphs that represent entities in the dataset. These graphs are composed of nodes and edges, where nodes represent entities, and edges represent the relationships between them. Both nodes and edges may have associated features that describe the attributes of the entity or relationship, respectively. These features can be used by the GNN model to learn the patterns and relationships in the data, and classify or predict labels for the graphs. By considering the structure of the data as a graph, GNNs can be particularly effective in capturing the complex relationships and dependencies between entities, making them a useful tool for a wide range of applications.
+
+<p></p>
+To prepare the input data for the GNN graph classification model, we generated labeled semantic subgraphs from each document of interest. These subgraphs were constructed by selecting neighbors and neighbors of neighbors around specific ”central” nodes. The central nodes were determined by identifying the top 500 nodes with the highest betweenness centrality within each document.
+<p></p>
+By focusing on these central nodes and their neighboring nodes, we aimed to capture the relevant information and relationships within the document. This approach allowed us to create labeled subgraphs that served as the input data for the GNN graph classification model, enabling us to classify and analyze the documents effectively.
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">networkx</span> <span class="kn">as</span> <span class="nn">nx</span>
+<span class="n">list1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>  
+<span class="n">list2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span>  
+<span class="n">radius</span><span class="o">=</span><span class="mi">2</span>
+<span class="n">datasetTest</span><span class="o">=</span><span class="nb">list</span><span class="p">()</span>
+<span class="n">datasetModel</span><span class="o">=</span><span class="nb">list</span><span class="p">()</span>
+<span class="n">dfUnion</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">seeds</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">artist</span> <span class="ow">in</span> <span class="n">list1</span> <span class="o">+</span> <span class="n">list2</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">artist</span> <span class="ow">in</span> <span class="n">list1</span><span class="p">:</span>
+    <span class="n">label</span><span class="o">=</span><span class="mi">0</span>
+  <span class="k">if</span> <span class="n">artist</span> <span class="ow">in</span> <span class="n">list2</span><span class="p">:</span>
+    <span class="n">label</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">edgeInfo0</span><span class="o">=</span><span class="n">edgeInfo</span><span class="p">[</span><span class="n">edgeInfo</span><span class="p">[</span><span class="s">'idxArtist'</span><span class="p">]</span><span class="o">==</span><span class="n">artist</span><span class="p">]</span>
+    <span class="n">G</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">from_pandas_edgelist</span><span class="p">(</span><span class="n">edgeInfo0</span><span class="p">,</span>  <span class="s">"wordpair1"</span><span class="p">,</span> <span class="s">"wordpair2"</span><span class="p">)</span>
+    <span class="n">betweenness</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">sorted_nodes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">betweenness</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">betweenness</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">top_nodes</span> <span class="o">=</span> <span class="n">sorted_nodes</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span>
+    <span class="n">dfTopNodes</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">top_nodes</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'seedPair'</span><span class="p">])</span>
+    <span class="n">dfTopNodes</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="n">dfTopNodes</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+      <span class="n">seed_node</span><span class="o">=</span><span class="n">dfTopNodes</span><span class="p">[</span><span class="s">'seedPair'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">seed</span><span class="p">]</span>
+      <span class="n">seeds</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">'label'</span><span class="p">:</span><span class="n">label</span><span class="p">,</span><span class="s">'artist'</span><span class="p">:</span><span class="n">artist</span><span class="p">,</span> <span class="s">'seed_node'</span><span class="p">:</span><span class="n">seed_node</span><span class="p">,</span> <span class="s">'seed'</span><span class="p">:</span><span class="n">seed</span><span class="p">})</span>
+      <span class="n">foaf_nodes</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">ego_graph</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">seed_node</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span><span class="o">.</span><span class="n">nodes</span>
+      <span class="n">dfFoaf</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">foaf_nodes</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'wordpair'</span><span class="p">])</span>
+      <span class="n">dfFoaf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+      <span class="n">dfFoaf</span><span class="p">[</span><span class="s">'foafIdx'</span><span class="p">]</span><span class="o">=</span><span class="n">dfFoaf</span><span class="o">.</span><span class="n">index</span>
+      <span class="n">words_embed</span> <span class="o">=</span> <span class="n">words_embeddings</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">dfFoaf</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">'wordpair'</span><span class="p">)</span>
+      <span class="n">values1</span><span class="o">=</span><span class="n">words_embed</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">384</span><span class="p">]</span>
+      <span class="n">fXValues1</span><span class="o">=</span> <span class="n">values1</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+      <span class="n">fXValuesPT1</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">fXValues1</span><span class="p">)</span>
+      <span class="n">graphSize</span><span class="o">=</span><span class="n">dfFoaf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="c"># dfFoaf.tail()</span>
+      <span class="n">oneGraph</span><span class="o">=</span><span class="p">[]</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">graphSize</span><span class="p">):</span>
+        <span class="n">pairi</span><span class="o">=</span><span class="n">dfFoaf</span><span class="p">[</span><span class="s">'wordpair'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">" "</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">pairi1</span> <span class="o">=</span> <span class="n">pairi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">pairi2</span> <span class="o">=</span> <span class="n">pairi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c"># for j in range(i+1,graphSize):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">graphSize</span><span class="p">):</span>
+          <span class="n">pairj</span><span class="o">=</span><span class="n">dfFoaf</span><span class="p">[</span><span class="s">'wordpair'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">" "</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+          <span class="n">pairj1</span> <span class="o">=</span> <span class="n">pairj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+          <span class="n">pairj2</span> <span class="o">=</span> <span class="n">pairj</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+          <span class="k">if</span> <span class="p">(</span> <span class="n">pairi2</span><span class="o">==</span><span class="n">pairj1</span><span class="p">):</span>
+            <span class="n">oneGraph</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">'label'</span><span class="p">:</span><span class="n">label</span><span class="p">,</span> <span class="s">'artist'</span><span class="p">:</span><span class="n">artist</span><span class="p">,</span><span class="s">'seed'</span><span class="p">:</span><span class="n">seed</span><span class="p">,</span>
+                             <span class="s">'centralNode'</span><span class="p">:</span><span class="n">seed_node</span><span class="p">,</span> <span class="s">'k1'</span><span class="p">:</span><span class="n">i</span><span class="p">,</span> <span class="s">'k2'</span><span class="p">:</span><span class="n">j</span><span class="p">,</span> <span class="s">'pairi'</span><span class="p">:</span><span class="n">pairi</span><span class="p">,</span> <span class="s">'pairj'</span><span class="p">:</span><span class="n">pairj</span><span class="p">})</span>
+      <span class="n">dfGraph</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">oneGraph</span><span class="p">)</span>
+      <span class="n">dfUnion</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dfUnion</span><span class="p">,</span> <span class="n">dfGraph</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+      <span class="n">edge1</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">dfGraph</span><span class="p">[[</span><span class="s">'k1'</span><span class="p">,</span><span class="s">'k2'</span><span class="p">]]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+      <span class="n">dataset1</span> <span class="o">=</span> <span class="n">Data</span><span class="p">(</span><span class="n">edge_index</span><span class="o">=</span><span class="n">edge1</span><span class="p">)</span>
+      <span class="n">dataset1</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">label</span><span class="p">])</span>
+      <span class="n">dataset1</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="n">fXValuesPT1</span>
+      <span class="n">datasetModel</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset1</span><span class="p">)</span>
+      <span class="n">loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">datasetModel</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+Model size
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">modelSize</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="n">modelSize</span>
+<span class="mi">1000</span></code></pre></figure>
+
+<p></p>
+<p></p>
+
+<p><h4>Training the Model</h4>
+<p></p>
+For this study we used the code provided by PyTorch Geometric as tutorial on GCNConv graph classification models - we just slightly tuned it for our data:
+
+<p></p>
+<p><h5>Randomly split data to training and tesing</h5>
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">random</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+<span class="n">percent</span> <span class="o">=</span> <span class="mf">0.13</span>
+<span class="n">sample_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">modelSize</span> <span class="o">*</span> <span class="n">percent</span><span class="p">)</span>
+<span class="n">train_size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">modelSize</span><span class="o">-</span><span class="n">sample_size</span><span class="p">)</span>
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">)</span>
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">train_size</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'Number of training graphs: {len(train_dataset)}'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'Number of test graphs: {len(test_dataset)}'</span><span class="p">)</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">training</span> <span class="n">graphs</span><span class="p">:</span> <span class="mi">870</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">test</span> <span class="n">graphs</span><span class="p">:</span> <span class="mi">130</span></code></pre></figure>
+
+
+<p></p>
+
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">torch_geometric.loader</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_loader</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'Step {step + 1}:'</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'======='</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'Number of graphs in the current batch: {data.num_graphs}'</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">()</span></code></pre></figure>
+
+<p></p>
+<h5>Prepare the model:</h5>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Linear</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">GCNConv</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">global_mean_pool</span>
+
+<span class="k">class</span> <span class="nc">GCN</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GCN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="mi">384</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="c"># 1. Obtain node embeddings</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">relu</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">relu</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+        <span class="c"># 2. Readout layer</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">global_mean_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>  <span class="c"># [batch_size, hidden_channels]</span>
+        <span class="c"># 3. Apply a final classifier</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>        
+        <span class="k">return</span> <span class="n">x</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GCN</span><span class="p">(</span><span class="n">hidden_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p><h5>Train the Model:</h5>
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Javascript</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Javascript</span><span class="p">(</span><span class="s">'''google.colab.output.setIframeHeight(0, true, {maxHeight: 300})'''</span><span class="p">))</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">GCN</span><span class="p">(</span><span class="n">hidden_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">():</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+   <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>  <span class="c"># Iterate in batches over the training dataset.</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="nb">float</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>  <span class="c"># Perform a single forward pass.</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>  <span class="c"># Compute the loss.</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c"># Derive gradients.</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  <span class="c"># Update parameters based on gradients.</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>  <span class="c"># Clear gradients.</span>
+
+<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">loader</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="nb">eval</span><span class="p">()</span>
+    <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>  <span class="c"># Iterate in batches over the training/test dataset.</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="nb">float</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>  
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c"># Use the class with highest probability.</span>
+        <span class="n">correct</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pred</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span>  <span class="c"># Check against ground-truth labels.</span>
+    <span class="k">return</span> <span class="n">correct</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>  <span class="c"># Derive ratio of correct predictions.</span>
+
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+   <span class="n">train</span><span class="p">()</span>
+   <span class="n">train_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+   <span class="n">test_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
+   <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'Epoch: {epoch:03d}, Train Acc: {train_acc:.4f}, Test Acc: {test_acc:.4f}'</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+<p></p>
+To estimate the model results we used the same model accuracy metrics as in the PyG tutorial.
+<p></p>
+<p></p>
+<p></p>
+
+<p><h5>Accuracy Metrics of the Model:</h5>
+<p></p>
+
+As we mentioned above, the GNN graph classification model exhibits higher sensitivity for classification compared to the GNN link prediction model. In both scenarios, we trained the models for 9 epochs.
+<p></p>
+Given the distinct differences between Monet and Malevich as artists, we anticipated achieving high accuracy metrics. However, the surprising outcome was obtaining perfect metrics as 1.0000 for training data and 1.0000 for testing right from the initial training step.
+
+<p></p>
+<p></p>
+<a href="#">
+    <img src="/img/modelStats1.jpg" alt="Post Sample Image" width="345" />
+</a>
+<p></p>
+
+In the classification of Wikipedia articles about Pablo Picasso and Georges Braque, we were not anticipating the significant differentiation between these two documents: these artists had very strong relationships in biography and art movements. Also GNN link prediction models classified these artists as highly similar.
+<p></p>
+<p></p>
+<a href="#">
+    <img src="/img/modelStats2.jpg" alt="Post Sample Image" width="345" />
+</a>
+<p></p>
+This observation highlights the high sensitivity of the GNN graph classifica- tion model and emphasizes the ability of the GNN graph classification model to capture nuanced differences and provide a more refined classification approach compared to the GNN Link Prediction models.
+
+<p><h4>Model Results</h4>
+<p></p>
+
+<p></p>
+To interpret model results we calculated the softmax probabilities for each class output by the model. The softmax probabilities represent the model's confidence in its prediction for each class.
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">modelSize</span>
+<span class="mi">1000</span></code></pre></figure>
+
+
+<p></p>
+<p></p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">softmax</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">graph1</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">modelSize</span><span class="p">):</span>
+  <span class="n">label</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+  <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="nb">float</span><span class="p">(),</span> <span class="n">dataset</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">dataset</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>
+  <span class="n">output</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+  <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+  <span class="n">graph1</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">'index'</span><span class="p">:</span><span class="n">g</span><span class="p">,</span>
+                 <span class="s">'label'</span><span class="p">:</span><span class="n">label</span><span class="p">,</span><span class="s">'pred'</span><span class="p">:</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                 <span class="s">'prob0'</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">4</span><span class="p">),</span><span class="s">'prob1'</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)})</span></code></pre></figure>
+
+<p></p>
+
+
+
+<p></p>
+One of the challenges encountered when utilizing the GNN graph classification model for text classification is the identification of outliers. In the scenario of classifying Wikipedia articles about the biographies of Claude Monet and Kazimir Malevich, the trained model did not detect any outliers.
+<p></p>
+In the case of Pablo Picasso and Georges Braque, we found that despite their shared biographies and involvement in the same art movements, there were no- table differences between their respective Wikipedia articles. The GNN graph classification model identified these articles as highly dissimilar, suggesting dis- tinct characteristics and content within their biographies. During our analysis of 1000 subgraphs, we encountered only 8 outliers.
+<p></p>
+<p></p>
+<a href="#">
+    <img src="/img/modelStats3.jpg" alt="Post Sample Image" width="444" />
+</a>
+<p></p>
+
+
+
+<p></p>
+<p></p>
+<p><h3>Conclusion</h3>
+
+
+<p></p>
+GNN graph classification is a powerful machine learning technique designed for object classification when the objects can be represented as graphs. By mapping object elements to nodes and their relationships to edges, GNN graph classification models capture complex interdependencies among the elements. This approach is particularly valuable when traditional machine learning methods struggle to capture complex relationships.
+<p></p>
+GNN graph classification has been successfully applied in various domains, including molecule classification, image recognition, protein classification, social networks, brain connectivity networks, road networks, and climate data analysis.
+<p></p>
+In this paper, we investigate the application of GNN graph classification models in NLP for document comparison, aiming to uncover document similarities and dissimilarities using graph topology and node features. We focus on comparing Wikipedia articles about modern art artists and demonstrate the potential of these models in extracting relevant information and identifying patterns. Additionally, we address challenges related to model sensitivity and outlier detection in GNN graph classification.
+<p></p>
+We investigated the effectiveness of GNN graph classification in capturing different types of relationships among artists. We specifically selected two pairs of artists, one representing highly connected relationships (Pablo Picasso and Georges Braque) and the other representing highly disconnected relationships (Claude Monet and Kazimir Malevich). As expected, in the case of classifying Wikipedia articles on the biographies of Claude Monet and Kazimir Malevich, no outliers were detected.
+<p></p>
+In the case of Pablo Picasso and Georges Braque, despite their shared biographies and association with the cubism art movement, we identified substantial differences in their respective articles. The GNN graph classification model categorized these articles as highly dissimilar and out of 1000 subgraphs, we encountered only 8 outliers, further emphasizing the model’s sensitivity in capturing the nuanced differences between the documents.
+<p></p>
+Future research can further explore the applications of GNN graph classification models in NLP, with a focus on addressing sensitivity and outlier detection challenges. Additionally, efforts can be made to deeper understanding of semantic graph relationships.
+<p></p>
+In conclusion, our study advances document comparison using GNN graph classification, offering valuable insights for text analysis and knowledge discovery. It contributes to the growing field of GNN-based methods in NLP, opening avenues for future research and practical applications.
+<p></p>
+<p><h3>Next Post - Graph Connectors</h3>
+
+In the next spost we will start a new topic related to knowledge graphs and GNN.
+<p></p>
+</p></p></p></p></p></p></p></p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2023/05/08/classGraphEeg/" data-toggle="tooltip" data-placement="top" title="GNN Graph Classification for EEG Pattern Analysis">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2023</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
