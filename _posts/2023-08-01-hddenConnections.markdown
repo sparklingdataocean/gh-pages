@@ -6,7 +6,7 @@ date:       2023-08-01 12:00:00
 author:     "Melenar"
 header-img: "img/pageEgg1m.jpg"
 ---
-<p><h3>Uncovering Hidden Connections in Semantic Knowledge Graphs</h3>
+<p><h3>Uncovering Hidden Connections in Knowledge Graphs</h3>
 
 <p>In recent years, knowledge graphs have become a powerful tool for integrating and analyzing data and shedding lights on the connections between entities. This study narrows its focus on unraveling detailed relationships within knowledge graphs, placing special emphasis on the role of graph connectors through link predictions and triangle analysis.</p>
 
