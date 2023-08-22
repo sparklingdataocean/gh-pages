@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Uncovering Hidden Connections - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2023/08/01/hddenConnections/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/pageEgg1m.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Uncovering Hidden Connections</h1>
+                    
+                    <h2 class="subheading">Granular Relationship Analysis in Knowledge Graphs</h2>
+                    
+                    <span class="meta">Posted by Melenar on August 1, 2023</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3>Uncovering Hidden Connections in Semantic Knowledge Graphs</h3>
+
+<p>In recent years, knowledge graphs have become a powerful tool for integrating and analyzing data and shedding lights on the connections between entities. This study narrows its focus on unraveling detailed relationships within knowledge graphs, placing special emphasis on the role of graph connectors through link predictions and triangle analysis.</p>
+
+<p>Using Graph Neural Network (GNN) Link Prediction models and graph triangle analysis in knowledge graphs, we have managed to uncover relationships that had been previously undetected or overlooked. Our findings mark a significant milestone, paving the way for more comprehensive exploration into the complex relationships that exist within knowledge graphs.</p>
+
+<p>This study initiates further research in the area of unveiling the hidden dynamics and connections in knowledge graphs. The insights from this work promise to redefine our understanding of knowledge graphs and their potential for unlocking the complexities of data interrelationships.</p>
+
+<p><h3>Introduction</h3>
+
+<h4>Deep Learning, Knowledge Graphs and the Emergence of GNN</h4>
+
+<p>The year 2012 was pivotal for deep learning and knowledge graphs. In that year, after AlexNet was introduced, a Convolutional Neural Network (CNN) highlighted the power of image classification techniques. Simultaneously, Google's introduction of knowledge graphs transformed data integration and management.</p>
+
+<p>For many years, deep learning and knowledge graphs developed independently. CNN proved effective with grid-structured data but struggled with graph-structured data. On the other hand, graph techniques excelled in representing and reasoning about graph data but lacked deep learning's power. The late 2010s Graph Neural Networks (GNN) bridged this gap and emerged as a potent tool for processing graph-structured data through deep learning techniques.</p>
+
+<h4>Our Past Experiments in Rewiring of Knowledge Graphs</h4>
+
+<p>In our previous study <u><a href="https://www.scitepress.org/Link.aspx?doi=10.5220/0011664400003393">'Rewiring Knowledge Graphs by Link Predictions'</a></u>
+
+we delved into the exploration of knowledge graph rewiring to reveal unknown relationships between modern art artists, employing GNN link prediction models. By training these models on Wikipedia articles about modern art artists' biographies and leveraging GNN link prediction models, we identified previously unknown relationships between artists.</p>
+
+<p>To rewire knowledge graphs, we adopted two distinct methods. First, we utilized a traditional method that involved a full-text analysis of articles and calculation of cosine similarities between re-embedded nodes. The second method involved the construction of semantic graphs based on the distribution of pairs of co-located words, and edges between nodes that share common words.</p>
+
+
+<h4>New Study: Focusing on Graph Triangles</h4>
+<p></p>
+
+In this study, we continue to leverage the same data source and employ similar techniques for graph representation. However, we introduce a novel approach of comparing two documents and examining entity relationships at granular level. Specifically, we concentrate on analyzing graph triangles, where one side displays a stronger connection than the other two sides.</p>
+
+<p>Analyzing graph triangles offers insights into the strength of connections between nodes within a network. We study the relationships among nodes A, B, and C, focusing on the strength of the connection between nodes B and C compared to the connections involving node A. We identify node A as a 'graph connector' node, critical in facilitating communication and interaction between nodes B and C. Serving as a link, node A allows the smooth flow of information and relationships between the strongly connected nodes B and C.
+<p></p>
+<p></p>
+
+<p></p>
+As analogy, imagine early 20th-century Vienna's intellectual scene as a dynamic network. Berta Zuckerkandl's salon stood out as one of central nodes, orchestrating and facilitating connections.
+Her salon served as the platform, connecting diverse talents like artists, scientists, and doctors. Each gathering at her salon can be seen as the creation of 'links' between nodes.
+Berta stands as a quintessential 'graph connector' and her role ensures not just random interactions, but impactful connections, emphasizing her integral position in this vibrant intellectual web.
+<p></p>
+<a href="#">
+    <img src="/img/salon1c.jpg" alt="Post Sample Image" width="1000" />
+</a>
+<p></p>
+
+
+<p></p>
+This characterizes the importance of graph connector nodes in enhancing the network's overall connectivity and functionality, fostering collective behaviors and dynamics among interconnected nodes.
+
+<p></p>
+<h4>Depicting Graph Connectors</h4>
+<p></p>
+To find graph connectors, we will look for graph triangles where one cosine similarity between the nodes is higher than other two cosine similarity values.  This implies a stronger connection between two nodes relative to the connections of two other node pairs.
+
+
+<p></p>
+
+<p></p>
+Graph representation traditionally operates in binary terms: either pairs of nodes are connected by edges or they are not. When using binary edges in graph triangle analysis, we are limited to recognizing the presence or absence of connections between nodes. Such a black-and-white perspective can overlook the nuanced graph connectors.
+<p></p>
+By employing GNN link prediction models, we move beyond this limitation. GNN link prediction model transcends this binary structure by embedding nodes into continuous vector space, providing a spectrum of ways to compare and evaluate these vectors. This deeper representation makes it possible to identify and understand graph connectors that a simple binary analysis might overlook.
+<p></p>
+In essence, understanding the nuances of node relationships allows for more robust, dynamic, and insightful analyses, enabling richer interpretations and predictions based on graph data. In this study we will apply GNN Link Prediction model to graph triangle analysis.
+<p></p>
+
+<h4>Employing Graph Triangle Analysis and the GraphSAGE Model</h4>
+
+<p>In this study, we aim to compare our previous study's results with the findings obtained through granular graph triangle analysis. Specifically, we'll examine the Wikipedia articles related to Paul Klee and Joan Miró, who were deemed as highly disconnected artists in the previous study. By employing graph triangle analysis techniques, we'll unveil previously overlooked graph connectors and patterns between these artists.</p>
+
+<p>For our GNN link prediction model, we'll use the GraphSAGE model. Unlike traditional approaches relying on the entire adjacency matrix information, GraphSAGE focuses on learning aggregator functions. This allows us to generate embeddings for new nodes based on their features and neighborhood information without the need to retrain the entire model.</p>
+
+<p>It's crucial to note that the outputs of the GraphSAGE model in our study are not actual predicted links, but embedded graphs. These embedded graphs capture the relationships and structural information within the original graphs. While these embeddings can be used for predicting graph edges, we will specifically utilize them for graph triangle analysis to identify and explore graph connectors within the network. These graph connectors play a pivotal role in facilitating connections and interactions between nodes, offering valuable insights into network dynamics and relationships.</p>
+
+
+<p></p>
+
+<p><h3>Methods</h3>
+
+<h4>Building a Knowledge Graph</h4>
+<p></p>
+In this section, we'll outline our strategy to formulate an introductory knowledge graph for each article. Our approach uses co-located word pairs as nodes, establishing links between pairs sharing common words. The method can be detailed in the following steps:
+<p></p>
+<ul>
+<li><strong>Text Tokenization:</strong> Begin by breaking down the text from Wikipedia into individual words or 'tokens', while also excluding common stop words that don't contribute much to the overall meaning.</li>
+
+<li><strong>Node Generation:</strong> Nodes in our knowledge graph are created from these co-located word pairs. These pairs of adjacent words from the text will form the basis of our graph.</li>
+
+<li><strong>Edge Calculation:</strong> Edges are established between nodes that share common words. This generates a network of word chains within each article and enables the connection of different articles through these word chains. Conceptually, consider two pairs, pair1 and pair2, represented as:</li>
+<p></p>
+<pre>
+    pair1=[leftWord1, rightWord1],
+    pair2=[leftWord2, rightWord2]
+</pre>
+<p></p>
+<li>If rightWord1 and leftWord2 are the same, then we have an edge, edge12, linking pair1 and pair2:</li>
+<p></p>
+<pre>
+    edge12={pair1, pair2}
+</pre>
+<p></p>
+<li><strong>Knowledge Graph Construction:</strong> With the nodes and edges defined, we can build the initial knowledge graph, visually representing the relationships between different co-located word pairs within and across the articles.</li>
+</ul>
+<p></p>
+
+<h4>Node Embedding</h4>
+<p></p>
+
+To encapsulate the complexities of the knowledge graph into our nodes and translate the text information into vectors, we're utilizing the 'all-MiniLM-L6-v2' transformer model from Hugging Face. This model is a part of the sentence-transformers family, purposely built to convert text into a dense vector space. The resultant vector space has 384 dimensions, providing a rich and multidimensional representation of our textual information.
+<p></p>
+<h4>Training a GNN Link Prediction Model</h4>
+<p></p>
+In our research, we've chosen to implement the GraphSAGE link prediction model proposed by Hamilton and others. This model is operationalized using the code provided in the DGL (Deep Graph Library) tutorial. It necessitates the transformation of the input graph data into an appropriate DGL data format. This transformation is a crucial step in preparing the data for the model training process.
+<p></p>
+
+
+<p></p>
+<h4>Triangle Analysis on Graphs</h4>
+<p></p>
+
+
+    <p>To delve deeper into the intricacies of graph structures, we used <strong>graph triangle analysis</strong>. Here's a step-by-step breakdown of our methodology:</p>
+
+    <ol>
+        <li>First, potential triangles are generated by considering all possible combinations of three distinct nodes from within the graph.</li>
+        <li>Second, for each identified triangle, we compute the cosine similarities between the nodes. This involves calculating three cosine similarity values for each triangle - one for each pairing of nodes.</li>
+        <li>Triangles of interest are those where one cosine similarity stands out as being notably higher compared to the other two values. This implies a stronger connection between two nodes relative to the connections of the other node pairs.</li>
+    </ol>
+
+    <p>By focusing on such triangles, we can derive more insight into the underlying relationships between nodes. This allows us to uncover intricate patterns and gain a deeper understanding of the structural nuances present within the graph.</p>
+
+
+
+
+<p></p>
+<h3>Experiments</h3>
+<p></p>
+<h4>Data Source</h4>
+<p></p>
+
+As the data source for this study we used a subset of text data from Wikipedia articles about 20 modern art artists:
+<p></p>
+<a href="#">
+    <img src="/img/artStats.jpg" alt="Post Sample Image" width="1000" />
+</a>
+<p></p>
+
+
+
+<p></p>
+
+<h4>Preparation of Input Data</h4>
+<p></p>
+
+We constructed a knowledge graph based on co-located word pairs as described in the Methods. section. For model input data for this study we selected Wikipedia articles about Paul Klee and Joan Miró:
+</p><p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">subsetWordpair</span> <span class="o">=</span> <span class="n">cleanPairWords</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s">'idxArtist'</span><span class="p">,</span><span class="s">'wordpair'</span><span class="p">,</span><span class="s">'word1'</span><span class="p">,</span>	<span class="s">'word2'</span>	<span class="p">]]</span>
+<span class="n">subsetWordpair</span> <span class="o">=</span> <span class="n">subsetWordpair</span><span class="p">[</span><span class="n">subsetWordpair</span><span class="p">[</span><span class="s">'idxArtist'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="mi">13</span><span class="p">,</span><span class="mi">19</span><span class="p">])]</span>
+<span class="n">subsetWordpair</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">nodeList</span><span class="o">=</span><span class="n">subsetWordpair</span>
+<span class="n">nodeList</span><span class="p">[</span><span class="s">'idxPair'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodeList</span><span class="o">.</span><span class="n">index</span></code></pre></figure>
+
+
+</p><p>
+Node list:
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">nodeList1</span><span class="o">=</span><span class="n">nodeList</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'word2'</span><span class="p">:</span><span class="s">'theWord'</span><span class="p">,</span><span class="s">'wordpair'</span><span class="p">:</span><span class="s">'wordpair1'</span><span class="p">,</span><span class="s">'wordPairIdx'</span><span class="p">:</span><span class="s">'wordPairIdx1'</span><span class="p">,</span><span class="s">'idxArtist'</span><span class="p">:</span><span class="s">'idxArtist1'</span><span class="p">,</span><span class="s">'idxPair'</span><span class="p">:</span><span class="s">'idxPair1'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">nodeList2</span><span class="o">=</span><span class="n">nodeList</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s">'word1'</span><span class="p">:</span><span class="s">'theWord'</span><span class="p">,</span><span class="s">'wordpair'</span><span class="p">:</span><span class="s">'wordpair2'</span><span class="p">,</span><span class="s">'wordPairIdx'</span><span class="p">:</span><span class="s">'wordPairIdx2'</span><span class="p">,</span><span class="s">'idxArtist'</span><span class="p">:</span><span class="s">'idxArtist2'</span><span class="p">,</span><span class="s">'idxPair'</span><span class="p">:</span><span class="s">'idxPair2'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">allNodes</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">nodeList1</span><span class="p">,</span><span class="n">nodeList2</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s">'theWord'</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s">'inner'</span><span class="p">)</span></code></pre></figure>
+
+
+</p><p>
+Get unique word pairs for embedding:
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">bagOfPairWords</span><span class="o">=</span><span class="n">nodeList</span>
+<span class="n">bagOfPairWords</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">bagOfPairWords</span><span class="p">[</span><span class="s">'bagPairWordsIdx'</span><span class="p">]</span><span class="o">=</span><span class="n">bagOfPairWords</span><span class="o">.</span><span class="n">index</span></code></pre></figure>
+
+
+
+</p><p>
+Node embedding:
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">wordpair_embeddings</span> <span class="o">=</span> <span class="n">modelST</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">bagOfPairWords</span><span class="p">[</span><span class="s">"wordpair"</span><span class="p">],</span><span class="n">convert_to_tensor</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+Save embedded word pairs:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">imgPath</span><span class="o">=</span><span class="s">'/content/drive/My Drive/NLP/'</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">imgPath</span><span class="o">+</span><span class="s">'wordpairs13b.pkl'</span><span class="p">,</span> <span class="s">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fOut</span><span class="p">:</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s">'idx'</span><span class="p">:</span> <span class="n">bagOfPairWords</span><span class="p">[</span><span class="s">"bagPairWordsIdx"</span><span class="p">],</span>
+                 <span class="s">'words'</span><span class="p">:</span> <span class="n">bagOfPairWords</span><span class="p">[</span><span class="s">"wordpair"</span><span class="p">],</span>
+                 <span class="s">'artist'</span><span class="p">:</span> <span class="n">bagOfPairWords</span><span class="p">[</span><span class="s">"idxArtist"</span><span class="p">],</span>
+                 <span class="s">'embeddings'</span><span class="p">:</span> <span class="n">wordpair_embeddings</span><span class="o">.</span><span class="n">cpu</span><span class="p">()},</span> <span class="n">fOut</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<h4>Transform Data to DGL Format</h4>
+
+
+<p></p>
+
+We trained our GNN link prediction model using the GraphSAGE model from the DGL library. More in-depth information and coding techniques for data preparation and encoding data into the DGL data format are available in our post <u><a href="http://sparklingdataocean.com/2022/11/09/knowledgeGraph4NlpGnn/"> 'Find Semantic Similarities by GNN Link Predictions'</a></u>.
+<p></p>
+
+<p></p>
+Import DGL andd read saved data:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">dgl</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="kn">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">dgl.data</span>
+<span class="kn">from</span> <span class="nn">dgl.data</span> <span class="kn">import</span> <span class="n">DGLDataset</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">imgPath</span><span class="o">+</span><span class="s">'wordpairs13b.pkl'</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fIn</span><span class="p">:</span>
+    <span class="n">stored_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fIn</span><span class="p">)</span>
+    <span class="n">gnn_index</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="s">'idx'</span><span class="p">]</span>
+    <span class="n">gnn_artist</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="s">'artist'</span><span class="p">]</span>
+    <span class="n">gnn_words</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="s">'words'</span><span class="p">]</span>
+    <span class="n">gnn_embeddings</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="s">'embeddings'</span><span class="p">]</span>
+<span class="n">df_gnn_words</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">gnn_words</span><span class="p">)</span>
+<span class="n">df_gnn_words</span><span class="p">[</span><span class="s">'idxNode'</span><span class="p">]</span><span class="o">=</span><span class="n">df_gnn_words</span><span class="o">.</span><span class="n">index</span></code></pre></figure>
+
+
+</p><p>
+Transform data to DGL format:
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">art_edges</span><span class="o">=</span><span class="n">allNodes</span><span class="p">[[</span><span class="s">'idxPair1'</span><span class="p">,</span><span class="s">'idxPair2'</span><span class="p">]]</span>
+<span class="n">unpickEdges</span><span class="o">=</span><span class="n">art_edges</span>
+<span class="n">edge_index</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">unpickEdges</span><span class="p">[[</span><span class="s">'idxPair1'</span><span class="p">,</span><span class="s">'idxPair2'</span><span class="p">]]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="o">=</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">gNew</span><span class="o">=</span><span class="n">dgl</span><span class="o">.</span><span class="n">graph</span><span class="p">((</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
+<span class="n">gNew</span><span class="o">.</span><span class="n">ndata</span><span class="p">[</span><span class="s">'feat'</span><span class="p">]</span><span class="o">=</span><span class="n">gnn_embeddings</span>
+<span class="n">gNew</span><span class="o">=</span><span class="n">dgl</span><span class="o">.</span><span class="n">add_self_loop</span><span class="p">(</span><span class="n">gNew</span><span class="p">)</span>
+<span class="n">g</span><span class="o">=</span><span class="n">gNew</span></code></pre></figure>
+
+
+<p></p>
+<h4>Model Training</h4>
+<p></p>
+Split edge set for training and testing
+<p></p>
+
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">()</span>
+<span class="n">eids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">number_of_edges</span><span class="p">())</span>
+<span class="n">eids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">eids</span><span class="p">)</span>
+<span class="n">test_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eids</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">train_size</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">number_of_edges</span><span class="p">()</span> <span class="o">-</span> <span class="n">test_size</span>
+<span class="n">test_pos_u</span><span class="p">,</span> <span class="n">test_pos_v</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]],</span> <span class="n">v</span><span class="p">[</span><span class="n">eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]]</span>
+<span class="n">train_pos_u</span><span class="p">,</span> <span class="n">train_pos_v</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">eids</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]],</span> <span class="n">v</span><span class="p">[</span><span class="n">eids</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]]</span></code></pre></figure>
+
+
+<p></p>
+Find all negative edges and split them for training and testing
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">adj</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)),</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">v</span><span class="o">.</span><span class="n">numpy</span><span class="p">())))</span>
+<span class="n">adj_neg</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">adj</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">())</span>
+<span class="n">neg_u</span><span class="p">,</span> <span class="n">neg_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">adj_neg</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">neg_eids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">neg_u</span><span class="p">),</span> <span class="n">g</span><span class="o">.</span><span class="n">number_of_edges</span><span class="p">())</span>
+<span class="n">test_neg_u</span><span class="p">,</span> <span class="n">test_neg_v</span> <span class="o">=</span> <span class="n">neg_u</span><span class="p">[</span><span class="n">neg_eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]],</span> <span class="n">neg_v</span><span class="p">[</span><span class="n">neg_eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]]</span>
+<span class="n">train_neg_u</span><span class="p">,</span> <span class="n">train_neg_v</span> <span class="o">=</span> <span class="n">neg_u</span><span class="p">[</span><span class="n">neg_eids</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]],</span> <span class="n">neg_v</span><span class="p">[</span><span class="n">neg_eids</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]]</span>
+<span class="n">train_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="o">.</span><span class="n">remove_edges</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">])</span>
+<span class="kn">from</span> <span class="nn">dgl.nn</span> <span class="kn">import</span> <span class="n">SAGEConv</span></code></pre></figure>
+
+
+<p></p>
+Create model: build a two-layer GraphSAGE model
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">GraphSAGE</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_feats</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GraphSAGE</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">SAGEConv</span><span class="p">(</span><span class="n">in_feats</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">,</span> <span class="s">'mean'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">SAGEConv</span><span class="p">(</span><span class="n">h_feats</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">,</span> <span class="s">'mean'</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">in_feat</span><span class="p">):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">in_feat</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">h</span>
+
+<span class="n">train_pos_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="o">.</span><span class="n">graph</span><span class="p">((</span><span class="n">train_pos_u</span><span class="p">,</span> <span class="n">train_pos_v</span><span class="p">),</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">())</span>
+<span class="n">train_neg_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="o">.</span><span class="n">graph</span><span class="p">((</span><span class="n">train_neg_u</span><span class="p">,</span> <span class="n">train_neg_v</span><span class="p">),</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">())</span>
+
+<span class="n">test_pos_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="o">.</span><span class="n">graph</span><span class="p">((</span><span class="n">test_pos_u</span><span class="p">,</span> <span class="n">test_pos_v</span><span class="p">),</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">())</span>
+<span class="n">test_neg_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="o">.</span><span class="n">graph</span><span class="p">((</span><span class="n">test_neg_u</span><span class="p">,</span> <span class="n">test_neg_v</span><span class="p">),</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">())</span>
+
+<span class="kn">import</span> <span class="nn">dgl.function</span> <span class="kn">as</span> <span class="nn">fn</span>
+
+<span class="k">class</span> <span class="nc">DotPredictor</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">g</span><span class="o">.</span><span class="n">local_scope</span><span class="p">():</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">ndata</span><span class="p">[</span><span class="s">'h'</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span>
+            <span class="c"># Compute a new edge feature named 'score' by a dot-product between the</span>
+            <span class="c"># source node feature 'h' and destination node feature 'h'.</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">apply_edges</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">u_dot_v</span><span class="p">(</span><span class="s">'h'</span><span class="p">,</span> <span class="s">'h'</span><span class="p">,</span> <span class="s">'score'</span><span class="p">))</span>
+            <span class="c"># u_dot_v returns a 1-element vector for each edge so you need to squeeze it.</span>
+            <span class="k">return</span> <span class="n">g</span><span class="o">.</span><span class="n">edata</span><span class="p">[</span><span class="s">'score'</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">MLPPredictor</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">h_feats</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">h_feats</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">apply_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edges</span><span class="p">):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">edges</span><span class="o">.</span><span class="n">src</span><span class="p">[</span><span class="s">'h'</span><span class="p">],</span> <span class="n">edges</span><span class="o">.</span><span class="n">dst</span><span class="p">[</span><span class="s">'h'</span><span class="p">]],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">'score'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">W2</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W1</span><span class="p">(</span><span class="n">h</span><span class="p">)))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)}</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">g</span><span class="o">.</span><span class="n">local_scope</span><span class="p">():</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">ndata</span><span class="p">[</span><span class="s">'h'</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">apply_edges</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apply_edges</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">g</span><span class="o">.</span><span class="n">edata</span><span class="p">[</span><span class="s">'score'</span><span class="p">]</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">GraphSAGE</span><span class="p">(</span><span class="n">train_g</span><span class="o">.</span><span class="n">ndata</span><span class="p">[</span><span class="s">'feat'</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">DotPredictor</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">])</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">pos_score</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">neg_score</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+    <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">binary_cross_entropy_with_logits</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compute_auc</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">])</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">pos_score</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">neg_score</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">scores</span><span class="p">)</span></code></pre></figure>
+
+
+
+<p></p>
+Set up loss and optimizer:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">pred</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+Model training:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">all_logits</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">):</span>
+    <span class="c"># forward</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">train_g</span><span class="p">,</span> <span class="n">train_g</span><span class="o">.</span><span class="n">ndata</span><span class="p">[</span><span class="s">'feat'</span><span class="p">])</span>
+    <span class="n">pos_score</span> <span class="o">=</span> <span class="n">pred</span><span class="p">(</span><span class="n">train_pos_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="n">neg_score</span> <span class="o">=</span> <span class="n">pred</span><span class="p">(</span><span class="n">train_neg_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">compute_loss</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">)</span>
+
+    <span class="c"># backward</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">e</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'In epoch {}, loss: {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">loss</span><span class="p">))</span></code></pre></figure>
+
+
+
+<p></p>
+Check results:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">pos_score</span> <span class="o">=</span> <span class="n">pred</span><span class="p">(</span><span class="n">test_pos_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="n">neg_score</span> <span class="o">=</span> <span class="n">pred</span><span class="p">(</span><span class="n">test_neg_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'AUC'</span><span class="p">,</span> <span class="n">compute_auc</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">))</span></code></pre></figure>
+
+
+<p></p>
+The model was trained using the following parameters:
+<p></p>
+<ul>
+  <li>Number of nodes: 3,274</li>
+  <li>Number of edges: 13,709</li>
+</ul>
+Embedded node features were represented as PyTorch tensors of size [3274, 384]. The re-embedded nodes resulted in a tensor of size [3274, 64].
+
+<p></p>
+To evaluate our model's performance, we calculated the Area Under the Curve (AUC) accuracy metric, which offers an indication of the model's predictive power. In our case, the accuracy metric was 0.848, demonstrating a high level of accuracy in the model's predictions.
+
+<p></p>
+<h4>Interpret Model Results</h4>
+<p></p>
+<p></p>
+Model results:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">gnnResults</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span></code></pre></figure>
+
+<p></p>
+Cosine similarity function and model scores:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">atan2</span><span class="p">,</span> <span class="n">radians</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="k">def</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">a_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">b_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">a_norm</span><span class="p">,</span> <span class="n">b_norm</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></code></pre></figure>
+
+
+<p></p>
+Model scores:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cosine_scores_gnn</span> <span class="o">=</span> <span class="n">pytorch_cos_sim</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+<h4>Graph Triangle Analysis</h4>
+<p></p>
+
+<p></p>
+Define graph and graph triangles:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">networkx</span> <span class="kn">as</span> <span class="nn">nx</span>
+<span class="n">G</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">from_pandas_edgelist</span><span class="p">(</span><span class="n">allNodes</span><span class="p">,</span>  <span class="s">"wordpair1"</span><span class="p">,</span> <span class="s">"wordpair2"</span><span class="p">)</span>
+<span class="n">triangles</span> <span class="o">=</span> <span class="p">[</span><span class="n">clique</span> <span class="k">for</span> <span class="n">clique</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">enumerate_all_cliques</span><span class="p">(</span><span class="n">G</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">clique</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">]</span></code></pre></figure>
+
+
+<p></p>
+Calculate cosine similarities within graph triangles:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">triangleStats</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">triangle</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">:</span>
+  <span class="n">idx3</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">nodeList</span><span class="p">[</span><span class="n">nodeList</span><span class="p">[</span><span class="s">'wordpair'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">triangle</span><span class="p">)][</span><span class="s">'bagPairWordsIdx'</span><span class="p">])</span>
+  <span class="k">for</span> <span class="n">pair1</span> <span class="ow">in</span> <span class="n">idx3</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">pair2</span> <span class="ow">in</span> <span class="n">idx3</span><span class="p">:</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">pair1</span><span class="o">&lt;</span><span class="n">pair2</span><span class="p">):</span>
+        <span class="n">score</span><span class="o">=</span><span class="n">dfWordPairs</span><span class="p">[(</span><span class="n">dfWordPairs</span><span class="p">[</span><span class="s">'idx1'</span><span class="p">]</span><span class="o">==</span><span class="n">pair1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">dfWordPairs</span><span class="p">[</span><span class="s">'idx2'</span><span class="p">]</span><span class="o">==</span><span class="n">pair2</span><span class="p">)][</span><span class="s">'score'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">triangleStats</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">'triangle'</span><span class="p">:</span><span class="n">triangle</span><span class="p">,</span><span class="s">'pair1'</span><span class="p">:</span><span class="n">pair1</span><span class="p">,</span><span class="s">'pair2'</span><span class="p">:</span><span class="n">pair2</span><span class="p">,</span><span class="s">'score'</span><span class="p">:</span><span class="n">score</span><span class="p">})</span></code></pre></figure>
+
+
+<p></p>
+Convert to triangle statistics to pandas data frame and save the results:
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">triangleStatsDF</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">triangleStats</span><span class="p">)</span>
+<span class="n">triangleStatsDF</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">imgPath</span><span class="o">+</span><span class="s">'triangleStats.csv'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+<h3>Insights from Graph Triangles</h3>
+<p></p>
+In our exploration of the embedded graph triangles, we utilized ordered edge weights as a basis for analysis. From this process, we identified a total of 46 graph triangles. Among these, several met the criteria for containing a graph connector node, acting as a bridge or link between the other nodes within the graph triangle.
+
+
+<p></p>
+
+<p></p>
+<a href="#">
+    <img src="/img/connectors5.jpg" alt="Post Sample Image" width="567" />
+</a>
+
+<p></p>
+Our graph triangle analysis is illustrated in the fugure above. In this figure, the numbers you see next to each edge represent the cosine similarities between the vectors of the corresponding nodes. These numbers essentially reflect the strength of the connection between two nodes.
+<p></p>
+The patterns observed in these graph triangles provide valuable insights into the intricate relationships within our knowledge graph. More importantly, they shed light on the crucial role of graph connectors - the nodes that act as bridges, facilitating communication and interaction between other nodes within the graph triangle.</p>
+<p></p>
+<h4>Observations and Insights</h4>
+<p></p>
+As we compare the results of our previous study <u><a href="https://www.scitepress.org/Link.aspx?doi=10.5220/0011664400003393">'Rewiring Knowledge Graphs by Link Predictions'</a></u>
+with the findings of this current study, we can notice both similarities and differences in the outcomes.
+
+<h5>Similarities:</h5>
+
+<ul>
+  <li>Both studies utilized Wikipedia articles focusing on the biographies of modern art artists.</li>
+  <li>The same semantic knowledge graph building method was employed in both studies.</li>
+  <li>The GraphSAGE GNN link prediction model was utilized for graph embedding in both studies.</li>
+</ul>
+
+<h5>Differences:</h5>
+
+<ul>
+  <li>In the previous study, the GNN link prediction model results were aggregated by artists. The analysis suggested that Paul Klee and Joan Miró were highly disconnected artists.</li>
+  <li>In contrast, the current study adopts a more granular approach to analyze the relationships between the artists. By using graph triangle analysis techniques, we were able to uncover potentially interesting relationships that were not previously identified.</li>
+</ul>
+
+<p>The example graph triangles, like those seen in picture above, demonstrate the crucial role of graph connectors. The numbers placed next to the edges represent the cosine similarities between the vectors of the corresponding nodes, providing valuable insights into the relationships and patterns within the knowledge graph.</p>
+
+
+<p></p>
+<p><h3>Conclusion</h3>
+
+
+
+<p>In this study, we utilized GNN link prediction techniques and graph triangle analysis to delve deeper into the intricacies of relationships within knowledge graphs. Leveraging these techniques, we demonstrated their potency in revealing patterns that might have previously gone unnoticed.</p>
+
+<p>Our comparison between granular relationship analysis and aggregated relationships unveiled some compelling insights. In our previous study, the artists Paul Klee and Joan Miró were deemed highly disconnected based on an aggregated view. However, this analysis failed to capture the finer nuances of their relationships. By applying graph triangle analysis techniques in this study, we found potentially significant connections and patterns between these artists, overlooked in the aggregated results.</p>
+
+<p>This demonstrates the significance of granular analysis in comprehending the complex relationships within knowledge graphs. A deeper probe into the relationships between entities uncovers hidden associations and provides fresh insights into the interconnected data.</p>
+
+<p>We have taken a step in exploring the concept of knowledge graph connectors. Through the use of GGN link prediction models and graph triangle analysis techniques, we have exposed the presence of graph connectors. These connectors play a critical role in facilitating connections and interactions between entities within the knowledge graphs.</p>
+
+<p></p>
+
+<p>
+
+Our study reveals new ways to understand complex connections in knowledge graphs, shedding light on hidden relationships and dynamics. This study is the beginning of a journey towards gaining a deeper understanding of the hidden relationships and dynamics within knowledge graphs.
+</p>
+
+<p></p>
+<p><h3>Next Post - Graph Connectors</h3>
+
+In the next spost we will start a new topic related to knowledge graphs and GNN.
+<p></p>
+</p></p></p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2023/07/07/knowledgeGraph4NlpGnn2/" data-toggle="tooltip" data-placement="top" title="Exploring Document Comparison with GNN Graph Classification">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2023</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
