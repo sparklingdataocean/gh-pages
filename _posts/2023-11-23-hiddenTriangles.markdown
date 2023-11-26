@@ -7,7 +7,7 @@ author:     "Melenar"
 header-img: "img/pageEgg1m.jpg"
 ---
 
-<p><h3>Conference Highlight</h3>
+<p><h3>Conference Highlights</h3>
 This research was presented at the 17th International Conference on Information Technology and Applications (ICITA 2023) that was held in Turin, Italy from October 20–22, 2023.
 <p></p>
 Paper 'Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge Graphs' is estimated to be published in February, 2024.
