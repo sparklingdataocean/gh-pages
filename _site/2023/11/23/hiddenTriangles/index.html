@@ -8,9 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Spark for Big Data Analytics.">
 
-    <title>Uncovering Hidden Connections - Sparkling Data Ocean</title>
+    <title>Uncovering Hidden Triangles - Sparkling Data Ocean</title>
 
-    <link rel="canonical" href="http://localhost:4000/2023/08/01/hddenConnections/">
+    <link rel="canonical" href="http://localhost:4000/2023/11/23/hiddenTriangles/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -89,11 +89,11 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <div class="post-heading">
-                    <h1>Uncovering Hidden Connections</h1>
+                    <h1>Uncovering Hidden Triangles</h1>
                     
                     <h2 class="subheading">Granular Relationship Analysis in Knowledge Graphs</h2>
                     
-                    <span class="meta">Posted by Melenar on August 1, 2023</span>
+                    <span class="meta">Posted by Melenar on November 23, 2023</span>
                 </div>
             </div>
         </div>
@@ -106,7 +106,15 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
-				<p><h3>Uncovering Hidden Connections in Knowledge Graphs</h3>
+				<p><h3>Conference Highlight</h3>
+This research was presented at the 17th International Conference on Information Technology and Applications (ICITA 2023) that was held in Turin, Italy from October 20–22, 2023.
+<p></p>
+Paper 'Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge Graphs' is estimated to be published in February, 2024.
+<p></p>
+To complement the text understanding, in this post we will feature some slides from the conference presentation.
+
+<p></p>
+<p><h3>Uncovering Hidden Triangles in Knowledge Graphs </h3>
 
 <p>In recent years, knowledge graphs have become a powerful tool for integrating and analyzing data and shedding lights on the connections between entities. This study narrows its focus on unraveling detailed relationships within knowledge graphs, placing special emphasis on the role of graph connectors through link predictions and triangle analysis.</p>
 
@@ -122,13 +130,15 @@
 
 <p>For many years, deep learning and knowledge graphs developed independently. CNN proved effective with grid-structured data but struggled with graph-structured data. On the other hand, graph techniques excelled in representing and reasoning about graph data but lacked deep learning's power. The late 2010s Graph Neural Networks (GNN) bridged this gap and emerged as a potent tool for processing graph-structured data through deep learning techniques.</p>
 
+<p>For years, we've relied on binary graph structures, simplifying complex relationships into 'yes' or 'no', '1' or '0'. But in our ever-evolving world, is that enough? We believed there was more depth to be explored. Thus, we turned to Graph Neural Networks, a frontier technology, to help us transition from these fixed binaries to a more fluid, continuous space. </p>
+
 <h4>Our Past Experiments in Rewiring of Knowledge Graphs</h4>
 
 <p>In our previous study <u><a href="https://www.scitepress.org/Link.aspx?doi=10.5220/0011664400003393">'Rewiring Knowledge Graphs by Link Predictions'</a></u>
 
 we delved into the exploration of knowledge graph rewiring to reveal unknown relationships between modern art artists, employing GNN link prediction models. By training these models on Wikipedia articles about modern art artists' biographies and leveraging GNN link prediction models, we identified previously unknown relationships between artists.</p>
 
-<p>To rewire knowledge graphs, we adopted two distinct methods. First, we utilized a traditional method that involved a full-text analysis of articles and calculation of cosine similarities between re-embedded nodes. The second method involved the construction of semantic graphs based on the distribution of pairs of co-located words, and edges between nodes that share common words.</p>
+<p>To rewire knowledge graphs, we adopted two distinct methods. First, we utilized a traditional method that involved a full-text analysis of articles and calculation of cosine similarities between embedded nodes. The second method involved the construction of semantic graphs based on the distribution of pairs of co-located words, and edges between nodes that share common words.</p>
 
 
 <h4>New Study: Focusing on Graph Triangles</h4>
@@ -136,7 +146,19 @@ we delved into the exploration of knowledge graph rewiring to reveal unknown rel
 
 In this study, we continue to leverage the same data source and employ similar techniques for graph representation. However, we introduce a novel approach of comparing two documents and examining entity relationships at granular level. Specifically, we concentrate on analyzing graph triangles, where one side displays a stronger connection than the other two sides.</p>
 
-<p>Analyzing graph triangles offers insights into the strength of connections between nodes within a network. We study the relationships among nodes A, B, and C, focusing on the strength of the connection between nodes B and C compared to the connections involving node A. We identify node A as a 'graph connector' node, critical in facilitating communication and interaction between nodes B and C. Serving as a link, node A allows the smooth flow of information and relationships between the strongly connected nodes B and C.
+<p>Let's take a moment to appreciate the evolution and elevation that GNN Link Prediction brings to the table. Remember the days of black and white television? Now imagine transitioning from that to a high-definition colored TV. That's the kind of transformative leap we're talking about when moving from traditional graph representations to GNN Link Prediction. Instead of just binary relationships, we're now operating on a continuous spectrum. Why is this so revolutionary? Because it allows us to see the subtle intricacies, the patterns that were once invisible. We're no longer just categorizing relationships as 'connected' or 'not connected'; we're exploring the depth, the weight, the very essence of these connections. It's like being given a magnifying glass to see the intricate patterns that were always there but previously overlooked. This shift not only boosts our prediction accuracy but also broadens our understanding of the complex web of relationships within our data.</p>
+
+
+
+<p>In the vast network of relationships, it's essential to understand not just who is connected to whom, but also the depth and nature of these connections. Let's take a simplified example featuring Alice, Beth, and their college. Alice and Beth shared a close bond during their college days, so their connection is strong. But when we look at their individual relationships with the college, it's more of an association by attendance, making it a weaker connection. Picture a triangle with its vertices representing Alice, Beth, and their college. The strength of the links in this triangle varies. The college acts as a 'Graph Connector'—a node that forms a bridge between different entities. Now, why is this distinction crucial? Because understanding these nuanced connections ensures we don't treat all relationships equally. It enables us to discern, prioritize, and gain richer insights into our network, ensuring our analysis is both detailed and accurate.</p>
+
+<p></p>
+<a href="#">
+    <img src="/img/slideTurino1.jpg" alt="Post Sample Image" width="628" />
+</a>
+<p></p>
+
+<p>Analyzing graph triangles offers insights into the strength of connections between nodes within a network. Looking at the relationships among nodes A, B, and C, we are focusing on the strength of the connection between nodes A and B compared to the connections involving node C. Node C, identified as a 'graph connector' node, is critical in facilitating communication and interaction between nodes A and B. Serving as a link, node C allows the smooth flow of information and relationships between the strongly connected nodes A and B.
 <p></p>
 <p></p>
 
@@ -159,15 +181,27 @@ This characterizes the importance of graph connector nodes in enhancing the netw
 <p></p>
 To find graph connectors, we will look for graph triangles where one cosine similarity between the nodes is higher than other two cosine similarity values.  This implies a stronger connection between two nodes relative to the connections of two other node pairs.
 
+<p></p>
+When delving into the world of graphs, it's essential to recognize the key players, the 'Graph Connectors'. These connectors serve as bridges within the intricate web of nodes. So, how do we uncover them? Let's take a journey through our method.
+First, we train our GNN Link Prediction model, which gives us the embeddings for each node. Think of these embeddings as unique signatures, encapsulating the essence of each node.
+<p></p>
+<a href="#">
+    <img src="/img/slideTurino2.jpg" alt="Post Sample Image" width="628" />
+</a>
+<p></p>
+With these embeddings in hand, we compute the cosines between every pair of nodes in each graph triangle. These cosine values measure the similarity between nodes, indicating the strength of their connection.
+Finally, the crux of our methodology: identifying the Graph Connectors. Based on our cosine computations, we determine which node acts as a bridge between the other two. For instance, in a triangle comprising nodes A, B, and C - if the connection strength between A and B surpasses the other two connections, it's clear that C plays the pivotal role of the connector.
+This method thus allows us to highlight nodes that play an essential role in maintaining the structure and connectivity of the graph.
+<p></p>
+
 
 <p></p>
 
-<p></p>
 Graph representation traditionally operates in binary terms: either pairs of nodes are connected by edges or they are not. When using binary edges in graph triangle analysis, we are limited to recognizing the presence or absence of connections between nodes. Such a black-and-white perspective can overlook the nuanced graph connectors.
 <p></p>
 By employing GNN link prediction models, we move beyond this limitation. GNN link prediction model transcends this binary structure by embedding nodes into continuous vector space, providing a spectrum of ways to compare and evaluate these vectors. This deeper representation makes it possible to identify and understand graph connectors that a simple binary analysis might overlook.
-<p></p>
-In essence, understanding the nuances of node relationships allows for more robust, dynamic, and insightful analyses, enabling richer interpretations and predictions based on graph data. In this study we will apply GNN Link Prediction model to graph triangle analysis.
+
+In essence, understanding the nuances of node relationships allows for more robust, dynamic, and insightful analyses, enabling richer interpretations and predictions based on graph data.
 <p></p>
 
 <h4>Employing Graph Triangle Analysis and the GraphSAGE Model</h4>
@@ -209,6 +243,11 @@ In this section, we'll outline our strategy to formulate an introductory knowled
 </ul>
 <p></p>
 
+<p></p>
+<a href="#">
+    <img src="/img/slideTurino7.jpg" alt="Post Sample Image" width="628" />
+</a>
+<p></p>
 <h4>Node Embedding</h4>
 <p></p>
 
@@ -235,26 +274,37 @@ In our research, we've chosen to implement the GraphSAGE link prediction model p
 
     <p>By focusing on such triangles, we can derive more insight into the underlying relationships between nodes. This allows us to uncover intricate patterns and gain a deeper understanding of the structural nuances present within the graph.</p>
 
-
-
-
 <p></p>
+<a href="#">
+    <img src="/img/slideTurino4.jpg" alt="Post Sample Image" width="628" />
+</a>
+<p></p>
+
 <h3>Experiments</h3>
 <p></p>
+In our exploration, we embarked on a transformative journey. We began by constructing semantic graphs, a process much like piecing together a puzzle, where each word forms a crucial piece, connecting with others to build a comprehensive picture. However, merely building the graph wasn't our end goal. To delve deeper into its intricate maze, we utilized Graph Triangle Analysis. This methodology allowed us to zoom in on specific relationships, akin to highlighting crucial intersections in a vast city map. It's through this refined lens that we transitioned from a broad understanding of the semantic landscape to pinpointing the connectors - the linchpins that hold the entire framework together, revealing a richer, more connected narrative.
+<p></p>
+
 <h4>Data Source</h4>
 <p></p>
 
 As the data source for this study we used a subset of text data from Wikipedia articles about 20 modern art artists:
 <p></p>
 <a href="#">
-    <img src="/img/artStats.jpg" alt="Post Sample Image" width="1000" />
+    <img src="/img/slideTurino6.jpg" alt="Post Sample Image" width="628" />
 </a>
 <p></p>
-
-
+Building on our previous 'Knowledge Graph Rewiring' research, we initially identified artist connections. Now, we're digging deeper to uncover more intricate relationships between artists, using our past findings as a starting point.
 
 <p></p>
+In our pursuit of understanding artist interconnections, we took a focused look at two iconic figures of the art world: Paul Klee and Joan Miró. In our previous research, a curious observation emerged. Despite both artists being immersed in significant art movements, our data showed a pronounced disconnect between them. Klee, a Swiss maestro, was deeply rooted in Expressionism, while Miró, the Spanish virtuoso, was an embodiment of Surrealism. On the surface, these movements and their geographic roots seem to keep them apart. Yet, why did we zero in on these two? The intrigue lies in an understated influence: Miró's artistry was, in fact, inspired by Klee. This revelation hints at more profound, nuanced connections between them, suggesting that artistic interplay goes beyond just the obvious associations.
 
+<p></p>
+<a href="#">
+    <img src="/img/slideTurino3.jpg" alt="Post Sample Image" width="628" />
+</a>
+<p></p>
+<p></p>
 <h4>Preparation of Input Data</h4>
 <p></p>
 
@@ -582,14 +632,22 @@ In our exploration of the embedded graph triangles, we utilized ordered edge wei
 
 
 <p></p>
-
 <p></p>
 <a href="#">
-    <img src="/img/connectors5.jpg" alt="Post Sample Image" width="567" />
+    <img src="/img/slideTurino5.jpg" alt="Post Sample Image" width="628" />
 </a>
+<p></p>
+<!-- <p></p>
+<a href="#">
+    <img src="/img/connectors5.jpg" alt="Post Sample Image" width="567">
+</a> -->
+
 
 <p></p>
 Our graph triangle analysis is illustrated in the fugure above. In this figure, the numbers you see next to each edge represent the cosine similarities between the vectors of the corresponding nodes. These numbers essentially reflect the strength of the connection between two nodes.
+<p></p>
+Imagine a vast network, a spider web of connections. Within this web, our goal was to uncover specific points, the linchpins holding everything together. These are our Graph Connectors. How do we identify them? We delve into Triangle Analysis. In this analysis, the sides of the triangles, the 'edges', represent how similar two nodes are to each other, quantified using cosine similarities. The Graph Connectors stand out as the acute-angled vertices, the points where threads converge sharply, indicating their pivotal role in the network's architecture. It's akin to finding the central anchors in our intricate web.
+
 <p></p>
 The patterns observed in these graph triangles provide valuable insights into the intricate relationships within our knowledge graph. More importantly, they shed light on the crucial role of graph connectors - the nodes that act as bridges, facilitating communication and interaction between other nodes within the graph triangle.</p>
 <p></p>
@@ -623,11 +681,11 @@ with the findings of this current study, we can notice both similarities and dif
 
 <p>In this study, we utilized GNN link prediction techniques and graph triangle analysis to delve deeper into the intricacies of relationships within knowledge graphs. Leveraging these techniques, we demonstrated their potency in revealing patterns that might have previously gone unnoticed.</p>
 
-<p>Our comparison between granular relationship analysis and aggregated relationships unveiled some compelling insights. In our previous study, the artists Paul Klee and Joan Miró were deemed highly disconnected based on an aggregated view. However, this analysis failed to capture the finer nuances of their relationships. By applying graph triangle analysis techniques in this study, we found potentially significant connections and patterns between these artists, overlooked in the aggregated results.</p>
+<p>Our comparison between granular relationship analysis and aggregated relationships unveiled some compelling insights. In our previous study, based on an aggregated view, the artists Paul Klee and Joan Miró were deemed highly disconnected. However, that analysis failed to capture the finer nuances of their relationships. By applying graph triangle analysis techniques in this study, we found potentially significant connections and patterns between these artists, overlooked in the aggregated results.</p>
 
 <p>This demonstrates the significance of granular analysis in comprehending the complex relationships within knowledge graphs. A deeper probe into the relationships between entities uncovers hidden associations and provides fresh insights into the interconnected data.</p>
 
-<p>We have taken a step in exploring the concept of knowledge graph connectors. Through the use of GGN link prediction models and graph triangle analysis techniques, we have exposed the presence of graph connectors. These connectors play a critical role in facilitating connections and interactions between entities within the knowledge graphs.</p>
+<p>We have taken a step in exploring the concept of knowledge graph connectors. Through the use of GNN link prediction models and graph triangle analysis techniques, we have exposed the presence of graph connectors. These connectors play a critical role in facilitating connections and interactions between entities within the knowledge graphs.</p>
 
 <p></p>
 
@@ -635,13 +693,33 @@ with the findings of this current study, we can notice both similarities and dif
 
 Our study reveals new ways to understand complex connections in knowledge graphs, shedding light on hidden relationships and dynamics. This study is the beginning of a journey towards gaining a deeper understanding of the hidden relationships and dynamics within knowledge graphs.
 </p>
+<p></p>
+
+<p><h3>Exploring Future Horizons with Graph Connectors</h3>
+
+<p>Envision the transformative impact of applying our advanced graph connector techniques across various fields:</p>
+
+<ul>
+    <li><strong>Medicine:</strong> Illuminate critical genetic pathways influencing diseases, paving the way for bespoke therapies and preventive measures.</li>
+    <li><strong>Social Networks:</strong> Uncover hidden influencers and emergent trends, reshaping our understanding of digital interactions.</li>
+    <li><strong>Finance:</strong> Identify key firms integral to market stability, potentially revolutionizing investment and economic strategies.</li>
+    <li><strong>Criminal Networks:</strong> Reveal the masterminds behind criminal activities, enhancing law enforcement capabilities.</li>
+    <li><strong>Education:</strong> Discover central interdisciplinary subjects that serve as educational connectors, promoting comprehensive learning experiences.</li>
+    <li><strong>Supply Chains:</strong> Spot critical intermediaries to streamline production, boosting efficiency and reducing operational costs.</li>
+</ul>
+
+<p>The possibilities are boundless, and the diverse applications of our graph connector methods promise a future rich with insight and innovation!</p>
+
+
+<p></p>
+
 
 <p></p>
 <p><h3>Next Post - Graph Connectors</h3>
 
-In the next spost we will start a new topic related to knowledge graphs and GNN.
+In the next spost we will continue exploring graph connector techniques.
 <p></p>
-</p></p></p></p>
+</p></p></p></p></p></p>
 
 
                 <hr>
