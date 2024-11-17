@@ -119,9 +119,9 @@ Read stored vertices and edges and rebuilt the graph:
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
 <span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
-<span class="k">val</span> <span class="n">graphNgramStressVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphNgramStressEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphNgramStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span> <span class="n">graphNgramStressEdges</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">graphNgramStressVertices</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphNgramStressEdges</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphNgramStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span> <span class="n">graphNgramStressEdges</span><span class="o">)</span></code></pre></figure>
 
 </p>
 
@@ -132,26 +132,26 @@ graph vertices and edges, minimum and maximum of edge weight and minimum and max
 connected component sizes.</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.DataFrame</span>
-<span class="k">def</span> <span class="n">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
+<span class="k">def</span> <span class="nf">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
      <span class="n">cosineMin</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span> <span class="n">cosineMax</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span>
      <span class="n">ccMin</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">ccMax</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span>
   <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="k">val</span> <span class="n">graphEdgesSub</span><span class="k">=</span> <span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&gt;</span><span class="n">cosineMin</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&lt;</span><span class="n">cosineMax</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
-  <span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
+  <span class="k">val</span> <span class="nv">graphEdgesSub</span><span class="k">=</span> <span class="nv">graphEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&gt;</span><span class="n">cosineMin</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&lt;</span><span class="n">cosineMax</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
+  <span class="nv">sc</span><span class="o">.</span><span class="py">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
      <span class="n">connectedComponents</span><span class="o">.</span>
-     <span class="n">run</span><span class="o">()</span>
-  <span class="k">val</span> <span class="n">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
-     <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+     <span class="nf">run</span><span class="o">()</span>
+  <span class="k">val</span> <span class="nv">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
+     <span class="nf">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
      <span class="n">count</span><span class="o">.</span>
-     <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
- <span class="k">val</span> <span class="n">sizeCC</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component=</span><span class="o">=='</span><span class="n">cc</span><span class="o">).</span>
-     <span class="n">filter</span><span class="o">(</span><span class="ss">'ccCt&lt;</span><span class="n">ccMax</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'ccCt&gt;</span><span class="n">ccMin</span><span class="o">).</span>
-     <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="n">distinct</span>
- <span class="n">graphEdges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span>
-     <span class="n">union</span><span class="o">(</span><span class="n">graphEdges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">id</span><span class="o">)).</span>
-     <span class="n">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span>
+     <span class="nf">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+ <span class="k">val</span> <span class="nv">sizeCC</span><span class="k">=</span><span class="nv">resultCC</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component</span><span class="o">===</span><span class="ss">'cc</span><span class="o">).</span>
+     <span class="nf">filter</span><span class="o">(</span><span class="ss">'ccCt</span><span class="o">&lt;</span><span class="n">ccMax</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'ccCt</span><span class="o">&gt;</span><span class="n">ccMin</span><span class="o">).</span>
+     <span class="nf">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="py">distinct</span>
+ <span class="nv">graphEdges</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'id</span><span class="o">).</span>
+     <span class="nf">union</span><span class="o">(</span><span class="nv">graphEdges</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst</span><span class="o">===</span><span class="ss">'id</span><span class="o">)).</span>
+     <span class="nf">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">distinct</span>
 <span class="o">}</span></code></pre></figure>
 
 
@@ -159,11 +159,11 @@ connected component sizes.</p>
 <p>As output of this function we are getting DataFrame with connected component identifiers, connected component sizes, and source, target and weight of edges. Example:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">result</span><span class="k">=</span><span class="nf">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span>
   <span class="n">graphNgramStressEdges</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="mi">30</span><span class="o">)</span>
-<span class="n">result</span><span class="o">.</span><span class="n">persist</span>
+<span class="nv">result</span><span class="o">.</span><span class="py">persist</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'component)</span><span class="o">.</span><span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">result</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'component</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
 <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
 <span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">effect</span><span class="o">,</span><span class="n">mental</span><span class="o">,</span><span class="mf">0.019197841854283394</span>
 <span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">negative</span><span class="o">,</span><span class="n">event</span><span class="o">,-</span><span class="mf">0.1545046492202531</span>
@@ -184,23 +184,23 @@ This function takes an output of the w2v2gConnectedComponents function, componen
 and minimum and maximum of edge weight:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">component2dot</span><span class="o">(</span><span class="n">graphComponents</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">componentId</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">component2dot</span><span class="o">(</span><span class="n">graphComponents</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">componentId</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span>
   <span class="n">cosineMin</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span> <span class="n">cosineMax</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>  
  <span class="n">graphComponents</span><span class="o">.</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'component=</span><span class="o">==</span><span class="n">componentId</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&gt;</span><span class="n">cosineMin</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&lt;</span><span class="n">cosineMax</span><span class="o">).</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
-  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
-        <span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+</span><span class="n">roundAt</span><span class="o">(</span><span class="mi">2</span><span class="o">)(</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">toDouble</span><span class="o">)+</span><span class="s">"\"];"</span><span class="o">)).</span>
-        <span class="n">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'component</span><span class="o">===</span><span class="n">componentId</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&gt;</span><span class="n">cosineMin</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&lt;</span><span class="n">cosineMax</span><span class="o">).</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span>
+  <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
+        <span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+</span><span class="nf">roundAt</span><span class="o">(</span><span class="mi">2</span><span class="o">)(</span><span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">toDouble</span><span class="o">)+</span><span class="s">"\"];"</span><span class="o">)).</span>
+        <span class="nf">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
 <span class="o">}</span></code></pre></figure>
 
 
 <p>This example is based on the the same parameters that we used to get an example of w2v2gConnectedComponents function:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">8589934598L</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">resultDot</span><span class="k">=</span><span class="nf">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">8589934598L</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
 <span class="s">"negatively"</span> <span class="o">-&gt;</span> <span class="s">"impact"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">62"</span><span class="o">];</span>
 <span class="s">"negative"</span> <span class="o">-&gt;</span> <span class="s">"impact"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">55"</span><span class="o">];</span>
 <span class="s">"impact"</span> <span class="o">-&gt;</span> <span class="s">"effect"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">56"</span><span class="o">];</span>
@@ -216,11 +216,11 @@ Do select potentially interesting connected components first we'll look at three
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
-<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span><span class="n">graphNgramStressEdges</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="mi">30</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+<span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nv">Window</span><span class="o">.</span><span class="py">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="py">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result</span><span class="k">=</span><span class="nf">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span><span class="n">graphNgramStressEdges</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="mi">30</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result2</span> <span class="k">=</span> <span class="nv">result</span><span class="o">.</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="nf">rank</span><span class="o">().</span><span class="py">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">result2</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">))</span>
 <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
 <span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">negatively</span><span class="o">,</span><span class="n">impact</span><span class="o">,</span><span class="mf">0.6222451350552916</span><span class="o">,</span><span class="mi">1</span>
 <span class="mi">8589934598</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">impact</span><span class="o">,</span><span class="n">effect</span><span class="o">,</span><span class="mf">0.5603950362283256</span><span class="o">,</span><span class="mi">2</span>
@@ -239,9 +239,9 @@ Do select potentially interesting connected components first we'll look at three
 <p>We will select connected component '146028888067' and run 'component2dot' function with different thresholds. </p>
 <p>Word pairs with cosine similarity &gt;0.5:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">146028888067L</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">resultDot</span><span class="k">=</span><span class="nf">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">146028888067L</span><span class="o">,</span><span class="mf">0.5</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
 <span class="s">"communication"</span> <span class="o">-&gt;</span> <span class="s">"methods"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">57"</span><span class="o">];</span>
 <span class="s">"techniques"</span> <span class="o">-&gt;</span> <span class="s">"monitoring"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">51"</span><span class="o">];</span>
 <span class="s">"therapeutic"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">53"</span><span class="o">];</span>
@@ -260,9 +260,9 @@ Do select potentially interesting connected components first we'll look at three
 
 <p>Word pairs with cosine similarity between 0.1 and 0.4:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">146028888067L</span><span class="o">,</span><span class="mf">0.1</span><span class="o">,</span><span class="mf">0.4</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">resultDot</span><span class="k">=</span><span class="nf">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">146028888067L</span><span class="o">,</span><span class="mf">0.1</span><span class="o">,</span><span class="mf">0.4</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
 <span class="s">"types"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">37"</span><span class="o">];</span>
 <span class="s">"communication"</span> <span class="o">-&gt;</span> <span class="s">"assertive"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">38"</span><span class="o">];</span>
 <span class="s">"skill"</span> <span class="o">-&gt;</span> <span class="s">"communication"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">34"</span><span class="o">];</span>
@@ -302,17 +302,17 @@ Here is the graph for these topics:
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
-<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span>
-   <span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span>
-   <span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectedComponents</span><span class="o">(</span>
+<span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span>
+   <span class="nf">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="nf">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="py">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result</span><span class="k">=</span><span class="nf">w2v2gConnectedComponents</span><span class="o">(</span>
    <span class="n">graphNgramStressVertices</span><span class="o">,</span><span class="n">graphNgramStressEdges</span><span class="o">,</span>
    <span class="mf">0.1</span><span class="o">,</span><span class="mf">0.4</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="mi">30</span><span class="o">)</span>
-<span class="n">result</span><span class="o">.</span><span class="n">persist</span>
-<span class="k">val</span> <span class="n">result3edges</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+<span class="nv">result</span><span class="o">.</span><span class="py">persist</span>
+<span class="k">val</span> <span class="nv">result3edges</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="nf">rank</span><span class="o">().</span><span class="py">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">result3edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">result3edges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">))</span>
 <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
 <span class="mi">60129542144</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="n">disorders</span><span class="o">,</span><span class="mf">0.5963055756093992</span><span class="o">,</span><span class="mi">1</span>
 <span class="mi">60129542144</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">stress</span><span class="o">,</span><span class="n">disorders</span><span class="o">,</span><span class="mf">0.5028157528421987</span><span class="o">,</span><span class="mi">2</span>
@@ -333,9 +333,9 @@ Here is the graph for these topics:
 
 <p>We will start with connected component '68719476739' that has word pairs with lowest cosine similarities. Graph DOT lines with the same thresholds:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot1</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">68719476739L</span><span class="o">,</span><span class="mf">0.1</span><span class="o">,</span><span class="mf">0.4</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">resultDot1</span><span class="k">=</span><span class="nf">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">68719476739L</span><span class="o">,</span><span class="mf">0.1</span><span class="o">,</span><span class="mf">0.4</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">resultDot1</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">resultDot1</span><span class="o">)</span>
 <span class="s">"imagery"</span> <span class="o">-&gt;</span> <span class="s">"visualization"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">21"</span><span class="o">];</span>
 <span class="s">"create"</span> <span class="o">-&gt;</span> <span class="s">"relaxing"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">35"</span><span class="o">];</span>
 <span class="s">"guided"</span> <span class="o">-&gt;</span> <span class="s">"imagery"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">27"</span><span class="o">];</span>
@@ -349,9 +349,9 @@ Here is the graph for these topics:
 
 <p>Graph DOT lines with no thresholds:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot2</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">68719476739L</span><span class="o">,-</span><span class="mf">1.0</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">resultDot2</span><span class="k">=</span><span class="nf">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">68719476739L</span><span class="o">,-</span><span class="mf">1.0</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">resultDot2</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">resultDot2</span><span class="o">)</span>
 <span class="s">"imagery"</span> <span class="o">-&gt;</span> <span class="s">"visualization"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">21"</span><span class="o">];</span>
 <span class="s">"create"</span> <span class="o">-&gt;</span> <span class="s">"relaxing"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">35"</span><span class="o">];</span>
 <span class="s">"create"</span> <span class="o">-&gt;</span> <span class="s">"pressure"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">01"</span><span class="o">];</span>
@@ -368,9 +368,9 @@ Here is the graph for these topics:
 <p>Here a other topics that gives us more ideas about stress relieve. We run  'component2dot' with no cosine similarity thresholds:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot3</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">549755813891L</span><span class="o">,-</span><span class="mf">1.0</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">resultDot3</span><span class="k">=</span><span class="nf">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">549755813891L</span><span class="o">,-</span><span class="mf">1.0</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">resultDot3</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">resultDot3</span><span class="o">)</span>
 <span class="s">"laughter"</span> <span class="o">-&gt;</span> <span class="s">"humor"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">45"</span><span class="o">];</span>
 <span class="s">"laughter"</span> <span class="o">-&gt;</span> <span class="s">"relieve"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">3"</span><span class="o">];</span>
 <span class="s">"drastically"</span> <span class="o">-&gt;</span> <span class="s">"children"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">-</span><span class="err">0</span><span class="kt">.</span><span class="err">24"</span><span class="o">];</span>
@@ -390,9 +390,9 @@ Here is the graph for these topics:
 </a>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot4</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">206158430208L</span><span class="o">,-</span><span class="mf">1.0</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">resultDot4</span><span class="k">=</span><span class="nf">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">206158430208L</span><span class="o">,-</span><span class="mf">1.0</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">resultDot4</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">resultDot4</span><span class="o">)</span>
 <span class="s">"resilience"</span> <span class="o">-&gt;</span> <span class="s">"building"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">09"</span><span class="o">];</span>
 <span class="s">"adverse"</span> <span class="o">-&gt;</span> <span class="s">"consequences"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">6"</span><span class="o">];</span>
 <span class="s">"consequences"</span> <span class="o">-&gt;</span> <span class="s">"marked"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">06"</span><span class="o">];</span>

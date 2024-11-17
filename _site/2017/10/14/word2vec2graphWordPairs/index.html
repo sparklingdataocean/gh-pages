@@ -118,14 +118,14 @@ In this post as Word2Vec model we will use the same model that was
 <h3>Read and Clean Stress Data File </h3>
 <p>Read Stress Data file:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputStress</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/stressWiki.txt"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">inputStress</span><span class="k">=</span><span class="nv">sc</span><span class="o">.</span><span class="py">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/stressWiki.txt"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span></code></pre></figure>
 
 <p>Using Spark ML functions tokenize and remove stop words from Stress Data file:</p>
 
 <figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kn">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="kn">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
-<span class="n">val</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RegexTokenizer</span><span class="o">().</span>
+<span class="n">val</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
    <span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
    <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
    <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
@@ -133,37 +133,37 @@ In this post as Word2Vec model we will use the same model that was
    <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
 <span class="n">val</span> <span class="n">tokenizedStress</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span>
    <span class="nf">transform</span><span class="o">(</span><span class="n">inputStress</span><span class="o">)</span>
-<span class="n">val</span> <span class="n">remover</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StopWordsRemover</span><span class="o">().</span>
+<span class="n">val</span> <span class="n">remover</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
    <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
    <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
 <span class="n">val</span> <span class="n">removedStopWordsStress</span> <span class="o">=</span> <span class="n">remover</span><span class="o">.</span>
-   <span class="nf">setStopWords</span><span class="o">(</span><span class="n">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
+   <span class="nf">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
    <span class="n">remover</span><span class="o">.</span><span class="na">getStopWords</span><span class="o">).</span>
    <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedStress</span><span class="o">)</span></code></pre></figure>
 
 <p><h3>Transform the results to Pairs of Words</h3>
 Get pairs of words - use Spark ML library ngram function:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">ngram</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NGram</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"ngrams"</span><span class="o">).</span>
-   <span class="n">setN</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">ngramCleanWords</span> <span class="k">=</span> <span class="n">ngram</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">removedStopWordsStress</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">ngram</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NGram</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"ngrams"</span><span class="o">).</span>
+   <span class="nf">setN</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">ngramCleanWords</span> <span class="k">=</span> <span class="n">ngram</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">removedStopWordsStress</span><span class="o">)</span></code></pre></figure>
 
 <p>Explode ngrams:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
-<span class="k">val</span> <span class="n">slpitNgrams</span><span class="k">=</span><span class="n">ngramCleanWords</span><span class="o">.</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"ngrams"</span><span class="o">)).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">).</span>
-   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span>
-      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
-      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">1</span><span class="o">))).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'ngram1=</span><span class="o">!='</span><span class="n">ngram2</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">slpitNgrams</span><span class="k">=</span><span class="n">ngramCleanWords</span><span class="o">.</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"ngrams"</span><span class="o">)).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">).</span>
+   <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">,</span>
+      <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
+      <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">1</span><span class="o">))).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'ngram1</span><span class="o">=!=</span><span class="ss">'ngram2</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">slpitNgrams</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">slpitNgrams</span><span class="o">)</span>
 <span class="n">ngram</span><span class="o">,</span><span class="n">ngram1</span><span class="o">,</span><span class="n">ngram2</span>
 <span class="n">psychological</span> <span class="n">stress</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="n">stress</span>
 <span class="n">wikipedia</span> <span class="n">encyclopedia</span><span class="o">,</span><span class="n">wikipedia</span><span class="o">,</span><span class="n">encyclopedia</span>
@@ -190,11 +190,11 @@ In the post where we
 Stress Data File based on Word2Vec model and saved the results.
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wStressCos</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">w2wStressCos</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">.</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&lt;</span> <span class="mf">0.1</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span> <span class="mf">0.0</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">.</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'cos</span><span class="o">&lt;</span> <span class="mf">0.1</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'cos</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">conducted</span><span class="o">,</span><span class="n">contribute</span><span class="o">,</span><span class="mf">0.08035969605150468</span>
 <span class="n">association</span><span class="o">,</span><span class="n">contribute</span><span class="o">,</span><span class="mf">0.06940379539008698</span>
@@ -206,15 +206,15 @@ Stress Data File based on Word2Vec model and saved the results.
 
 <p>Filter out word pairs with words that are not in the set of words from the Word2Vec model</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">ngramW2V</span><span class="k">=</span><span class="n">slpitNgrams</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">,</span><span class="ss">'ngram1=</span><span class="o">=='</span><span class="n">word1</span> <span class="o">&amp;&amp;</span> <span class="ss">'ngram2=</span><span class="o">=='</span><span class="n">word2</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">).</span><span class="n">distinct</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">ngramW2V</span><span class="k">=</span><span class="n">slpitNgrams</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="n">w2wStressCos</span><span class="o">,</span><span class="ss">'ngram1</span><span class="o">===</span><span class="ss">'word1</span> <span class="o">&amp;&amp;</span> <span class="ss">'ngram2</span><span class="o">===</span><span class="ss">'word2</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">).</span><span class="py">distinct</span></code></pre></figure>
 
 <p>Example: Word Pairs with high Cosine Similarity &gt;0.7:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">ngramW2V</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="ss">'ngram,'cos)</span><span class="o">.</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="mf">0.7</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'cos.</span><span class="n">desc</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="n">ngramW2V</span><span class="o">.</span>
+   <span class="nf">select</span><span class="o">(</span><span class="ss">'ngram</span><span class="o">,</span><span class="ss">'cos</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'cos</span><span class="o">&gt;</span><span class="mf">0.7</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'cos</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 <span class="n">ngram</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">acute</span> <span class="n">chronic</span><span class="o">,</span><span class="mf">0.7848571640793651</span>
 <span class="n">governmental</span> <span class="n">organizations</span><span class="o">,</span><span class="mf">0.7414504735574394</span>
@@ -225,10 +225,10 @@ Stress Data File based on Word2Vec model and saved the results.
 
 <p>Example: Word Pairs with Cosine Similarity close to 0:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">ngramWord2VecDF</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="ss">'ngram,'cos)</span><span class="o">.</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&gt;</span><span class="o">(-</span><span class="mf">0.002</span><span class="o">)).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'cos&lt;</span><span class="o">(</span><span class="mf">0.002</span><span class="o">)).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'cos)</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="n">ngramWord2VecDF</span><span class="o">.</span>
+   <span class="nf">select</span><span class="o">(</span><span class="ss">'ngram</span><span class="o">,</span><span class="ss">'cos</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'cos</span><span class="o">&gt;(-</span><span class="mf">0.002</span><span class="o">)).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'cos</span><span class="o">&lt;(</span><span class="mf">0.002</span><span class="o">)).</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'cos</span><span class="o">))</span>
 <span class="n">ngram</span><span class="o">,</span><span class="n">cos</span>
 <span class="n">researchers</span> <span class="n">interested</span><span class="o">,-</span><span class="mf">0.0019752767768097153</span>
 <span class="n">defense</span> <span class="n">mechanisms</span><span class="o">,-</span><span class="mf">0.0014974826488316265</span>
@@ -241,43 +241,43 @@ Stress Data File based on Word2Vec model and saved the results.
 Now we can build a graph on word pairs: words will be nodes, ngrams - edges and cosine similarities - edge weights.</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
-<span class="k">val</span> <span class="n">graphNodes1</span><span class="k">=</span><span class="n">ngramW2V</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">ngramW2V</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"ngram2"</span><span class="o">)).</span>
-   <span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphEdges1</span><span class="k">=</span><span class="n">ngramW2V</span><span class="o">.</span>  
-   <span class="n">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">).</span>
-   <span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes1</span><span class="o">,</span><span class="n">graphEdges1</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">graphNodes1</span><span class="k">=</span><span class="n">ngramW2V</span><span class="o">.</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="nv">ngramW2V</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"ngram2"</span><span class="o">)).</span>
+   <span class="nv">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphEdges1</span><span class="k">=</span><span class="n">ngramW2V</span><span class="o">.</span>  
+   <span class="nf">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">).</span>
+   <span class="nv">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes1</span><span class="o">,</span><span class="n">graphEdges1</span><span class="o">)</span></code></pre></figure>
 
 <p>To use this graph in several posts we will save graph vertices and edges as Parquet to Databricks locations.</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">graph1</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">write</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
-<span class="n">graph1</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">write</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nv">graph1</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span><span class="py">write</span><span class="o">.</span>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
+<span class="nv">graph1</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">write</span><span class="o">.</span>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span></code></pre></figure>
 
 <p> Load vertices and edges and rebuild the same graph back</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphNgramStressVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphNgramStressEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphNgramStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span> <span class="n">graphNgramStressEdges</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphNgramStressVertices</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphNgramStressEdges</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphNgramStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span> <span class="n">graphNgramStressEdges</span><span class="o">)</span></code></pre></figure>
 
 <p><h3>Page Rank</h3>
 Calculate Page Rank: </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphNgramStressPageRank</span> <span class="k">=</span> <span class="n">graphNgramStress</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphNgramStressPageRank</span> <span class="k">=</span> <span class="n">graphNgramStress</span><span class="o">.</span>
    <span class="n">pageRank</span><span class="o">.</span>
-   <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
-   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
-   <span class="n">run</span><span class="o">()</span>
+   <span class="nf">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+   <span class="nf">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
+   <span class="nf">run</span><span class="o">()</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">graphNgramStressPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">graphNgramStressPageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
    <span class="n">distinct</span><span class="o">.</span>
-   <span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span>
-   <span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+   <span class="nf">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span>
+   <span class="nf">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
    <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
    <span class="n">stress</span><span class="o">,</span><span class="mf">36.799029843873065</span>
    <span class="n">social</span><span class="o">,</span><span class="mf">8.794399876715186</span>

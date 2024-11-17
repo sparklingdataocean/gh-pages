@@ -115,40 +115,40 @@ In the previous post we explained
 <p><h3>Get Data from Data Storage</h3>
 Read word to word Stress Data File combinations with Word2Vec cosine similarities: </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wStressCos</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">w2wStressCos</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span></code></pre></figure>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"w2wStressCos"</span><span class="o">)</span></code></pre></figure>
 
 <p>Read vertices and edges of Word2Vec2Graph and build a graph: &lt;/p&gt;</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
-<span class="k">val</span> <span class="n">graphStressNodes</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
+<span class="k">val</span> <span class="nv">graphStressNodes</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressNodes"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphStressEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphStressNodes"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphStressEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphStressEdges"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphStressNodes</span><span class="o">,</span><span class="n">graphStressEdges</span><span class="o">)</span></code></pre></figure>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphStressEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphStressNodes</span><span class="o">,</span><span class="n">graphStressEdges</span><span class="o">)</span></code></pre></figure>
 
 <p><h3>Page Rank</h3>
 Calculate Page Rank: </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">stressPageRank</span> <span class="k">=</span> <span class="n">graphStress</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">stressPageRank</span> <span class="k">=</span> <span class="n">graphStress</span><span class="o">.</span>
    <span class="n">pageRank</span><span class="o">.</span>
-   <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
-   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+   <span class="nf">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+   <span class="nf">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="py">run</span><span class="o">()</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">stressPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
-   <span class="n">distinct</span><span class="o">().</span>
-   <span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">asc</span><span class="o">).</span>
-   <span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span></code></pre></figure>
+<span class="nf">display</span><span class="o">(</span><span class="nv">stressPageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
+   <span class="nf">distinct</span><span class="o">().</span>
+   <span class="nf">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">asc</span><span class="o">).</span>
+   <span class="nf">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span></code></pre></figure>
 
 <p>Our graph is built on the full matrix so all words pairs are connected therefore we are getting all Page Ranks equal to 1. Now we will look at Page Rank of a subgraph based on the edge weight threshold. We will use the same threshold (&gt;.075) as we used in the previous post when we calculated graph  connected components.</p>
 <p>Build subgraph: </p>
 
 <figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">val</span> <span class="n">edgeHightWeight</span> <span class="o">=</span> <span class="n">graphStress</span><span class="o">.</span><span class="na">edges</span><span class="o">.</span>
    <span class="nf">filter</span><span class="o">(</span><span class="s">"edgeWeight &gt; 0.75"</span><span class="o">)</span>
-<span class="n">val</span> <span class="n">graphHightWeight</span> <span class="o">=</span> <span class="n">GraphFrame</span><span class="o">(</span><span class="n">graphStress</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span> <span class="n">edgeHightWeight</span><span class="o">)</span></code></pre></figure>
+<span class="n">val</span> <span class="n">graphHightWeight</span> <span class="o">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphStress</span><span class="o">.</span><span class="na">vertices</span><span class="o">,</span> <span class="n">edgeHightWeight</span><span class="o">)</span></code></pre></figure>
 
 <p>Calculate Page Rank: </p>
 
@@ -178,11 +178,11 @@ Calculate Page Rank: </p>
 <p><h3>Page Rank and Degrees</h3>
 Graph that we use now is indirect so high Page Rank vertices are similar to high in-degree vertices: </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">vertexInDegrees</span><span class="k">=</span> <span class="n">graphHightWeight</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">vertexInDegrees</span><span class="k">=</span> <span class="n">graphHightWeight</span><span class="o">.</span>
    <span class="n">inDegrees</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">vertexInDegrees</span><span class="o">.</span>
-   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'inDegree.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">vertexInDegrees</span><span class="o">.</span>
+   <span class="nf">orderBy</span><span class="o">(</span><span class="ss">'inDegree</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
 <span class="n">id</span><span class="o">,</span><span class="n">inDegree</span>
 <span class="n">processes</span><span class="o">,</span><span class="mi">6</span>
 <span class="n">disorders</span><span class="o">,</span><span class="mi">6</span>
@@ -201,17 +201,17 @@ Graph that we use now is indirect so high Page Rank vertices are similar to high
 <p><h3>Page Rank and Connected Components</h3>
 Connected components: </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphHightWeightCC</span> <span class="k">=</span> <span class="n">graphHightWeight</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nv">sc</span><span class="o">.</span><span class="py">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphHightWeightCC</span> <span class="k">=</span> <span class="n">graphHightWeight</span><span class="o">.</span>
    <span class="n">connectedComponents</span><span class="o">.</span>
-   <span class="n">run</span><span class="o">()</span>
-<span class="k">val</span> <span class="n">graphHightWeightCcCount</span><span class="k">=</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
-   <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="nf">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="nv">graphHightWeightCcCount</span><span class="k">=</span><span class="n">graphHightWeightCC</span><span class="o">.</span>
+   <span class="nf">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
    <span class="n">count</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">graphHightWeightCcCount</span><span class="o">.</span>
-   <span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">graphHightWeightCcCount</span><span class="o">.</span>
+   <span class="nf">orderBy</span><span class="o">(</span><span class="ss">'ccCt</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
 <span class="mi">60129542144</span><span class="o">,</span><span class="mi">17</span>
 <span class="mi">60129542145</span><span class="o">,</span><span class="mi">9</span>

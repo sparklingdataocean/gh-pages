@@ -118,72 +118,72 @@
 <p>To randomly generate word sequences we used a function from fast.ai Lesson 4: </p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">sample_model</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
-    <span class="n">s_toks</span> <span class="o">=</span> <span class="n">Tokenizer</span><span class="p">()</span><span class="o">.</span><span class="n">proc_text</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">s_toks</span> <span class="o">=</span> <span class="nc">Tokenizer</span><span class="p">().</span><span class="nf">proc_text</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="n">s_nums</span> <span class="o">=</span> <span class="p">[</span><span class="n">stoi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">s_toks</span><span class="p">]</span>
-    <span class="n">s_var</span> <span class="o">=</span> <span class="n">V</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s_nums</span><span class="p">))[</span><span class="bp">None</span><span class="p">]</span>
-    <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bs</span><span class="o">=</span><span class="mi">1</span>
-    <span class="n">m</span><span class="o">.</span><span class="nb">eval</span><span class="p">()</span>
-    <span class="n">m</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-    <span class="n">res</span><span class="p">,</span>  <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">s_var</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">'...'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">exp</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="c">#r = torch.topk(res[-1].exp(), 2)[1]</span>
-        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">s_var</span> <span class="o">=</span> <span class="nc">V</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">s_nums</span><span class="p">))[</span><span class="bp">None</span><span class="p">]</span>
+    <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">bs</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">m</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
+    <span class="n">m</span><span class="p">.</span><span class="nf">reset</span><span class="p">()</span>
+    <span class="n">res</span><span class="p">,</span>  <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="nf">m</span><span class="p">(</span><span class="n">s_var</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">...</span><span class="sh">'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="sh">''</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">multinomial</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="nf">exp</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#r = torch.topk(res[-1].exp(), 2)[1]
+</span>        <span class="k">if</span> <span class="n">r</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">word</span> <span class="o">=</span> <span class="n">itos</span><span class="p">[</span><span class="n">to_np</span><span class="p">(</span><span class="n">r</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="n">res</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">' '</span><span class="p">)</span>
-    <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bs</span><span class="o">=</span><span class="n">bs</span></code></pre></figure>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">itos</span><span class="p">[</span><span class="nf">to_np</span><span class="p">(</span><span class="n">r</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">res</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="nf">m</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="nf">print</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="sh">'</span><span class="s"> </span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">bs</span><span class="o">=</span><span class="n">bs</span></code></pre></figure>
 
 
 <p><p><h3>Language Model Examples</h3></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"freud"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"freud"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>freud</mark>
 ...had given a opinion that that society could support children rather than even women without further research . in many cases transcranial was among the psychoanalytic groups that sought to develop new and
 </small></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"freud"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">33</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"freud"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">33</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>freud</mark>...'s thoughts on religious beliefs and the arguments his version of what he describes as " the intrinsically destructive drive " . tom martin explained how the " practicing of the mind "
 </small></p>
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"freud was"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"freud was"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>freud was</mark>...recognized as the center of the research . analytically had entirely improves upon an everyday life with a formal idea by the north american affects of the previous year ; and the non - psychological perspective that it obtained by listening to the eye . the board also asked brentano
 </small></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"stress"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"stress"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>stress</mark>
 ...disorder causing ques- eld diffuse patients to become more “ active ” informa- dishonesty or par- martindale time . s. frosch said : “ we can spend a lot of time looking at people 's memory . dr assets are about other things that are a very important side of
 </small></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"stress"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"stress"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>stress</mark>
 ...and stress disorder and psychopathology . painful things might be evident when they are under a cold weather after being turned about by old gist jakob ◆ thinker ( nt ) whom he had tests in an reflective lab . an old object that results in a blocking effect is
 </small></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"stress disorder"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">60</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"stress disorder"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">60</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>stress disorder</mark>
 ...previously rejected " escape " program calls . it resulted in the appearance of a " trajectories " . the new magazine called this book " the universe of future men essays " an " air of openness " for beauty and creativity . david ptsd is some of whom had previously been considered a theorists . in 1999 he</small></p>
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"stress disorder"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"stress disorder"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>stress disorder</mark>
 ...in the to - bulb field ( including the second burst ) in a working group . the best carbon - based work or writing of this period is in the largest prospective sixteen members of european society . for most of the work how for the united states population ] the international business times described and criticized the language
@@ -191,14 +191,14 @@
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"creative"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"creative"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>creative</mark>
 ...power . the presentation was notable for its use of decorative terms " eeg " to describe what are called " other understanding characteristics " . academy of humanities production 's code of conduct results in being written as follows : whether the work from the prior reading is an
 </small></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"creativity"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"creativity"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>creativity</mark>
 ...is from the three learn how to become an american . we know apparently the best way to develop this method of learning is through really specific courses and studies . the ability to learn provides basic skills . the creative framework requires creative information and intelligence to relax .
@@ -206,7 +206,7 @@
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"insight"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">40</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"insight"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">40</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>insight</mark>
 .... anxiety can be a crucial part of mental structure . science research group first 5 november 2012 concluded that the lovell experiment involved " remarkable performance " and noted that despite being highly genius worked out despite having a
@@ -214,14 +214,14 @@
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"neural"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"neural"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>neural</mark>
 ...content needs to be biases and will be able to arise in the now episodic ways . “ the lessons are mundane and cause you to view the expectations . ” this is a goal used to explore mental abilities located on the oceans . in particular these systems interconnected
 </small></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"neural network"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"neural network"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>neural network</mark>
 ...of a new controlling interest next to the 2012 gold age . information obtained by scientists from various online strategic services has been given to aca- self- ... the most ’’ of these programs .
@@ -231,7 +231,7 @@
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"artificial"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"artificial"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>artificial</mark>
 ...the transference knowledge which has been implemented as an illusion of the future . the assumption that ® wishes people are valuable is not originally written by hans - ernst wilhelm von perls but by von der psychologists who started using classical view as an explanation for how to solve
@@ -240,28 +240,28 @@
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"intelligence"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"intelligence"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>intelligence</mark>
 ...experiments performed by the spontaneously detected latency stress disorder involving inserm at the control room . the patient had been given an extensive account of the surgery with the domains . once the surgery he had had his behavioral network developed to the point where it was able to travel
 </small></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"artificial intelligence"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"artificial intelligence"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">50</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>artificial intelligence</mark>
 ...never came into existence . this from history was only a matter of reason . despite more significant arlow — particularly to learn greater details — that key children would lose each year they needed more opportunities for a job . explained by the fact that a 2003 museum of
 </small></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"big data"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">40</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"big data"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">40</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>big data</mark>
 ...from the beginning to end with a strongly natural message from them . a new list of intellectual hints such as those that did not necessarily name this system — one by david ernest duncan and another by daniel a.
 </small></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="n">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"big data"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">40</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sample</span><span class="k">=</span><span class="nf">sample_model</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="s">"big data"</span><span class="o">,</span> <span class="n">l</span><span class="k">=</span><span class="mi">40</span><span class="o">)</span></code></pre></figure>
 
 <p><small><mark>big data</mark>
 ...they were not able to speed up attempts to win phrase for a single objective . overall the writers sought to solve this problem by offering the task of creating additional reflective material for details . today these stuck largely

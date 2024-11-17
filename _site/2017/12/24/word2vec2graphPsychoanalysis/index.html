@@ -117,35 +117,35 @@ Read Psychoanalysis Data file, tokenize and remove stop words:
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
-<span class="k">val</span> <span class="n">inputPsychoanalysis</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/psychoanalisys1.txt"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">inputPsychoanalysis</span><span class="k">=</span><span class="nv">sc</span><span class="o">.</span><span class="py">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/psychoanalisys1.txt"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
-   <span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
-   <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">tokenizedPsychoanalysis</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">inputPsychoanalysis</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">removedStopWordsPsychoanalysis</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
-   <span class="n">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
-   <span class="n">remover</span><span class="o">.</span><span class="n">getStopWords</span><span class="o">).</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedPsychoanalysis</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
+   <span class="nf">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
+   <span class="nf">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">tokenizedPsychoanalysis</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">inputPsychoanalysis</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">removedStopWordsPsychoanalysis</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
+   <span class="nf">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
+   <span class="nv">remover</span><span class="o">.</span><span class="py">getStopWords</span><span class="o">).</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">tokenizedPsychoanalysis</span><span class="o">)</span></code></pre></figure>
 
 
 <p> </p>
 <p>Explode Psychoanalysis word arrays to words:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
-<span class="k">val</span> <span class="n">slpitCleanPsychoanalysis</span> <span class="k">=</span> <span class="n">removedStopWordsPsychoanalysis</span><span class="o">.</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"stopWordFree"</span><span class="o">)).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">).</span>
+<span class="k">val</span> <span class="nv">slpitCleanPsychoanalysis</span> <span class="k">=</span> <span class="n">removedStopWordsPsychoanalysis</span><span class="o">.</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"stopWordFree"</span><span class="o">)).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">).</span>
    <span class="n">distinct</span>
-<span class="n">slpitCleanPsychoanalysis</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">4030</span></code></pre></figure>
+<span class="nv">slpitCleanPsychoanalysis</span><span class="o">.</span><span class="py">count</span><span class="c1">//--4030</span></code></pre></figure>
 
 <p> </p>
 
@@ -159,21 +159,21 @@ Read trained Word2Vec model that was trained and described in
 <span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.ml.feature.Word2VecModel</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.Row</span>
-<span class="k">val</span> <span class="n">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">modelNewsWiki</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+<span class="k">val</span> <span class="nv">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">modelNewsWiki</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span></code></pre></figure>
+   <span class="nf">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span></code></pre></figure>
 
 
 <p>Get a set of all words from the Word2Vec model and compare Psychoanalysis file word pairs with words from the Word2Vec model </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">cleanPsychoW2V</span><span class="k">=</span><span class="n">slpitCleanPsychoanalysis</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">modelWords</span><span class="o">,</span><span class="ss">'cleanWord=</span><span class="o">=='</span><span class="n">word</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">).</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">cleanPsychoW2V</span><span class="k">=</span><span class="n">slpitCleanPsychoanalysis</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="n">modelWords</span><span class="o">,</span><span class="ss">'cleanWord</span><span class="o">===</span><span class="ss">'word</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">).</span>
    <span class="n">distinct</span>
-<span class="n">cleanPsychoW2V</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">3318</span></code></pre></figure>
+<span class="nv">cleanPsychoW2V</span><span class="o">.</span><span class="py">count</span><span class="c1">//--3318</span></code></pre></figure>
 
 
 <p>The Word2Vec model was trained on corpus based on News and Wikipedia data about psychology but only 82% of Psychoanalysis file word pairs are in the model. To increase this percentage we will include Psychoanalysis file data to training corpus and retrain the Word2Vec model. </p>
@@ -182,40 +182,40 @@ Read trained Word2Vec model that was trained and described in
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
-  <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/newsTest.txt"</span><span class="o">).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">inputWiki</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/WikiTest.txt"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">tokenizedNewsWikiPsychoanalysis</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">inputWiki</span><span class="o">).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">inputPsychoanalysis</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+  <span class="nf">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/newsTest.txt"</span><span class="o">).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">inputWiki</span><span class="k">=</span><span class="nv">sc</span><span class="o">.</span><span class="py">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/WikiTest.txt"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">tokenizedNewsWikiPsychoanalysis</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>
+   <span class="nf">union</span><span class="o">(</span><span class="n">inputWiki</span><span class="o">).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="n">inputPsychoanalysis</span><span class="o">))</span>
 
-<span class="k">val</span> <span class="n">w2VmodelNewsWikiPsychoanalysis</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span>
-      <span class="n">fit</span><span class="o">(</span><span class="n">tokenizedNewsWikiPsychoanalysis</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">w2VmodelNewsWikiPsychoanalysis</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span>
+      <span class="nf">fit</span><span class="o">(</span><span class="n">tokenizedNewsWikiPsychoanalysis</span><span class="o">)</span>
    <span class="n">w2VmodelNewsWikiPsychoanalysis</span><span class="o">.</span>
       <span class="n">write</span><span class="o">.</span>
       <span class="n">overwrite</span><span class="o">.</span>
-      <span class="n">save</span><span class="o">(</span><span class="s">"w2VmodelNewsWikiPsychoanalysis"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">modelNewsWikiPsychoanalysis</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+      <span class="nf">save</span><span class="o">(</span><span class="s">"w2VmodelNewsWikiPsychoanalysis"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">modelNewsWikiPsychoanalysis</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
       <span class="n">read</span><span class="o">.</span>
-      <span class="n">load</span><span class="o">(</span><span class="s">"w2VmodelNewsWikiPsychoanalysis"</span><span class="o">)</span>   </code></pre></figure>
+      <span class="nf">load</span><span class="o">(</span><span class="s">"w2VmodelNewsWikiPsychoanalysis"</span><span class="o">)</span>   </code></pre></figure>
 
 
 <p>Get a set of all words from the new Word2Vec model and compare them with Psychoanalysis file words:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modelNewsWikiPsychoanalysis</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modelNewsWikiPsychoanalysis</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">load</span><span class="o">(</span><span class="s">"w2VmodelNewsWikiPsychoanalysis"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">modelWordsPsychoanalysis</span><span class="k">=</span><span class="n">modelNewsWikiPsychoanalysis</span><span class="o">.</span>
+   <span class="nf">load</span><span class="o">(</span><span class="s">"w2VmodelNewsWikiPsychoanalysis"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">modelWordsPsychoanalysis</span><span class="k">=</span><span class="n">modelNewsWikiPsychoanalysis</span><span class="o">.</span>
     <span class="n">getVectors</span><span class="o">.</span>
-    <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">cleanPsychoNewW2V</span><span class="k">=</span><span class="n">slpitCleanPsychoanalysis</span><span class="o">.</span>
-    <span class="n">join</span><span class="o">(</span><span class="n">modelWordsPsychoanalysis</span><span class="o">,</span><span class="ss">'cleanWord=</span><span class="o">=='</span><span class="n">word</span><span class="o">).</span>
-    <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span>
+    <span class="nf">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">cleanPsychoNewW2V</span><span class="k">=</span><span class="n">slpitCleanPsychoanalysis</span><span class="o">.</span>
+    <span class="nf">join</span><span class="o">(</span><span class="n">modelWordsPsychoanalysis</span><span class="o">,</span><span class="ss">'cleanWord</span><span class="o">===</span><span class="ss">'word</span><span class="o">).</span>
+    <span class="nf">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span>
     <span class="n">distinct</span>
-<span class="n">cleanPsychoNewW2V</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">3433</span>    </code></pre></figure>
+<span class="nv">cleanPsychoNewW2V</span><span class="o">.</span><span class="py">count</span><span class="c1">//--3433    </span></code></pre></figure>
 
 
 <p>This new Word2Vec model works a little bit better: 85% of Psychoanalysis File words are in the model. </p>
@@ -227,30 +227,30 @@ We introduced Word2Vec Cosine Similarity Function in the
 </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml.linalg.Vector</span>
-<span class="k">def</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+<span class="k">def</span> <span class="nf">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
              <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
   <span class="k">var</span> <span class="n">dot</span><span class="k">=</span><span class="mf">0.0</span>
-  <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span><span class="mi">0</span> <span class="n">to</span> <span class="n">vectorX</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">dot</span> <span class="o">+=</span> <span class="n">vectorX</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">*</span> <span class="n">vectorY</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
+  <span class="nf">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span><span class="mi">0</span> <span class="n">to</span> <span class="nv">vectorX</span><span class="o">.</span><span class="py">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">dot</span> <span class="o">+=</span> <span class="nf">vectorX</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">*</span> <span class="nf">vectorY</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
   <span class="n">dot</span>
 <span class="o">}</span>
-<span class="k">def</span> <span class="n">cosineVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+<span class="k">def</span> <span class="nf">cosineVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
                  <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="n">require</span><span class="o">(</span><span class="n">vectorX</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">vectorY</span><span class="o">.</span><span class="n">size</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">dot</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">div</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorX</span><span class="o">)</span> <span class="o">*</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorY</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
-  <span class="k">if</span> <span class="o">(</span><span class="n">div</span><span class="o">==</span><span class="mi">0</span><span class="o">)</span><span class="mi">0</span>
-  <span class="k">else</span> <span class="n">dot</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="o">(</span><span class="n">div</span><span class="o">)</span>
+  <span class="nf">require</span><span class="o">(</span><span class="nv">vectorX</span><span class="o">.</span><span class="py">size</span> <span class="o">==</span> <span class="nv">vectorY</span><span class="o">.</span><span class="py">size</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">dot</span><span class="k">=</span><span class="nf">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">div</span><span class="k">=</span><span class="nf">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorX</span><span class="o">)</span> <span class="o">*</span> <span class="nf">dotVector</span><span class="o">(</span><span class="n">vectorY</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+  <span class="nf">if</span> <span class="o">(</span><span class="n">div</span><span class="o">==</span><span class="mi">0</span><span class="o">)</span><span class="mi">0</span>
+  <span class="k">else</span> <span class="n">dot</span><span class="o">/</span><span class="nv">math</span><span class="o">.</span><span class="py">sqrt</span><span class="o">(</span><span class="n">div</span><span class="o">)</span>
 <span class="o">}</span>
 
-<span class="k">val</span> <span class="n">cleanPsychoNewW2V2</span><span class="k">=</span><span class="n">cleanPsychoNewW2V</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">w2wPsycho</span><span class="k">=</span><span class="n">cleanPsychoNewW2V</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">cleanPsychoNewW2V2</span><span class="o">,</span><span class="ss">'word=</span><span class="o">!='</span><span class="n">word2</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">w2wPsychoCosDF</span><span class="k">=</span><span class="n">w2wPsycho</span><span class="o">.</span>
-   <span class="n">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">2</span><span class="o">),</span>
-    <span class="n">cosineVector</span><span class="o">(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">),</span>
-    <span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">3</span><span class="o">)))).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">cleanPsychoNewW2V2</span><span class="k">=</span><span class="n">cleanPsychoNewW2V</span><span class="o">.</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">w2wPsycho</span><span class="k">=</span><span class="n">cleanPsychoNewW2V</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="n">cleanPsychoNewW2V2</span><span class="o">,</span><span class="ss">'word</span><span class="o">=!=</span><span class="ss">'word2</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">w2wPsychoCosDF</span><span class="k">=</span><span class="n">w2wPsycho</span><span class="o">.</span>
+   <span class="nf">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="nv">r</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">),</span><span class="nv">r</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">2</span><span class="o">),</span>
+    <span class="nf">cosineVector</span><span class="o">(</span><span class="nv">r</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">),</span>
+    <span class="nv">r</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">3</span><span class="o">)))).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">)</span></code></pre></figure>
 
 
 <p><h3>Transform to Pairs of Words</h3>
@@ -258,27 +258,27 @@ Get pairs of words and explode ngrams:</p>
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
-<span class="k">val</span> <span class="n">ngram</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NGram</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"ngrams"</span><span class="o">).</span>
-   <span class="n">setN</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">ngramCleanWords</span> <span class="k">=</span> <span class="n">ngram</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">removedStopWordsPsychoanalysis</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">slpitNgrams</span><span class="k">=</span><span class="n">ngramCleanWords</span><span class="o">.</span>
-    <span class="n">withColumn</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"ngrams"</span><span class="o">)).</span>
-    <span class="n">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">).</span>
-    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span>
-         <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
-         <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">1</span><span class="o">))).</span>
-    <span class="n">toDF</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">).</span>
-    <span class="n">filter</span><span class="o">(</span><span class="ss">'ngram1=</span><span class="o">!='</span><span class="n">ngram2</span><span class="o">)</span>   </code></pre></figure>
+<span class="k">val</span> <span class="nv">ngram</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NGram</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"ngrams"</span><span class="o">).</span>
+   <span class="nf">setN</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">ngramCleanWords</span> <span class="k">=</span> <span class="n">ngram</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">removedStopWordsPsychoanalysis</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">slpitNgrams</span><span class="k">=</span><span class="n">ngramCleanWords</span><span class="o">.</span>
+    <span class="nf">withColumn</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"ngrams"</span><span class="o">)).</span>
+    <span class="nf">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">).</span>
+    <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">,</span>
+         <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
+         <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">1</span><span class="o">))).</span>
+    <span class="nf">toDF</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">).</span>
+    <span class="nf">filter</span><span class="o">(</span><span class="ss">'ngram1</span><span class="o">=!=</span><span class="ss">'ngram2</span><span class="o">)</span>   </code></pre></figure>
 
 
 Cosine similarities for pairs of words:</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">ngramCos</span><span class="k">=</span><span class="n">slpitNgrams</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">w2wPsychoCosDF</span><span class="o">,</span><span class="ss">'ngram1=</span><span class="o">=='</span><span class="n">word1</span> <span class="o">&amp;&amp;</span> <span class="ss">'ngram2=</span><span class="o">=='</span><span class="n">word2</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">ngramCos</span><span class="k">=</span><span class="n">slpitNgrams</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="n">w2wPsychoCosDF</span><span class="o">,</span><span class="ss">'ngram1</span><span class="o">===</span><span class="ss">'word1</span> <span class="o">&amp;&amp;</span> <span class="ss">'ngram2</span><span class="o">===</span><span class="ss">'word2</span><span class="o">)</span></code></pre></figure>
 
 
 <p><h3>Graph on Word Pairs</h3>
@@ -287,41 +287,41 @@ Now we can build a graph on word pairs: words will be nodes, ngrams - edges and 
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
-<span class="k">val</span> <span class="n">graphNodes1</span><span class="k">=</span><span class="n">ngramCos</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">ngramCos</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"ngram2"</span><span class="o">)).</span>
+<span class="k">val</span> <span class="nv">graphNodes1</span><span class="k">=</span><span class="n">ngramCos</span><span class="o">.</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="nv">ngramCos</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"ngram2"</span><span class="o">)).</span>
    <span class="n">distinct</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphEdges1</span><span class="k">=</span><span class="n">ngramCos</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphEdges1</span><span class="k">=</span><span class="n">ngramCos</span><span class="o">.</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"cos"</span><span class="o">).</span>
    <span class="n">distinct</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes1</span><span class="o">,</span><span class="n">graphEdges1</span><span class="o">)</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes1</span><span class="o">,</span><span class="n">graphEdges1</span><span class="o">)</span>
 
-<span class="n">graph1</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">write</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphPsychoVertices"</span><span class="o">)</span>
-<span class="n">graph1</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">write</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphPsychoEdges"</span><span class="o">)</span>
+<span class="nv">graph1</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span><span class="py">write</span><span class="o">.</span>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphPsychoVertices"</span><span class="o">)</span>
+<span class="nv">graph1</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">write</span><span class="o">.</span>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphPsychoEdges"</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">graphPsychoanalysisVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphPsychoVertices"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphPsychoanalysisEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphPsychoEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphPsychoanalysisVertices</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphPsychoVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphPsychoanalysisEdges</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphPsychoEdges"</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">graphPsychoanalysis</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphPsychoanalysisVertices</span><span class="o">,</span> <span class="n">graphPsychoanalysisEdges</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">graphPsychoanalysis</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphPsychoanalysisVertices</span><span class="o">,</span> <span class="n">graphPsychoanalysisEdges</span><span class="o">)</span></code></pre></figure>
 
 
 
 <p><h3>Page Rank</h3>
 Calculate Page Rank:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphPsychoanalysisPageRank</span> <span class="k">=</span> <span class="n">graphPsychoanalysis</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphPsychoanalysisPageRank</span> <span class="k">=</span> <span class="n">graphPsychoanalysis</span><span class="o">.</span>
    <span class="n">pageRank</span><span class="o">.</span>
-   <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
-   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
-   <span class="n">run</span><span class="o">()</span>
-<span class="n">display</span><span class="o">(</span><span class="n">graphPsychoanalysisPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+   <span class="nf">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+   <span class="nf">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
+   <span class="nf">run</span><span class="o">()</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">graphPsychoanalysisPageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
    <span class="n">distinct</span><span class="o">.</span>
-   <span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span>
-   <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+   <span class="nf">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span>
+   <span class="nf">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
 
    <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
    <span class="n">freud</span><span class="o">,</span><span class="mf">94.16935233039906</span>
@@ -345,51 +345,51 @@ We created a function to calculate connected components with cosine similarly an
 </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.DataFrame</span>
-<span class="k">def</span> <span class="n">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
+<span class="k">def</span> <span class="nf">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
    <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
    <span class="n">cosineMin</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span> <span class="n">cosineMax</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span>
    <span class="n">ccMin</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">ccMax</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
-<span class="k">val</span> <span class="n">graphEdgesSub</span><span class="k">=</span> <span class="n">graphEdges</span><span class="o">.</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&gt;</span><span class="n">cosineMin</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&lt;</span><span class="n">cosineMax</span><span class="o">)</span>
- <span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
- <span class="k">val</span> <span class="n">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
+<span class="k">val</span> <span class="nv">graphEdgesSub</span><span class="k">=</span> <span class="n">graphEdges</span><span class="o">.</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&gt;</span><span class="n">cosineMin</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&lt;</span><span class="n">cosineMax</span><span class="o">)</span>
+ <span class="nv">sc</span><span class="o">.</span><span class="py">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+ <span class="k">val</span> <span class="nv">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
     <span class="n">connectedComponents</span><span class="o">.</span>
-    <span class="n">run</span><span class="o">()</span>
- <span class="k">val</span> <span class="n">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
-    <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+    <span class="nf">run</span><span class="o">()</span>
+ <span class="k">val</span> <span class="nv">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
+    <span class="nf">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
     <span class="n">count</span><span class="o">.</span>
-    <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
- <span class="k">val</span> <span class="n">sizeCC</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component=</span><span class="o">=='</span><span class="n">cc</span><span class="o">).</span>
-    <span class="n">filter</span><span class="o">(</span><span class="ss">'ccCt&lt;</span><span class="n">ccMax</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'ccCt&gt;</span><span class="n">ccMin</span><span class="o">).</span>
-    <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="n">distinct</span>
-    <span class="n">graphEdges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span>
-    <span class="n">union</span><span class="o">(</span><span class="n">graphEdges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">id</span><span class="o">)).</span>
-    <span class="n">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span>
+    <span class="nf">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+ <span class="k">val</span> <span class="nv">sizeCC</span><span class="k">=</span><span class="nv">resultCC</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component</span><span class="o">===</span><span class="ss">'cc</span><span class="o">).</span>
+    <span class="nf">filter</span><span class="o">(</span><span class="ss">'ccCt</span><span class="o">&lt;</span><span class="n">ccMax</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'ccCt</span><span class="o">&gt;</span><span class="n">ccMin</span><span class="o">).</span>
+    <span class="nf">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="py">distinct</span>
+    <span class="nv">graphEdges</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'id</span><span class="o">).</span>
+    <span class="nf">union</span><span class="o">(</span><span class="nv">graphEdges</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst</span><span class="o">===</span><span class="ss">'id</span><span class="o">)).</span>
+    <span class="nf">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">distinct</span>
 <span class="o">}</span>
 
-<span class="k">def</span> <span class="n">roundAt</span><span class="o">(</span><span class="n">p</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
-   <span class="k">val</span> <span class="n">s</span> <span class="k">=</span> <span class="n">math</span> <span class="n">pow</span> <span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="n">p</span><span class="o">);</span> <span class="o">(</span><span class="n">math</span> <span class="n">round</span> <span class="n">n</span> <span class="o">*</span> <span class="n">s</span><span class="o">)</span> <span class="o">/</span> <span class="n">s</span>
+<span class="k">def</span> <span class="nf">roundAt</span><span class="o">(</span><span class="n">p</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
+   <span class="k">val</span> <span class="nv">s</span> <span class="k">=</span> <span class="n">math</span> <span class="nf">pow</span> <span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="n">p</span><span class="o">);</span> <span class="o">(</span><span class="n">math</span> <span class="n">round</span> <span class="n">n</span> <span class="o">*</span> <span class="n">s</span><span class="o">)</span> <span class="o">/</span> <span class="n">s</span>
 <span class="o">}</span>
-<span class="k">def</span> <span class="n">component2dot</span><span class="o">(</span><span class="n">graphComponents</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
+<span class="k">def</span> <span class="nf">component2dot</span><span class="o">(</span><span class="n">graphComponents</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
    <span class="n">componentId</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span> <span class="n">cosineMin</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span> <span class="n">cosineMax</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
   <span class="n">graphComponents</span><span class="o">.</span>
-    <span class="n">filter</span><span class="o">(</span><span class="ss">'component=</span><span class="o">==</span><span class="n">componentId</span><span class="o">).</span>
-    <span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&gt;</span><span class="n">cosineMin</span><span class="o">).</span>
-    <span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&lt;</span><span class="n">cosineMax</span><span class="o">).</span>
-    <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
-    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
-      <span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+</span><span class="n">roundAt</span><span class="o">(</span><span class="mi">2</span><span class="o">)(</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">toDouble</span><span class="o">)+</span><span class="s">"\"];"</span><span class="o">)).</span>
-      <span class="n">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
+    <span class="nf">filter</span><span class="o">(</span><span class="ss">'component</span><span class="o">===</span><span class="n">componentId</span><span class="o">).</span>
+    <span class="nf">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&gt;</span><span class="n">cosineMin</span><span class="o">).</span>
+    <span class="nf">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&lt;</span><span class="n">cosineMax</span><span class="o">).</span>
+    <span class="nf">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span>
+    <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
+      <span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+</span><span class="nf">roundAt</span><span class="o">(</span><span class="mi">2</span><span class="o">)(</span><span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">toDouble</span><span class="o">)+</span><span class="s">"\"];"</span><span class="o">)).</span>
+      <span class="nf">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
 <span class="o">}</span></code></pre></figure>
 
 
 <p>To select parameters we analyzed cosine similarity distribution. </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">weightDistribution</span><span class="k">=</span><span class="n">graphPsychoanalysisEdges</span><span class="o">.</span>
-   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">roundAt</span><span class="o">(</span><span class="mi">2</span><span class="o">)(</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">toDouble</span><span class="o">))).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"cosine1"</span><span class="o">).</span><span class="n">groupBy</span><span class="o">(</span><span class="s">"cosine1"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"cosine1"</span><span class="o">,</span><span class="s">"cosine1Count"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">weightDistribution</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'cosine1)</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">weightDistribution</span><span class="k">=</span><span class="n">graphPsychoanalysisEdges</span><span class="o">.</span>
+   <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">roundAt</span><span class="o">(</span><span class="mi">2</span><span class="o">)(</span><span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">toDouble</span><span class="o">))).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"cosine1"</span><span class="o">).</span><span class="py">groupBy</span><span class="o">(</span><span class="s">"cosine1"</span><span class="o">).</span><span class="py">count</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"cosine1"</span><span class="o">,</span><span class="s">"cosine1Count"</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">weightDistribution</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'cosine1</span><span class="o">))</span></code></pre></figure>
 
 
 <a href="#">
@@ -403,15 +403,15 @@ Connected components with edge weights greater than 0.7: </p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
-<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span>
-   <span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span>
-   <span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphPsychoanalysisVertices</span><span class="o">,</span>
+<span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span>
+   <span class="nf">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="nf">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="py">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result</span><span class="k">=</span><span class="nf">w2v2gConnectedComponents</span><span class="o">(</span><span class="n">graphPsychoanalysisVertices</span><span class="o">,</span>
    <span class="n">graphPsychoanalysisEdges</span><span class="o">,</span><span class="mf">0.7</span><span class="o">,</span><span class="mf">1.0</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="mi">30</span><span class="o">)</span>
-<span class="n">result</span><span class="o">.</span><span class="n">persist</span>
-<span class="k">val</span> <span class="n">result3edges</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span>
-    <span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
-<span class="n">display</span><span class="o">(</span><span class="n">result3edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">))</span>
+<span class="nv">result</span><span class="o">.</span><span class="py">persist</span>
+<span class="k">val</span> <span class="nv">result3edges</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span>
+    <span class="nf">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="nf">rank</span><span class="o">().</span><span class="py">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">result3edges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">))</span>
 
 <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
 <span class="mi">94489280524</span><span class="o">,</span><span class="mi">8</span><span class="o">,</span><span class="n">patient</span><span class="o">,</span><span class="n">symptoms</span><span class="o">,</span><span class="mf">0.7865587769877727</span><span class="o">,</span><span class="mi">1</span>
@@ -430,8 +430,8 @@ Connected components with edge weights greater than 0.7: </p>
 
 <p>We selected component '94489280524'. First we'll create a graph with the same cosine similarity parameters them we used to look at connected components, i.e. for word pairs with cosine similarity &gt;0.7:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultDot</span><span class="k">=</span><span class="n">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">94489280524L</span><span class="o">,</span><span class="mf">0.7</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">resultDot</span><span class="k">=</span><span class="nf">component2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">94489280524L</span><span class="o">,</span><span class="mf">0.7</span><span class="o">,</span><span class="mf">1.0</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">resultDot</span><span class="o">)</span>
 <span class="s">"patient"</span> <span class="o">-&gt;</span> <span class="s">"symptoms"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">79"</span><span class="o">];</span>
 <span class="s">"causes"</span> <span class="o">-&gt;</span> <span class="s">"illness"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">7"</span><span class="o">];</span>
 <span class="s">"mental"</span> <span class="o">-&gt;</span> <span class="s">"physical"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"0</span><span class="kt">.</span><span class="err">71"</span><span class="o">];</span>

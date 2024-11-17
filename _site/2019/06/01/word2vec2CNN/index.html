@@ -175,27 +175,27 @@ Read text file, tokenize it and remove stop words:
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
 
-<span class="k">val</span> <span class="n">inputPsychoanalysis</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/psychoanalisys1.txt"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">inputPsychoanalysis</span><span class="k">=</span><span class="nv">sc</span><span class="o">.</span><span class="py">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/psychoanalisys1.txt"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
-   <span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
-   <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
+   <span class="nf">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
+   <span class="nf">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">tokenizedPsychoanalysis</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">inputPsychoanalysis</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">tokenizedPsychoanalysis</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">inputPsychoanalysis</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">removedStopWordsPsychoanalysis</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
-   <span class="n">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
-   <span class="n">remover</span><span class="o">.</span><span class="n">getStopWords</span><span class="o">).</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedPsychoanalysis</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">removedStopWordsPsychoanalysis</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
+   <span class="nf">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
+   <span class="nv">remover</span><span class="o">.</span><span class="py">getStopWords</span><span class="o">).</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">tokenizedPsychoanalysis</span><span class="o">)</span></code></pre></figure>
 
 
 <p></p>
@@ -209,22 +209,22 @@ Get pairs of words from text than explode ngrams:
 
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">ngram</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NGram</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"ngrams"</span><span class="o">).</span>
-   <span class="n">setN</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">ngram</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NGram</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"ngrams"</span><span class="o">).</span>
+   <span class="nf">setN</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">ngramCleanWords</span> <span class="k">=</span> <span class="n">ngram</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">removedStopWordsPsychoanalysis</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">ngramCleanWords</span> <span class="k">=</span> <span class="n">ngram</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">removedStopWordsPsychoanalysis</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">slpitNgrams</span><span class="k">=</span><span class="n">ngramCleanWords</span><span class="o">.</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"ngrams"</span><span class="o">)).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">).</span>
-   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span>
-      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
-      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">1</span><span class="o">))).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'ngram1=</span><span class="o">!='</span><span class="n">ngram2</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">slpitNgrams</span><span class="k">=</span><span class="n">ngramCleanWords</span><span class="o">.</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"ngrams"</span><span class="o">)).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">).</span>
+   <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">,</span>
+      <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
+      <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">1</span><span class="o">))).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'ngram1</span><span class="o">=!=</span><span class="ss">'ngram2</span><span class="o">)</span></code></pre></figure>
 
 
 <h3>Vectors for Pairs of Words</h3>
@@ -236,17 +236,17 @@ Read trained Word2Vec model:
 </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">modelNewsBrain</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+<span class="k">val</span> <span class="nv">modelNewsBrain</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">load</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
+   <span class="nf">load</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">modelWordsPsychoanalysis</span><span class="k">=</span><span class="n">modelNewsBrain</span><span class="o">.</span>
+<span class="k">val</span> <span class="nv">modelWordsPsychoanalysis</span><span class="k">=</span><span class="n">modelNewsBrain</span><span class="o">.</span>
    <span class="n">getVectors</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span></code></pre></figure>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span></code></pre></figure>
 
 
 <p>
@@ -256,11 +256,11 @@ Read trained Word2Vec model:
 Map words of word pairs to Word2Vec model and get sets: {word1, vector1, word2, vector2}:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">ngramW2V</span><span class="k">=</span><span class="n">slpitNgrams</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">modelWordsPsychoanalysis</span><span class="o">,</span><span class="ss">'ngram1=</span><span class="o">=='</span><span class="n">word</span><span class="o">).</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">modelWordsPsychoanalysis</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">),</span><span class="ss">'ngram2=</span><span class="o">=='</span><span class="n">word2</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"vector1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">).</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">ngramW2V</span><span class="k">=</span><span class="n">slpitNgrams</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="n">modelWordsPsychoanalysis</span><span class="o">,</span><span class="ss">'ngram1</span><span class="o">===</span><span class="ss">'word</span><span class="o">).</span>
+   <span class="nf">join</span><span class="o">(</span><span class="nv">modelWordsPsychoanalysis</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">),</span><span class="ss">'ngram2</span><span class="o">===</span><span class="ss">'word2</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"vector1"</span><span class="o">,</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">).</span>
    <span class="n">distinct</span></code></pre></figure>
 
 
@@ -268,9 +268,9 @@ Map words of word pairs to Word2Vec model and get sets: {word1, vector1, word2, 
 Get single words with vectors from word pairs: {word1, vector1}:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">ngram1W2V</span><span class="k">=</span><span class="n">ngramW2V</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"vector1"</span><span class="o">).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">ngramW2V</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)).</span>
-   <span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">ngram1W2V</span><span class="k">=</span><span class="nv">ngramW2V</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"ngram1"</span><span class="o">,</span><span class="s">"vector1"</span><span class="o">).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="nv">ngramW2V</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"ngram2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)).</span>
+   <span class="nv">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span></code></pre></figure>
 
 
 
@@ -281,21 +281,21 @@ Get single words with vectors from word pairs: {word1, vector1}:
 Combine vectors from word pairs {word1, word2} reversing the second vector.
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">arrayDFdiff</span> <span class="k">=</span> <span class="n">ngramW2V</span><span class="o">.</span><span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">x</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">)</span> <span class="o">+</span><span class="s">"~"</span><span class="o">+</span>  <span class="n">x</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">2</span><span class="o">)</span> <span class="o">,</span>
-   <span class="n">x</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">).</span><span class="n">toArray</span><span class="o">++</span><span class="n">x</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">Vector</span><span class="o">](</span><span class="mi">3</span><span class="o">).</span><span class="n">toArray</span><span class="o">.</span><span class="n">reverse</span><span class="o">)).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"array"</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span> <span class="o">+:</span> <span class="o">(</span><span class="mi">0</span> <span class="n">until</span> <span class="mi">200</span><span class="o">).</span><span class="n">map</span><span class="o">(</span><span class="n">i</span> <span class="k">=&gt;</span>  
-   <span class="n">col</span><span class="o">(</span><span class="s">"array"</span><span class="o">)(</span><span class="n">i</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="n">s</span><span class="s">"col$i"</span><span class="o">))</span><span class="k">:</span> <span class="kt">*</span><span class="k">_</span><span class="kt">*</span><span class="o">).</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"pairType"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"diff"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">arrayDFdiff</span> <span class="k">=</span> <span class="nv">ngramW2V</span><span class="o">.</span><span class="py">rdd</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">x</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="nv">x</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">)</span> <span class="o">+</span><span class="s">"~"</span><span class="o">+</span>  <span class="nv">x</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">2</span><span class="o">)</span> <span class="o">,</span>
+   <span class="nv">x</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">).</span><span class="py">toArray</span><span class="o">++</span><span class="nv">x</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">Vector</span><span class="o">](</span><span class="mi">3</span><span class="o">).</span><span class="py">toArray</span><span class="o">.</span><span class="py">reverse</span><span class="o">)).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"array"</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span> <span class="o">+:</span> <span class="o">(</span><span class="mi">0</span> <span class="n">until</span> <span class="mi">200</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="n">i</span> <span class="k">=&gt;</span>  
+   <span class="nf">col</span><span class="o">(</span><span class="s">"array"</span><span class="o">)(</span><span class="n">i</span><span class="o">).</span><span class="py">alias</span><span class="o">(</span><span class="n">s</span><span class="s">"col$i"</span><span class="o">))</span><span class="k">:</span> <span class="kt">*</span><span class="k">_</span><span class="kt">*</span><span class="o">).</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"pairType"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="s">"diff"</span><span class="o">))</span></code></pre></figure>
 
 
 
 <p>Combine vectors from single words with themselves reversing the second vector.</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">arrayDFsame</span> <span class="k">=</span> <span class="n">ngram1W2V</span><span class="o">.</span><span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">x</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">)</span> <span class="o">+</span><span class="s">"~"</span><span class="o">+</span>  <span class="n">x</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">)</span> <span class="o">,</span>
-   <span class="n">x</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">).</span><span class="n">toArray</span><span class="o">++</span><span class="n">x</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">).</span><span class="n">toArray</span><span class="o">.</span><span class="n">reverse</span><span class="o">)).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"array"</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span> <span class="o">+:</span> <span class="o">(</span><span class="mi">0</span> <span class="n">until</span> <span class="mi">200</span><span class="o">).</span><span class="n">map</span><span class="o">(</span><span class="n">i</span> <span class="k">=&gt;</span>  <span class="n">col</span><span class="o">(</span><span class="s">"array"</span><span class="o">)(</span><span class="n">i</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="n">s</span><span class="s">"col$i"</span><span class="o">))</span><span class="k">:</span> <span class="kt">*</span><span class="k">_</span><span class="kt">*</span><span class="o">).</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"pairType"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"same"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">arrayDFsame</span> <span class="k">=</span> <span class="nv">ngram1W2V</span><span class="o">.</span><span class="py">rdd</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">x</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="nv">x</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">)</span> <span class="o">+</span><span class="s">"~"</span><span class="o">+</span>  <span class="nv">x</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">)</span> <span class="o">,</span>
+   <span class="nv">x</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">).</span><span class="py">toArray</span><span class="o">++</span><span class="nv">x</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">).</span><span class="py">toArray</span><span class="o">.</span><span class="py">reverse</span><span class="o">)).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"array"</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"word"</span><span class="o">)</span> <span class="o">+:</span> <span class="o">(</span><span class="mi">0</span> <span class="n">until</span> <span class="mi">200</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="n">i</span> <span class="k">=&gt;</span>  <span class="nf">col</span><span class="o">(</span><span class="s">"array"</span><span class="o">)(</span><span class="n">i</span><span class="o">).</span><span class="py">alias</span><span class="o">(</span><span class="n">s</span><span class="s">"col$i"</span><span class="o">))</span><span class="k">:</span> <span class="kt">*</span><span class="k">_</span><span class="kt">*</span><span class="o">).</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"pairType"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="s">"same"</span><span class="o">))</span></code></pre></figure>
 
 
 
@@ -308,15 +308,15 @@ We splitted the source file to words={pairType, word} and vector. The 'pairType'
 </p>
 
 
-<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">a</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="na">read_csv</span><span class="o">(</span><span class="n">PATH</span> <span class="o">+</span> <span class="err">‘</span><span class="n">words</span><span class="o">.</span><span class="na">csv</span><span class="err">'</span><span class="o">,</span> <span class="n">sep</span><span class="o">=</span><span class="sc">','</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">a</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="na">read_csv</span><span class="o">(</span><span class="no">PATH</span> <span class="o">+</span> <span class="err">‘</span><span class="n">words</span><span class="o">.</span><span class="na">csv</span><span class="err">'</span><span class="o">,</span> <span class="n">sep</span><span class="o">=</span><span class="sc">','</span><span class="o">)</span>
 <span class="n">d</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="na">drop</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="na">columns</span><span class="o">[</span><span class="mi">0</span><span class="o">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="o">).</span><span class="na">drop</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="na">columns</span><span class="o">[</span><span class="mi">201</span><span class="o">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="o">)</span>
 <span class="n">fX</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="na">fillna</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="na">values</span>
 <span class="n">image_size</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="n">gasf</span> <span class="o">=</span> <span class="n">GASF</span><span class="o">(</span><span class="n">image_size</span><span class="o">)</span>
+<span class="n">gasf</span> <span class="o">=</span> <span class="no">GASF</span><span class="o">(</span><span class="n">image_size</span><span class="o">)</span>
 <span class="n">fX_gasf</span> <span class="o">=</span> <span class="n">gasf</span><span class="o">.</span><span class="na">fit_transform</span><span class="o">(</span><span class="n">fX</span><span class="o">)</span>
 
 <span class="n">f</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="na">iloc</span><span class="o">[:,</span> <span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="mi">201</span><span class="o">]]</span>
-<span class="n">imgId</span> <span class="o">=</span> <span class="n">PATH</span> <span class="o">+</span> <span class="n">str</span><span class="o">(</span><span class="n">f</span><span class="o">[</span><span class="err">'</span><span class="n">pairType</span><span class="err">'</span><span class="o">][</span><span class="n">i</span><span class="o">])+</span><span class="sc">'/'</span><span class="o">+</span><span class="n">str</span><span class="o">(</span><span class="n">f</span><span class="o">[</span><span class="err">'</span><span class="n">word</span><span class="err">'</span><span class="o">][</span><span class="n">i</span><span class="o">])+</span><span class="err">'</span><span class="o">.</span><span class="na">jpg</span><span class="err">'</span></code></pre></figure>
+<span class="n">imgId</span> <span class="o">=</span> <span class="no">PATH</span> <span class="o">+</span> <span class="n">str</span><span class="o">(</span><span class="n">f</span><span class="o">[</span><span class="err">'</span><span class="n">pairType</span><span class="err">'</span><span class="o">][</span><span class="n">i</span><span class="o">])+</span><span class="sc">'/'</span><span class="o">+</span><span class="n">str</span><span class="o">(</span><span class="n">f</span><span class="o">[</span><span class="err">'</span><span class="n">word</span><span class="err">'</span><span class="o">][</span><span class="n">i</span><span class="o">])+</span><span class="err">'</span><span class="o">.</span><span class="na">jpg</span><span class="err">'</span></code></pre></figure>
 
 
 <p>

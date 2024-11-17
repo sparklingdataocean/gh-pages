@@ -118,25 +118,25 @@ Read stored vertices and edges and rebuilt the graph:
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
-<span class="k">val</span> <span class="n">graphNgramStressVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphNgramStressEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphNgramStressVertices</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphNgramVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphNgramStressEdges</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphNgramEdges"</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">graphNgramStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span> <span class="n">graphNgramStressEdges</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">graphNgramStress</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNgramStressVertices</span><span class="o">,</span> <span class="n">graphNgramStressEdges</span><span class="o">)</span></code></pre></figure>
 
 </p>
 
 <h3>Connected Components</h3>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">resultStressCC</span> <span class="k">=</span> <span class="n">graphNgramStress</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nv">sc</span><span class="o">.</span><span class="py">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">resultStressCC</span> <span class="k">=</span> <span class="n">graphNgramStress</span><span class="o">.</span>
    <span class="n">connectedComponents</span><span class="o">.</span>
-   <span class="n">run</span><span class="o">()</span>
-<span class="k">val</span> <span class="n">ccStressCount</span><span class="k">=</span><span class="n">resultStressCC</span><span class="o">.</span>
-   <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="nf">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="nv">ccStressCount</span><span class="k">=</span><span class="n">resultStressCC</span><span class="o">.</span>
+   <span class="nf">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
    <span class="n">count</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">ccStressCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">ccStressCount</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'ccCt</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
 <span class="mi">0</span><span class="o">,</span><span class="mi">1111</span>
 <span class="mi">240518168576</span><span class="o">,</span><span class="mi">2</span></code></pre></figure>
@@ -147,15 +147,15 @@ Read stored vertices and edges and rebuilt the graph:
 
 <h3>Label Propagation</h3>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">lapelPropId</span> <span class="k">=</span> <span class="n">graphNgramStress</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">lapelPropId</span> <span class="k">=</span> <span class="n">graphNgramStress</span><span class="o">.</span>
   <span class="n">labelPropagation</span><span class="o">.</span>
-  <span class="n">maxIter</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
-  <span class="n">run</span><span class="o">().</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord"</span><span class="o">,</span><span class="s">"lpLabel"</span><span class="o">)</span>
+  <span class="nf">maxIter</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
+  <span class="nf">run</span><span class="o">().</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"lpWord"</span><span class="o">,</span><span class="s">"lpLabel"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">.</span>
-  <span class="n">groupBy</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"label"</span><span class="o">,</span><span class="s">"count"</span><span class="o">).</span>
-  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'count.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">.</span>
+  <span class="nf">groupBy</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">).</span><span class="py">count</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"label"</span><span class="o">,</span><span class="s">"count"</span><span class="o">).</span>
+  <span class="nf">orderBy</span><span class="o">(</span><span class="ss">'count</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
   <span class="n">label</span><span class="o">,</span><span class="n">count</span>
   <span class="mi">386547056642</span><span class="o">,</span><span class="mi">115</span>
   <span class="mi">317827579910</span><span class="o">,</span><span class="mi">107</span>
@@ -173,12 +173,12 @@ Read stored vertices and edges and rebuilt the graph:
 As Label Propagation algorithm is cutting loosely connected edges, we want to see which {word1, word2} ngram pairs from text file are within the same Label Propagation groups.
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">pairLabel</span><span class="k">=</span><span class="n">graphNgramStress</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">pairLabel</span><span class="k">=</span><span class="n">graphNgramStress</span><span class="o">.</span>
   <span class="n">edges</span><span class="o">.</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">lpWord</span><span class="o">).</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord2"</span><span class="o">,</span><span class="s">"lpLabel2"</span><span class="o">),</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">lpWord2</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">=='</span><span class="n">lpLabel2</span><span class="o">).</span>
-  <span class="n">select</span><span class="o">(</span><span class="ss">'src,'dst,'edgeWeight,'lpLabel)</span>
+  <span class="nf">join</span><span class="o">(</span><span class="n">lapelPropId</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'lpWord</span><span class="o">).</span>
+  <span class="nf">join</span><span class="o">(</span><span class="nv">lapelPropId</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"lpWord2"</span><span class="o">,</span><span class="s">"lpLabel2"</span><span class="o">),</span><span class="ss">'dst</span><span class="o">===</span><span class="ss">'lpWord2</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'lpLabel</span><span class="o">===</span><span class="ss">'lpLabel2</span><span class="o">).</span>
+  <span class="nf">select</span><span class="o">(</span><span class="ss">'src</span><span class="o">,</span><span class="ss">'dst</span><span class="o">,</span><span class="ss">'edgeWeight</span><span class="o">,</span><span class="ss">'lpLabel</span><span class="o">)</span>
   </code></pre></figure>
 
 <p>
@@ -186,9 +186,9 @@ For now we will ignore small groups and look at groups that have at least 3 {wor
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala">  
-<span class="n">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
-  <span class="n">groupBy</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"lpLabelCount"</span><span class="o">,</span><span class="s">"pairCount"</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="s">"pairCount&gt;2"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'pairCount.</span><span class="n">desc</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
+  <span class="nf">groupBy</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">).</span><span class="py">count</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"lpLabelCount"</span><span class="o">,</span><span class="s">"pairCount"</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="s">"pairCount&gt;2"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'pairCount</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 <span class="n">lpLabelCount</span><span class="o">,</span><span class="n">pairCount</span>
   <span class="mi">386547056642</span><span class="o">,</span><span class="mi">54</span>
   <span class="mi">317827579910</span><span class="o">,</span><span class="mi">30</span>
@@ -200,10 +200,10 @@ For now we will ignore small groups and look at groups that have at least 3 {wor
 Here are edges that belong to this group - {word1, word2, word2vec cosine similarity}:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"317827579910"</span><span class="o">).</span>
-  <span class="n">select</span><span class="o">(</span><span class="ss">'src,'dst,'edgeWeight)</span><span class="o">.</span>
-  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'lpLabel</span><span class="o">===</span><span class="s">"317827579910"</span><span class="o">).</span>
+  <span class="nf">select</span><span class="o">(</span><span class="ss">'src</span><span class="o">,</span><span class="ss">'dst</span><span class="o">,</span><span class="ss">'edgeWeight</span><span class="o">).</span>
+  <span class="nf">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 <span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeWeight</span>
 <span class="n">military</span><span class="o">,</span><span class="n">combat</span><span class="o">,</span><span class="mf">0.6585100225253417</span>
 <span class="n">theories</span><span class="o">,</span><span class="n">kinds</span><span class="o">,</span><span class="mf">0.614683170553027</span>
@@ -248,9 +248,9 @@ Here are edges that belong to this group - {word1, word2, word2vec cosine simila
 We use a semi-manual way on building Gephi graphs. Create a list of direct edges:  
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"317827579910"</span><span class="o">).</span>
-  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span> <span class="s">" -&gt; "</span><span class="o">+</span> <span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'lpLabel</span><span class="o">===</span><span class="s">"317827579910"</span><span class="o">).</span>
+  <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span> <span class="s">" -&gt; "</span><span class="o">+</span> <span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span><span class="o">)))</span></code></pre></figure>
 
 
 <p>Then put the list within 'digraph{...}' and getting data in .DOT format:
@@ -310,31 +310,31 @@ We use a semi-manual way on building Gephi graphs. Create a list of direct edges
 We can see that in the center of the biggest group is the word 'stress' - the word with the highest PageRank. We'll calculate high PageRank words for word pair groups.   
 Calculate PageRank:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphNgramStressPageRank</span> <span class="k">=</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphNgramStressPageRank</span> <span class="k">=</span>
   <span class="n">graphNgramStress</span><span class="o">.</span>
   <span class="n">pageRank</span><span class="o">.</span>
-  <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
-  <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
-  <span class="n">run</span><span class="o">()</span>
-<span class="k">val</span> <span class="n">pageRankId</span><span class="k">=</span><span class="n">graphNgramStressPageRank</span><span class="o">.</span>
+  <span class="nf">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+  <span class="nf">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
+  <span class="nf">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="nv">pageRankId</span><span class="k">=</span><span class="n">graphNgramStressPageRank</span><span class="o">.</span>
   <span class="n">vertices</span><span class="o">.</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"prWord"</span><span class="o">,</span><span class="s">"pagerank"</span><span class="o">)</span></code></pre></figure>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"prWord"</span><span class="o">,</span><span class="s">"pagerank"</span><span class="o">)</span></code></pre></figure>
 
 
 <p>Calculate lists of distinct words in the label groups:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">wordLabel</span><span class="k">=</span><span class="n">pairLabel</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="ss">'src,'lpLabel)</span><span class="o">.</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
-    <span class="n">select</span><span class="o">(</span><span class="ss">'dst,'lpLabel)</span><span class="o">).</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">wordLabel</span><span class="k">=</span><span class="n">pairLabel</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="ss">'src</span><span class="o">,</span><span class="ss">'lpLabel</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="n">pairLabel</span><span class="o">.</span>
+    <span class="nf">select</span><span class="o">(</span><span class="ss">'dst</span><span class="o">,</span><span class="ss">'lpLabel</span><span class="o">)).</span>
   <span class="n">distinct</span><span class="o">.</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"lpWord"</span><span class="o">,</span><span class="s">"lpLabel"</span><span class="o">)</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"lpWord"</span><span class="o">,</span><span class="s">"lpLabel"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">wordLabel</span><span class="o">.</span>
-  <span class="n">groupBy</span><span class="o">(</span><span class="ss">'lpLabel)</span><span class="o">.</span><span class="n">count</span><span class="o">.</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">,</span><span class="s">"labelCount"</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="s">"labelCount&gt;2"</span><span class="o">).</span>
-  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'labelCount.</span><span class="n">desc</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">wordLabel</span><span class="o">.</span>
+  <span class="nf">groupBy</span><span class="o">(</span><span class="ss">'lpLabel</span><span class="o">).</span><span class="py">count</span><span class="o">.</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"lpLabel"</span><span class="o">,</span><span class="s">"labelCount"</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="s">"labelCount&gt;2"</span><span class="o">).</span>
+  <span class="nf">orderBy</span><span class="o">(</span><span class="ss">'labelCount</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 <span class="n">lpLabel</span><span class="o">,</span><span class="n">labelCount</span>
 <span class="mi">386547056642</span><span class="o">,</span><span class="mi">47</span>
 <span class="mi">317827579910</span><span class="o">,</span><span class="mi">30</span>
@@ -347,15 +347,15 @@ Calculate PageRank:</p>
 <p>
 The biggest group:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">wordLabelPageRank</span><span class="k">=</span><span class="n">wordLabel</span><span class="o">.</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">pageRankId</span><span class="o">,</span><span class="ss">'lpWord=</span><span class="o">=='</span><span class="n">prWord</span><span class="o">).</span>
-  <span class="n">select</span><span class="o">(</span><span class="ss">'lpLabel,'lpWord,'pageRank)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">wordLabelPageRank</span><span class="k">=</span><span class="n">wordLabel</span><span class="o">.</span>
+  <span class="nf">join</span><span class="o">(</span><span class="n">pageRankId</span><span class="o">,</span><span class="ss">'lpWord</span><span class="o">===</span><span class="ss">'prWord</span><span class="o">).</span>
+  <span class="nf">select</span><span class="o">(</span><span class="ss">'lpLabel</span><span class="o">,</span><span class="ss">'lpWord</span><span class="o">,</span><span class="ss">'pageRank</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="ss">'lpWord,'pageRank)</span><span class="o">.</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"386547056642"</span><span class="o">).</span>
-  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'pageRank.</span><span class="n">desc</span><span class="o">).</span>
-  <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="ss">'lpWord</span><span class="o">,</span><span class="ss">'pageRank</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'lpLabel</span><span class="o">===</span><span class="s">"386547056642"</span><span class="o">).</span>
+  <span class="nf">orderBy</span><span class="o">(</span><span class="ss">'pageRank</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span>
+  <span class="nf">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
 <span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
   <span class="n">stress</span><span class="o">,</span><span class="mf">36.799029843873036</span>
   <span class="n">stressful</span><span class="o">,</span><span class="mf">7.982561760153138</span>
@@ -371,11 +371,11 @@ The biggest group:</p>
 
 <p>Second group: </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="ss">'lpWord,'pageRank)</span><span class="o">.</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"317827579910"</span><span class="o">).</span>
-  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'pageRank.</span><span class="n">desc</span><span class="o">).</span>
-  <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="ss">'lpWord</span><span class="o">,</span><span class="ss">'pageRank</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'lpLabel</span><span class="o">===</span><span class="s">"317827579910"</span><span class="o">).</span>
+  <span class="nf">orderBy</span><span class="o">(</span><span class="ss">'pageRank</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span>
+  <span class="nf">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
 <span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
   <span class="n">individual</span><span class="o">,</span><span class="mf">8.75686668967628</span>
   <span class="n">changes</span><span class="o">,</span><span class="mf">5.642126628136839</span>
@@ -391,11 +391,11 @@ The biggest group:</p>
 
 <p>Third Group:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="ss">'lpWord,'pageRank)</span><span class="o">.</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'lpLabel=</span><span class="o">==</span><span class="s">"274877906949"</span><span class="o">).</span>
-  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'pageRank.</span><span class="n">desc</span><span class="o">).</span>
-  <span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="n">wordLabelPageRank</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="ss">'lpWord</span><span class="o">,</span><span class="ss">'pageRank</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'lpLabel</span><span class="o">===</span><span class="s">"274877906949"</span><span class="o">).</span>
+  <span class="nf">orderBy</span><span class="o">(</span><span class="ss">'pageRank</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span>
+  <span class="nf">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
 <span class="n">lpWord</span><span class="o">,</span><span class="n">pageRank</span>
   <span class="n">disease</span><span class="o">,</span><span class="mf">4.195635531226847</span>
   <span class="n">illness</span><span class="o">,</span><span class="mf">2.90222622174496</span>

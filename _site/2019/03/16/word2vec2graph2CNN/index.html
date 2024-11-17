@@ -172,27 +172,27 @@ Read text file, tokenize it and remove stop words:
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
-<span class="k">val</span> <span class="n">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
-   <span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
-   <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">inputInsight</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
-   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/ahaMoments.txt"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">tokenizedInsight</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">inputInsight</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">removedStopWordsInsight</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
-   <span class="n">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
-   <span class="n">remover</span><span class="o">.</span><span class="n">getStopWords</span><span class="o">).</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedInsight</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">slpitCleanInsight</span> <span class="k">=</span> <span class="n">removedStopWordsInsight</span><span class="o">.</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"stopWordFree"</span><span class="o">)).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">).</span>
+<span class="k">val</span> <span class="nv">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
+   <span class="nf">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
+   <span class="nf">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">inputInsight</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+   <span class="nf">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/ahaMoments.txt"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">tokenizedInsight</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">inputInsight</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">removedStopWordsInsight</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
+   <span class="nf">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
+   <span class="nv">remover</span><span class="o">.</span><span class="py">getStopWords</span><span class="o">).</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">tokenizedInsight</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">slpitCleanInsight</span> <span class="k">=</span> <span class="n">removedStopWordsInsight</span><span class="o">.</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"stopWordFree"</span><span class="o">)).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"cleanWord"</span><span class="o">).</span>
    <span class="n">distinct</span></code></pre></figure>
 
 
@@ -200,18 +200,18 @@ Read text file, tokenize it and remove stop words:
 Read trained Word2Vec model and from data about Creativity and Aha Moments text exclude words that are not in the model:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">modelNewsBrain</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">modelNewsBrain</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">load</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">modelWordsInsight</span><span class="k">=</span><span class="n">modelNewsBrain</span><span class="o">.</span>
+   <span class="nf">load</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">modelWordsInsight</span><span class="k">=</span><span class="n">modelNewsBrain</span><span class="o">.</span>
    <span class="n">getVectors</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">cleanInsight</span><span class="k">=</span><span class="n">slpitCleanInsight</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">modelWordsInsight</span><span class="o">,</span><span class="ss">'cleanWord=</span><span class="o">=='</span><span class="n">word</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">cleanInsight</span><span class="k">=</span><span class="n">slpitCleanInsight</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="n">modelWordsInsight</span><span class="o">,</span><span class="ss">'cleanWord</span><span class="o">===</span><span class="ss">'word</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span>
    <span class="n">distinct</span></code></pre></figure>
 
 
@@ -221,39 +221,39 @@ Read nodes and edges that we calculated and saved before, build a graph with wor
 http://sparklingdataocean.com/2017/09/17/word2vec2graph/">"Introduction to Word2Vec2Graph Model."</a></i>
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphInsightVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphVerticesSub"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphInsightEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphEdgesSub"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphInsight2</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span> <span class="n">graphInsightEdges</span><span class="o">)</span>
-<span class="n">graphInsight2</span><span class="o">.</span><span class="n">persist</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphInsightVertices</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphVerticesSub"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphInsightEdges</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphEdgesSub"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphInsight2</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span> <span class="n">graphInsightEdges</span><span class="o">)</span>
+<span class="nv">graphInsight2</span><span class="o">.</span><span class="py">persist</span></code></pre></figure>
 
 <p></p>
 Function to calculate connected components with cosine similarly and component size parameters:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">word2vector2ghraphCCid</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">word2vector2ghraphCCid</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
      <span class="n">cosineMin</span><span class="k">:</span> <span class="kt">Double</span><span class="o">,</span> <span class="n">cosineMax</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span><span class="k">:</span>
   <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="k">val</span> <span class="n">graphEdgesSub</span><span class="k">=</span> <span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&gt;</span><span class="n">cosineMin</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeWeight&lt;</span><span class="n">cosineMax</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
-  <span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
+  <span class="k">val</span> <span class="nv">graphEdgesSub</span><span class="k">=</span> <span class="nv">graphEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&gt;</span><span class="n">cosineMin</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">&lt;</span><span class="n">cosineMax</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
+  <span class="nv">sc</span><span class="o">.</span><span class="py">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
      <span class="n">connectedComponents</span><span class="o">.</span>
-     <span class="n">run</span><span class="o">()</span>
-  <span class="k">val</span> <span class="n">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
-     <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+     <span class="nf">run</span><span class="o">()</span>
+  <span class="k">val</span> <span class="nv">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
+     <span class="nf">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
      <span class="n">count</span><span class="o">.</span>
-     <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
-  <span class="n">resultCC</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component=</span><span class="o">=='</span><span class="n">cc</span><span class="o">).</span>    
-     <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="n">distinct</span>
+     <span class="nf">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+  <span class="nv">resultCC</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component</span><span class="o">===</span><span class="ss">'cc</span><span class="o">).</span>    
+     <span class="nf">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="py">distinct</span>
 <span class="o">}</span></code></pre></figure>
 
 <p></p>
 Calculate connected components with high cosine similarly:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">resultsCCid</span><span class="k">=</span><span class="n">word2vector2ghraphCCid</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span> <span class="n">graphInsightEdges</span><span class="o">,</span><span class="mf">0.8</span><span class="o">,</span> <span class="mf">0.99</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">resultsCCid</span><span class="k">=</span><span class="nf">word2vector2ghraphCCid</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span> <span class="n">graphInsightEdges</span><span class="o">,</span><span class="mf">0.8</span><span class="o">,</span> <span class="mf">0.99</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">resultsCCid</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">resultsCCid</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'ccCt</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
    <span class="n">component</span>	<span class="n">ccCt</span>
   <span class="mi">8589934606</span>	 <span class="mi">315</span>
           <span class="mi">19</span>	  <span class="mi">80</span>
@@ -270,14 +270,14 @@ Calculate connected components with high cosine similarly:
 <p>Calculate graph Page Ranks:</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphSub2PageRank</span> <span class="k">=</span> <span class="n">graphInsight2</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphSub2PageRank</span> <span class="k">=</span> <span class="n">graphInsight2</span><span class="o">.</span>
    <span class="n">pageRank</span><span class="o">.</span>
-   <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
-   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
-   <span class="n">run</span><span class="o">()</span>
-<span class="n">display</span><span class="o">(</span><span class="n">graphSub2PageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+   <span class="nf">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+   <span class="nf">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span>
+   <span class="nf">run</span><span class="o">()</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">graphSub2PageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
    <span class="n">distinct</span><span class="o">.</span>
-   <span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">))</span>
+   <span class="nf">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 
 <span class="n">id</span>     <span class="n">pagerank</span>
 <span class="n">funny</span>    <span class="mf">4.66</span>
@@ -295,16 +295,16 @@ Calculate connected components with high cosine similarly:
 Join PageRank data with connected components and find the top Page Rank word for each component:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphCCpageRank</span><span class="k">=</span><span class="n">graphSub2PageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">resultsCCid</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;12"</span><span class="o">)</span> <span class="o">,</span><span class="nc">Seq</span><span class="o">(</span><span class="s">"id"</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphCCpageRank</span><span class="k">=</span><span class="nv">graphSub2PageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="nv">resultsCCid</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"ccCt&gt;12"</span><span class="o">)</span> <span class="o">,</span><span class="nc">Seq</span><span class="o">(</span><span class="s">"id"</span><span class="o">))</span>
 
-<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span>
-   <span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"pageRank"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">ccTopPageRank</span> <span class="k">=</span> <span class="n">graphCCpageRank</span><span class="o">.</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"ccPageRank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">)).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"topCCword"</span><span class="o">,</span><span class="s">"componentId"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nv">Window</span><span class="o">.</span><span class="py">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="nf">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"pageRank"</span><span class="o">.</span><span class="py">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">ccTopPageRank</span> <span class="k">=</span> <span class="n">graphCCpageRank</span><span class="o">.</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"ccPageRank"</span><span class="o">,</span> <span class="nf">rank</span><span class="o">().</span><span class="py">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">)).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"topCCword"</span><span class="o">,</span><span class="s">"componentId"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">ccTopPageRank</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccPageRank=1"</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">ccTopPageRank</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"ccPageRank=1"</span><span class="o">))</span>
    <span class="n">topCCword</span>	<span class="n">componentId</span>
    <span class="n">decrease</span>	<span class="mi">19</span>
    <span class="n">emory</span>	<span class="mi">17179869190</span>
@@ -317,21 +317,21 @@ Join PageRank data with connected components and find the top Page Rank word for
 Use the top PageRank as a class word for connected components:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">classWords</span><span class="k">=</span><span class="n">resultsCCid</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;12"</span><span class="o">).</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">ccTopPageRank</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccPageRank=1"</span><span class="o">),</span><span class="ss">'component=</span><span class="o">=='</span><span class="n">componentId</span><span class="o">).</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"classWord"</span><span class="o">,</span><span class="n">concat</span><span class="o">(</span><span class="n">$</span><span class="s">"topCCword"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"~"</span><span class="o">),</span><span class="n">$</span><span class="s">"ccCt"</span><span class="o">)).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"classWord"</span><span class="o">,</span><span class="s">"id"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">classWords</span><span class="k">=</span><span class="nv">resultsCCid</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"ccCt&gt;12"</span><span class="o">).</span>
+   <span class="nf">join</span><span class="o">(</span><span class="nv">ccTopPageRank</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"ccPageRank=1"</span><span class="o">),</span><span class="ss">'component</span><span class="o">===</span><span class="ss">'componentId</span><span class="o">).</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"classWord"</span><span class="o">,</span><span class="nf">concat</span><span class="o">(</span><span class="n">$</span><span class="s">"topCCword"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="s">"~"</span><span class="o">),</span><span class="n">$</span><span class="s">"ccCt"</span><span class="o">)).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"classWord"</span><span class="o">,</span><span class="s">"id"</span><span class="o">)</span></code></pre></figure>
 
 
 <p>
 Define word vectors, convert vectors to strings and save it as csv file:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">cc2vec</span><span class="k">=</span><span class="n">classWords</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">modelWordsInsight</span><span class="o">,</span><span class="ss">'id=</span><span class="o">=='</span><span class="n">word</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"word"</span><span class="o">).</span>
-   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">)).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"class"</span><span class="o">,</span><span class="s">"classWord"</span><span class="o">,</span><span class="s">"vec"</span><span class="o">).</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"vec2"</span><span class="o">,</span><span class="n">regexp_replace</span><span class="o">(</span><span class="n">$</span><span class="s">"vec"</span><span class="o">,</span><span class="s">"\\["</span><span class="o">,</span><span class="s">" "</span><span class="o">)).</span><span class="n">drop</span><span class="o">(</span><span class="s">"vec"</span><span class="o">).</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"vecString"</span><span class="o">,</span><span class="n">regexp_replace</span><span class="o">(</span><span class="n">$</span><span class="s">"vec2"</span><span class="o">,</span><span class="s">"\\]"</span><span class="o">,</span><span class="s">" "</span><span class="o">)).</span><span class="n">drop</span><span class="o">(</span><span class="s">"vec2"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">cc2vec</span><span class="k">=</span><span class="nv">classWords</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">modelWordsInsight</span><span class="o">,</span><span class="ss">'id</span><span class="o">===</span><span class="ss">'word</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="s">"word"</span><span class="o">).</span>
+   <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">,</span><span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span><span class="o">,</span><span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">)).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"class"</span><span class="o">,</span><span class="s">"classWord"</span><span class="o">,</span><span class="s">"vec"</span><span class="o">).</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"vec2"</span><span class="o">,</span><span class="nf">regexp_replace</span><span class="o">(</span><span class="n">$</span><span class="s">"vec"</span><span class="o">,</span><span class="s">"\\["</span><span class="o">,</span><span class="s">" "</span><span class="o">)).</span><span class="py">drop</span><span class="o">(</span><span class="s">"vec"</span><span class="o">).</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"vecString"</span><span class="o">,</span><span class="nf">regexp_replace</span><span class="o">(</span><span class="n">$</span><span class="s">"vec2"</span><span class="o">,</span><span class="s">"\\]"</span><span class="o">,</span><span class="s">" "</span><span class="o">)).</span><span class="py">drop</span><span class="o">(</span><span class="s">"vec2"</span><span class="o">)</span>
 
 <span class="n">class</span><span class="o">,</span><span class="n">classWord</span><span class="o">,</span><span class="n">vecString</span>
 <span class="n">integrated</span><span class="o">~</span><span class="mi">70</span><span class="o">,</span><span class="n">solutions</span><span class="o">,</span><span class="s">" -0.14655259251594543,-0.0015149622922763228,-0.21045255661010742,0.02907191775739193,-0.010674788616597652,0.08036941289901733,
@@ -349,11 +349,11 @@ We splitted the source file to words={class, classWord} and vecString. The 'clas
 </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">imgFile</span> <span class="k">=</span> <span class="nc">PATH</span> <span class="o">+</span> <span class="err">‘</span><span class="n">wordVec</span><span class="o">.</span><span class="n">csv</span><span class="o">'</span>
-<span class="n">words</span> <span class="k">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="o">(</span><span class="n">imgFile</span><span class="o">,</span> <span class="n">sep</span><span class="o">=',',</span><span class="n">usecols</span><span class="o">=[</span><span class="err">0</span>,<span class="err">1</span><span class="o">])</span>
-<span class="n">vectors</span> <span class="k">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="o">(</span><span class="n">imgFile</span><span class="o">,</span> <span class="n">sep</span><span class="o">=',').</span><span class="n">drop</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="o">[</span><span class="err">0</span><span class="o">],</span> <span class="n">axis</span><span class="k">=</span><span class="mi">1</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="o">[</span><span class="err">1</span><span class="o">],</span> <span class="n">axis</span><span class="k">=</span><span class="mi">1</span><span class="o">)</span>
-<span class="n">numbers</span> <span class="k">=</span> <span class="n">vectors</span><span class="o">[</span><span class="kt">'vecString'</span><span class="o">].</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="sc">','</span><span class="o">,</span> <span class="n">expand</span><span class="k">=</span> <span class="nc">True</span> <span class="o">)</span>
-<span class="n">imgId</span> <span class="k">=</span> <span class="nc">PATH</span> <span class="o">+</span> <span class="n">str</span><span class="o">(</span><span class="n">f</span><span class="o">[</span><span class="kt">'class'</span><span class="o">][</span><span class="kt">i</span><span class="o">])</span> <span class="o">+</span> <span class="sc">'/'</span><span class="o">+</span><span class="n">str</span><span class="o">(</span><span class="n">f</span><span class="o">[</span><span class="kt">'classWord'</span><span class="o">][</span><span class="kt">i</span><span class="o">])</span> <span class="o">+</span> <span class="o">'.</span><span class="n">jpg</span><span class="o">'</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">imgFile</span> <span class="k">=</span> <span class="nc">PATH</span> <span class="o">+</span> <span class="err">‘</span><span class="nv">wordVec</span><span class="o">.</span><span class="py">csv</span><span class="err">'</span>
+<span class="n">words</span> <span class="k">=</span> <span class="nv">pd</span><span class="o">.</span><span class="py">read_csv</span><span class="o">(</span><span class="n">imgFile</span><span class="o">,</span> <span class="n">sep</span><span class="o">=</span><span class="sc">','</span><span class="o">,</span><span class="n">usecols</span><span class="o">=[</span><span class="err">0</span>,<span class="err">1</span><span class="o">])</span>
+<span class="n">vectors</span> <span class="k">=</span> <span class="nv">pd</span><span class="o">.</span><span class="py">read_csv</span><span class="o">(</span><span class="n">imgFile</span><span class="o">,</span> <span class="n">sep</span><span class="o">=</span><span class="sc">','</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="nv">a</span><span class="o">.</span><span class="py">columns</span><span class="o">[</span><span class="err">0</span><span class="o">],</span> <span class="n">axis</span><span class="k">=</span><span class="mi">1</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="nv">a</span><span class="o">.</span><span class="py">columns</span><span class="o">[</span><span class="err">1</span><span class="o">],</span> <span class="n">axis</span><span class="k">=</span><span class="mi">1</span><span class="o">)</span>
+<span class="n">numbers</span> <span class="k">=</span> <span class="n">vectors</span><span class="o">[</span><span class="err">'</span><span class="kt">vecString</span><span class="err">'</span><span class="o">].</span><span class="py">str</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="sc">','</span><span class="o">,</span> <span class="n">expand</span><span class="k">=</span> <span class="nc">True</span> <span class="o">)</span>
+<span class="n">imgId</span> <span class="k">=</span> <span class="nc">PATH</span> <span class="o">+</span> <span class="nf">str</span><span class="o">(</span><span class="n">f</span><span class="o">[</span><span class="err">'</span><span class="kt">class</span><span class="err">'</span><span class="o">][</span><span class="kt">i</span><span class="o">])</span> <span class="o">+</span> <span class="sc">'/'</span><span class="o">+</span><span class="nf">str</span><span class="o">(</span><span class="n">f</span><span class="o">[</span><span class="err">'</span><span class="kt">classWord</span><span class="err">'</span><span class="o">][</span><span class="kt">i</span><span class="o">])</span> <span class="o">+</span> <span class="err">'</span><span class="o">.</span><span class="py">jpg</span><span class="err">'</span></code></pre></figure>
 
 
 <p>
@@ -367,12 +367,12 @@ Potentially this accuracy can be improved using more advanced Word2Vec model.
 Function to find two degree neighbors ('friend of a friend') by word and transform the results to DOT language:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">foaf2dot</span><span class="o">(</span><span class="n">graph</span><span class="k">:</span> <span class="kt">GraphFrame</span><span class="o">,</span> <span class="n">node</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>  
-   <span class="n">graph</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="n">node</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"worrd2"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">).</span>
-   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span> <span class="s">" -&gt; "</span><span class="o">+</span> <span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span> <span class="s">"; "</span> <span class="o">+</span> <span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span> <span class="s">" -&gt; "</span><span class="o">+</span> <span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">foaf2dot</span><span class="o">(</span><span class="n">graph</span><span class="k">:</span> <span class="kt">GraphFrame</span><span class="o">,</span> <span class="n">node</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>  
+   <span class="nv">graph</span><span class="o">.</span><span class="py">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="n">node</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"ab.src"</span><span class="o">,</span><span class="s">"ab.dst"</span><span class="o">,</span><span class="s">"bc.dst"</span><span class="o">).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"worrd2"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">).</span>
+   <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span> <span class="s">" -&gt; "</span><span class="o">+</span> <span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span> <span class="s">"; "</span> <span class="o">+</span> <span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span> <span class="s">" -&gt; "</span><span class="o">+</span> <span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">))</span>
 <span class="o">}</span>  </code></pre></figure>
 
 
@@ -381,7 +381,7 @@ Calculate two degree neighbors for top PageRank words of connected components.
 </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"symptoms"</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"symptoms"</span><span class="o">))</span>
 <span class="n">symptoms</span> <span class="o">-&gt;</span> <span class="n">ailments</span><span class="o">;</span> <span class="n">ailments</span> <span class="o">-&gt;</span> <span class="n">diseases</span>
 <span class="n">symptoms</span> <span class="o">-&gt;</span> <span class="n">ailments</span><span class="o">;</span> <span class="n">ailments</span> <span class="o">-&gt;</span> <span class="n">illnesses</span>
 <span class="n">symptoms</span> <span class="o">-&gt;</span> <span class="n">ailments</span><span class="o">;</span> <span class="n">ailments</span> <span class="o">-&gt;</span> <span class="n">genes</span>
@@ -443,7 +443,7 @@ We used a semi-manual way on building Gephi graphs: created a list of friends of
 Top PageRank word - 'funny':</p>
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"funny"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"funny"</span><span class="o">))</span></code></pre></figure>
 
 
 <a href="#">
@@ -453,7 +453,7 @@ Top PageRank word - 'funny':</p>
 <p>Top PageRank word - 'decrease':</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"decrease"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"decrease"</span><span class="o">))</span></code></pre></figure>
 
 
 <a href="#">
@@ -463,7 +463,7 @@ Top PageRank word - 'funny':</p>
 <p>Top PageRank word -  'integrated':</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"integrated"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"integrated"</span><span class="o">))</span></code></pre></figure>
 
 
 <a href="#">
@@ -473,7 +473,7 @@ Top PageRank word - 'funny':</p>
 <p>Top PageRank word - 'symptoms':</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"symptoms"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"symptoms"</span><span class="o">))</span></code></pre></figure>
 
 
 <a href="#">
@@ -483,7 +483,7 @@ Top PageRank word - 'funny':</p>
 <p>Top PageRank word - 'emory':</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"emory"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">foaf2dot</span><span class="o">(</span><span class="n">graphInsight2</span><span class="o">,</span><span class="s">"emory"</span><span class="o">))</span></code></pre></figure>
 
 
 <a href="#">

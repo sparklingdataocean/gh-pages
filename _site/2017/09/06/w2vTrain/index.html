@@ -174,15 +174,15 @@ And it's free!</p>
 
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
-  <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/newsTest.txt"</span><span class="o">).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+  <span class="nf">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/newsTest.txt"</span><span class="o">).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span></code></pre></figure>
 
 <p>First we'll tokenize the data</p>
 
 <figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kn">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="kn">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
-<span class="n">val</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RegexTokenizer</span><span class="o">().</span>
+<span class="n">val</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
    <span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
    <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
    <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
@@ -196,7 +196,7 @@ And it's free!</p>
 <span class="kn">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="kn">import</span> <span class="nn">org.apache.spark.ml.feature.Word2VecModel</span>
 <span class="kn">import</span> <span class="nn">org.apache.spark.sql.Row</span>
-<span class="n">val</span> <span class="n">word2vec</span><span class="o">=</span> <span class="k">new</span> <span class="n">Word2Vec</span><span class="o">().</span>
+<span class="n">val</span> <span class="n">word2vec</span><span class="o">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">().</span>
    <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
    <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
 <span class="n">val</span> <span class="n">w2VmodelNews</span><span class="o">=</span><span class="n">word2vec</span><span class="o">.</span><span class="na">fit</span><span class="o">(</span><span class="n">tokenizedNews</span><span class="o">)</span></code></pre></figure>
@@ -206,14 +206,14 @@ And it's free!</p>
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">w2VmodelNews</span><span class="o">.</span>
    <span class="n">write</span><span class="o">.</span>
    <span class="n">overwrite</span><span class="o">.</span>
-   <span class="n">save</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">word2vecNews</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+   <span class="nf">save</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">word2vecNews</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">load</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span></code></pre></figure>
+   <span class="nf">load</span><span class="o">(</span><span class="s">"w2vNews"</span><span class="o">)</span></code></pre></figure>
 
 <p>Now let's test the model. The most popular function of Word2Vec model shows us how different words are associated:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">word2vecNews</span><span class="o">.</span><span class="n">findSynonyms</span><span class="o">(</span><span class="s">"stress"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">word2vecNews</span><span class="o">.</span><span class="py">findSynonyms</span><span class="o">(</span><span class="s">"stress"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
 
 <span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
 <span class="n">risk</span><span class="o">,</span><span class="mf">0.6505142450332642</span>
@@ -229,25 +229,25 @@ And it's free!</p>
 To see how the corpus that we used to train the model affects the results we will add a small file, train the model on  combined corpus and compare the results. </p>
 <p>To play with data about psychology we copied it from several Wikipedia articles, got a small file (180 KB), and combined it with news file (42 MB). Then we trained the Word2vec model on this combined file. </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputWiki</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/WikiTest.txt"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">tokenizedNewsWiki</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">inputWiki</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">inputWiki</span><span class="k">=</span><span class="nv">sc</span><span class="o">.</span><span class="py">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/WikiTest.txt"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">tokenizedNewsWiki</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>
+   <span class="nf">union</span><span class="o">(</span><span class="n">inputWiki</span><span class="o">))</span></code></pre></figure>
 
 <p>Train Word2Vec model and save the results:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2VmodelNewsWiki</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span>
-   <span class="n">fit</span><span class="o">(</span><span class="n">tokenizedNewsWiki</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">w2VmodelNewsWiki</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span>
+   <span class="nf">fit</span><span class="o">(</span><span class="n">tokenizedNewsWiki</span><span class="o">)</span>
 <span class="n">w2VmodelNewsWiki</span><span class="o">.</span>
    <span class="n">write</span><span class="o">.</span>
    <span class="n">overwrite</span><span class="o">.</span>
-   <span class="n">save</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">modelNewsWiki</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+   <span class="nf">save</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">modelNewsWiki</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">modelNewsWiki</span><span class="o">.</span>
-   <span class="n">findSynonyms</span><span class="o">(</span><span class="s">"stress"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span></code></pre></figure>
+   <span class="nf">load</span><span class="o">(</span><span class="s">"w2vNewsWiki"</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">modelNewsWiki</span><span class="o">.</span>
+   <span class="nf">findSynonyms</span><span class="o">(</span><span class="s">"stress"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span></code></pre></figure>
 
 <p>The results of these models are very different for some words and very similar for some other words. Here are examples:</p>
 

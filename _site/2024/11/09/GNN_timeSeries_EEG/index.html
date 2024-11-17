@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>Graph Neural Networks for EEG Connectivity Analysis - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/page107.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Graph Neural Networks for EEG Connectivity Analysis</h1>
+                    
+                    <h2 class="subheading">Using GNN Link Prediction to Uncover Hidden Patterns in EEG Time Series Data</h2>
+                    
+                    <span class="meta">Posted by Melenar on November 9, 2024</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<h3>Introduction</h3>
+
+<p>
+    Electroencephalography (EEG) is a widely used non-invasive neuroimaging technique that captures electrical activity in the brain. By recording voltage fluctuations across the scalp, EEG enables researchers to monitor real-time brain activity, providing insights into cognitive processes, mental states, and neurological disorders. It is a valuable tool for understanding how different brain regions coordinate to support functions such as attention, memory, and motor control, making EEG essential for studying neural connectivity.
+</p>
+
+<p>
+    Traditional methods for analyzing EEG data, such as feature extraction, spectral analysis, and machine learning models like Support Vector Machines (SVM) or Convolutional Neural Networks (CNN), often process channels independently or in predefined groups. While these approaches have achieved moderate success, they struggle to fully model the complex, non-linear spatial and temporal dependencies present in EEG signals. This limitation often results in the loss of crucial information about brain network dynamics.
+</p>
+
+<p>
+    The graph-like nature of EEG data, where electrode positions can be represented as nodes and interactions as edges, has led to the adoption of Graph Neural Networks (GNNs) for more advanced analysis. GNNs capture the intricate spatial relationships and temporal dependencies in EEG signals, offering a powerful framework for understanding neural dynamics. This capability makes GNNs highly effective for applications such as cognitive state monitoring, emotion recognition, and neurological disorder diagnosis. Recent studies have demonstrated that GNN-based models can provide deeper insights into brain activity compared to traditional methods by revealing subtle connectivity patterns.
+</p>
+
+<h4>Current Study Overview</h4>
+
+<p>
+    This study utilizes the publicly available <em>EEG-Alcohol</em> dataset from Kaggle, which includes EEG recordings from subjects exposed to visual stimuli. Trials involved either a single picture stimulus or two picture stimuli, with the latter being either matched (identical) or non-matched (different). This dataset serves as a basis for exploring the impact of alcohol on brain connectivity and cognitive processing.
+</p>
+
+<h4>Building on Prior Work</h4>
+<p>
+    Our previous studies analyzed this dataset using different methodologies:
+</p>
+<ul>
+    <li>
+        <strong>Study 1:</strong> Used CNNs and time series analysis to classify EEG signals, showing higher accuracy with Gramian Angular Field (GAF) transformations but limited success in distinguishing Alcoholic and Control groups for single-stimulus trials.
+    </li>
+    <p></p>
+    <a href="#">
+        <img src="/img/dataSource5.jpg" alt="Figure 1: Connectivity Patterns from Previous Study" width="404" />
+    </a>
+    <p></p>
+    <p>
+        This figure from our previous study shows how connectivity patterns were analyzed using traditional graph mining, revealing stronger and weaker similarities between EEG positions. We found that single-image trials were not effective for distinguishing Alcoholic and Control groups. In this study, we extend these findings by using GNN Link Prediction models.
+    </p>
+
+    <li>
+        <strong>Study 2:</strong> Employed GNN Graph Classification models, representing each trial as a graph with EEG channels as nodes. While this approach improved classification accuracy, it struggled with single-stimulus trials and highlighted the need for more detailed connectivity analysis.
+    </li>
+</ul>
+
+<p>
+    Building on these findings, this study introduces a unified graph structure where edges represent spatial relationships between EEG channels. This new framework provides a consistent basis for analyzing brain-trial combinations at a granular level, capturing both spatial and temporal dependencies in EEG data.
+</p>
+
+<h4>Significance of the Unified Graph Approach</h4>
+<p>
+    In contrast to earlier studies that created separate graphs for each trial, this approach integrates all EEG signals into a unified graph structure. Nodes represent EEG channels, while edges reflect spatial proximity, ensuring consistency across analyses. Each trial contributes to a subgraph within the unified structure, capturing both local and global dependencies. The unified graph serves as input for the GNN Link Prediction model, enabling us to detect subtle variations in connectivity across experimental conditions.
+</p>
+
+<p>
+    By transforming EEG signals into high-dimensional embeddings, this method provides a deeper exploration of spatial and temporal relationships, revealing interactions that conventional techniques could not capture. The study contributes to the growing field of AI-driven neuroscience by offering a versatile framework for analyzing EEG connectivity patterns and improving our understanding of neural dynamics.
+</p>
+
+<h3>Methods</h3>
+
+<h4>EEG Channel Position Mapping and Graph Construction</h4>
+
+<p>
+    This section outlines the process of mapping EEG channel positions in 3D space and constructing an initial graph to capture spatial relationships between the electrodes. The goal was to create a graph where nodes represent EEG channels, and edges reflect their spatial proximity, forming the foundation for subsequent analysis.
+</p>
+
+<h5>EEG Channel Position Extraction</h5>
+<ul>
+    <li>We loaded the standard EEG montage (<code>'standard_1005'</code>) using the <strong>mne</strong> library.</li>
+    <li>Channel positions were retrieved as (x, y, z) coordinates, representing each EEG channel in 3D space.</li>
+    <li>Pairwise Euclidean distances between channels were calculated using <strong>scipy.spatial.distance</strong>, capturing the spatial proximity between electrodes.</li>
+</ul>
+
+<h5>Distance Matrix Construction</h5>
+<ul>
+    <li>The computed distances were used to create a distance matrix that encapsulates the spatial relationships between EEG channels.</li>
+    <li>This matrix was formatted into a structured dataset, making it suitable for graph-based modeling.</li>
+</ul>
+
+<h5>Minimum Distance Filtering and Graph Creation</h5>
+<ul>
+    <li>To ensure no channel was isolated, we identified the shortest distance for each channel.</li>
+    <li>A distance threshold was applied, defined as the maximum of these minimum distances, to retain only the closest pairs of channels.</li>
+    <li>The final graph was constructed with nodes representing EEG channels and edges indicating spatial proximity, ensuring the graph was fully connected for analysis.</li>
+</ul>
+
+<h5>Initial EEG Graph Construction</h5>
+<ul>
+    <li>We built an initial graph representing the spatial configuration of the EEG channels.</li>
+    <li>In this graph:
+        <ul>
+            <li><strong>Nodes:</strong> Represent EEG channels.</li>
+            <li><strong>Edges:</strong> Represent spatial proximity between channels.</li>
+        </ul>
+    </li>
+    <li>Time-series EEG signals for each channel were incorporated as node features, capturing both spatial and temporal dependencies within the EEG data.</li>
+</ul>
+
+<p>
+    <strong>Figure 2:</strong> An overview of the EEG graph analysis pipeline. The initial graph (left) is built using spatial and temporal EEG data. The GNN Link Prediction model (center) processes the graph to learn node connections, generating embedded vectors (right) that capture complex relationships within the EEG signals for further analysis.
+</p>
+<p></p>
+<p><a href="#">
+    <img src="/img/pipeline2.jpg" alt="EEG Graph Analysis Pipeline" width="888" />
+</a></p>
+<p></p>
+
+<p></p>
+<h3>Experiments </h3>
+
+<p></p>
+<p>Using the EEG-Alcohol dataset from Kaggle, we preprocessed data from 61 EEG channels across multiple trials. The GNN model trained on this graph data demonstrated high accuracy, achieving an 81.45% AUC in distinguishing connectivity patterns between control and alcohol groups. Key differences emerged between experimental conditions, with the control group displaying stronger connectivity in visual processing areas compared to the alcohol group​</p>
+<p></p>
+
+<h4>Data Source</h4>
+
+<p>In our study on brain connectivity, we used the publicly available <a href="https://www.kaggle.com/datasets/nnair25/Alcoholics">EEG-Alcohol dataset</a> from Kaggle (Kaggle.com, EEG-Alcohol Data Set, 2017). This dataset contains EEG recordings collected to explore how genetic predisposition to alcoholism might affect neural responses. Each participant was exposed to visual stimuli, either as a single image or two consecutive images. In trials with two images, the stimuli could either be identical (matched) or different (non-matched). The images used were selected from the well-known Snodgrass and Vanderwart picture set, created in 1980, which is commonly used in psychological studies.</p>
+
+<p>The dataset includes EEG data from 8 participants in each group—those with and without alcohol exposure. EEG activity was recorded using 64 electrodes placed across the scalp, capturing brain signals at a high sampling rate of 256 Hz over short, 1-second trials. Due to quality issues in some channels, we focused on data from 61 out of the 64 electrodes, resulting in a total of 61 person-trial pairs included in our analysis.</p>
+
+<p>Our data preparation approach was partly inspired by <a href="https://www.kaggle.com/code/ruslankl/eeg-data-analysis">Ruslan Klymentiev's Kaggle notebook</a> on EEG Data Analysis, which provided a foundation for processing the raw EEG data into a structured format. Building on Klymentiev’s work, we implemented additional transformations to convert these EEG recordings into a structured time series format for each electrode, making the data suitable for graph-based modeling.</p>
+
+<p>To organize the raw sensor data, we categorized it by sensor position and trial number, then created a structured dataset where each row represents a single time point, and each column shows the sensor value from a specific EEG channel at that moment. This transformation was essential for enabling our subsequent graph-based analysis, laying the groundwork for understanding connectivity patterns in the brain. For a more detailed look at our data transformation process, check out our related blog post.</p>
+
+<p>This preprocessing step was crucial as it prepared the dataset for our deeper analysis, allowing us to model brain connectivity patterns effectively. Through this structured data, we could dive into the fascinating world of neural dynamics and uncover insights into how alcohol exposure might influence brain connectivity.</p>
+
+<h4>Prepare Input Data for GNN Link Prediction Model</h4>
+
+<p>The initial graph structure was created by calculating pairwise Euclidean distances between EEG channels, as outlined in the EEG Channel Position Mapping and Graph Construction subsection of the Methods section. These distances capture the spatial relationships between electrodes based on their physical positions on the scalp. The maximum of the minimum distances between EEG channels was calculated to be 0.038, and to prevent isolated nodes, a slightly higher threshold of 0.04 was used to filter and retain the closest channel pairs. This process resulted in a consistent graph structure with 61 nodes and 108 edges, representing the spatial layout of EEG channels across all subjects and trials. This shared graph provides a uniform topology for all subsequent subject-trial graphs, facilitating comparative analysis.
+After establishing the graph structure, we defined graph nodes and their features for each subject-trial combination. Each node corresponds to one of the 61 EEG channels, while node features are derived from the time series signals recorded at these positions during the trials. The data was grouped by type (Alcohol and Control), subject, trial, and channel position, forming structured datasets that capture both spatial and temporal characteristics of the EEG signals. While the spatial configuration of the graph remains constant, node features vary based on each subject and trial, enabling the GNN Link Prediction model to detect connectivity patterns specific to different experimental conditions. For further details on the data preparation process, refer to our related blog post [18].</p>
+
+<h4>Data Preparation: Building the Initial Graph Structure</h4>
+
+<p>To analyze EEG connectivity patterns effectively, we constructed an initial graph structure that represents the spatial relationships between EEG channels. This process involved calculating pairwise Euclidean distances based on the physical positions of electrodes on the scalp. Using these distances, we created a graph where nodes correspond to EEG channels and edges represent spatial proximity. To ensure no isolated nodes, a distance threshold was set slightly above the maximum of the minimum distances between channels, calculated to be <code>0.038</code>. A threshold of <code>0.04</code> was applied to retain the closest channel pairs, resulting in a connected graph with 61 nodes.</p>
+
+<p>The following Python code demonstrates the steps to build the graph structure, including calculating distances and filtering edges based on the threshold:</p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">mne</span>
+<span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="n">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
+
+<span class="c1"># Load EEG channel positions using MNE's standard montage
+</span><span class="n">montage</span> <span class="o">=</span> <span class="n">mne</span><span class="p">.</span><span class="n">channels</span><span class="p">.</span><span class="nf">make_standard_montage</span><span class="p">(</span><span class="sh">'</span><span class="s">standard_1005</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">montage</span><span class="p">.</span><span class="nf">get_positions</span><span class="p">()[</span><span class="sh">'</span><span class="s">ch_pos</span><span class="sh">'</span><span class="p">]</span>
+<span class="n">uppercase_pos</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">.</span><span class="nf">upper</span><span class="p">():</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pos</span><span class="p">.</span><span class="nf">items</span><span class="p">()}</span>
+
+<span class="c1"># Filter positions to retain only the relevant EEG channels
+</span><span class="n">filtered_positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">positions</span> <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">uppercase_pos</span><span class="p">]</span>
+<span class="nf">len</span><span class="p">(</span><span class="n">filtered_positions</span><span class="p">)</span>
+<span class="mi">61</span></code></pre></figure>
+
+<p></p>
+
+<p>The coordinates of the EEG channels were extracted, and a pairwise distance matrix was calculated:</p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Extract coordinates for the filtered EEG channels
+</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="n">uppercase_pos</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">filtered_positions</span><span class="p">])</span>
+<span class="n">distance_matrix</span> <span class="o">=</span> <span class="nf">squareform</span><span class="p">(</span><span class="nf">pdist</span><span class="p">(</span><span class="n">coordinates</span><span class="p">))</span>
+
+<span class="c1"># Calculate pairwise distances and store them in a list
+</span><span class="n">distance_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pos1</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">filtered_positions</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">pos2</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">filtered_positions</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>  <span class="c1"># Avoid duplicate pairs and self-distances
+</span>            <span class="n">distance</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">distance_list</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">pos1</span><span class="si">}</span><span class="s">, </span><span class="si">{</span><span class="n">pos2</span><span class="si">}</span><span class="s">, </span><span class="si">{</span><span class="n">distance</span><span class="si">:</span><span class="p">.</span><span class="mi">6</span><span class="n">f</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">len</span><span class="p">(</span><span class="n">distance_list</span><span class="p">)</span>
+<span class="mi">3660</span></code></pre></figure>
+
+<p></p>
+
+<p>To organize the distances, a DataFrame was created, and the minimum distance for each EEG channel was identified:</p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Split distance data into a structured DataFrame
+</span><span class="n">split_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="sh">"</span><span class="s">, </span><span class="sh">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">distance_list</span><span class="p">]</span>
+<span class="n">distance_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">split_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">left</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">right</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">distance</span><span class="sh">"</span><span class="p">])</span>
+<span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">distance_df</span><span class="p">.</span><span class="nf">head</span><span class="p">()</span>
+<span class="c1"># Example output
+# left    right    distance
+# AF1     AF2      0.038294
+# AF1     AF7      0.057702
+# AF1     AF8      0.086636
+# AF1     AFZ      0.018912
+# AF1     C1       0.107897
+</span>
+<span class="c1"># Calculate the maximum of the minimum distances
+</span><span class="n">min_distances</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="nf">set</span><span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">]).</span><span class="nf">union</span><span class="p">(</span><span class="nf">set</span><span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">])):</span>
+    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">distance_df</span><span class="p">[(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">position</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">position</span><span class="p">)]</span>
+    <span class="n">min_distance</span> <span class="o">=</span> <span class="n">filtered_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">].</span><span class="nf">min</span><span class="p">()</span>
+    <span class="n">min_distances</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_distance</span>
+
+<span class="n">max_of_min_distances</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="n">min_distances</span><span class="p">.</span><span class="nf">values</span><span class="p">())</span>
+<span class="n">max_of_min_distances</span>
+<span class="c1"># Output: 0.038043</span></code></pre></figure>
+
+<p></p>
+
+<p>Using the calculated maximum of the minimum distances (<code>0.038043</code>), we applied a slightly higher threshold (<code>0.04</code>) to retain only the closest channel pairs. This ensured that the graph remained fully connected, providing a robust structure for subsequent analysis.</p>
+
+<p><a href="#">
+    <img src="/img/distanceEEG.jpg" alt="Post Sample Image" width="567" />
+</a></p>
+<p></p>
+
+<p>This data preparation step was critical for constructing a meaningful graph structure that captures the spatial relationships between EEG channels. By incorporating both node positions and proximity-based edge definitions, this graph provides a solid foundation for analyzing connectivity patterns using Graph Neural Networks.</p>
+
+<p>The distribution of distances between electrode positions was analyzed to verify the spatial relationships used for graph construction. Below is a histogram illustrating the distance distribution:</p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="n">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">hist</span><span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="sh">'</span><span class="s">k</span><span class="sh">'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">title</span><span class="p">(</span><span class="sh">'</span><span class="s">Distribution of Distances Between Electrode Positions</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">xlabel</span><span class="p">(</span><span class="sh">'</span><span class="s">Distance</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">ylabel</span><span class="p">(</span><span class="sh">'</span><span class="s">Frequency</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">grid</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
+
+<span class="c1"># Print basic statistics
+</span><span class="nf">print</span><span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">].</span><span class="nf">describe</span><span class="p">())</span></code></pre></figure>
+
+<p></p>
+
+<p>Basic statistics of the distances:</p>
+<ul>
+    <li><strong>Count:</strong> 3660</li>
+    <li><strong>Mean:</strong> 0.119815</li>
+    <li><strong>Standard Deviation:</strong> 0.045156</li>
+    <li><strong>Min:</strong> 0.018912</li>
+    <li><strong>Max:</strong> 0.206672</li>
+</ul>
+
+<p>Filtered edges below the threshold distance (<code>0.04</code>) were selected to ensure a fully connected graph. The following code demonstrates the construction of the graph:</p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
+
+<span class="c1"># Filter pairs below the threshold
+</span><span class="n">filtered_pairs</span> <span class="o">=</span> <span class="n">distance_df</span><span class="p">[</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.04</span><span class="p">]</span>
+
+<span class="c1"># Create the graph and add edges with weights
+</span><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nc">Graph</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">filtered_pairs</span><span class="p">.</span><span class="nf">iterrows</span><span class="p">():</span>
+    <span class="n">G</span><span class="p">.</span><span class="nf">add_edge</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">],</span> <span class="n">weight</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">])</span>
+
+<span class="c1"># Visualize the graph
+</span><span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nf">kamada_kawai_layout</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="n">nx</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="sh">'</span><span class="s">white</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span></code></pre></figure>
+
+<p></p>
+
+<p><a href="#">
+    <img src="/img/eegLandscape.jpg" alt="Post Sample Image" width="404" />
+</a></p>
+<p></p>
+
+<p>The resulting graph represents the spatial relationships between EEG electrodes, as shown in the visualization above. This consistent graph topology is used for all subsequent analyses, with the node features varying based on subject-trial combinations. This approach enables the model to explore dynamic connectivity patterns, providing insights into brain network interactions under different conditions.</p>
+
+<p>For further details on the data preparation and modeling process, refer to our related <a href="#">blog post</a>.</p>
+
+<h4>Pre-Training Data Preparation for EEG Graph Neural Network</h4>
+
+<p>Following the construction of the initial graph with 61 nodes and 108 edges based on spatial distances between EEG channels, we defined node features for each subject-trial combination. This graph structure provided a uniform topology, enabling the detection of connectivity patterns that varied across different experimental conditions, such as Alcohol and Control groups.</p>
+
+<p>Each node in the graph represents one of the 61 EEG channels, with node features derived from the time series signals recorded during trials. By grouping the data by type (Alcohol and Control), subject, trial, and channel position, we captured both spatial and temporal aspects of the EEG signals. While the graph's spatial configuration remains constant, node features vary across subject-trial combinations, allowing the Graph Neural Network (GNN) Link Prediction model to identify connectivity patterns specific to different conditions.</p>
+
+<p>We started by creating a DataFrame of edges that represents the connections between nodes (EEG channels). This involved combining metadata and filtering edges based on group matching. Here’s the code for constructing the edges:</p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
+
+<span class="c1"># Create an edges DataFrame from the graph's edges
+</span><span class="n">edges</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">G</span><span class="p">.</span><span class="n">edges</span><span class="p">)</span>
+<span class="n">edges</span><span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Separate feature and metadata columns
+</span><span class="n">values</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">262</span><span class="p">]</span>
+<span class="n">metavalues1</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
+<span class="n">metavalues2</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">262</span><span class="p">:]</span>
+<span class="n">metavalues</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">([</span><span class="n">metavalues1</span><span class="p">,</span> <span class="n">metavalues2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Drop unnecessary metadata columns and merge with edges
+</span><span class="n">metaData</span> <span class="o">=</span> <span class="n">metavalues</span><span class="p">.</span><span class="nf">drop</span><span class="p">([</span><span class="sh">'</span><span class="s">trial</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">match</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">channel</span><span class="sh">'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">edges_left</span> <span class="o">=</span> <span class="n">metaData</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="sh">'</span><span class="s">positionIdx</span><span class="sh">'</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">).</span><span class="nf">drop</span><span class="p">(</span><span class="sh">'</span><span class="s">position</span><span class="sh">'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">edges_left</span><span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">index</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">left_index</span><span class="sh">'</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">edges_right</span> <span class="o">=</span> <span class="n">edges_left</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">metaData</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="sh">'</span><span class="s">positionIdx</span><span class="sh">'</span><span class="p">).</span><span class="nf">drop</span><span class="p">(</span><span class="sh">'</span><span class="s">position</span><span class="sh">'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">edges_right</span><span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">index</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">right_index</span><span class="sh">'</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Filter edges by group matching and reset index
+</span><span class="n">filtered_edges</span> <span class="o">=</span> <span class="n">edges_right</span><span class="p">[</span><span class="n">edges_right</span><span class="p">[</span><span class="sh">'</span><span class="s">group_x</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">edges_right</span><span class="p">[</span><span class="sh">'</span><span class="s">group_y</span><span class="sh">'</span><span class="p">]]</span>
+<span class="n">edges_final</span> <span class="o">=</span> <span class="n">filtered_edges</span><span class="p">.</span><span class="nf">drop</span><span class="p">([</span><span class="sh">'</span><span class="s">group_y</span><span class="sh">'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">).</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">edges_final</span><span class="p">[</span><span class="sh">'</span><span class="s">index_final</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">edges_final</span><span class="p">.</span><span class="n">index</span>  <span class="c1"># Add final index as a column
+</span>
+<span class="c1"># Create the final NetworkX graph from the processed edges DataFrame
+</span><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nf">from_pandas_edgelist</span><span class="p">(</span><span class="n">edges_final</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="sh">'</span><span class="s">left_index</span><span class="sh">'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="sh">'</span><span class="s">right_index</span><span class="sh">'</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<p>After defining the edges and nodes, we used the Deep Graph Library (DGL) to convert the NetworkX graph into a DGL graph. We then added the node features (time series signals) as tensors, which the model will use to analyze connectivity patterns. Here’s the code for preparing the DGL graph and adding features:</p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">dgl</span>
+<span class="kn">import</span> <span class="n">torch</span>
+
+<span class="c1"># Convert NetworkX graph to DGL graph
+</span><span class="n">g</span> <span class="o">=</span> <span class="n">dgl</span><span class="p">.</span><span class="nf">from_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+<span class="c1"># Convert EEG time series data to a tensor and add it as node features
+</span><span class="n">values</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">262</span><span class="p">]</span>
+<span class="n">features_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">values</span><span class="p">.</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">g</span><span class="p">.</span><span class="n">ndata</span><span class="p">[</span><span class="sh">'</span><span class="s">feat</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">features_tensor</span>
+
+<span class="c1"># Display the graph summary
+</span><span class="n">g</span>
+<span class="c1"># Output:
+# Graph(num_nodes=3721, num_edges=13176,
+#       ndata_schemes={'feat': Scheme(shape=(256,), dtype=torch.float32)}
+#       edata_schemes={})</span></code></pre></figure>
+
+<p></p>
+
+<p>This data preparation stage established a robust graph-based representation of EEG data, where each node (EEG channel) has unique features based on time series signals across trials. The resulting graph, with 3721 nodes and 13176 edges, serves as input to the GNN model, allowing it to explore complex connectivity patterns across experimental conditions. This setup lays the groundwork for effective pre-training and connectivity analysis.</p>
+
+<p>For more information on the data preparation process and detailed GNN modeling steps, refer to our related <a href="#">blog post</a>.</p>
+
+<h4>Train the Model</h4>
+
+<p>We utilized the GraphSAGE link prediction model, implemented with the Deep Graph Library (DGL), to train our model on the EEG graph data. GraphSAGE employs two layers to aggregate information from neighboring nodes, enabling the model to capture complex connectivity patterns and interactions between EEG channels.</p>
+
+<ul>
+    <li><strong>Total Nodes:</strong> 3,721</li>
+    <li><strong>Total Edges:</strong> 13,176</li>
+    <li><strong>Node Feature Size:</strong> 256</li>
+</ul>
+
+<p>The model’s performance was evaluated using the Area Under the Curve (AUC) metric, achieving an accuracy of <strong>81.45%</strong>. This high AUC score demonstrates the model’s effectiveness in predicting connectivity patterns and capturing the underlying signal dependencies within the EEG data.</p>
+
+<p>We implemented our model using code from the tutorial "<a href="https://www.dgl.ai">Deep Graph Library (DGL): Link Prediction Using Graph Neural Networks</a>," published in 2018. This resource provided a foundational framework for building and optimizing our GraphSAGE-based link prediction model.</p>
+
+<h4>EEG Connectivity Analysis: GNN Link Prediction and Statistical Calculations</h4>
+
+<p>
+    The foundation of our connectivity analysis stems from the results of a Graph Neural Network (GNN) link prediction model. This model generates a matrix, <code>h</code>, where each row represents an embedded vector corresponding to a graph node. In our context, these nodes represent EEG channels, and the embedded vectors capture the spatial and temporal relationships between signals from different brain regions.
+</p>
+<p>
+    These embeddings provide a powerful, compressed representation of connectivity patterns, allowing us to measure the relationships between nodes through cosine similarity.
+</p>
+
+<p>
+    To evaluate the strength of connections between EEG nodes, we calculated pairwise cosine similarity scores between their embedded vectors. Cosine similarity measures the cosine of the angle between two vectors, producing a value between -1 (completely opposite) and 1 (completely identical).
+</p>
+<p>Below is the PyTorch-based implementation for calculating cosine similarity:</p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">torch</span>
+
+<span class="c1"># Define a function to calculate cosine similarity using PyTorch
+</span><span class="k">def</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="c1"># Ensure inputs are PyTorch tensors
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+    <span class="c1"># Adjust dimensions for single-row tensors
+</span>    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Normalize the vectors
+</span>    <span class="n">a_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">functional</span><span class="p">.</span><span class="nf">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">b_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">functional</span><span class="p">.</span><span class="nf">normalize</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Compute cosine similarity
+</span>    <span class="k">return</span> <span class="n">torch</span><span class="p">.</span><span class="nf">mm</span><span class="p">(</span><span class="n">a_norm</span><span class="p">,</span> <span class="n">b_norm</span><span class="p">.</span><span class="n">T</span><span class="p">)</span>
+
+<span class="c1"># Example usage: compute cosine similarity for matrix `h`
+</span><span class="n">cosine_scores</span> <span class="o">=</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<h5>Statistical Analysis Using Self-Join Cosine Similarity</h5>
+<p>
+    Once the cosine similarity matrix (<code>cosine_scores</code>) is computed, we perform statistical calculations by grouping the data and applying self-join operations. This allows us to analyze the pairwise connectivity patterns within specific experimental groups (e.g., Alcohol and Control) and conditions (e.g., Single Stimulus, Two Stimuli).
+</p>
+<p>The self-join operation systematically computes pairwise statistics within each group, focusing on unique connections between EEG channels. Below is the implementation:</p>
+
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">group_scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Iterate over each unique group in the 'group' column
+</span><span class="k">for</span> <span class="n">group_idx</span> <span class="ow">in</span> <span class="n">metaRawData</span><span class="p">[</span><span class="sh">'</span><span class="s">group</span><span class="sh">'</span><span class="p">].</span><span class="nf">unique</span><span class="p">():</span>
+    <span class="c1"># Filter rows that belong to the current group
+</span>    <span class="n">group_data</span> <span class="o">=</span> <span class="n">metaRawData</span><span class="p">[</span><span class="n">metaRawData</span><span class="p">[</span><span class="sh">'</span><span class="s">group</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">group_idx</span><span class="p">]</span>
+
+    <span class="c1"># Extract `type`, `match`, and `name` for the group (assuming they are the same for the group)
+</span>    <span class="n">group_type</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">group_match</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="sh">'</span><span class="s">match</span><span class="sh">'</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">group_name</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Get the indices of the rows for the current group
+</span>    <span class="n">group_indices</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">.</span><span class="n">index</span>
+
+    <span class="c1"># Calculate self-join cosine similarity within the group
+</span>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row_i</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">group_indices</span><span class="p">):</span>
+        <span class="n">position_i</span> <span class="o">=</span> <span class="n">metaRawData</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row_i</span><span class="p">,</span> <span class="sh">'</span><span class="s">position</span><span class="sh">'</span><span class="p">]</span>
+
+        <span class="c1"># Start from the next index to avoid duplicate pairs (i, j) and (j, i)
+</span>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">row_j</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">group_indices</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span> <span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">position_j</span> <span class="o">=</span> <span class="n">metaRawData</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row_j</span><span class="p">,</span> <span class="sh">'</span><span class="s">position</span><span class="sh">'</span><span class="p">]</span>
+
+            <span class="c1"># Retrieve cosine similarity score from cosine_scores array
+</span>            <span class="n">cos</span> <span class="o">=</span> <span class="n">cosine_scores</span><span class="p">[</span><span class="n">row_i</span><span class="p">][</span><span class="n">row_j</span><span class="p">].</span><span class="nf">item</span><span class="p">()</span>
+
+            <span class="c1"># Append the results to the list
+</span>            <span class="n">group_scores</span><span class="p">.</span><span class="nf">append</span><span class="p">({</span>
+                <span class="sh">'</span><span class="s">group</span><span class="sh">'</span><span class="p">:</span> <span class="n">group_idx</span><span class="p">,</span>
+                <span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">:</span> <span class="n">group_type</span><span class="p">,</span>
+                <span class="sh">'</span><span class="s">match</span><span class="sh">'</span><span class="p">:</span> <span class="n">group_match</span><span class="p">,</span>
+                <span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="n">group_name</span><span class="p">,</span>
+                <span class="sh">'</span><span class="s">position_i</span><span class="sh">'</span><span class="p">:</span> <span class="n">position_i</span><span class="p">,</span>
+                <span class="sh">'</span><span class="s">position_j</span><span class="sh">'</span><span class="p">:</span> <span class="n">position_j</span><span class="p">,</span>
+                <span class="sh">'</span><span class="s">left_idx</span><span class="sh">'</span><span class="p">:</span> <span class="n">row_i</span><span class="p">,</span>
+                <span class="sh">'</span><span class="s">right_index</span><span class="sh">'</span><span class="p">:</span> <span class="n">row_j</span><span class="p">,</span>
+                <span class="sh">'</span><span class="s">cosine_similarity</span><span class="sh">'</span><span class="p">:</span> <span class="n">cos</span>
+            <span class="p">})</span></code></pre></figure>
+
+<p></p>
+
+<p>
+    The result of this process is a structured dataset where each row represents a unique connection between two EEG channels, along with the computed cosine similarity and group-level metadata. An example entry might look like this:
+</p>
+<pre>
+<code>
+{
+    "group": "Alcohol",
+    "type": "Experimental",
+    "match": "Two Stimuli - Matched",
+    "name": "Subject 1",
+    "position_i": "Cz",
+    "position_j": "Pz",
+    "left_idx": 5,
+    "right_index": 10,
+    "cosine_similarity": 0.76
+}
+</code>
+</pre>
+
+<p>Key Insights and Applications</p>
+<ul>
+    <li>Condition-Wise Connectivity Analysis: Aggregating cosine similarity scores allows us to compare connectivity strength between experimental groups (e.g., Alcohol vs. Control) under various conditions (e.g., Single Stimulus, Two Stimuli).</li>
+    <li>Node-Level Connectivity Patterns: The <code>position_i</code> and <code>position_j</code> fields enable spatial mapping of connectivity patterns across the brain.</li>
+    <li>Group Comparisons: By grouping the results, we can identify statistically significant differences in connectivity patterns between conditions.</li>
+</ul>
+
+<p>
+    The combination of GNN embeddings, cosine similarity, and statistical grouping enables a robust and scalable approach to analyzing EEG connectivity. By leveraging self-join matrices, we quantify pairwise relationships between EEG channels, uncovering patterns that provide valuable insights into the neural effects of experimental conditions such as alcohol exposure.
+</p>
+
+<h3>Interpreting Model Results</h3>
+
+<h4>Condition-wise Analysis of Cosine Similarities</h4>
+
+<p>To compare connectivity patterns between the Alcohol and Control groups, we computed the average cosine similarities from the embedded vectors generated by the model. These cosine similarities represent the strength of connectivity between brain regions, with higher values indicating stronger connections. The computed values were aggregated by condition type and match status to assess differences across the experimental groups.</p>
+
+<p>As shown in Table 1, the <strong>‘Single stimulus’</strong> condition revealed minimal differences between the Alcohol and Control groups. This finding aligns with results from our previous studies [2, 3]. Since the <strong>‘Single stimulus’</strong> condition did not show significant variation in connectivity patterns, it was excluded from further analysis.</p>
+
+<p>We instead focused on the <strong>‘Two stimuli - matched’</strong> and <strong>‘Two stimuli - non-matched’</strong> conditions, where clearer distinctions between the groups were observed:</p>
+
+<ul>
+    <li><strong>Alcohol group:</strong> Average cosine similarity of 0.546.</li>
+    <li><strong>Control group:</strong> Average cosine similarity of 0.645.</li>
+</ul>
+
+<p>The higher average cosine similarity in the Control group suggests stronger overall connectivity compared to the Alcohol group. This finding may reflect differences in the efficiency or robustness of neural communication between the two groups. These variations could be indicative of the impact of alcohol on brain connectivity.</p>
+
+<p>In the following sections, we will delve deeper into these patterns at the node level, highlighting specific regions of the brain with both high and low signal correlations between the groups.</p>
+
+<h6>Table 1: Average Cosine Similarities by Condition and Group</h6>
+<p></p>
+<p><a href="#">
+    <img src="/img/eegTable1.jpg" alt="Post Sample Image" width="471" />
+</a></p>
+<p></p>
+
+<h4>Strongly Connected Positions</h4>
+
+<p>
+    Our analysis utilized a GNN Link Prediction model to explore the EEG connectivity patterns in both the Alcohol and Control groups. This model was specifically designed to capture the intricate spatial relationships and temporal dependencies present in EEG data. By analyzing connectivity patterns at a granular level, the GNN Link Prediction model provided critical insights into how different brain regions interact under various experimental conditions.
+</p>
+
+<p>
+    The GNN Link Prediction model generated embedded vectors, which were used to calculate edge weights based on the initial graph structure. Node-level cosine similarities were then computed by combining left and right node positions, grouping them by type and position, and averaging the values to evaluate overall connectivity strength.
+</p>
+
+<p>
+    Tables 2 and 3 highlight the top highly connected node pairs and nodes, respectively. In the Control group, the strongest connections are concentrated in the occipital and parietal regions. These regions play a vital role in visual processing and sensory integration, showcasing a stable and efficient brain network organization. The occipital region's dominance in the Control group suggests healthy neural patterns without significant disruptions. This enables consistent and efficient communication within the brain, particularly in areas essential for interpreting visual input.
+</p>
+
+<p>
+    On the other hand, the Alcohol group displays more disruptions, characterized by lower overall connectivity values. Although connections are observed in the parietal and occipital regions, they are weaker compared to the Control group. This indicates a less organized and consistent brain network in the Alcohol group, likely reflecting the effects of alcohol on neural connectivity. Interestingly, the parietal region's dominance in the Alcohol group might suggest a compensatory mechanism, where the brain attempts to enhance connectivity in regions responsible for sensory processing and spatial awareness to counterbalance alcohol-induced disruptions.
+</p>
+
+<p>
+    Table 2 highlights the top connected node pairs based on cosine similarity for the Alcohol and Control groups. The analysis reveals that the Alcohol group exhibits strong connectivity in the parietal and occipital regions, which are associated with sensory processing and spatial awareness. However, the Control group demonstrates even stronger connections within the occipital area, a region crucial for visual processing and sensory integration.
+</p>
+<p></p>
+<p><a href="#">
+    <img src="/img/eegTable2.jpg" alt="Top Connected Node Pairs" width="471" />
+</a></p>
+<p></p>
+<p>
+    These findings suggest that the Control group has a more stable and efficient brain network organization, enabling robust communication between regions involved in visual and sensory information processing. In contrast, the Alcohol group's connectivity, while present, appears less stable, potentially reflecting the impact of alcohol on neural communication pathways.
+</p>
+
+<p>
+    Table 3 showcases the nodes with the highest cosine similarity values for both the Alcohol and Control groups. In the Alcohol group, the strongest connectivity is observed in the parietal region, suggesting a focus on regions responsible for sensory processing and spatial awareness. This pattern could indicate a compensatory mechanism in response to disruptions caused by alcohol.
+</p>
+<p></p>
+<p><a href="#">
+    <img src="/img/eegTable3.jpg" alt="Top Nodes with Highest Cosine Similarity" width="333" />
+</a></p>
+<p></p>
+<p>
+    Conversely, the Control group shows dominance in the occipital region, which reflects consistent and efficient neural communication critical for interpreting visual information. This occipital region dominance highlights the Control group's more organized and robust brain network, supporting efficient sensory and visual information processing. The contrast between the two groups underscores differences in how the brain processes sensory and visual stimuli under varying conditions.
+</p>
+
+<h4>Weakly Connected Positions</h4>
+
+<p>
+    As shown in Tables 4 and 5, the nodes and node pairs with the lowest cosine similarity values for both the Alcohol and Control groups are concentrated in the central brain regions, such as <strong>CZ</strong>, <strong>C1</strong>, and <strong>C2</strong>. These regions are primarily associated with motor functions and are not expected to exhibit high connectivity in trials focused on visual stimuli. This finding aligns with the task's emphasis on visual processing rather than motor activity.
+</p>
+
+<p>
+    In the Control group, these motor-related regions display low connectivity, which is consistent with the visual nature of the task. However, in the Alcohol group, the connectivity in these regions is even weaker, indicating that alcohol exposure may lead to broader disruptions across brain networks, even in areas not directly involved in the experimental task. This suggests that alcohol may impair not only task-relevant connectivity but also overall neural network stability.
+</p>
+
+<p>
+    Table 4 highlights node pairs with the lowest cosine similarity values in both the Alcohol and Control groups. These weakly connected regions are particularly concentrated in central areas associated with motor function. While both groups show reduced connectivity in these regions, the Alcohol group exhibits more pronounced disruptions, indicating a broader impact of alcohol on neural networks.
+</p>
+<p></p>
+<p><a href="#">
+    <img src="/img/eegTable4.jpg" alt="Table 4: Lowest Connected Node Pairs" width="471" />
+</a></p>
+<p></p>
+
+<p>
+    Table 5 identifies individual nodes with the lowest cosine similarity values in both groups, primarily located in central regions such as CZ, C1, and C2. The Control group maintains slightly higher connectivity in these areas, aligning with the task's visual focus. In contrast, the Alcohol group demonstrates more pronounced disruptions, further reflecting the potential impact of alcohol on overall brain network stability.
+</p>
+<p></p>
+<p><a href="#">
+    <img src="/img/eegTable5.jpg" alt="Table 5: Lowest Connected Nodes" width="333" />
+</a></p>
+<p></p>
+
+<h4>Graphical Representation of High and Low Connectivity Nodes</h4>
+
+<p>
+    The figure displays a topographical map of EEG channels, highlighting nodes based on their overall cosine similarity values for the Alcohol and Control groups. Nodes with the highest connectivity are shown in <strong>turquoise</strong> for the Alcohol group and in <strong>blue</strong> for the Control group, while those with the lowest connectivity are represented in <strong>yellow</strong> for the Alcohol group and <strong>orange</strong> for the Control group. This visualization offers a clear comparison of connectivity patterns, identifying regions of stronger and weaker signal correlations.
+</p>
+<p></p>
+<div style="text-align: center; border: 2px solid #ccc; padding: 10px; width: fit-content; margin: auto;">
+
+    <a href="#">
+        <img src="/img/brain4.jpg" alt="Graphical Representation of Connectivity Nodes" width="598" />
+    </a>
+</div>
+<p></p>
+<p></p>
+
+<p></p>
+<p>
+    In the Control group, the high-connectivity nodes are primarily located in the occipital region, which is responsible for visual processing. This stable neural interaction is expected during visual trials, indicating efficient brain network organization in response to visual stimuli. In contrast, the Alcohol group exhibits stronger connections in the parietal region, with fewer occipital nodes involved. This shift in connectivity may indicate how alcohol alters brain activity, possibly disrupting normal visual processing and causing compensatory activity in other regions.
+</p>
+
+<p>
+    Both groups demonstrate low connectivity in the central region, which is typically linked to motor and sensorimotor processing. The lower activity in these areas during visual trials suggests they are not heavily engaged, aligning with their expected limited role in visual perception and processing tasks.
+</p>
+
+<h3>In Conclusion</h3>
+
+<p>
+    This study highlights the potential of GNN Link Prediction models to uncover subtle variations in EEG connectivity, providing a deeper understanding of neural dynamics. By developing a unified graph structure based on spatial distances between EEG electrodes, we successfully applied these models to analyze and interpret brain connectivity patterns in both Alcohol and Control groups.
+</p>
+
+<p>
+    Our findings reveal that GNN Link Prediction models offer unique insights into connectivity patterns that traditional methods might miss. In the Control group, high-connectivity nodes were predominantly found in the occipital region, which is crucial for visual processing, reflecting stable and efficient neural responses. In contrast, the Alcohol group exhibited stronger connectivity in the parietal region, suggesting compensatory mechanisms to address disruptions caused by alcohol exposure. This shift highlights how alcohol may alter typical brain activity, particularly in regions linked to sensory and cognitive functions.
+</p>
+
+<p>
+    Beyond EEG analysis, this framework is adaptable to other types of time series data, making it a versatile tool for studying connectivity patterns and uncovering underlying physiological dynamics. By integrating AI with neuroscience, this work demonstrates how GNN Link Prediction models can enhance our understanding of brain connectivity and open new avenues for research and clinical applications.
+</p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+<p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2024/09/01/vectors2gafGNN/" data-toggle="tooltip" data-placement="top" title="Pre-final222 Vector Caching in Graph Classification">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2024</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>

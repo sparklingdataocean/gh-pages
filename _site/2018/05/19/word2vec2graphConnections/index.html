@@ -130,61 +130,61 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 
 <p>Combine text files about stress, psychoanalysis and aha moments.</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">inputStress</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
-   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/stressWiki.txt"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">inputPsychoanalysis</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
-   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/psychoanalisys1.txt"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">inputInsight</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
-   <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/ahaMoments.txt"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">inputBrain</span><span class="k">=</span><span class="n">inputStress</span><span class="o">.</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">inputPsychoanalysis</span><span class="o">).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">inputInsight</span><span class="o">)</span>
-<span class="n">inputBrain</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">2422</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">inputStress</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+   <span class="nf">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/stressWiki.txt"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">inputPsychoanalysis</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+   <span class="nf">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/psychoanalisys1.txt"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">inputInsight</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+   <span class="nf">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/ahaMoments.txt"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">inputBrain</span><span class="k">=</span><span class="n">inputStress</span><span class="o">.</span>
+   <span class="nf">union</span><span class="o">(</span><span class="n">inputPsychoanalysis</span><span class="o">).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="n">inputInsight</span><span class="o">)</span>
+<span class="nv">inputBrain</span><span class="o">.</span><span class="py">count</span><span class="c1">//--2422</span></code></pre></figure>
 
 
 <p>Tokenize text file and exclude stop words:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.ml.feature._</span>
-<span class="k">val</span> <span class="n">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
-   <span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
-   <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">tokenizedInput</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">inputBrain</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">removedStopWordsInput</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
-   <span class="n">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
-   <span class="n">remover</span><span class="o">.</span><span class="n">getStopWords</span><span class="o">).</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedInput</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
+   <span class="nf">setMinTokenLength</span><span class="o">(</span><span class="mi">5</span><span class="o">).</span>
+   <span class="nf">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">tokenizedInput</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">inputBrain</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">removedStopWordsInput</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
+   <span class="nf">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
+   <span class="nv">remover</span><span class="o">.</span><span class="py">getStopWords</span><span class="o">).</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">tokenizedInput</span><span class="o">)</span></code></pre></figure>
 
 
 
 <p>Get word trios (word1, word2, word3) from lines of inputBrain text file:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">ngramTrio</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NGram</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"ngrams"</span><span class="o">).</span>
-   <span class="n">setN</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">ngramTrioCleanWords</span> <span class="k">=</span> <span class="n">ngramTrio</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">removedStopWordsInput</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">ngramTrio</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NGram</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"ngrams"</span><span class="o">).</span>
+   <span class="nf">setN</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">ngramTrioCleanWords</span> <span class="k">=</span> <span class="n">ngramTrio</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">removedStopWordsInput</span><span class="o">)</span></code></pre></figure>
 
 
 
 <p>Explode word trios:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
-<span class="k">val</span> <span class="n">slpitNgramsTrio</span><span class="k">=</span><span class="n">ngramTrioCleanWords</span><span class="o">.</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"ngrams"</span><span class="o">)).</span><span class="n">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"trioWords"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">slpitNgramsTrio</span><span class="k">=</span><span class="n">ngramTrioCleanWords</span><span class="o">.</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"ngrams"</span><span class="o">)).</span><span class="py">select</span><span class="o">(</span><span class="s">"ngram"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"trioWords"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">slpitNgramsTrio</span><span class="o">.</span><span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">slpitNgramsTrio</span><span class="o">.</span><span class="py">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
 <span class="n">trioWords</span>
 <span class="n">differently</span> <span class="n">experiences</span> <span class="n">different</span>
 <span class="n">humor</span> <span class="n">excellent</span> <span class="n">defensive</span>
@@ -200,15 +200,15 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 
 <p>Split word trios to three columns:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">brainTrioWords</span><span class="k">=</span><span class="n">slpitNgramsTrio</span><span class="o">.</span>
-   <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span>
-      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
-      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">1</span><span class="o">),</span>     
-      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">2</span><span class="o">))).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"trioWords"</span><span class="o">,</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="ss">'word1=</span><span class="o">!='</span><span class="n">word2</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'word1=</span><span class="o">!='</span><span class="n">word3</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'word2=</span><span class="o">!='</span><span class="n">word3</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">brainTrioWords</span><span class="k">=</span><span class="n">slpitNgramsTrio</span><span class="o">.</span>
+   <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">,</span>
+      <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
+      <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">1</span><span class="o">),</span>     
+      <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">" "</span><span class="o">)(</span><span class="mi">2</span><span class="o">))).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"trioWords"</span><span class="o">,</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="ss">'word1</span><span class="o">=!=</span><span class="ss">'word2</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'word1</span><span class="o">=!=</span><span class="ss">'word3</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'word2</span><span class="o">=!=</span><span class="ss">'word3</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">brainTrioWords</span><span class="o">.</span><span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">brainTrioWords</span><span class="o">.</span><span class="py">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
 <span class="n">trioWords</span><span class="o">,</span><span class="n">word1</span><span class="o">,</span><span class="n">word2</span><span class="o">,</span><span class="n">word3</span>
 <span class="n">negative</span> <span class="n">emotions</span> <span class="n">surrounding</span><span class="o">,</span><span class="n">negative</span><span class="o">,</span><span class="n">emotions</span><span class="o">,</span><span class="n">surrounding</span>
 <span class="n">longer</span> <span class="n">periods</span> <span class="n">types</span><span class="o">,</span><span class="n">longer</span><span class="o">,</span><span class="n">periods</span><span class="o">,</span><span class="n">types</span>
@@ -225,12 +225,12 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 
 <p>Get the list of all words from word trios:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">brainAllWords</span><span class="k">=</span><span class="n">brainTrioWords</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">brainTrioWords</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">brainTrioWords</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word3"</span><span class="o">)).</span>
-   <span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"wordList"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">brainAllWords</span><span class="k">=</span><span class="nv">brainTrioWords</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="nv">brainTrioWords</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="nv">brainTrioWords</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"word3"</span><span class="o">)).</span>
+   <span class="nv">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"wordList"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">brainAllWords</span><span class="o">.</span><span class="n">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">brainAllWords</span><span class="o">.</span><span class="py">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">))</span>
 <span class="n">wordList</span>
 <span class="n">recognize</span>
 <span class="n">persist</span>
@@ -250,31 +250,31 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.ml.feature.Word2VecModel</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.Row</span>
-<span class="k">val</span> <span class="n">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
-  <span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/newsTest.txt"</span><span class="o">).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">tokenizedNewsBrain</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">inputBrain</span><span class="o">))</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">inputNews</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span>
+  <span class="nf">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/newsTest.txt"</span><span class="o">).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">tokenizedNewsBrain</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">inputNews</span><span class="o">.</span>
+   <span class="nf">union</span><span class="o">(</span><span class="n">inputBrain</span><span class="o">))</span></code></pre></figure>
 
 
 
 <p>Train Word2Vec model and save the results:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">()</span>
-  <span class="o">.</span><span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">)</span>
-  <span class="o">.</span><span class="n">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">w2Vmodel</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span>
-   <span class="n">fit</span><span class="o">(</span><span class="n">tokenizedNewsBrain</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">word2vec</span><span class="k">=</span> <span class="k">new</span> <span class="nc">Word2Vec</span><span class="o">()</span>
+  <span class="o">.</span><span class="py">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">)</span>
+  <span class="o">.</span><span class="py">setOutputCol</span><span class="o">(</span><span class="s">"result"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">w2Vmodel</span><span class="k">=</span><span class="n">word2vec</span><span class="o">.</span>
+   <span class="nf">fit</span><span class="o">(</span><span class="n">tokenizedNewsBrain</span><span class="o">)</span>
 <span class="n">w2Vmodel</span><span class="o">.</span>
    <span class="n">write</span><span class="o">.</span>
    <span class="n">overwrite</span><span class="o">.</span>
-   <span class="n">save</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">modelNewsBrain</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
+   <span class="nf">save</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">modelNewsBrain</span><span class="k">=</span><span class="nc">Word2VecModel</span><span class="o">.</span>
    <span class="n">read</span><span class="o">.</span>
-   <span class="n">load</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
+   <span class="nf">load</span><span class="o">(</span><span class="s">"w2VmodelNewsBrain"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">modelNewsBrain</span><span class="o">.</span><span class="n">findSynonyms</span><span class="o">(</span><span class="s">"creativity"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">modelNewsBrain</span><span class="o">.</span><span class="py">findSynonyms</span><span class="o">(</span><span class="s">"creativity"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">word</span><span class="o">,</span><span class="n">similarity</span>
 <span class="n">diversity</span><span class="o">,</span><span class="mf">0.8130543231964111</span>
 <span class="n">compatible</span><span class="o">,</span><span class="mf">0.8086180090904236</span>
@@ -288,53 +288,53 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 
 <p>Get a set of all words from the modelNewsBrain Word2Vec model and join them with list of words from Brain Text File:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modelWordsBrain</span><span class="k">=</span><span class="n">modelNewsBrain</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modelWordsBrain</span><span class="k">=</span><span class="n">modelNewsBrain</span><span class="o">.</span>
    <span class="n">getVectors</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span>   
-<span class="k">val</span> <span class="n">brainWordVector</span><span class="k">=</span><span class="n">brainAllWords</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">modelWordsBrain</span><span class="o">,</span><span class="ss">'wordList=</span><span class="o">=='</span><span class="n">word</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">)</span>   
+<span class="k">val</span> <span class="nv">brainWordVector</span><span class="k">=</span><span class="n">brainAllWords</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="n">modelWordsBrain</span><span class="o">,</span><span class="ss">'wordList</span><span class="o">===</span><span class="ss">'word</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">).</span>
    <span class="n">distinct</span>
-<span class="n">brainWordVector</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">7794</span></code></pre></figure>
+<span class="nv">brainWordVector</span><span class="o">.</span><span class="py">count</span><span class="c1">//--7794</span></code></pre></figure>
 
 
 <h3>Cosine Similarities</h3>
 <p>Cosine similarity function:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.ml.linalg.Vector</span>
-<span class="k">def</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+<span class="k">def</span> <span class="nf">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
              <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
   <span class="k">var</span> <span class="n">dot</span><span class="k">=</span><span class="mf">0.0</span>
-  <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span><span class="mi">0</span> <span class="n">to</span> <span class="n">vectorX</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">dot</span> <span class="o">+=</span> <span class="n">vectorX</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">*</span> <span class="n">vectorY</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
+  <span class="nf">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span><span class="mi">0</span> <span class="n">to</span> <span class="nv">vectorX</span><span class="o">.</span><span class="py">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">dot</span> <span class="o">+=</span> <span class="nf">vectorX</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">*</span> <span class="nf">vectorY</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
   <span class="n">dot</span>
 <span class="o">}</span>
-<span class="k">def</span> <span class="n">cosineVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
+<span class="k">def</span> <span class="nf">cosineVector</span><span class="o">(</span><span class="n">vectorX</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">,</span>
                  <span class="n">vectorY</span><span class="k">:</span> <span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="n">require</span><span class="o">(</span><span class="n">vectorX</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">vectorY</span><span class="o">.</span><span class="n">size</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">dot</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">div</span><span class="k">=</span><span class="n">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorX</span><span class="o">)</span> <span class="o">*</span> <span class="n">dotVector</span><span class="o">(</span><span class="n">vectorY</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
-  <span class="k">if</span> <span class="o">(</span><span class="n">div</span><span class="o">==</span><span class="mi">0</span><span class="o">)</span><span class="mi">0</span>
-  <span class="k">else</span> <span class="n">dot</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="o">(</span><span class="n">div</span><span class="o">)</span>
+  <span class="nf">require</span><span class="o">(</span><span class="nv">vectorX</span><span class="o">.</span><span class="py">size</span> <span class="o">==</span> <span class="nv">vectorY</span><span class="o">.</span><span class="py">size</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">dot</span><span class="k">=</span><span class="nf">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">div</span><span class="k">=</span><span class="nf">dotVector</span><span class="o">(</span><span class="n">vectorX</span><span class="o">,</span><span class="n">vectorX</span><span class="o">)</span> <span class="o">*</span> <span class="nf">dotVector</span><span class="o">(</span><span class="n">vectorY</span><span class="o">,</span><span class="n">vectorY</span><span class="o">)</span>
+  <span class="nf">if</span> <span class="o">(</span><span class="n">div</span><span class="o">==</span><span class="mi">0</span><span class="o">)</span><span class="mi">0</span>
+  <span class="k">else</span> <span class="n">dot</span><span class="o">/</span><span class="nv">math</span><span class="o">.</span><span class="py">sqrt</span><span class="o">(</span><span class="n">div</span><span class="o">)</span>
 <span class="o">}</span></code></pre></figure>
 
 
 <p>Self-join brainWordVector table to get all pairs of words of Brain Text File:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">brainWordVector2</span><span class="k">=</span><span class="n">brainWordVector</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">w2wBrain</span><span class="k">=</span><span class="n">brainWordVector</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">brainWordVector2</span><span class="o">,</span><span class="ss">'word=</span><span class="o">!='</span><span class="n">word2</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
-<span class="n">w2wBrain</span><span class="o">.</span><span class="n">count</span><span class="o">//--</span><span class="mi">60738642</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">brainWordVector2</span><span class="k">=</span><span class="n">brainWordVector</span><span class="o">.</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">w2wBrain</span><span class="k">=</span><span class="n">brainWordVector</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="n">brainWordVector2</span><span class="o">,</span><span class="ss">'word</span><span class="o">=!=</span><span class="ss">'word2</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="s">"vector"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"vector2"</span><span class="o">)</span>
+<span class="nv">w2wBrain</span><span class="o">.</span><span class="py">count</span><span class="c1">//--60738642</span></code></pre></figure>
 
 
 <p>Calculate Cosine Similarity matrix - Cosine Similarities between all pairs of words of Brain Text File:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">w2wBrainCosMatrix</span><span class="k">=</span><span class="n">w2wBrain</span><span class="o">.</span>
-   <span class="n">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">),</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">2</span><span class="o">),</span>
-   <span class="n">cosineVector</span><span class="o">(</span><span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">),</span>
-   <span class="n">r</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">3</span><span class="o">)))).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"w1"</span><span class="o">,</span><span class="s">"w2"</span><span class="o">,</span><span class="s">"cos12"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">w2wBrainCosMatrix</span><span class="k">=</span><span class="n">w2wBrain</span><span class="o">.</span>
+   <span class="nf">map</span><span class="o">(</span><span class="n">r</span><span class="o">=&gt;(</span><span class="nv">r</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">0</span><span class="o">),</span><span class="nv">r</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="mi">2</span><span class="o">),</span>
+   <span class="nf">cosineVector</span><span class="o">(</span><span class="nv">r</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">1</span><span class="o">),</span>
+   <span class="nv">r</span><span class="o">.</span><span class="py">getAs</span><span class="o">[</span><span class="kt">org.apache.spark.ml.linalg.Vector</span><span class="o">](</span><span class="mi">3</span><span class="o">)))).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"w1"</span><span class="o">,</span><span class="s">"w2"</span><span class="o">,</span><span class="s">"cos12"</span><span class="o">)</span></code></pre></figure>
 
 
 
@@ -342,53 +342,53 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 <h3>Build a Graph</h3>
 <p>To prepare word triples for graph we will join Brain Text File triples (brainTrioWords table) with cosine similarity matrix:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">trioCos</span><span class="k">=</span><span class="n">brainTrioWords</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">w2wBrainCosMatrix</span><span class="o">,</span> <span class="ss">'word1=</span><span class="o">=='</span><span class="n">w1</span> <span class="o">&amp;&amp;</span> <span class="ss">'word3=</span><span class="o">=='</span><span class="n">w2</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span> <span class="s">"word3"</span><span class="o">,</span> <span class="s">"word2"</span><span class="o">,</span> <span class="s">"cos12"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">trioCos</span><span class="k">=</span><span class="n">brainTrioWords</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="n">w2wBrainCosMatrix</span><span class="o">,</span> <span class="ss">'word1</span><span class="o">===</span><span class="ss">'w1</span> <span class="o">&amp;&amp;</span> <span class="ss">'word3</span><span class="o">===</span><span class="ss">'w2</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span> <span class="s">"word3"</span><span class="o">,</span> <span class="s">"word2"</span><span class="o">,</span> <span class="s">"cos12"</span><span class="o">)</span></code></pre></figure>
 
 
 
 <p>Build a graph:</p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
-<span class="k">val</span> <span class="n">graphNodes1</span><span class="k">=</span><span class="n">trioCos</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">trioCos</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)).</span>
+<span class="k">val</span> <span class="nv">graphNodes1</span><span class="k">=</span><span class="n">trioCos</span><span class="o">.</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="nv">trioCos</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">)).</span>
    <span class="n">distinct</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphEdges1</span><span class="k">=</span><span class="n">trioCos</span><span class="o">.</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos12"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphEdges1</span><span class="k">=</span><span class="n">trioCos</span><span class="o">.</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"word1"</span><span class="o">,</span><span class="s">"word3"</span><span class="o">,</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"cos12"</span><span class="o">).</span>
    <span class="n">distinct</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes1</span><span class="o">,</span><span class="n">graphEdges1</span><span class="o">)</span></code></pre></figure>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graph1</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes1</span><span class="o">,</span><span class="n">graphEdges1</span><span class="o">)</span></code></pre></figure>
 
 
 
 <p>Save graph vertices and edges as Parquet to Databricks locations:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">graph1</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">write</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphBrainVertices"</span><span class="o">)</span>
-<span class="n">graph1</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">write</span><span class="o">.</span>
-   <span class="n">parquet</span><span class="o">(</span><span class="s">"graphBrainEdges"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nv">graph1</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span><span class="py">write</span><span class="o">.</span>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphBrainVertices"</span><span class="o">)</span>
+<span class="nv">graph1</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">write</span><span class="o">.</span>
+   <span class="nf">parquet</span><span class="o">(</span><span class="s">"graphBrainEdges"</span><span class="o">)</span></code></pre></figure>
 
 
 
 <p>Load vertices and edges and rebuild the same graph:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphBrainVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphBrainVertices"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphBrainEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphBrainEdges"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphBrain</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">graphBrainEdges</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphBrainVertices</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphBrainVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphBrainEdges</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphBrainEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphBrain</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">graphBrainEdges</span><span class="o">)</span></code></pre></figure>
 
 
 <p>Graph PageRank:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphBrainPageRank</span> <span class="k">=</span> <span class="n">graphBrain</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphBrainPageRank</span> <span class="k">=</span> <span class="n">graphBrain</span><span class="o">.</span>
    <span class="n">pageRank</span><span class="o">.</span>
-   <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
-   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+   <span class="nf">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+   <span class="nf">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="py">run</span><span class="o">()</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">graphBrainPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
-   <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">asc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">graphBrainPageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
+   <span class="nv">distinct</span><span class="o">.</span><span class="py">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">asc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
    <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
    <span class="n">freud</span><span class="o">,</span><span class="mf">74.31134249545481</span>
    <span class="n">brain</span><span class="o">,</span><span class="mf">38.13756389088785</span>
@@ -412,17 +412,17 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
-<span class="k">val</span> <span class="n">edgesStats</span><span class="k">=</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
-   <span class="n">groupBy</span><span class="o">(</span><span class="s">"edgeName"</span><span class="o">).</span><span class="n">agg</span><span class="o">(</span><span class="n">max</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="s">"max"</span><span class="o">),</span>
-     <span class="n">min</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="s">"min"</span><span class="o">),</span>
-     <span class="n">sum</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="s">"sum"</span><span class="o">),</span>
-     <span class="n">count</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">alias</span><span class="o">(</span><span class="s">"count"</span><span class="o">)).</span><span class="n">filter</span><span class="o">(</span><span class="s">"count&gt;1"</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">edgesStats</span><span class="k">=</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span>
+   <span class="nf">groupBy</span><span class="o">(</span><span class="s">"edgeName"</span><span class="o">).</span><span class="py">agg</span><span class="o">(</span><span class="nf">max</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">alias</span><span class="o">(</span><span class="s">"max"</span><span class="o">),</span>
+     <span class="nf">min</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">alias</span><span class="o">(</span><span class="s">"min"</span><span class="o">),</span>
+     <span class="nf">sum</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">alias</span><span class="o">(</span><span class="s">"sum"</span><span class="o">),</span>
+     <span class="nf">count</span><span class="o">(</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">alias</span><span class="o">(</span><span class="s">"count"</span><span class="o">)).</span><span class="py">filter</span><span class="o">(</span><span class="s">"count&gt;1"</span><span class="o">)</span></code></pre></figure>
 
 
 
 <p>Highest edge weights:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edgesStats</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'max.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">edgesStats</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'max</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">edgeName</span><span class="o">,</span><span class="n">max</span><span class="o">,</span><span class="n">min</span><span class="o">,</span><span class="n">sum</span><span class="o">,</span><span class="n">count</span>
 <span class="n">child</span><span class="o">,</span><span class="mf">0.8584717249492438</span><span class="o">,-</span><span class="mf">0.30117121433417127</span><span class="o">,</span><span class="mf">7.583085681939111</span><span class="o">,</span><span class="mi">54</span>
 <span class="n">psychology</span><span class="o">,</span><span class="mf">0.8556911081737578</span><span class="o">,-</span><span class="mf">0.37700439365336214</span><span class="o">,</span><span class="mf">9.712497328132436</span><span class="o">,</span><span class="mi">55</span>
@@ -435,7 +435,7 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 
 <p>Lowest edge weights:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edgesStats</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'min.</span><span class="n">asc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">edgesStats</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'min</span><span class="o">.</span><span class="py">asc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">edgeName</span><span class="o">,</span><span class="n">max</span><span class="o">,</span><span class="n">min</span><span class="o">,</span><span class="n">sum</span><span class="o">,</span><span class="n">count</span>
 <span class="n">beeman</span><span class="o">,</span><span class="mf">0.596008130136649</span><span class="o">,-</span><span class="mf">0.5696883342362257</span><span class="o">,</span><span class="mf">4.134895812880752</span><span class="o">,</span><span class="mi">33</span>
 <span class="n">distinctive</span><span class="o">,</span><span class="mf">0.36268952837900825</span><span class="o">,-</span><span class="mf">0.5584905988347715</span><span class="o">,-</span><span class="mf">0.5268212152607737</span><span class="o">,</span><span class="mi">4</span>
@@ -449,7 +449,7 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 
 <p>Highest summary of edge weights:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edgesStats</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'sum.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">edgesStats</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'sum</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">edgeName</span><span class="o">,</span><span class="n">max</span><span class="o">,</span><span class="n">min</span><span class="o">,</span><span class="n">sum</span><span class="o">,</span><span class="n">count</span>
 <span class="n">freud</span><span class="o">,</span><span class="mf">0.7194757332843367</span><span class="o">,-</span><span class="mf">0.3691721677418447</span><span class="o">,</span><span class="mf">45.8165427413474</span><span class="o">,</span><span class="mi">370</span>
 <span class="n">brain</span><span class="o">,</span><span class="mf">0.8077240803083802</span><span class="o">,-</span><span class="mf">0.36925714175395613</span><span class="o">,</span><span class="mf">31.27596725835625</span><span class="o">,</span><span class="mi">159</span>
@@ -462,7 +462,7 @@ To build the Word2Vec2Graph model in this post we will use slightly different da
 
 <p>Lowest summary of edge weights:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edgesStats</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'sum.</span><span class="n">asc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">edgesStats</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'sum</span><span class="o">.</span><span class="py">asc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">edgeName</span><span class="o">,</span><span class="n">max</span><span class="o">,</span><span class="n">min</span><span class="o">,</span><span class="n">sum</span><span class="o">,</span><span class="n">count</span>
 <span class="n">service</span><span class="o">,-</span><span class="mf">0.02717220518964349</span><span class="o">,-</span><span class="mf">0.38409168941265176</span><span class="o">,-</span><span class="mf">0.6042134814366678</span><span class="o">,</span><span class="mi">3</span>
 <span class="n">melcher</span><span class="o">,-</span><span class="mf">0.16486841646031114</span><span class="o">,-</span><span class="mf">0.42791377206009545</span><span class="o">,-</span><span class="mf">0.5927821885204065</span><span class="o">,</span><span class="mi">2</span>
@@ -480,16 +480,16 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 <p>First, running connected components for the whole graphBrain, we can see that almost all edges are in one large connected component:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphBrainCC</span> <span class="k">=</span> <span class="n">graphBrain</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nv">sc</span><span class="o">.</span><span class="py">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphBrainCC</span> <span class="k">=</span> <span class="n">graphBrain</span><span class="o">.</span>
    <span class="n">connectedComponents</span><span class="o">.</span>
-   <span class="n">run</span><span class="o">()</span>
-<span class="k">val</span> <span class="n">graphBrainCCCount</span><span class="k">=</span><span class="n">graphBrainCC</span><span class="o">.</span>
-   <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+   <span class="nf">run</span><span class="o">()</span>
+<span class="k">val</span> <span class="nv">graphBrainCCCount</span><span class="k">=</span><span class="n">graphBrainCC</span><span class="o">.</span>
+   <span class="nf">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
    <span class="n">count</span><span class="o">.</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">graphBrainCCCount</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'ccCt.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">graphBrainCCCount</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'ccCt</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">cc</span><span class="o">,</span><span class="n">ccCt</span>
 <span class="mi">0</span><span class="o">,</span><span class="mi">7499</span>
 <span class="mi">403726925838</span><span class="o">,</span><span class="mi">4</span>
@@ -503,24 +503,24 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.DataFrame</span>
-<span class="k">def</span> <span class="n">w2v2gConnectionCC</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
+<span class="k">def</span> <span class="nf">w2v2gConnectionCC</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
      <span class="n">connection</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span>
   <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="k">val</span> <span class="n">graphEdgesSub</span><span class="k">=</span> <span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName.</span><span class="n">rlike</span><span class="o">(</span><span class="n">connection</span><span class="o">))</span>
-  <span class="k">val</span> <span class="n">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
-  <span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
+  <span class="k">val</span> <span class="nv">graphEdgesSub</span><span class="k">=</span> <span class="nv">graphEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeName</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="n">connection</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
+  <span class="nv">sc</span><span class="o">.</span><span class="py">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
      <span class="n">connectedComponents</span><span class="o">.</span>
-     <span class="n">run</span><span class="o">()</span>
-  <span class="k">val</span> <span class="n">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
-     <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+     <span class="nf">run</span><span class="o">()</span>
+  <span class="k">val</span> <span class="nv">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
+     <span class="nf">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
      <span class="n">count</span><span class="o">.</span>
-     <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
- <span class="k">val</span> <span class="n">sizeCC</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component=</span><span class="o">=='</span><span class="n">cc</span><span class="o">).</span>
-     <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="n">distinct</span>
- <span class="n">graphEdgesSub</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span>
-     <span class="n">union</span><span class="o">(</span><span class="n">graphEdgesSub</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">id</span><span class="o">)).</span>
-     <span class="n">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span>
+     <span class="nf">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+ <span class="k">val</span> <span class="nv">sizeCC</span><span class="k">=</span><span class="nv">resultCC</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component</span><span class="o">===</span><span class="ss">'cc</span><span class="o">).</span>
+     <span class="nf">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="py">distinct</span>
+ <span class="nv">graphEdgesSub</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'id</span><span class="o">).</span>
+     <span class="nf">union</span><span class="o">(</span><span class="nv">graphEdgesSub</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst</span><span class="o">===</span><span class="ss">'id</span><span class="o">)).</span>
+     <span class="nf">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">distinct</span>
 <span class="o">}</span></code></pre></figure>
 
 
@@ -529,13 +529,13 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
-<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectionCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"creat"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+<span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nv">Window</span><span class="o">.</span><span class="py">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="py">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result</span><span class="k">=</span><span class="nf">w2v2gConnectionCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"creat"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result2</span> <span class="k">=</span> <span class="nv">result</span><span class="o">.</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="nf">rank</span><span class="o">().</span><span class="py">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span>
-   <span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">9</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">result2</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span>
+   <span class="nf">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">9</span><span class="o">))</span>
 <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeName</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
 <span class="mi">8</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="n">neural</span><span class="o">,</span><span class="n">creations</span><span class="o">,</span><span class="mf">0.6628680134625873</span><span class="o">,</span><span class="mi">1</span>
 <span class="mi">8</span><span class="o">,</span><span class="mi">6</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="n">neural</span><span class="o">,</span><span class="n">create</span><span class="o">,</span><span class="mf">0.6628680134625873</span><span class="o">,</span><span class="mi">1</span>
@@ -550,26 +550,26 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <p>Function to convert edge ("src","dst") to .DOT language:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">cc2dot</span><span class="o">(</span><span class="n">graphComponents</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">componentId</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>  
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">cc2dot</span><span class="o">(</span><span class="n">graphComponents</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">componentId</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>  
  <span class="n">graphComponents</span><span class="o">.</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'component=</span><span class="o">==</span><span class="n">componentId</span><span class="o">).</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
-  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
-        <span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" ;"</span><span class="o">)).</span>
-        <span class="n">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'component</span><span class="o">===</span><span class="n">componentId</span><span class="o">).</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span>
+  <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
+        <span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" ;"</span><span class="o">)).</span>
+        <span class="nf">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
 <span class="o">}</span></code></pre></figure>
 
 
 <p>Connections like 'creat' - topics examples</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">670014898189L</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">670014898189L</span><span class="o">))</span>
 <span class="s">"measures"</span> <span class="o">-&gt;</span> <span class="s">"despite"</span> <span class="o">;</span>
 <span class="s">"measures"</span> <span class="o">-&gt;</span> <span class="s">"generally"</span> <span class="o">;</span>
 <span class="s">"correlates"</span> <span class="o">-&gt;</span> <span class="s">"generally"</span> <span class="o">;</span>
 <span class="s">"generally"</span> <span class="o">-&gt;</span> <span class="s">"mental"</span> <span class="o">;</span>
 <span class="s">"direction"</span> <span class="o">-&gt;</span> <span class="s">"mental"</span> <span class="o">;</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">481036337163L</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nf">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">481036337163L</span><span class="o">))</span>
 <span class="s">"ability"</span> <span class="o">-&gt;</span> <span class="s">"gifted"</span> <span class="o">;</span>
 <span class="s">"necessary"</span> <span class="o">-&gt;</span> <span class="s">"ability"</span> <span class="o">;</span>
 <span class="s">"predicts"</span> <span class="o">-&gt;</span> <span class="s">"ability"</span> <span class="o">;</span></code></pre></figure>
@@ -577,12 +577,12 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <p>Connections like 'psycho' - topics examples</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectionCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"psycho"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
-<span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span>
-   <span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nv">Window</span><span class="o">.</span><span class="py">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="py">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result</span><span class="k">=</span><span class="nf">w2v2gConnectionCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"psycho"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result2</span> <span class="k">=</span> <span class="nv">result</span><span class="o">.</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="nf">rank</span><span class="o">().</span><span class="py">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">result2</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span>
+   <span class="nf">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
 <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeName</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
 <span class="mi">8</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="mf">0.744622420826979</span><span class="o">,</span><span class="mi">1</span>
 <span class="mi">8</span><span class="o">,</span><span class="mi">7</span><span class="o">,</span><span class="n">basic</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="n">psychological</span><span class="o">,</span><span class="mf">0.6912580242535618</span><span class="o">,</span><span class="mi">2</span>
@@ -600,7 +600,7 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">8L</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">8L</span><span class="o">))</span>
 <span class="s">"important"</span> <span class="o">-&gt;</span> <span class="s">"processes"</span> <span class="o">;</span>
 <span class="s">"creativity"</span> <span class="o">-&gt;</span> <span class="s">"processes"</span> <span class="o">;</span>
 <span class="s">"correlation"</span> <span class="o">-&gt;</span> <span class="s">"creativity"</span> <span class="o">;</span>
@@ -608,12 +608,12 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 <span class="s">"claims"</span> <span class="o">-&gt;</span> <span class="s">"unsupported"</span> <span class="o">;</span>
 <span class="s">"claims"</span> <span class="o">-&gt;</span> <span class="s">"basic"</span> <span class="o">;</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">670014898183L</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nf">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">670014898183L</span><span class="o">))</span>
 <span class="s">"beginning"</span> <span class="o">-&gt;</span> <span class="s">"investigation"</span> <span class="o">;</span>
 <span class="s">"applying"</span> <span class="o">-&gt;</span> <span class="s">"methods"</span> <span class="o">;</span>
 <span class="s">"methods"</span> <span class="o">-&gt;</span> <span class="s">"investigation"</span> <span class="o">;</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">678604832798L</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nf">cc2dot</span><span class="o">(</span><span class="n">result</span><span class="o">,</span><span class="mi">678604832798L</span><span class="o">))</span>
 <span class="s">"believes"</span> <span class="o">-&gt;</span> <span class="s">"contained"</span> <span class="o">;</span>
 <span class="s">"believes"</span> <span class="o">-&gt;</span> <span class="s">"scientific"</span> <span class="o">;</span>
 <span class="s">"scientific"</span> <span class="o">-&gt;</span> <span class="s">"defined"</span> <span class="o">;</span>
@@ -629,19 +629,19 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <p>Build subgraph with edge name like 'creat'</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainEdges</span><span class="k">=</span><span class="n">graphBrainEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"creat"</span><span class="o">))</span>
-<span class="k">val</span> <span class="n">subGraphBrain</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainEdges</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">subGraphBrainEdges</span><span class="k">=</span><span class="nv">graphBrainEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeName</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"creat"</span><span class="o">))</span>
+<span class="k">val</span> <span class="nv">subGraphBrain</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainEdges</span><span class="o">)</span></code></pre></figure>
 
 
 <p>Calculate 'creat' subgraph PageRank</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainPageRank</span> <span class="k">=</span> <span class="n">subGraphBrain</span><span class="o">.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">subGraphBrainPageRank</span> <span class="k">=</span> <span class="n">subGraphBrain</span><span class="o">.</span>
    <span class="n">pageRank</span><span class="o">.</span>
-   <span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
-   <span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+   <span class="nf">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span>
+   <span class="nf">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="py">run</span><span class="o">()</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">subGraphBrainPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
-   <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">subGraphBrainPageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
+   <span class="nv">distinct</span><span class="o">.</span><span class="py">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
 <span class="n">insight</span><span class="o">,</span><span class="mf">14.372598514419272</span>
 <span class="n">thinking</span><span class="o">,</span><span class="mf">12.364614660701669</span>
@@ -654,13 +654,13 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <p>PageRank of subgraph like 'psycho' </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainEdges</span><span class="k">=</span><span class="n">graphBrainEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"psycho"</span><span class="o">))</span>
-<span class="k">val</span> <span class="n">subGraphBrain</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainEdges</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">subGraphBrainPageRank</span> <span class="k">=</span> <span class="n">subGraphBrain</span><span class="o">.</span>
-   <span class="n">pageRank</span><span class="o">.</span><span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">subGraphBrainEdges</span><span class="k">=</span><span class="nv">graphBrainEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeName</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"psycho"</span><span class="o">))</span>
+<span class="k">val</span> <span class="nv">subGraphBrain</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainEdges</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">subGraphBrainPageRank</span> <span class="k">=</span> <span class="n">subGraphBrain</span><span class="o">.</span>
+   <span class="nv">pageRank</span><span class="o">.</span><span class="py">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="py">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="py">run</span><span class="o">()</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">subGraphBrainPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
-    <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">subGraphBrainPageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
+    <span class="nv">distinct</span><span class="o">.</span><span class="py">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">11</span><span class="o">))</span>
 <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
 <span class="n">theory</span><span class="o">,</span><span class="mf">11.854709255771983</span>
 <span class="n">therapy</span><span class="o">,</span><span class="mf">10.320306649251734</span>
@@ -680,18 +680,18 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <p>Function to find word synonyms on direct Word2Vec2Graph</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">word</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">numSynonyms</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">word</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">numSynonyms</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span>
   <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'src=</span><span class="o">==</span><span class="n">word</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">union</span><span class="o">(</span>
-  <span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dst=</span><span class="o">==</span><span class="n">word</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"weight"</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
-  <span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="n">numSynonyms</span><span class="o">)</span>
+  <span class="nv">graphEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'src</span><span class="o">===</span><span class="n">word</span><span class="o">).</span><span class="py">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">union</span><span class="o">(</span>
+  <span class="nv">graphEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'dst</span><span class="o">===</span><span class="n">word</span><span class="o">).</span><span class="py">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">)).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"word2"</span><span class="o">,</span><span class="s">"weight"</span><span class="o">).</span><span class="py">select</span><span class="o">(</span><span class="s">"word2"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span>
+  <span class="nf">orderBy</span><span class="o">(</span><span class="ss">'edgeWeight</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="n">numSynonyms</span><span class="o">)</span>
 <span class="o">}</span></code></pre></figure>
 
 
 <p>Synonyms of the word 'insight':</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">w2v2gSynonyms</span><span class="o">(</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">word2</span>
 <span class="n">analytical</span>
 <span class="n">creativity</span>
@@ -704,7 +704,7 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <p>Synonyms of the word 'brain':</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">w2v2gSynonyms</span><span class="o">(</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">word2</span>
 <span class="n">disorder</span>
 <span class="n">illness</span>
@@ -718,19 +718,19 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <p>To calculate a subset of edges with connections on 'insight' synonyms we will combine edges with edge name 'insight' and edges with edge names with 5 top 'insight' synonyms. </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainSynonymEdges</span><span class="k">=</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">5</span><span class="o">),</span><span class="ss">'edgeName=</span><span class="o">=='</span><span class="n">word2</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName=</span><span class="o">==</span><span class="s">"insight"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">subGraphBrainSynonymEdges</span><span class="k">=</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="nf">w2v2gSynonyms</span><span class="o">(</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">5</span><span class="o">),</span><span class="ss">'edgeName</span><span class="o">===</span><span class="ss">'word2</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeName</span><span class="o">===</span><span class="s">"insight"</span><span class="o">))</span></code></pre></figure>
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainSynonym</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainSynonymEdges</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">subGraphBrainSynonymPageRank</span> <span class="k">=</span> <span class="n">subGraphBrainSynonym</span><span class="o">.</span>
-   <span class="n">pageRank</span><span class="o">.</span><span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">subGraphBrainSynonym</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainSynonymEdges</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">subGraphBrainSynonymPageRank</span> <span class="k">=</span> <span class="n">subGraphBrainSynonym</span><span class="o">.</span>
+   <span class="nv">pageRank</span><span class="o">.</span><span class="py">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="py">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="py">run</span><span class="o">()</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">subGraphBrainSynonymPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
-   <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">subGraphBrainSynonymPageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
+   <span class="nv">distinct</span><span class="o">.</span><span class="py">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
 <span class="n">solutions</span><span class="o">,</span><span class="mf">8.15511268601736</span>
 <span class="n">effect</span><span class="o">,</span><span class="mf">6.5060703332388</span>
@@ -743,16 +743,16 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <p>PageRank of subgraph with connections on 7 top 'brain' synonyms</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">subGraphBrainSynonymEdges</span><span class="k">=</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">7</span><span class="o">),</span><span class="ss">'edgeName=</span><span class="o">=='</span><span class="n">word2</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span>
-   <span class="n">union</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName=</span><span class="o">==</span><span class="s">"brain"</span><span class="o">))</span>
-<span class="k">val</span> <span class="n">subGraphBrainSynonym</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainSynonymEdges</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">subGraphBrainSynonymPageRank</span> <span class="k">=</span> <span class="n">subGraphBrainSynonym</span><span class="o">.</span>
-   <span class="n">pageRank</span><span class="o">.</span><span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">subGraphBrainSynonymEdges</span><span class="k">=</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span>
+   <span class="nf">join</span><span class="o">(</span><span class="nf">w2v2gSynonyms</span><span class="o">(</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">7</span><span class="o">),</span><span class="ss">'edgeName</span><span class="o">===</span><span class="ss">'word2</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span>
+   <span class="nf">union</span><span class="o">(</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeName</span><span class="o">===</span><span class="s">"brain"</span><span class="o">))</span>
+<span class="k">val</span> <span class="nv">subGraphBrainSynonym</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span> <span class="n">subGraphBrainSynonymEdges</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">subGraphBrainSynonymPageRank</span> <span class="k">=</span> <span class="n">subGraphBrainSynonym</span><span class="o">.</span>
+   <span class="nv">pageRank</span><span class="o">.</span><span class="py">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="py">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="py">run</span><span class="o">()</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">subGraphBrainSynonymPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
-    <span class="n">distinct</span><span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">subGraphBrainSynonymPageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
+    <span class="nv">distinct</span><span class="o">.</span><span class="py">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">7</span><span class="o">))</span>
 <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
 <span class="n">activity</span><span class="o">,</span><span class="mf">11.333038986522027</span>
 <span class="n">flexibility</span><span class="o">,</span><span class="mf">10.252780304836739</span>
@@ -766,39 +766,39 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 <h3>Topics based on Synonyms of Connections</h3>
 <p>The following function similar to the w2v2gConnectionCC function. It calculates  connected components of subgraph built on synonyms of edge connections.</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">w2v2gConnectionSynCC</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">w2v2gConnectionSynCC</span><span class="o">(</span><span class="n">graphVertices</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">,</span>
      <span class="n">connection</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">numSynonyms</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span>
   <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="k">val</span> <span class="n">graphEdgesSub</span><span class="k">=</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
-     <span class="n">join</span><span class="o">(</span><span class="n">w2v2gSynonyms</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">,</span><span class="n">connection</span><span class="o">,</span><span class="n">numSynonyms</span><span class="o">),</span><span class="ss">'edgeName=</span><span class="o">=='</span><span class="n">word2</span><span class="o">).</span>
-     <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span>
-     <span class="n">union</span><span class="o">(</span><span class="n">graphBrain</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'edgeName=</span><span class="o">==</span><span class="n">connection</span><span class="o">))</span>   
-  <span class="k">val</span> <span class="n">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
-  <span class="n">sc</span><span class="o">.</span><span class="n">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
+  <span class="k">val</span> <span class="nv">graphEdgesSub</span><span class="k">=</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span>
+     <span class="nf">join</span><span class="o">(</span><span class="nf">w2v2gSynonyms</span><span class="o">(</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">,</span><span class="n">connection</span><span class="o">,</span><span class="n">numSynonyms</span><span class="o">),</span><span class="ss">'edgeName</span><span class="o">===</span><span class="ss">'word2</span><span class="o">).</span>
+     <span class="nf">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span>
+     <span class="nf">union</span><span class="o">(</span><span class="nv">graphBrain</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'edgeName</span><span class="o">===</span><span class="n">connection</span><span class="o">))</span>   
+  <span class="k">val</span> <span class="nv">graphSub</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphVertices</span><span class="o">,</span> <span class="n">graphEdgesSub</span><span class="o">)</span>
+  <span class="nv">sc</span><span class="o">.</span><span class="py">setCheckpointDir</span><span class="o">(</span><span class="s">"/FileStore/"</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">resultCC</span> <span class="k">=</span> <span class="n">graphSub</span><span class="o">.</span>
      <span class="n">connectedComponents</span><span class="o">.</span>
-     <span class="n">run</span><span class="o">()</span>
-  <span class="k">val</span> <span class="n">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
-     <span class="n">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
+     <span class="nf">run</span><span class="o">()</span>
+  <span class="k">val</span> <span class="nv">resultCCcount</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span>
+     <span class="nf">groupBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">).</span>
      <span class="n">count</span><span class="o">.</span>
-     <span class="n">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
- <span class="k">val</span> <span class="n">sizeCC</span><span class="k">=</span><span class="n">resultCC</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component=</span><span class="o">=='</span><span class="n">cc</span><span class="o">).</span>
-     <span class="n">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="n">distinct</span>
- <span class="n">graphEdgesSub</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span>
-     <span class="n">union</span><span class="o">(</span><span class="n">graphEdgesSub</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">id</span><span class="o">)).</span>
-     <span class="n">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="n">distinct</span>
+     <span class="nf">toDF</span><span class="o">(</span><span class="s">"cc"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">)</span>
+ <span class="k">val</span> <span class="nv">sizeCC</span><span class="k">=</span><span class="nv">resultCC</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">resultCCcount</span><span class="o">,</span><span class="ss">'component</span><span class="o">===</span><span class="ss">'cc</span><span class="o">).</span>
+     <span class="nf">select</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">).</span><span class="py">distinct</span>
+ <span class="nv">graphEdgesSub</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'id</span><span class="o">).</span>
+     <span class="nf">union</span><span class="o">(</span><span class="nv">graphEdgesSub</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">sizeCC</span><span class="o">,</span><span class="ss">'dst</span><span class="o">===</span><span class="ss">'id</span><span class="o">)).</span>
+     <span class="nf">select</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"ccCt"</span><span class="o">,</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeName"</span><span class="o">,</span><span class="s">"edgeWeight"</span><span class="o">).</span><span class="py">distinct</span>
 <span class="o">}</span></code></pre></figure>
 
 
 <h4>
 <p>Topics based on 'Brain' synonyms:</p> </h4>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectionSynCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">7</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nv">Window</span><span class="o">.</span><span class="py">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="py">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result</span><span class="k">=</span><span class="nf">w2v2gConnectionSynCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">7</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result2</span> <span class="k">=</span> <span class="nv">result</span><span class="o">.</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="nf">rank</span><span class="o">().</span><span class="py">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">result2</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
    <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeName</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
    <span class="mi">8589934597</span><span class="o">,</span><span class="mi">8</span><span class="o">,</span><span class="n">science</span><span class="o">,</span><span class="n">explains</span><span class="o">,</span><span class="n">consciousness</span><span class="o">,</span><span class="mf">0.3798126607701545</span><span class="o">,</span><span class="mi">1</span>
    <span class="mi">8589934597</span><span class="o">,</span><span class="mi">8</span><span class="o">,</span><span class="n">behavior</span><span class="o">,</span><span class="n">anatomy</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mf">0.34740929480845656</span><span class="o">,</span><span class="mi">2</span>
@@ -846,12 +846,12 @@ In <i><a href="http://sparklingdataocean.com/2018/04/25/word2vec2graph1slide/">o
 
 <h4><p>Topics based on 'Insight' synonyms:</p></h4>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="n">desc</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result</span><span class="k">=</span><span class="n">w2v2gConnectionSynCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">7</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">result2</span> <span class="k">=</span> <span class="n">result</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="n">rank</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nv">Window</span><span class="o">.</span><span class="py">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"component"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeWeight"</span><span class="o">.</span><span class="py">desc</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result</span><span class="k">=</span><span class="nf">w2v2gConnectionSynCC</span><span class="o">(</span><span class="n">graphBrainVertices</span><span class="o">,</span><span class="n">graphBrainEdges</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">7</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">result2</span> <span class="k">=</span> <span class="nv">result</span><span class="o">.</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"rank"</span><span class="o">,</span> <span class="nf">rank</span><span class="o">().</span><span class="py">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">result2</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">result2</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"rank&lt;4"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="s">"ccCt&gt;3"</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="s">"ccCt&lt;30"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"component"</span><span class="o">,</span><span class="s">"rank"</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
    <span class="n">component</span><span class="o">,</span><span class="n">ccCt</span><span class="o">,</span><span class="n">src</span><span class="o">,</span><span class="n">dst</span><span class="o">,</span><span class="n">edgeName</span><span class="o">,</span><span class="n">edgeWeight</span><span class="o">,</span><span class="n">rank</span>
    <span class="mi">85899345930</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">fundamental</span><span class="o">,</span><span class="n">specifically</span><span class="o">,</span><span class="n">processes</span><span class="o">,</span><span class="mf">0.4803744056926936</span><span class="o">,</span><span class="mi">1</span>
    <span class="mi">85899345930</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="n">nature</span><span class="o">,</span><span class="n">fundamental</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="mf">0.4465274807724954</span><span class="o">,</span><span class="mi">2</span>

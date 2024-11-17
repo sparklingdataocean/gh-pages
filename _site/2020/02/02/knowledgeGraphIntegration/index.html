@@ -141,12 +141,12 @@ This knowledge graph allowed us to find different groups of artists, for example
 We will start data integration from the Artist Biography knowledge graph nodes and edges:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioNodes</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphNodesArtistBio"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">artistBioEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphEdgesArtistBio"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistBioNodes</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphNodesArtistBio"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">artistBioEdges</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphEdgesArtistBio"</span><span class="o">)</span></code></pre></figure>
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span><span class="n">artistBioNodes</span><span class="o">,</span> <span class="n">artistBioEdges</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span><span class="n">artistBioNodes</span><span class="o">,</span> <span class="n">artistBioEdges</span><span class="o">)</span></code></pre></figure>
 
 
 <a href="#">
@@ -156,8 +156,8 @@ We will start data integration from the Artist Biography knowledge graph nodes a
 This graph is artist name centric:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">bioArtistList</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span><span class="n">distinct</span>
-<span class="n">display</span><span class="o">(</span><span class="n">bioArtistList</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"src"</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">bioArtistList</span><span class="k">=</span><span class="nv">artistBioGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span><span class="py">distinct</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">bioArtistList</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"src"</span><span class="o">))</span>
 <span class="nc">Claude</span> <span class="nc">Monet</span>
 <span class="nc">Egon</span> <span class="nc">Schiele</span>
 <span class="nc">Franz</span> <span class="nc">Marc</span>
@@ -184,7 +184,7 @@ This graph is artist name centric:
 Edge types in the Artist Biography knowledge graph are the following:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">artistBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeId)</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">artistBioEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'edgeId</span><span class="o">))</span>
 <span class="nc">BeginDate</span>
 <span class="nc">EndDate</span>
 <span class="nc">Gender</span>
@@ -198,10 +198,10 @@ To define edge destination types we will show 3 examples of destinations for all
 <p></p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
-<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"dst"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">artistBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"rn"</span><span class="o">,</span><span class="n">row_number</span><span class="o">().</span><span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">)).</span>
-<span class="n">filter</span><span class="o">(</span><span class="s">"rn&lt;4"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'edgeId,'rn)</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nv">Window</span><span class="o">.</span><span class="py">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"edgeId"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="n">$</span><span class="s">"dst"</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">artistBioEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span>
+<span class="nf">withColumn</span><span class="o">(</span><span class="s">"rn"</span><span class="o">,</span><span class="nf">row_number</span><span class="o">().</span><span class="py">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">)).</span>
+<span class="nf">filter</span><span class="o">(</span><span class="s">"rn&lt;4"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'edgeId</span><span class="o">,</span><span class="ss">'rn</span><span class="o">))</span>
   <span class="mi">1839</span><span class="o">,</span><span class="nc">BeginDate</span><span class="o">,</span><span class="mi">1</span>
   <span class="mi">1840</span><span class="o">,</span><span class="nc">BeginDate</span><span class="o">,</span><span class="mi">2</span>
   <span class="mi">1848</span><span class="o">,</span><span class="nc">BeginDate</span><span class="o">,</span><span class="mi">3</span>
@@ -225,11 +225,11 @@ To define edge destination types we will show 3 examples of destinations for all
 Ontology graph edges:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioOntoEdged</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistBioOntoEdged</span><span class="k">=</span><span class="nv">sc</span><span class="o">.</span><span class="py">parallelize</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span>
   <span class="o">(</span><span class="s">"Year"</span><span class="o">,</span><span class="s">"BeginDate"</span><span class="o">),(</span><span class="s">"Year"</span><span class="o">,</span><span class="s">"EndDate"</span><span class="o">),</span>
   <span class="o">(</span><span class="s">"Gender"</span><span class="o">,</span><span class="s">"Gender"</span><span class="o">),(</span><span class="s">"Nationality"</span><span class="o">,</span><span class="s">"Nationality"</span><span class="o">),</span>
   <span class="o">(</span><span class="s">"Nationality"</span><span class="o">,</span><span class="s">"bornNationality"</span><span class="o">),(</span><span class="s">"Country"</span><span class="o">,</span><span class="s">"bornInCountry"</span><span class="o">))).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"ArtistName"</span><span class="o">))</span></code></pre></figure>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="s">"ArtistName"</span><span class="o">))</span></code></pre></figure>
 
 
 
@@ -237,16 +237,16 @@ Ontology graph edges:
 Ontology graph:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioOntoGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
-  <span class="n">artistBioOntoEdged</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">artistBioOntoEdged</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span>
-  <span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
-  <span class="n">artistBioOntoEdged</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistBioOntoGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="nv">artistBioOntoEdged</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="nv">artistBioOntoEdged</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span>
+  <span class="nv">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="nv">artistBioOntoEdged</span><span class="o">.</span><span class="py">distinct</span><span class="o">)</span></code></pre></figure>
 
 
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">artistBioOntoGraph</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">graph2dot</span><span class="o">(</span><span class="n">artistBioOntoGraph</span><span class="o">))</span>
 <span class="s">"Year"</span> <span class="o">-&gt;</span> <span class="s">"EndDate"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">ArtistName</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Nationality"</span> <span class="o">-&gt;</span> <span class="s">"Nationality"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">ArtistName</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Year"</span> <span class="o">-&gt;</span> <span class="s">"BeginDate"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">ArtistName</span><span class="err">"</span><span class="o">];</span>
@@ -296,7 +296,7 @@ MoMA website has a lot of interesting information about this exhibition. In part
 Connections between artist pairs:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairsDF</span><span class="k">=</span><span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistPairsDF</span><span class="k">=</span><span class="nv">sc</span><span class="o">.</span><span class="py">parallelize</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span>
   <span class="o">(</span><span class="s">"Vasily Kandinsky"</span><span class="o">,</span><span class="s">"Franz Marc"</span><span class="o">),</span>
   <span class="o">(</span><span class="s">"Vasily Kandinsky"</span><span class="o">,</span><span class="s">"Kazimir Malevich"</span><span class="o">),</span>
   <span class="o">(</span><span class="s">"Vasily Kandinsky"</span><span class="o">,</span><span class="s">"Natalia Goncharova"</span><span class="o">),</span>
@@ -305,33 +305,33 @@ Connections between artist pairs:
   <span class="o">(</span><span class="s">"Kazimir Malevich"</span><span class="o">,</span><span class="s">"Natalia Goncharova"</span><span class="o">),</span>
   <span class="o">(</span><span class="s">"Natalia Goncharova"</span><span class="o">,</span><span class="s">"Pablo Picasso"</span><span class="o">),</span>
   <span class="o">(</span><span class="s">"Paul Klee"</span><span class="o">,</span><span class="s">"Pablo Picasso"</span><span class="o">))).</span>
-<span class="n">toDF</span><span class="o">(</span><span class="s">"col1"</span><span class="o">,</span><span class="s">"col2"</span><span class="o">)</span></code></pre></figure>
+<span class="nf">toDF</span><span class="o">(</span><span class="s">"col1"</span><span class="o">,</span><span class="s">"col2"</span><span class="o">)</span></code></pre></figure>
 
 
 <p></p>
 Knowledge graph edges:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairEdges</span><span class="k">=</span><span class="n">artistPairsDF</span><span class="o">.</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">artistPairsDF</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"col2"</span><span class="o">,</span><span class="s">"col1"</span><span class="o">)).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span>
-  <span class="n">withColumn</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"relationship"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistPairEdges</span><span class="k">=</span><span class="n">artistPairsDF</span><span class="o">.</span>
+  <span class="nf">union</span><span class="o">(</span><span class="nv">artistPairsDF</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"col2"</span><span class="o">,</span><span class="s">"col1"</span><span class="o">)).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span>
+  <span class="nf">withColumn</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="s">"relationship"</span><span class="o">))</span></code></pre></figure>
 
 
 <p></p>
 Artist pairs knowledge graph:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
-  <span class="n">artistPairEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">artistPairEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
-  <span class="n">artistPairEdges</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistPairGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="nv">artistPairEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="nv">artistPairEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="nv">artistPairEdges</span><span class="o">.</span><span class="py">distinct</span><span class="o">)</span></code></pre></figure>
 
 
 <p></p>
 Artist pairs knowledge graph:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">artistPairGraph</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">graph2dot</span><span class="o">(</span><span class="n">artistPairGraph</span><span class="o">))</span>
 <span class="s">"Franz Marc"</span> <span class="o">-&gt;</span> <span class="s">"Vasily Kandinsky"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Natalia Goncharova"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Natalia Goncharova"</span> <span class="o">-&gt;</span> <span class="s">"Vasily Kandinsky"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
@@ -397,24 +397,24 @@ Overlap Artists Pairs nodes with Artist Biography nodes
 Add Artists Pairs edges to Artist Biography edges
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">unionArtistPairBioEdges</span><span class="k">=</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">unionArtistPairBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
-  <span class="n">unionArtistPairBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">unionArtistPairBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
-  <span class="n">unionArtistPairBioEdges</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">unionArtistPairBioEdges</span><span class="k">=</span><span class="nv">artistPairGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span>
+  <span class="nf">union</span><span class="o">(</span><span class="nv">artistBioGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">unionArtistPairBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="nv">unionArtistPairBioEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="nv">unionArtistPairBioEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="nv">unionArtistPairBioEdges</span><span class="o">.</span><span class="py">distinct</span><span class="o">)</span></code></pre></figure>
 
 
 Overlap Artists Pairs nodes with Artist Biography nodes
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">overlapArtistPairBioEdges</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">vertices</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span> <span class="o">||</span> <span class="ss">'dst=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="n">union</span><span class="o">(</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">overlapArtistPairBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
-  <span class="n">overlapArtistPairBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
-    <span class="n">union</span><span class="o">(</span><span class="n">overlapArtistPairBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
-  <span class="n">overlapArtistPairBioEdges</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span>   </code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">overlapArtistPairBioEdges</span><span class="k">=</span><span class="nv">artistBioGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span>
+  <span class="nf">join</span><span class="o">(</span><span class="nv">artistPairGraph</span><span class="o">.</span><span class="py">vertices</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'id</span> <span class="o">||</span> <span class="ss">'dst</span><span class="o">===</span><span class="ss">'id</span><span class="o">).</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeId"</span><span class="o">).</span><span class="py">union</span><span class="o">(</span><span class="nv">artistPairGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">overlapArtistPairBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="nv">overlapArtistPairBioEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+    <span class="nf">union</span><span class="o">(</span><span class="nv">overlapArtistPairBioEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="nv">overlapArtistPairBioEdges</span><span class="o">.</span><span class="py">distinct</span><span class="o">)</span>   </code></pre></figure>
 
 
 <a href="#">
@@ -429,7 +429,7 @@ Our next dataset is data about a timeline of the
 
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/aboutModerArt"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">sc</span><span class="o">.</span><span class="py">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/aboutModerArt"</span><span class="o">).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"charLine"</span><span class="o">))</span></code></pre></figure>
 
 <p></p>
 
@@ -489,11 +489,11 @@ To convert this data to DataFrame we will do the following:
 <p></p>
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
-<span class="k">val</span> <span class="n">data</span><span class="o">=(</span><span class="nc">Seq</span><span class="o">.</span><span class="n">range</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span><span class="mi">85</span><span class="o">)</span> <span class="n">zip</span>  
-  <span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/aboutModerArt"</span><span class="o">).</span><span class="n">collect</span><span class="o">).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"inx"</span><span class="o">,</span><span class="s">"charLine"</span><span class="o">).</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"rem"</span><span class="o">,</span><span class="n">col</span><span class="o">(</span><span class="s">"inx"</span><span class="o">)%</span><span class="mi">5</span><span class="o">).</span>
-  <span class="n">withColumn</span><span class="o">(</span><span class="s">"div"</span><span class="o">,</span><span class="n">floor</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"inx"</span><span class="o">)/</span><span class="mi">5</span><span class="o">))</span>
-<span class="n">display</span><span class="o">(</span><span class="n">data</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">data</span><span class="o">=(</span><span class="nv">Seq</span><span class="o">.</span><span class="py">range</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span><span class="mi">85</span><span class="o">)</span> <span class="n">zip</span>  
+  <span class="nv">sc</span><span class="o">.</span><span class="py">textFile</span><span class="o">(</span><span class="s">"/FileStore/tables/aboutModerArt"</span><span class="o">).</span><span class="py">collect</span><span class="o">).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"inx"</span><span class="o">,</span><span class="s">"charLine"</span><span class="o">).</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"rem"</span><span class="o">,</span><span class="nf">col</span><span class="o">(</span><span class="s">"inx"</span><span class="o">)%</span><span class="mi">5</span><span class="o">).</span>
+  <span class="nf">withColumn</span><span class="o">(</span><span class="s">"div"</span><span class="o">,</span><span class="nf">floor</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"inx"</span><span class="o">)/</span><span class="mi">5</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">data</span><span class="o">)</span>
 <span class="n">inx</span><span class="o">,</span><span class="n">charLine</span><span class="o">,</span><span class="n">rem</span><span class="o">,</span><span class="n">div</span>
 <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="mi">0</span>
 <span class="mi">1</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="mi">1</span><span class="o">,</span><span class="mi">0</span>
@@ -504,29 +504,29 @@ To convert this data to DataFrame we will do the following:
 Next we will combine data by art movements by self-joining the table several times:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">dataModernArt</span><span class="k">=</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">0</span><span class="o">).</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">1</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">2</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">3</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
-   <span class="n">join</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'rem=</span><span class="o">==</span><span class="mi">4</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
-   <span class="n">drop</span><span class="o">(</span><span class="s">"rem"</span><span class="o">,</span><span class="s">"inx"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"rownumber"</span><span class="o">,</span><span class="s">"time"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"summary"</span><span class="o">,</span><span class="s">"keyArtists"</span><span class="o">,</span><span class="s">"aboutArt"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">dataModernArt</span><span class="k">=</span><span class="nv">data</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'rem</span><span class="o">===</span><span class="mi">0</span><span class="o">).</span>
+   <span class="nf">join</span><span class="o">(</span><span class="nv">data</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'rem</span><span class="o">===</span><span class="mi">1</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
+   <span class="nf">join</span><span class="o">(</span><span class="nv">data</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'rem</span><span class="o">===</span><span class="mi">2</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
+   <span class="nf">join</span><span class="o">(</span><span class="nv">data</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'rem</span><span class="o">===</span><span class="mi">3</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
+   <span class="nf">join</span><span class="o">(</span><span class="nv">data</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'rem</span><span class="o">===</span><span class="mi">4</span><span class="o">),</span><span class="s">"div"</span><span class="o">).</span>
+   <span class="nf">drop</span><span class="o">(</span><span class="s">"rem"</span><span class="o">,</span><span class="s">"inx"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"rownumber"</span><span class="o">,</span><span class="s">"time"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"summary"</span><span class="o">,</span><span class="s">"keyArtists"</span><span class="o">,</span><span class="s">"aboutArt"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">dataModernArt</span><span class="o">)</span></code></pre></figure>
+<span class="nf">display</span><span class="o">(</span><span class="n">dataModernArt</span><span class="o">)</span></code></pre></figure>
 
 
 <p></p>
 Then we will split "keyArtists" column to Key Artist names:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">dataModernArtArtist</span><span class="k">=</span><span class="n">dataModernArt</span><span class="o">.</span><span class="n">drop</span><span class="o">(</span><span class="s">"summary"</span><span class="o">,</span><span class="s">"aboutArt"</span><span class="o">).</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"keyArtistList"</span><span class="o">,</span>
-   <span class="n">regexp_replace</span><span class="o">(</span><span class="n">regexp_replace</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"keyArtists"</span><span class="o">),</span><span class="s">"\\(.+?\\)"</span><span class="o">,</span><span class="s">""</span><span class="o">),</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">dataModernArtArtist</span><span class="k">=</span><span class="nv">dataModernArt</span><span class="o">.</span><span class="py">drop</span><span class="o">(</span><span class="s">"summary"</span><span class="o">,</span><span class="s">"aboutArt"</span><span class="o">).</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"keyArtistList"</span><span class="o">,</span>
+   <span class="nf">regexp_replace</span><span class="o">(</span><span class="nf">regexp_replace</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"keyArtists"</span><span class="o">),</span><span class="s">"\\(.+?\\)"</span><span class="o">,</span><span class="s">""</span><span class="o">),</span>
    <span class="s">"Key artists: "</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"keyArtistText"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">split</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"keyArtistList"</span><span class="o">),</span><span class="s">","</span><span class="o">))).</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">,</span><span class="n">trim</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"keyArtistText"</span><span class="o">)))</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"keyArtistText"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="nf">split</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"keyArtistList"</span><span class="o">),</span><span class="s">","</span><span class="o">))).</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">,</span><span class="nf">trim</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"keyArtistText"</span><span class="o">)))</span>
 
-   <span class="n">display</span><span class="o">(</span><span class="n">dataModernArtArtist</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"rownumber"</span><span class="o">,</span><span class="s">"time"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"keyArtist"</span><span class="o">))</span>
+   <span class="nf">display</span><span class="o">(</span><span class="nv">dataModernArtArtist</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"rownumber"</span><span class="o">,</span><span class="s">"time"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"keyArtist"</span><span class="o">))</span>
    <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Claude</span> <span class="nc">Monet</span>
    <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Pierre</span><span class="o">-</span><span class="nc">Auguste</span> <span class="nc">Renoir</span>
    <span class="mi">0</span><span class="o">,</span><span class="mi">1872</span> <span class="err">–</span> <span class="mi">1892</span><span class="o">,</span><span class="nc">Impressionism</span><span class="o">,</span><span class="nc">Camille</span> <span class="nc">Pissarro</span>
@@ -612,11 +612,11 @@ Then we will split "keyArtists" column to Key Artist names:
 From Modern Art Movements Key Artists we will take the list of artists from our Artist Biography knowledge graph:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtData</span> <span class="k">=</span> <span class="n">dataModernArtArtist</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"time"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"keyArtist"</span><span class="o">).</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">bioArtistList</span><span class="o">,</span><span class="ss">'keyArtist=</span><span class="o">=='</span><span class="n">src</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span><span class="n">distinct</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtData</span> <span class="k">=</span> <span class="n">dataModernArtArtist</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"time"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"keyArtist"</span><span class="o">).</span>
+  <span class="nf">join</span><span class="o">(</span><span class="n">bioArtistList</span><span class="o">,</span><span class="ss">'keyArtist</span><span class="o">===</span><span class="ss">'src</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span><span class="py">distinct</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">modernArtArtist</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">modernArtArtist</span><span class="o">)</span>
 <span class="n">time</span><span class="o">,</span><span class="n">artMovement</span><span class="o">,</span><span class="n">keyArtist</span>
 <span class="mi">1905</span> <span class="o">-</span> <span class="mi">1910</span><span class="o">,</span><span class="nc">Fauvism</span><span class="o">,</span><span class="nc">Henri</span> <span class="nc">Matisse</span>
 <span class="mi">1943</span> <span class="err">–</span> <span class="mi">1965</span><span class="o">,</span><span class="nc">Abstract</span> <span class="nc">Expressionism</span><span class="o">,</span><span class="nc">Jackson</span> <span class="nc">Pollock</span>
@@ -643,26 +643,26 @@ We will build Modern Art Movement knowledge graph based on ontology:
 Modern Art Movement knowledge graph edges:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtEdges</span><span class="k">=</span>
-  <span class="n">modernArtData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span>
-  <span class="n">withColumn</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"artMovement"</span><span class="o">)).</span><span class="n">union</span><span class="o">(</span>
-  <span class="n">modernArtData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"time"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span>
-  <span class="n">withColumn</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="s">"time"</span><span class="o">))).</span><span class="n">distinct</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtEdges</span><span class="k">=</span>
+  <span class="nv">modernArtData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">,</span><span class="s">"artMovement"</span><span class="o">).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span>
+  <span class="nf">withColumn</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="s">"artMovement"</span><span class="o">)).</span><span class="py">union</span><span class="o">(</span>
+  <span class="nv">modernArtData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"artMovement"</span><span class="o">,</span><span class="s">"time"</span><span class="o">).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span>
+  <span class="nf">withColumn</span><span class="o">(</span><span class="s">"edgeId"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="s">"time"</span><span class="o">))).</span><span class="py">distinct</span></code></pre></figure>
 
 
 <p></p>
 Modern Art Movement knowledge graph:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
-  <span class="n">modernArtEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">modernArtEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
-  <span class="n">modernArtEdges</span><span class="o">.</span><span class="n">distinct</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="nv">modernArtEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="nv">modernArtEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="nv">modernArtEdges</span><span class="o">.</span><span class="py">distinct</span><span class="o">)</span></code></pre></figure>
 
 
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">graph2dot</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">))</span>
 <span class="s">"Jackson Pollock"</span> <span class="o">-&gt;</span> <span class="s">"Abstract Expressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Fauvism"</span> <span class="o">-&gt;</span> <span class="s">"1905 - 1910"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Paul Cézanne"</span> <span class="o">-&gt;</span> <span class="s">"Post-Impressionism"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">artMovement</span><span class="err">"</span><span class="o">];</span>
@@ -704,15 +704,15 @@ Ontology of integrated graph:
 <p>To add artist pair relationship info to modern art movement info we will combine edges of Modern Art Movement and Artist Pairs knowledge graphs:
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtPairGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
-  <span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">).</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
-  <span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtPairGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="nv">artistPairGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">union</span><span class="o">(</span><span class="nv">modernArtGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">).</span><span class="py">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="nv">artistPairGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">union</span><span class="o">(</span><span class="nv">modernArtGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">).</span><span class="py">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+  <span class="nv">artistPairGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">union</span><span class="o">(</span><span class="nv">modernArtGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">)</span>
 <span class="o">)</span></code></pre></figure>
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">modernArtPairGraph</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">graph2dot</span><span class="o">(</span><span class="n">modernArtPairGraph</span><span class="o">))</span>
 <span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Franz Marc"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Vasily Kandinsky"</span> <span class="o">-&gt;</span> <span class="s">"Kazimir Malevich"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Paul Klee"</span> <span class="o">-&gt;</span> <span class="s">"Vasily Kandinsky"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">relationship</span><span class="err">"</span><span class="o">];</span>
@@ -759,8 +759,8 @@ Ontology of integrated graph:
 <p>From Artist Biography knowledge graph we will take information about nationalities and born countries of modern art key artists.
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtKeyArtists</span> <span class="k">=</span> <span class="n">modernArtData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">modernArtKeyArtists</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtKeyArtists</span> <span class="k">=</span> <span class="nv">modernArtData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">modernArtKeyArtists</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">))</span>
 <span class="nc">Claude</span> <span class="nc">Monet</span>
 <span class="nc">Georges</span> <span class="nc">Braque</span>
 <span class="nc">Henri</span> <span class="nc">Matisse</span>
@@ -779,19 +779,19 @@ Ontology of integrated graph:
 <p>Combine edges of Artist Biography knowledge graph and edges of Modern Art Movement knowledge graph and exclude edges related to genders and dates:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtBioEdges</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">modernArtKeyArtists</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">keyArtist</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="n">not</span><span class="o">(</span><span class="ss">'edgeId.</span><span class="n">isin</span><span class="o">(</span><span class="s">"EndDate"</span><span class="o">,</span><span class="s">"BeginDate"</span><span class="o">,</span><span class="s">"Gender"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtBioEdges</span><span class="k">=</span><span class="nv">artistBioGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span>
+  <span class="nf">join</span><span class="o">(</span><span class="n">modernArtKeyArtists</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'keyArtist</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="s">"keyArtist"</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="nv">modernArtGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="nf">not</span><span class="o">(</span><span class="ss">'edgeId</span><span class="o">.</span><span class="py">isin</span><span class="o">(</span><span class="s">"EndDate"</span><span class="o">,</span><span class="s">"BeginDate"</span><span class="o">,</span><span class="s">"Gender"</span><span class="o">)))</span></code></pre></figure>
 
 
 
 <p>Biographies of Modern Art Movement key artists:
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
-  <span class="n">modernArtBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">modernArtBioEdges</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtBioGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span>
+  <span class="nv">modernArtBioEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"src"</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="nv">modernArtBioEdges</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">)).</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">),</span>
   <span class="n">modernArtBioEdges</span><span class="o">)</span></code></pre></figure>
 
 
@@ -821,30 +821,30 @@ First from each graph we will get artist name list then calculate overlap of the
 <br />Artist names from Artist Biography knowledge graph: </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioNodes</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id1"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistBioNodes</span><span class="k">=</span><span class="nv">artistBioGraph</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id1"</span><span class="o">)</span></code></pre></figure>
 
 </p><p>
 
 Artist names from Artist Pairs knowledge graph: </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairNodes</span><span class="k">=</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id2"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistPairNodes</span><span class="k">=</span><span class="nv">artistPairGraph</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id2"</span><span class="o">)</span></code></pre></figure>
 
 </p><p>
 
 Artist names from Modern Art Movement knowledge graph: </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtNodes</span><span class="k">=</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">distinct</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id3"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtNodes</span><span class="k">=</span><span class="nv">modernArtGraph</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span><span class="py">distinct</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id3"</span><span class="o">)</span></code></pre></figure>
 
 </p><p>
 
 There are only three artist names that are in each of three knowledge graphs: </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistNodes</span><span class="k">=</span><span class="n">artistBioNodes</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">artistPairNodes</span><span class="o">,</span><span class="ss">'id1=</span><span class="o">=='</span><span class="n">id2</span><span class="o">).</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">modernArtNodes</span><span class="o">,</span><span class="ss">'id2=</span><span class="o">=='</span><span class="n">id3</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"id2"</span><span class="o">,</span><span class="s">"id3"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistNodes</span><span class="k">=</span><span class="nv">artistBioNodes</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">artistPairNodes</span><span class="o">,</span><span class="ss">'id1</span><span class="o">===</span><span class="ss">'id2</span><span class="o">).</span>
+  <span class="nf">join</span><span class="o">(</span><span class="n">modernArtNodes</span><span class="o">,</span><span class="ss">'id2</span><span class="o">===</span><span class="ss">'id3</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="s">"id2"</span><span class="o">,</span><span class="s">"id3"</span><span class="o">).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">)</span>
 <span class="nc">Pablo</span> <span class="nc">Picasso</span>
 <span class="nc">Kazimir</span> <span class="nc">Malevich</span>
 <span class="nc">Natalia</span> <span class="nc">Goncharova</span></code></pre></figure>
@@ -857,32 +857,32 @@ Next, we need to get edges from knowledge graphs related to overlapping artists.
 
 <br />As Artist Biography knowledge graph is artist name centric, to get combined graph edges we will filter them by edge 'src': </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistBioEdges</span><span class="k">=</span><span class="n">artistBioGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistBioEdges</span><span class="k">=</span><span class="nv">artistBioGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span>
+  <span class="nf">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'id</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span></code></pre></figure>
 
 </p><p>
 
 <p>
 To get edges from Artist Pairs knowledge graph we need to filter them by both edge parameters - 'src' and edge 'dst': </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairEdges</span><span class="k">=</span><span class="n">artistPairGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id1</span><span class="o">).</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id2"</span><span class="o">),</span><span class="ss">'dst=</span><span class="o">=='</span><span class="n">id2</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"id1"</span><span class="o">,</span><span class="s">"id2"</span><span class="o">).</span><span class="n">distinct</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistPairEdges</span><span class="k">=</span><span class="nv">artistPairGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'id1</span><span class="o">).</span>
+  <span class="nf">join</span><span class="o">(</span><span class="nv">artistNodes</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id2"</span><span class="o">),</span><span class="ss">'dst</span><span class="o">===</span><span class="ss">'id2</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="s">"id1"</span><span class="o">,</span><span class="s">"id2"</span><span class="o">).</span><span class="py">distinct</span></code></pre></figure>
 
 </p><p>
 
 <p>
 Modern Art Movement knowledge graph has two types of edges: Artist -&gt; Modern Art Movement and Modern Art Movement -&gt; time period. {Artist, Modern Art Movement} edges :</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtEdges1</span><span class="k">=</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span>
-  <span class="n">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">id1</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"id1"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtEdges1</span><span class="k">=</span><span class="nv">modernArtGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span>
+  <span class="nf">join</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'id1</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="s">"id1"</span><span class="o">)</span></code></pre></figure>
 
 </p><p>
 
 <p>
 {Modern Art Movement, time period} edges: </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">modernArtEdges2</span><span class="k">=</span><span class="n">modernArtGraph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">join</span><span class="o">(</span><span class="n">modernArtEdges1</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"dst1"</span><span class="o">),</span><span class="ss">'src=</span><span class="o">=='</span><span class="n">dst1</span><span class="o">).</span><span class="n">drop</span><span class="o">(</span><span class="s">"dst1"</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">modernArtEdges2</span><span class="k">=</span><span class="nv">modernArtGraph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">join</span><span class="o">(</span><span class="n">modernArtEdges1</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"dst"</span><span class="o">).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"dst1"</span><span class="o">),</span><span class="ss">'src</span><span class="o">===</span><span class="ss">'dst1</span><span class="o">).</span><span class="py">drop</span><span class="o">(</span><span class="s">"dst1"</span><span class="o">)</span></code></pre></figure>
 
 </p><p>
 
@@ -890,10 +890,10 @@ Modern Art Movement knowledge graph has two types of edges: Artist -&gt; Modern 
 Edges of combined graph:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistEdges</span><span class="k">=</span><span class="n">artistBioEdges</span><span class="o">.</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">artistPairEdges</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">modernArtEdges1</span><span class="o">).</span>
-  <span class="n">union</span><span class="o">(</span><span class="n">modernArtEdges2</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistEdges</span><span class="k">=</span><span class="n">artistBioEdges</span><span class="o">.</span>
+  <span class="nf">union</span><span class="o">(</span><span class="n">artistPairEdges</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="n">modernArtEdges1</span><span class="o">).</span>
+  <span class="nf">union</span><span class="o">(</span><span class="n">modernArtEdges2</span><span class="o">)</span></code></pre></figure>
 
 
 
@@ -901,8 +901,8 @@ Edges of combined graph:
 Build a combine graph:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="n">artistEdges</span><span class="o">)</span>
-<span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">artistGraph</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistGraph</span><span class="k">=</span><span class="nc">GraphFrame</span><span class="o">(</span><span class="n">artistNodes</span><span class="o">,</span><span class="n">artistEdges</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="nf">graph2dot</span><span class="o">(</span><span class="n">artistGraph</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span>
 <span class="s">"Cubism"</span> <span class="o">-&gt;</span> <span class="s">"1907 – 1922"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Futurism"</span> <span class="o">-&gt;</span> <span class="s">"1909 – late 1920s"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">time</span><span class="err">"</span><span class="o">];</span>
 <span class="s">"Kazimir Malevich"</span> <span class="o">-&gt;</span> <span class="s">"1878"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"</span><span class="kt">BeginDate</span><span class="err">"</span><span class="o">];</span>

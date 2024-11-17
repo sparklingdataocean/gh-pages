@@ -134,22 +134,22 @@ Data preparation process for Word2Vec2Graph model in described in several post a
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
-<span class="k">val</span> <span class="n">graphInsightVertices</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphInsightVertices"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">graphInsightEdges</span> <span class="k">=</span> <span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="o">(</span><span class="s">"graphInsightEdges"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphInsightVertices</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphInsightVertices"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">graphInsightEdges</span> <span class="k">=</span> <span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">parquet</span><span class="o">(</span><span class="s">"graphInsightEdges"</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">graphInsight</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span> <span class="n">graphInsightEdges</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">graphInsight</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span> <span class="n">graphInsightEdges</span><span class="o">)</span></code></pre></figure>
 
 
 
 <p><h3>Page Rank</h3>
 <p>The highest Page Rank words about Creativity and Aha Moments:</p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphInsightPageRank</span> <span class="k">=</span> <span class="n">graphInsight</span><span class="o">.</span>
-   <span class="n">pageRank</span><span class="o">.</span><span class="n">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="n">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="n">run</span><span class="o">()</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphInsightPageRank</span> <span class="k">=</span> <span class="n">graphInsight</span><span class="o">.</span>
+   <span class="nv">pageRank</span><span class="o">.</span><span class="py">resetProbability</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="py">maxIter</span><span class="o">(</span><span class="mi">11</span><span class="o">).</span><span class="py">run</span><span class="o">()</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">graphInsightPageRank</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">graphInsightPageRank</span><span class="o">.</span><span class="py">vertices</span><span class="o">.</span>
    <span class="n">distinct</span><span class="o">.</span>
-   <span class="n">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="n">desc</span><span class="o">).</span><span class="n">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
+   <span class="nf">sort</span><span class="o">(</span><span class="n">$</span><span class="s">"pagerank"</span><span class="o">.</span><span class="py">desc</span><span class="o">).</span><span class="py">limit</span><span class="o">(</span><span class="mi">12</span><span class="o">))</span>
    <span class="n">id</span><span class="o">,</span><span class="n">pagerank</span>
    <span class="n">creative</span><span class="o">,</span><span class="mf">36.427592633298694</span>
    <span class="n">brain</span><span class="o">,</span><span class="mf">35.64966777994186</span>
@@ -178,14 +178,14 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
-   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
+   <span class="nf">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="n">orderBy</span><span class="o">((</span><span class="ss">'ab+'bc)</span><span class="o">.</span><span class="n">desc</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">path</span><span class="o">.</span><span class="py">orderBy</span><span class="o">((</span><span class="ss">'ab</span><span class="o">+</span><span class="ss">'bc</span><span class="o">).</span><span class="py">desc</span><span class="o">))</span>
 <span class="n">a</span><span class="o">,</span><span class="n">ab</span><span class="o">,</span><span class="n">b</span><span class="o">,</span><span class="n">bc</span><span class="o">,</span><span class="n">c</span>
 <span class="n">insight</span><span class="o">,</span><span class="mf">0.4128722197714052</span><span class="o">,</span><span class="n">invasive</span><span class="o">,</span><span class="mf">0.5830608090075667</span><span class="o">,</span><span class="n">brain</span>
 <span class="n">insight</span><span class="o">,</span><span class="mf">0.5926405065153766</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.35538729273722036</span><span class="o">,</span><span class="n">brain</span>
@@ -206,14 +206,14 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 
 </p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
-   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
+   <span class="nf">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="n">orderBy</span><span class="o">((</span><span class="ss">'ab+'bc)</span><span class="o">.</span><span class="n">desc</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">path</span><span class="o">.</span><span class="py">orderBy</span><span class="o">((</span><span class="ss">'ab</span><span class="o">+</span><span class="ss">'bc</span><span class="o">).</span><span class="py">desc</span><span class="o">))</span>
 <span class="n">a</span><span class="o">,</span><span class="n">ab</span><span class="o">,</span><span class="n">b</span><span class="o">,</span><span class="n">bc</span><span class="o">,</span><span class="n">c</span>
 <span class="n">brain</span><span class="o">,</span><span class="mf">0.4486765246697501</span><span class="o">,</span><span class="n">conscious</span><span class="o">,</span><span class="mf">0.22780425594285608</span><span class="o">,</span><span class="n">insight</span>
 <span class="n">brain</span><span class="o">,</span><span class="mf">0.30888238508458593</span><span class="o">,</span><span class="n">activity</span><span class="o">,</span><span class="mf">0.2913329808544577</span><span class="o">,</span><span class="n">insight</span>
@@ -225,14 +225,14 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>'insight' -&gt; 'word1' -&gt; 'word2' -&gt; 'brain' (142  lines):
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
-   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c); (c) - [cd] -&gt; (d)"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"d.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">,</span><span class="s">"cd.edgeWeight"</span><span class="o">,</span><span class="s">"d.id"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">,</span><span class="s">"cd"</span><span class="o">,</span><span class="s">"d"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
+   <span class="nf">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c); (c) - [cd] -&gt; (d)"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"d.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">,</span><span class="s">"cd.edgeWeight"</span><span class="o">,</span><span class="s">"d.id"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">,</span><span class="s">"cd"</span><span class="o">,</span><span class="s">"d"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="n">orderBy</span><span class="o">((</span><span class="ss">'ab+'bc+'cd)</span><span class="o">.</span><span class="n">desc</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">path</span><span class="o">.</span><span class="py">orderBy</span><span class="o">((</span><span class="ss">'ab</span><span class="o">+</span><span class="ss">'bc</span><span class="o">+</span><span class="ss">'cd</span><span class="o">).</span><span class="py">desc</span><span class="o">))</span>
 <span class="n">a</span><span class="o">,</span><span class="n">ab</span><span class="o">,</span><span class="n">b</span><span class="o">,</span><span class="n">bc</span><span class="o">,</span><span class="n">c</span><span class="o">,</span><span class="n">cd</span><span class="o">,</span><span class="n">d</span>
 <span class="n">insight</span><span class="o">,</span><span class="mf">0.28168782668396153</span><span class="o">,</span><span class="n">brain</span><span class="o">,</span><span class="mf">0.7644093868324334</span><span class="o">,</span><span class="n">cells</span><span class="o">,</span><span class="mf">0.7644093868324334</span><span class="o">,</span><span class="n">brain</span>
 <span class="n">insight</span><span class="o">,</span><span class="mf">0.5873913431733343</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="mf">0.72979093470829</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.35538729273722036</span><span class="o">,</span><span class="n">brain</span>
@@ -248,14 +248,14 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>'brain' -&gt; 'word1' -&gt; 'word2' -&gt; 'insight' (105 lines):</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
-   <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c); (c) - [cd] -&gt; (d)"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
-   <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"d.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
-   <span class="n">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">,</span><span class="s">"cd.edgeWeight"</span><span class="o">,</span><span class="s">"d.id"</span><span class="o">).</span>
-   <span class="n">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">,</span><span class="s">"cd"</span><span class="o">,</span><span class="s">"d"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">path</span><span class="k">=</span><span class="n">graphInsight</span><span class="o">.</span>
+   <span class="nf">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c); (c) - [cd] -&gt; (d)"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">===</span><span class="s">"brain"</span><span class="o">).</span>
+   <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"d.id"</span><span class="o">===</span><span class="s">"insight"</span><span class="o">).</span>
+   <span class="nf">select</span><span class="o">(</span><span class="s">"a.id"</span><span class="o">,</span><span class="s">"ab.edgeWeight"</span><span class="o">,</span><span class="s">"b.id"</span><span class="o">,</span><span class="s">"bc.edgeWeight"</span><span class="o">,</span><span class="s">"c.id"</span><span class="o">,</span><span class="s">"cd.edgeWeight"</span><span class="o">,</span><span class="s">"d.id"</span><span class="o">).</span>
+   <span class="nf">toDF</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"ab"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"bc"</span><span class="o">,</span><span class="s">"c"</span><span class="o">,</span><span class="s">"cd"</span><span class="o">,</span><span class="s">"d"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="n">orderBy</span><span class="o">((</span><span class="ss">'ab+'bc+'cd)</span><span class="o">.</span><span class="n">desc</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">path</span><span class="o">.</span><span class="py">orderBy</span><span class="o">((</span><span class="ss">'ab</span><span class="o">+</span><span class="ss">'bc</span><span class="o">+</span><span class="ss">'cd</span><span class="o">).</span><span class="py">desc</span><span class="o">))</span>
 <span class="n">brain</span><span class="o">,</span><span class="mf">0.627845334314687</span><span class="o">,</span><span class="n">memory</span><span class="o">,</span><span class="mf">0.5969736849364111</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.5926405065153766</span><span class="o">,</span><span class="n">insight</span>
 <span class="n">brain</span><span class="o">,</span><span class="mf">0.5818230817465604</span><span class="o">,</span><span class="n">function</span><span class="o">,</span><span class="mf">0.6050462263809657</span><span class="o">,</span><span class="n">creativity</span><span class="o">,</span><span class="mf">0.5873913431733343</span><span class="o">,</span><span class="n">insight</span>
 <span class="n">brain</span><span class="o">,</span><span class="mf">0.522079405363812</span><span class="o">,</span><span class="n">abilities</span><span class="o">,</span><span class="mf">0.6439093697793404</span><span class="o">,</span><span class="n">creative</span><span class="o">,</span><span class="mf">0.5926405065153766</span><span class="o">,</span><span class="n">insight</span>
@@ -274,8 +274,8 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>We will build a graph with lower cosine similarity.
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphInsightLow</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span>
-     <span class="n">graphInsightEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="s">"edgeWeight&lt;0.33"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphInsightLow</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphInsightVertices</span><span class="o">,</span>
+     <span class="nv">graphInsightEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="s">"edgeWeight&lt;0.33"</span><span class="o">))</span></code></pre></figure>
 
 
 <p><h3>Path String for 'Find' Function</h3>
@@ -283,38 +283,38 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
-<span class="k">def</span> <span class="n">formLine</span><span class="o">(</span><span class="n">steps</span><span class="k">:</span><span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+<span class="k">def</span> <span class="nf">formLine</span><span class="o">(</span><span class="n">steps</span><span class="k">:</span><span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
    <span class="k">var</span> <span class="n">line</span><span class="k">=new</span> <span class="nc">String</span>
-   <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">line</span><span class="o">+=</span><span class="s">"(x"</span><span class="o">+</span><span class="n">lit</span><span class="o">(</span><span class="n">i</span><span class="o">)+</span><span class="s">")-[]-&gt;(x"</span><span class="o">+</span><span class="n">lit</span><span class="o">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">)+</span><span class="s">");"</span>
-   <span class="n">line</span><span class="o">.</span><span class="n">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="n">line</span><span class="o">.</span><span class="n">length</span><span class="o">()</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
+   <span class="nf">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">line</span><span class="o">+=</span><span class="s">"(x"</span><span class="o">+</span><span class="nf">lit</span><span class="o">(</span><span class="n">i</span><span class="o">)+</span><span class="s">")-[]-&gt;(x"</span><span class="o">+</span><span class="nf">lit</span><span class="o">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">)+</span><span class="s">");"</span>
+   <span class="nv">line</span><span class="o">.</span><span class="py">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="nv">line</span><span class="o">.</span><span class="py">length</span><span class="o">()</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
 <span class="o">}</span></code></pre></figure>
 
 
 <p>Path line examples:</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">formLine</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">formLine</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
 <span class="o">(</span><span class="n">x1</span><span class="o">)-[]-&gt;(</span><span class="n">x2</span><span class="o">);(</span><span class="n">x2</span><span class="o">)-[]-&gt;(</span><span class="n">x3</span><span class="o">)</span>
 
-<span class="n">formLine</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
+<span class="nf">formLine</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
 <span class="o">(</span><span class="n">x1</span><span class="o">)-[]-&gt;(</span><span class="n">x2</span><span class="o">);(</span><span class="n">x2</span><span class="o">)-[]-&gt;(</span><span class="n">x3</span><span class="o">);(</span><span class="n">x3</span><span class="o">)-[]-&gt;(</span><span class="n">x4</span><span class="o">)</span>
 
-<span class="n">formLine</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>
+<span class="nf">formLine</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>
 <span class="o">(</span><span class="n">x1</span><span class="o">)-[]-&gt;(</span><span class="n">x2</span><span class="o">);(</span><span class="n">x2</span><span class="o">)-[]-&gt;(</span><span class="n">x3</span><span class="o">);(</span><span class="n">x3</span><span class="o">)-[]-&gt;(</span><span class="n">x4</span><span class="o">);(</span><span class="n">x4</span><span class="o">)-[]-&gt;(</span><span class="n">x5</span><span class="o">)</span></code></pre></figure>
 
 
 <p>'Find' result examples:
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsightLow</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="n">formLine</span><span class="o">(</span><span class="mi">3</span><span class="o">))</span>
-<span class="n">display</span><span class="o">(</span><span class="n">path</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">path</span><span class="k">=</span><span class="nv">graphInsightLow</span><span class="o">.</span><span class="py">find</span><span class="o">(</span><span class="nf">formLine</span><span class="o">(</span><span class="mi">3</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">path</span><span class="o">)</span>
 <span class="n">x1</span><span class="o">,</span><span class="n">x2</span><span class="o">,</span><span class="n">x3</span>
 <span class="s">"{""id"":""answers""}"</span><span class="o">,</span><span class="s">"{""id"":""abandon""}"</span><span class="o">,</span><span class="s">"{""id"":""ideas""}"</span>
 <span class="s">"{""id"":""according""}"</span><span class="o">,</span><span class="s">"{""id"":""internal""}"</span><span class="o">,</span><span class="s">"{""id"":""goals""}"</span>
 <span class="s">"{""id"":""apparent""}"</span><span class="o">,</span><span class="s">"{""id"":""effort""}"</span><span class="o">,</span><span class="s">"{""id"":""takes""}"</span>
 <span class="s">"{""id"":""apparent""}"</span><span class="o">,</span><span class="s">"{""id"":""effort""}"</span><span class="o">,</span><span class="s">"{""id"":""achievement""}"</span>
 
-<span class="n">path</span><span class="o">.</span><span class="n">printSchema</span>
+<span class="nv">path</span><span class="o">.</span><span class="py">printSchema</span>
 <span class="n">root</span>
  <span class="o">|--</span> <span class="n">x1</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
  <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span>
@@ -323,7 +323,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
  <span class="o">|--</span> <span class="n">x3</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
  <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span>
 
-<span class="k">val</span> <span class="n">path</span><span class="k">=</span><span class="n">graphInsightLow</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="n">formLine</span><span class="o">(</span><span class="mi">4</span><span class="o">))</span>
+<span class="k">val</span> <span class="nv">path</span><span class="k">=</span><span class="nv">graphInsightLow</span><span class="o">.</span><span class="py">find</span><span class="o">(</span><span class="nf">formLine</span><span class="o">(</span><span class="mi">4</span><span class="o">))</span>
 <span class="n">x1</span><span class="o">,</span><span class="n">x2</span><span class="o">,</span><span class="n">x3</span><span class="o">,</span><span class="n">x4</span>
 <span class="s">"{""id"":""according""}"</span><span class="o">,</span><span class="s">"{""id"":""internal""}"</span><span class="o">,</span><span class="s">"{""id"":""goals""}"</span><span class="o">,</span><span class="s">"{""id"":""chapter""}"</span>
 <span class="s">"{""id"":""association""}"</span><span class="o">,</span><span class="s">"{""id"":""brain""}"</span><span class="o">,</span><span class="s">"{""id"":""require""}"</span><span class="o">,</span><span class="s">"{""id"":""spreading""}"</span>
@@ -331,7 +331,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <span class="s">"{""id"":""according""}"</span><span class="o">,</span><span class="s">"{""id"":""internal""}"</span><span class="o">,</span><span class="s">"{""id"":""goals""}"</span><span class="o">,</span><span class="s">"{""id"":""competitiveness""}"</span>
 <span class="s">"{""id"":""according""}"</span><span class="o">,</span><span class="s">"{""id"":""internal""}"</span><span class="o">,</span><span class="s">"{""id"":""goals""}"</span><span class="o">,</span><span class="s">"{""id"":""everyone""}"</span>
 
-<span class="n">path</span><span class="o">.</span><span class="n">printSchema</span>
+<span class="nv">path</span><span class="o">.</span><span class="py">printSchema</span>
 <span class="n">root</span>
  <span class="o">|--</span> <span class="n">x1</span><span class="k">:</span> <span class="kt">struct</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">false</span><span class="o">)</span>
  <span class="o">|</span>    <span class="o">|--</span> <span class="n">id</span><span class="k">:</span> <span class="kt">string</span> <span class="o">(</span><span class="kt">nullable</span> <span class="o">=</span> <span class="kt">true</span><span class="o">)</span>
@@ -346,12 +346,12 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>To change the structure of path first we will get a string of words:  </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path1</span><span class="k">=</span><span class="n">graphInsightLow</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="n">formLine</span><span class="o">(</span><span class="mi">4</span><span class="o">))</span>
-<span class="k">val</span> <span class="n">path2</span><span class="k">=</span><span class="n">path1</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">toString</span><span class="o">)).</span>
-  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">replaceAll</span><span class="o">(</span><span class="s">"\\["</span><span class="o">,</span><span class="s">""</span><span class="o">))).</span>
-  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">replaceAll</span><span class="o">(</span><span class="s">"\\]"</span><span class="o">,</span><span class="s">""</span><span class="o">)))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">path1</span><span class="k">=</span><span class="nv">graphInsightLow</span><span class="o">.</span><span class="py">find</span><span class="o">(</span><span class="nf">formLine</span><span class="o">(</span><span class="mi">4</span><span class="o">))</span>
+<span class="k">val</span> <span class="nv">path2</span><span class="k">=</span><span class="nv">path1</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">toString</span><span class="o">)).</span>
+  <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">replaceAll</span><span class="o">(</span><span class="s">"\\["</span><span class="o">,</span><span class="s">""</span><span class="o">))).</span>
+  <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">replaceAll</span><span class="o">(</span><span class="s">"\\]"</span><span class="o">,</span><span class="s">""</span><span class="o">)))</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">path2</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">path2</span><span class="o">)</span>
 <span class="n">value</span>
 <span class="s">"according,internal,goals,competitiveness"</span>
 <span class="s">"adult,returns,child,interest"</span>
@@ -361,8 +361,8 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Next we will transform a string of words to array of words: </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">path3</span><span class="k">=</span><span class="n">path2</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">","</span><span class="o">))).</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">toArray</span><span class="o">))</span>
-<span class="n">display</span><span class="o">(</span><span class="n">path3</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">path3</span><span class="k">=</span><span class="nv">path2</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">","</span><span class="o">))).</span><span class="py">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">toArray</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">path3</span><span class="o">)</span>
 <span class="n">value</span>
 <span class="s">"[""according"",""internal"",""goals"",""competitiveness""]"</span>
 <span class="s">"[""adult"",""returns"",""child"",""interest""]"</span>
@@ -373,13 +373,13 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Now we can specify words for beginning and end of the path. </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">word1</span><span class="o">=</span><span class="s">"insight"</span>
-<span class="k">val</span> <span class="n">word2</span><span class="o">=</span><span class="s">"brain"</span>
-<span class="k">val</span> <span class="n">steps</span><span class="k">=</span><span class="mi">4</span>
-<span class="k">val</span> <span class="n">path4</span><span class="k">=</span><span class="n">path3</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">==</span><span class="n">word1</span><span class="o">)).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">==</span><span class="n">word2</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">word1</span><span class="o">=</span><span class="s">"insight"</span>
+<span class="k">val</span> <span class="nv">word2</span><span class="o">=</span><span class="s">"brain"</span>
+<span class="k">val</span> <span class="nv">steps</span><span class="k">=</span><span class="mi">4</span>
+<span class="k">val</span> <span class="nv">path4</span><span class="k">=</span><span class="nv">path3</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">==</span><span class="n">word1</span><span class="o">)).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span><span class="o">==</span><span class="n">word2</span><span class="o">))</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">path4</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">path4</span><span class="o">)</span>
 <span class="n">value</span>
 <span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span>
 <span class="s">"[""insight"",""requires"",""different"",""brain""]"</span>
@@ -404,10 +404,10 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.functions.explode</span>
-<span class="k">val</span> <span class="n">path5</span><span class="k">=</span><span class="n">path4</span><span class="o">.</span><span class="n">rdd</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span>
-  <span class="n">withColumn</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"words"</span><span class="o">)).</span><span class="n">distinct</span>
+<span class="k">val</span> <span class="nv">path5</span><span class="k">=</span><span class="nv">path4</span><span class="o">.</span><span class="py">rdd</span><span class="o">.</span><span class="py">zipWithIndex</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span>
+  <span class="nf">withColumn</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"words"</span><span class="o">)).</span><span class="py">distinct</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">path5</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"id"</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">path5</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"id"</span><span class="o">))</span>
 <span class="n">words</span><span class="o">,</span><span class="n">id</span><span class="o">,</span><span class="n">word</span>
 <span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">prefrontal</span>
 <span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">insight</span>
@@ -426,11 +426,11 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.expressions.Window</span>
-<span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"id"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">path6</span> <span class="k">=</span> <span class="n">path5</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"wordCount"</span><span class="o">,</span> <span class="n">count</span><span class="o">(</span><span class="n">$</span><span class="s">"word"</span><span class="o">).</span>
-  <span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+<span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nv">Window</span><span class="o">.</span><span class="py">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"id"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">path6</span> <span class="k">=</span> <span class="nv">path5</span><span class="o">.</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"wordCount"</span><span class="o">,</span> <span class="nf">count</span><span class="o">(</span><span class="n">$</span><span class="s">"word"</span><span class="o">).</span>
+  <span class="nf">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">path6</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">path6</span><span class="o">)</span>
 <span class="n">words</span><span class="o">,</span><span class="n">id</span><span class="o">,</span><span class="n">word</span>
 <span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">activity</span><span class="o">,</span><span class="mi">4</span>
 <span class="s">"[""insight"",""prefrontal"",""activity"",""brain""]"</span><span class="o">,</span><span class="mi">0</span><span class="o">,</span><span class="n">prefrontal</span><span class="o">,</span><span class="mi">4</span>
@@ -448,11 +448,11 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>To exclude line with word duplicates we will filter out lines with count of words smaller then  'steps' - the number of words parameter. If we are calculating circles (like 'brain' -&gt; * -&gt; 'brain' ) we will filter out lines with count of words smaller then 'steps-1': </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">result</span><span class="k">=</span>  
-<span class="k">if</span> <span class="o">(</span><span class="n">word1</span><span class="o">!=</span><span class="n">word2</span><span class="o">)</span><span class="n">path6</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'wordCount=</span><span class="o">==</span><span class="n">steps</span><span class="o">).</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="n">distinct</span>
-<span class="k">else</span> <span class="n">path6</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'wordCount=</span><span class="o">==</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="n">distinct</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">result</span><span class="k">=</span>  
+<span class="nf">if</span> <span class="o">(</span><span class="n">word1</span><span class="o">!=</span><span class="n">word2</span><span class="o">)</span><span class="nv">path6</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'wordCount</span><span class="o">===</span><span class="n">steps</span><span class="o">).</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="py">distinct</span>
+<span class="k">else</span> <span class="nv">path6</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'wordCount</span><span class="o">===</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="py">distinct</span></code></pre></figure>
 
 
 <p><h3>Function to Find Word Lines</h3>
@@ -460,29 +460,29 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">org.apache.spark.sql.DataFrame</span>
-<span class="k">def</span> <span class="n">findForm</span><span class="o">(</span><span class="n">graph</span><span class="k">:</span> <span class="kt">GraphFrame</span><span class="o">,</span> <span class="n">word1</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+<span class="k">def</span> <span class="nf">findForm</span><span class="o">(</span><span class="n">graph</span><span class="k">:</span> <span class="kt">GraphFrame</span><span class="o">,</span> <span class="n">word1</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
     <span class="n">word2</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">steps</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">={</span>
-  <span class="k">val</span> <span class="n">path1</span><span class="k">=</span><span class="n">graph</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="n">formLine</span><span class="o">(</span><span class="n">steps</span><span class="o">))</span>
-  <span class="k">val</span> <span class="n">path2</span><span class="k">=</span><span class="n">path1</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">toString</span><span class="o">)).</span>
-    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">replaceAll</span><span class="o">(</span><span class="s">"\\["</span><span class="o">,</span><span class="s">""</span><span class="o">))).</span>
-    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">replaceAll</span><span class="o">(</span><span class="s">"\\]"</span><span class="o">,</span><span class="s">""</span><span class="o">)))</span>
-  <span class="k">val</span> <span class="n">path3</span><span class="k">=</span><span class="n">path2</span><span class="o">.</span>
-    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">","</span><span class="o">))).</span>
-    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">.</span><span class="n">toArray</span><span class="o">))</span>
-  <span class="k">val</span> <span class="n">path4</span><span class="k">=</span><span class="n">path3</span><span class="o">.</span>
-    <span class="n">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">==</span><span class="n">word1</span><span class="o">)).</span>
-    <span class="n">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">==</span><span class="n">word2</span><span class="o">))</span>
-  <span class="k">val</span> <span class="n">path5</span><span class="k">=</span><span class="n">path4</span><span class="o">.</span><span class="n">rdd</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="o">.</span>
-    <span class="n">toDF</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span>
-    <span class="n">withColumn</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"words"</span><span class="o">)).</span><span class="n">distinct</span>
-  <span class="k">val</span> <span class="n">partitionWindow</span> <span class="k">=</span> <span class="nc">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"id"</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">path6</span> <span class="k">=</span> <span class="n">path5</span><span class="o">.</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"wordCount"</span><span class="o">,</span><span class="n">count</span><span class="o">(</span><span class="n">$</span><span class="s">"word"</span><span class="o">).</span>
-    <span class="n">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
-  <span class="k">if</span> <span class="o">(</span><span class="n">word1</span><span class="o">!=</span><span class="n">word2</span><span class="o">)</span><span class="n">path6</span><span class="o">.</span>
-    <span class="n">filter</span><span class="o">(</span><span class="ss">'wordCount=</span><span class="o">==</span><span class="n">steps</span><span class="o">).</span>
-    <span class="n">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="n">distinct</span>
-  <span class="k">else</span> <span class="n">path6</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'wordCount=</span><span class="o">==</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span>
-    <span class="n">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="n">distinct</span>
+  <span class="k">val</span> <span class="nv">path1</span><span class="k">=</span><span class="nv">graph</span><span class="o">.</span><span class="py">find</span><span class="o">(</span><span class="nf">formLine</span><span class="o">(</span><span class="n">steps</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">path2</span><span class="k">=</span><span class="nv">path1</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">toString</span><span class="o">)).</span>
+    <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">replaceAll</span><span class="o">(</span><span class="s">"\\["</span><span class="o">,</span><span class="s">""</span><span class="o">))).</span>
+    <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">replaceAll</span><span class="o">(</span><span class="s">"\\]"</span><span class="o">,</span><span class="s">""</span><span class="o">)))</span>
+  <span class="k">val</span> <span class="nv">path3</span><span class="k">=</span><span class="n">path2</span><span class="o">.</span>
+    <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">","</span><span class="o">))).</span>
+    <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nv">s</span><span class="o">.</span><span class="py">toArray</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">path4</span><span class="k">=</span><span class="n">path3</span><span class="o">.</span>
+    <span class="nf">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">==</span><span class="n">word1</span><span class="o">)).</span>
+    <span class="nf">filter</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span><span class="o">==</span><span class="n">word2</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">path5</span><span class="k">=</span><span class="nv">path4</span><span class="o">.</span><span class="py">rdd</span><span class="o">.</span><span class="py">zipWithIndex</span><span class="o">.</span>
+    <span class="nf">toDF</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span>
+    <span class="nf">withColumn</span><span class="o">(</span><span class="s">"word"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"words"</span><span class="o">)).</span><span class="py">distinct</span>
+  <span class="k">val</span> <span class="nv">partitionWindow</span> <span class="k">=</span> <span class="nv">Window</span><span class="o">.</span><span class="py">partitionBy</span><span class="o">(</span><span class="n">$</span><span class="s">"id"</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">path6</span> <span class="k">=</span> <span class="nv">path5</span><span class="o">.</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"wordCount"</span><span class="o">,</span><span class="nf">count</span><span class="o">(</span><span class="n">$</span><span class="s">"word"</span><span class="o">).</span>
+    <span class="nf">over</span><span class="o">(</span><span class="n">partitionWindow</span><span class="o">))</span>
+  <span class="nf">if</span> <span class="o">(</span><span class="n">word1</span><span class="o">!=</span><span class="n">word2</span><span class="o">)</span><span class="n">path6</span><span class="o">.</span>
+    <span class="nf">filter</span><span class="o">(</span><span class="ss">'wordCount</span><span class="o">===</span><span class="n">steps</span><span class="o">).</span>
+    <span class="nf">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="py">distinct</span>
+  <span class="k">else</span> <span class="nv">path6</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'wordCount</span><span class="o">===</span><span class="n">steps</span><span class="o">-</span><span class="mi">1</span><span class="o">).</span>
+    <span class="nf">select</span><span class="o">(</span><span class="s">"words"</span><span class="o">,</span><span class="s">"id"</span><span class="o">).</span><span class="py">distinct</span>
 <span class="o">}</span></code></pre></figure>
 
 
@@ -491,7 +491,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Line: 'insight' -&gt; (1 word) -&gt; 'brain' </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">3</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">3</span><span class="o">))</span>
 <span class="n">words</span>
 <span class="s">"[""brain"",""right"",""insight""]"</span>
 <span class="s">"[""brain"",""activity"",""insight""]"</span>
@@ -501,7 +501,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Line: 'insight' -&gt; (2 words) -&gt; 'brain' - some examples</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">4</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">4</span><span class="o">))</span>
 <span class="n">words</span>
 <span class="s">"[""brain"",""require"",""spontaneous"",""insight""]"</span>
 <span class="s">"[""brain"",""thought"",""called"",""insight""]"</span>
@@ -512,7 +512,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Line: 'insight' -&gt; (3 words) -&gt; 'brain' </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
 <span class="n">words</span>
 <span class="s">"[""brain"",""require"",""neural"",""activity"",""insight""]"</span>
 <span class="s">"[""brain"",""dominant"",""problem"",""called"",""insight""]"</span>
@@ -524,7 +524,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Circle: 'insight' -&gt; (3 words) -&gt; 'insight' </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
 <span class="n">words</span>
 <span class="s">"[""insight"",""requires"",""prefrontal"",""activity"",""insight""]"</span>
 <span class="s">"[""insight"",""increase"",""creative"",""moment"",""insight""]"</span>
@@ -537,7 +537,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Circle: 'brain' -&gt; (2 words) -&gt; 'brain' </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">4</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="s">"brain"</span><span class="o">,</span><span class="mi">4</span><span class="o">))</span>
 <span class="n">words</span>
 <span class="s">"[""brain"",""right"",""hemisphere"",""brain""]"</span>
 <span class="s">"[""brain"",""develop"",""human"",""brain""]"</span>
@@ -549,7 +549,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Line: 'insight' -&gt; (3 words) -&gt; 'association' </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="s">"association"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="s">"association"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
 <span class="n">words</span>
 <span class="s">"[""insight"",""using"",""different"",""sudden"",""association""]"</span>
 <span class="s">"[""insight"",""increase"",""creative"",""process"",""association""]"</span>
@@ -561,7 +561,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Circle: 'associated' -&gt; (3 words) -&gt; 'associated' </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"associated"</span><span class="o">,</span><span class="s">"associated"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"associated"</span><span class="o">,</span><span class="s">"associated"</span><span class="o">,</span><span class="mi">5</span><span class="o">))</span>
 <span class="n">words</span>
 <span class="s">"[""associated"",""different"",""prefrontal"",""activity"",""associated""]"</span>
 <span class="s">"[""associated"",""musical"",""ability"",""children"",""associated""]"</span>
@@ -574,7 +574,7 @@ We will start with two high Page Ranks words 'insight' and 'brain' and look for 
 <p>Line: 'association' -&gt; (4 words) -&gt; 'insight' </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"association"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">6</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">findForm</span><span class="o">(</span><span class="n">graphInsightLow</span><span class="o">,</span><span class="s">"association"</span><span class="o">,</span><span class="s">"insight"</span><span class="o">,</span><span class="mi">6</span><span class="o">))</span>
 <span class="n">words</span>
 <span class="s">"[""association"",""useful"",""elegant"",""ideas"",""without"",""insight""]"</span>
 <span class="s">"[""association"",""brain"",""great"",""knowledge"",""shows"",""insight""]"</span>

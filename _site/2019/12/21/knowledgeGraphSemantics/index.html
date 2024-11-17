@@ -125,16 +125,16 @@ Using the same Kaggle dataset as in previous post
 <span class="k">import</span> <span class="nn">org.graphframes.GraphFrame</span>
 <span class="k">import</span> <span class="nn">org.apache.spark.sql.functions._</span>
 
-<span class="k">val</span> <span class="n">data</span><span class="k">=</span><span class="n">sqlContext</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="s">"csv"</span><span class="o">).</span>
-  <span class="n">option</span><span class="o">(</span><span class="s">"header"</span><span class="o">,</span><span class="s">"true"</span><span class="o">).</span><span class="n">load</span><span class="o">(</span><span class="s">"/FileStore/tables/daYes2.txt"</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">data</span><span class="k">=</span><span class="nv">sqlContext</span><span class="o">.</span><span class="py">read</span><span class="o">.</span><span class="py">format</span><span class="o">(</span><span class="s">"csv"</span><span class="o">).</span>
+  <span class="nf">option</span><span class="o">(</span><span class="s">"header"</span><span class="o">,</span><span class="s">"true"</span><span class="o">).</span><span class="py">load</span><span class="o">(</span><span class="s">"/FileStore/tables/daYes2.txt"</span><span class="o">)</span></code></pre></figure>
 
 
 <p>Get artist names, painting titles and dates when paintings were created:</p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">titleData</span><span class="k">=</span><span class="n">data</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"Date"</span><span class="o">).</span><span class="n">distinct</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">titleData</span><span class="k">=</span><span class="nv">data</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"Date"</span><span class="o">).</span><span class="py">distinct</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">titleData</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">titleData</span><span class="o">)</span>
 <span class="nc">Artist</span><span class="o">,</span><span class="nc">Title</span><span class="o">,</span><span class="nc">Date</span>
 <span class="nc">Joan</span> <span class="nc">Miró</span><span class="o">,</span><span class="s">"Rope and People, I"</span><span class="o">,</span><span class="s">"Barcelona, March 27, 1935"</span>
 <span class="nc">Paul</span> <span class="nc">Klee</span><span class="o">,</span><span class="nc">Fire</span> <span class="n">in</span> <span class="n">the</span> <span class="nc">Evening</span><span class="o">,</span><span class="mi">1929</span>
@@ -279,18 +279,18 @@ Some of these column values have just a year, some columns show time periods, so
 To define the year when painting was created we will extract the latest year from 'Date' columns:
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">titleLastYear</span><span class="k">=</span><span class="n">titleData</span><span class="o">.</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"period"</span><span class="o">,</span><span class="n">regexp_extract</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"Date"</span><span class="o">),</span><span class="s">"\\d{4}-\\d{2}"</span><span class="o">,</span><span class="mi">0</span><span class="o">)).</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"periodEnd"</span><span class="o">,</span><span class="n">concat</span><span class="o">(</span><span class="n">substring</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"period"</span><span class="o">),</span><span class="mi">1</span><span class="o">,</span><span class="mi">2</span><span class="o">),</span><span class="n">substring</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"period"</span><span class="o">),</span><span class="mi">6</span><span class="o">,</span><span class="mi">7</span><span class="o">))).</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"year1"</span><span class="o">,</span><span class="n">regexp_extract</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"Date"</span><span class="o">),</span><span class="s">"\\d{4}"</span><span class="o">,</span><span class="mi">0</span><span class="o">)).</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"date2"</span><span class="o">,</span><span class="n">regexp_replace</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"Date"</span><span class="o">),</span> <span class="n">col</span><span class="o">(</span><span class="s">"period"</span><span class="o">),</span> <span class="n">lit</span><span class="o">(</span><span class="s">""</span><span class="o">))).</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"date3"</span><span class="o">,</span><span class="n">regexp_replace</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"date2"</span><span class="o">),</span> <span class="n">col</span><span class="o">(</span><span class="s">"year1"</span><span class="o">),</span> <span class="n">lit</span><span class="o">(</span><span class="s">""</span><span class="o">))).</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"year2"</span><span class="o">,</span><span class="n">regexp_extract</span><span class="o">(</span><span class="n">col</span><span class="o">(</span><span class="s">"date3"</span><span class="o">),</span><span class="s">"\\d{4}"</span><span class="o">,</span><span class="mi">0</span><span class="o">)).</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"year3"</span><span class="o">,</span><span class="n">greatest</span><span class="o">(</span><span class="s">"year1"</span><span class="o">,</span><span class="s">"periodEnd"</span><span class="o">)).</span>
-<span class="n">withColumn</span><span class="o">(</span><span class="s">"lastYear"</span><span class="o">,</span><span class="n">greatest</span><span class="o">(</span><span class="s">"year2"</span><span class="o">,</span><span class="s">"year3"</span><span class="o">)).</span>
-<span class="n">drop</span><span class="o">(</span><span class="s">"period"</span><span class="o">,</span><span class="s">"periodEnd"</span><span class="o">,</span><span class="s">"year1"</span><span class="o">,</span><span class="s">"date2"</span><span class="o">,</span><span class="s">"date3"</span><span class="o">,</span><span class="s">"year2"</span><span class="o">,</span><span class="s">"year3"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">titleLastYear</span><span class="k">=</span><span class="n">titleData</span><span class="o">.</span>
+<span class="nf">withColumn</span><span class="o">(</span><span class="s">"period"</span><span class="o">,</span><span class="nf">regexp_extract</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"Date"</span><span class="o">),</span><span class="s">"\\d{4}-\\d{2}"</span><span class="o">,</span><span class="mi">0</span><span class="o">)).</span>
+<span class="nf">withColumn</span><span class="o">(</span><span class="s">"periodEnd"</span><span class="o">,</span><span class="nf">concat</span><span class="o">(</span><span class="nf">substring</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"period"</span><span class="o">),</span><span class="mi">1</span><span class="o">,</span><span class="mi">2</span><span class="o">),</span><span class="nf">substring</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"period"</span><span class="o">),</span><span class="mi">6</span><span class="o">,</span><span class="mi">7</span><span class="o">))).</span>
+<span class="nf">withColumn</span><span class="o">(</span><span class="s">"year1"</span><span class="o">,</span><span class="nf">regexp_extract</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"Date"</span><span class="o">),</span><span class="s">"\\d{4}"</span><span class="o">,</span><span class="mi">0</span><span class="o">)).</span>
+<span class="nf">withColumn</span><span class="o">(</span><span class="s">"date2"</span><span class="o">,</span><span class="nf">regexp_replace</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"Date"</span><span class="o">),</span> <span class="nf">col</span><span class="o">(</span><span class="s">"period"</span><span class="o">),</span> <span class="nf">lit</span><span class="o">(</span><span class="s">""</span><span class="o">))).</span>
+<span class="nf">withColumn</span><span class="o">(</span><span class="s">"date3"</span><span class="o">,</span><span class="nf">regexp_replace</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"date2"</span><span class="o">),</span> <span class="nf">col</span><span class="o">(</span><span class="s">"year1"</span><span class="o">),</span> <span class="nf">lit</span><span class="o">(</span><span class="s">""</span><span class="o">))).</span>
+<span class="nf">withColumn</span><span class="o">(</span><span class="s">"year2"</span><span class="o">,</span><span class="nf">regexp_extract</span><span class="o">(</span><span class="nf">col</span><span class="o">(</span><span class="s">"date3"</span><span class="o">),</span><span class="s">"\\d{4}"</span><span class="o">,</span><span class="mi">0</span><span class="o">)).</span>
+<span class="nf">withColumn</span><span class="o">(</span><span class="s">"year3"</span><span class="o">,</span><span class="nf">greatest</span><span class="o">(</span><span class="s">"year1"</span><span class="o">,</span><span class="s">"periodEnd"</span><span class="o">)).</span>
+<span class="nf">withColumn</span><span class="o">(</span><span class="s">"lastYear"</span><span class="o">,</span><span class="nf">greatest</span><span class="o">(</span><span class="s">"year2"</span><span class="o">,</span><span class="s">"year3"</span><span class="o">)).</span>
+<span class="nf">drop</span><span class="o">(</span><span class="s">"period"</span><span class="o">,</span><span class="s">"periodEnd"</span><span class="o">,</span><span class="s">"year1"</span><span class="o">,</span><span class="s">"date2"</span><span class="o">,</span><span class="s">"date3"</span><span class="o">,</span><span class="s">"year2"</span><span class="o">,</span><span class="s">"year3"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">titleLastYear</span><span class="o">)</span>
+<span class="nf">display</span><span class="o">(</span><span class="n">titleLastYear</span><span class="o">)</span>
 <span class="nc">Artist</span><span class="o">,</span><span class="nc">Title</span><span class="o">,</span><span class="nc">Date</span><span class="o">,</span><span class="n">lastYear</span>
 <span class="nc">Joan</span> <span class="nc">Miró</span><span class="o">,</span><span class="s">"Rope and People, I"</span><span class="o">,</span><span class="s">"Barcelona, March 27, 1935"</span><span class="o">,</span><span class="mi">1935</span>
 <span class="nc">Paul</span> <span class="nc">Klee</span><span class="o">,</span><span class="nc">Fire</span> <span class="n">in</span> <span class="n">the</span> <span class="nc">Evening</span><span class="o">,</span><span class="mi">1929</span><span class="o">,</span><span class="mi">1929</span>
@@ -320,7 +320,7 @@ To analyze 'Title' text column we will use the following data preparation proces
 First, we'll see how many paintings we have for each artist. Of course, Picasso has the biggest number:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">titleLastYear</span><span class="o">.</span><span class="n">groupBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'count.</span><span class="n">desc</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">titleLastYear</span><span class="o">.</span><span class="py">groupBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">).</span><span class="py">count</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'count</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 <span class="nc">Pablo</span> <span class="nc">Picasso</span><span class="o">,</span><span class="mi">55</span>
 <span class="nc">Henri</span> <span class="nc">Matisse</span><span class="o">,</span><span class="mi">34</span>
 <span class="nc">Joan</span> <span class="nc">Miró</span><span class="o">,</span><span class="mi">19</span>
@@ -347,16 +347,16 @@ First, we'll see how many paintings we have for each artist. Of course, Picasso 
 Tokenize 'Title' column:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"Title"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
-   <span class="n">setMinTokenLength</span><span class="o">(</span><span class="mi">3</span><span class="o">).</span>
-   <span class="n">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">tokenizedTitle</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">titleLastYear</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">tokenizer</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">RegexTokenizer</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"Title"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setPattern</span><span class="o">(</span><span class="s">"[^a-z]+"</span><span class="o">).</span>
+   <span class="nf">setMinTokenLength</span><span class="o">(</span><span class="mi">3</span><span class="o">).</span>
+   <span class="nf">setGaps</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">tokenizedTitle</span> <span class="k">=</span> <span class="n">tokenizer</span><span class="o">.</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">titleLastYear</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">tokenizedTitle</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"value"</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">tokenizedTitle</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"value"</span><span class="o">))</span>
 <span class="nc">Joan</span> <span class="nc">Miró</span><span class="o">,</span><span class="s">"Rope and People, I"</span><span class="o">,</span><span class="s">"[""rope"",""and"",""people""]"</span>
 <span class="nc">Paul</span> <span class="nc">Klee</span><span class="o">,</span><span class="nc">Fire</span> <span class="n">in</span> <span class="n">the</span> <span class="nc">Evening</span><span class="o">,</span><span class="s">"[""fire"",""the"",""evening""]"</span>
 <span class="nc">Pablo</span> <span class="nc">Picasso</span><span class="o">,</span><span class="nc">Guitar</span><span class="o">,</span><span class="s">"[""guitar""]"</span>
@@ -370,15 +370,15 @@ Remove stop words:
 
 
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala">   
-<span class="k">val</span> <span class="n">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
-   <span class="n">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
-   <span class="n">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">removedStopWordsTittle</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
-   <span class="n">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
-   <span class="n">remover</span><span class="o">.</span><span class="n">getStopWords</span><span class="o">).</span>
-   <span class="n">transform</span><span class="o">(</span><span class="n">tokenizedTittle</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">remover</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StopWordsRemover</span><span class="o">().</span>
+   <span class="nf">setInputCol</span><span class="o">(</span><span class="s">"value"</span><span class="o">).</span>
+   <span class="nf">setOutputCol</span><span class="o">(</span><span class="s">"stopWordFree"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">removedStopWordsTittle</span> <span class="k">=</span> <span class="n">remover</span><span class="o">.</span>
+   <span class="nf">setStopWords</span><span class="o">(</span><span class="nc">Array</span><span class="o">(</span><span class="s">"none"</span><span class="o">,</span><span class="s">"also"</span><span class="o">,</span><span class="s">"nope"</span><span class="o">,</span><span class="s">"null"</span><span class="o">)++</span>
+   <span class="nv">remover</span><span class="o">.</span><span class="py">getStopWords</span><span class="o">).</span>
+   <span class="nf">transform</span><span class="o">(</span><span class="n">tokenizedTittle</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">removedStopWordsTitle</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"value"</span><span class="o">,</span><span class="s">"stopWordFree"</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">removedStopWordsTitle</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"value"</span><span class="o">,</span><span class="s">"stopWordFree"</span><span class="o">))</span>
 <span class="nc">Joan</span> <span class="nc">Miró</span><span class="o">,</span><span class="s">"Rope and People, I"</span><span class="o">,</span><span class="s">"[""rope"",""and"",""people""]"</span><span class="o">,</span><span class="s">"[""rope"",""people""]"</span>
 <span class="nc">Paul</span> <span class="nc">Klee</span><span class="o">,</span><span class="nc">Fire</span> <span class="n">in</span> <span class="n">the</span> <span class="nc">Evening</span><span class="o">,</span><span class="s">"[""fire"",""the"",""evening""]"</span><span class="o">,</span><span class="s">"[""fire"",""evening""]"</span>
 <span class="nc">Pablo</span> <span class="nc">Picasso</span><span class="o">,</span><span class="nc">Guitar</span><span class="o">,</span><span class="s">"[""guitar""]"</span><span class="o">,</span><span class="s">"[""guitar""]"</span>
@@ -390,11 +390,11 @@ Remove stop words:
 Explode word arrays to words:  
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">slpitTitleData</span> <span class="k">=</span> <span class="n">removedStopWordsTitle</span><span class="o">.</span>
-   <span class="n">withColumn</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">,</span><span class="n">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"stopWordFree"</span><span class="o">)).</span>
-   <span class="n">drop</span><span class="o">(</span><span class="s">"value"</span><span class="o">,</span><span class="s">"stopWordFree"</span><span class="o">).</span><span class="n">distinct</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">slpitTitleData</span> <span class="k">=</span> <span class="n">removedStopWordsTitle</span><span class="o">.</span>
+   <span class="nf">withColumn</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">,</span><span class="nf">explode</span><span class="o">(</span><span class="n">$</span><span class="s">"stopWordFree"</span><span class="o">)).</span>
+   <span class="nf">drop</span><span class="o">(</span><span class="s">"value"</span><span class="o">,</span><span class="s">"stopWordFree"</span><span class="o">).</span><span class="py">distinct</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">slpitTitleData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">))</span>
 <span class="nc">Claude</span> <span class="nc">Monet</span><span class="o">,</span><span class="nc">Agapanthus</span><span class="o">,</span><span class="n">agapanthus</span>
 <span class="nc">Claude</span> <span class="nc">Monet</span><span class="o">,</span><span class="s">"On the Cliff at Pourville, Clear Weather"</span><span class="o">,</span><span class="n">weather</span>
 <span class="nc">Claude</span> <span class="nc">Monet</span><span class="o">,</span><span class="s">"On the Cliff at Pourville, Clear Weather"</span><span class="o">,</span><span class="n">cliff</span>
@@ -412,7 +412,7 @@ Explode word arrays to words:
 How many title words artists used in their titles?
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span><span class="n">groupBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'count.</span><span class="n">desc</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">slpitTitleData</span><span class="o">.</span><span class="py">groupBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">).</span><span class="py">count</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'count</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 <span class="nc">Pablo</span> <span class="nc">Picasso</span><span class="o">,</span><span class="mi">125</span>
 <span class="nc">Henri</span> <span class="nc">Matisse</span><span class="o">,</span><span class="mi">83</span>
 <span class="nc">Piet</span> <span class="nc">Mondrian</span><span class="o">,</span><span class="mi">60</span>
@@ -440,7 +440,7 @@ How many distinct title words artists used?
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span><span class="n">groupBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'count.</span><span class="n">desc</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">slpitTitleData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span><span class="py">groupBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">).</span><span class="py">count</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'count</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 <span class="nc">Pablo</span> <span class="nc">Picasso</span><span class="o">,</span><span class="mi">85</span>
 <span class="nc">Henri</span> <span class="nc">Matisse</span><span class="o">,</span><span class="mi">74</span>
 <span class="nc">Joan</span> <span class="nc">Miró</span><span class="o">,</span><span class="mi">45</span>
@@ -466,8 +466,8 @@ How many distinct title words artists used?
 <p>Different artists used different words. For example, Paul Signac and Kazimir Malevich had very different styles so they used very different words to describe their paintings:  </p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'Artist=</span><span class="o">==</span><span class="s">"Paul Signac"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">slpitTitleData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'Artist</span><span class="o">===</span><span class="s">"Paul Signac"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">))</span>
 <span class="nc">Paul</span> <span class="nc">Signac</span><span class="o">,</span><span class="n">adagio</span><span class="o">,</span><span class="s">"Setting Sun. Sardine Fishing. Adagio. Opus 221 from the series The Sea, The Boats, Concarneau"</span>
 <span class="nc">Paul</span> <span class="nc">Signac</span><span class="o">,</span><span class="n">angles</span><span class="o">,</span><span class="s">"Opus 217. Against the Enamel of a Background Rhythmic with Beats and Angles, Tones, and Tints, Portrait of M. Félix Fénéon in 1890"</span>
 <span class="nc">Paul</span> <span class="nc">Signac</span><span class="o">,</span><span class="n">background</span><span class="o">,</span><span class="s">"Opus 217. Against the Enamel of a Background Rhythmic with Beats and Angles, Tones, and Tints, Portrait of M. Félix Fénéon in 1890"</span>
@@ -492,8 +492,8 @@ How many distinct title words artists used?
 
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'Artist=</span><span class="o">==</span><span class="s">"Kazimir Malevich"</span><span class="o">).</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">slpitTitleData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'Artist</span><span class="o">===</span><span class="s">"Kazimir Malevich"</span><span class="o">).</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">))</span>
 <span class="nc">Kazimir</span> <span class="nc">Malevich</span><span class="o">,</span><span class="n">airplane</span><span class="o">,</span><span class="nc">Suprematist</span> <span class="nc">Composition</span><span class="k">:</span> <span class="kt">Airplane</span> <span class="kt">Flying</span>
 <span class="nc">Kazimir</span> <span class="nc">Malevich</span><span class="o">,</span><span class="n">arrangement</span><span class="o">,</span><span class="nc">Woman</span> <span class="k">with</span> <span class="nc">Pails</span><span class="k">:</span> <span class="kt">Dynamic</span> <span class="kt">Arrangement</span>
 <span class="nc">Kazimir</span> <span class="nc">Malevich</span><span class="o">,</span><span class="n">boy</span><span class="o">,</span><span class="nc">Painterly</span> <span class="nc">Realism</span> <span class="n">of</span> <span class="n">a</span> <span class="nc">Boy</span> <span class="k">with</span> <span class="n">a</span> <span class="nc">Knapsack</span> <span class="o">-</span> <span class="nc">Color</span> <span class="nc">Masses</span> <span class="n">in</span> <span class="n">the</span> <span class="nc">Fourth</span> <span class="nc">Dimension</span>
@@ -527,7 +527,7 @@ How many distinct title words artists used?
 What title words used often by artists?
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span><span class="n">groupBy</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'count.</span><span class="n">desc</span><span class="o">,</span><span class="ss">'titleWord)</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">slpitTitleData</span><span class="o">.</span><span class="py">groupBy</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">).</span><span class="py">count</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'count</span><span class="o">.</span><span class="py">desc</span><span class="o">,</span><span class="ss">'titleWord</span><span class="o">))</span>
 <span class="n">titleWord</span><span class="o">,</span><span class="n">count</span>
 <span class="n">life</span><span class="o">,</span><span class="mi">16</span>
 <span class="n">still</span><span class="o">,</span><span class="mi">16</span>
@@ -546,8 +546,8 @@ What title words used often by artists?
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span><span class="n">distinct</span><span class="o">.</span>
-  <span class="n">groupBy</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'count.</span><span class="n">desc</span><span class="o">,</span><span class="ss">'titleWord)</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">slpitTitleData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span><span class="py">distinct</span><span class="o">.</span>
+  <span class="nf">groupBy</span><span class="o">(</span><span class="s">"titleWord"</span><span class="o">).</span><span class="py">count</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'count</span><span class="o">.</span><span class="py">desc</span><span class="o">,</span><span class="ss">'titleWord</span><span class="o">))</span>
 <span class="n">titleWord</span><span class="o">,</span><span class="n">count</span>
 <span class="n">portrait</span><span class="o">,</span><span class="mi">9</span>
 <span class="n">life</span><span class="o">,</span><span class="mi">6</span>
@@ -577,9 +577,9 @@ To show a different look at data we will build a knowledge graph as connections 
 
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistYearWordData</span><span class="k">=</span><span class="n">slpitTitleData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"createdYear"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">columnList</span><span class="k">=</span><span class="n">artistYearWordData</span><span class="o">.</span><span class="n">columns</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistYearWordData</span><span class="k">=</span><span class="nv">slpitTitleData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"createdYear"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">)</span>
+<span class="k">val</span> <span class="nv">columnList</span><span class="k">=</span><span class="nv">artistYearWordData</span><span class="o">.</span><span class="py">columns</span>
 
 <span class="n">columnList</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Array</span><span class="o">(</span><span class="n">artist</span><span class="o">,</span> <span class="n">createdYear</span><span class="o">,</span> <span class="n">titleWord</span><span class="o">)</span></code></pre></figure>
 
@@ -587,17 +587,17 @@ To show a different look at data we will build a knowledge graph as connections 
 We will build a knowledge graph based on all pairs: {artist, title word}, {artist, created year}, {title word, created year}. Also we will add a node type attribute to graph vertices:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">var</span> <span class="n">graphNodes</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span><span class="nc">Seq</span><span class="o">((</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"nodeType"</span><span class="o">)</span>
-<span class="k">var</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span><span class="nc">Seq</span><span class="o">((</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeType"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">var</span> <span class="n">graphNodes</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span><span class="nc">Seq</span><span class="o">((</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"nodeType"</span><span class="o">)</span>
+<span class="k">var</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span><span class="nc">Seq</span><span class="o">((</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeType"</span><span class="o">)</span>
 <span class="k">var</span> <span class="n">idx</span><span class="k">=</span><span class="mi">0</span>
-<span class="k">for</span> <span class="o">(</span><span class="n">columnx</span> <span class="k">&lt;-</span> <span class="n">columnList</span><span class="o">)</span> <span class="o">{</span>  
+<span class="nf">for</span> <span class="o">(</span><span class="n">columnx</span> <span class="k">&lt;-</span> <span class="n">columnList</span><span class="o">)</span> <span class="o">{</span>  
   <span class="k">var</span> <span class="n">idy</span><span class="k">=</span><span class="mi">0</span>
-  <span class="n">graphNodes</span><span class="k">=</span><span class="n">graphNodes</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">artistYearWordData</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="n">columnx</span><span class="o">).</span>
-    <span class="n">withColumn</span><span class="o">(</span><span class="s">"nodeType"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="n">columnx</span><span class="o">)))</span>
-  <span class="k">for</span> <span class="o">(</span><span class="n">columny</span> <span class="k">&lt;-</span> <span class="n">columnList</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">graphEdges</span><span class="k">=</span><span class="n">graphEdges</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">artistYearWordData</span><span class="o">.</span>
-      <span class="n">select</span><span class="o">(</span><span class="n">artistYearWordData</span><span class="o">.</span><span class="n">columns</span><span class="o">(</span><span class="n">idx</span><span class="o">),</span><span class="n">columny</span><span class="o">).</span>
-    <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"edgeType"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="n">columny</span><span class="o">))).</span><span class="n">distinct</span>
+  <span class="n">graphNodes</span><span class="k">=</span><span class="nv">graphNodes</span><span class="o">.</span><span class="py">union</span><span class="o">(</span><span class="nv">artistYearWordData</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="n">columnx</span><span class="o">).</span>
+    <span class="nf">withColumn</span><span class="o">(</span><span class="s">"nodeType"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="n">columnx</span><span class="o">)))</span>
+  <span class="nf">for</span> <span class="o">(</span><span class="n">columny</span> <span class="k">&lt;-</span> <span class="n">columnList</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">graphEdges</span><span class="k">=</span><span class="nv">graphEdges</span><span class="o">.</span><span class="py">union</span><span class="o">(</span><span class="n">artistYearWordData</span><span class="o">.</span>
+      <span class="nf">select</span><span class="o">(</span><span class="nv">artistYearWordData</span><span class="o">.</span><span class="py">columns</span><span class="o">(</span><span class="n">idx</span><span class="o">),</span><span class="n">columny</span><span class="o">).</span>
+    <span class="nf">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"edgeType"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="n">columny</span><span class="o">))).</span><span class="py">distinct</span>
     <span class="n">idy</span><span class="k">=</span><span class="n">idy</span><span class="o">+</span><span class="mi">1</span>
   <span class="o">}</span>
   <span class="n">idx</span><span class="k">=</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span>
@@ -609,10 +609,10 @@ Build a graph:
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphNodesArtistYearWord</span><span class="k">=</span><span class="n">graphNodes</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'id=</span><span class="o">!=</span><span class="s">""</span><span class="o">).</span><span class="n">distinct</span>
-<span class="k">val</span> <span class="n">graphEdgesArtistYearWord</span><span class="k">=</span><span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'src=</span><span class="o">!=</span><span class="s">""</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'dst=</span><span class="o">!=</span><span class="s">""</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'src=</span><span class="o">!='</span><span class="n">dst</span><span class="o">).</span><span class="n">distinct</span>
-<span class="k">val</span> <span class="n">graphArtistYearWord</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodesArtistYearWord</span><span class="o">,</span><span class="n">graphEdgesArtistYearWord</span><span class="o">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphNodesArtistYearWord</span><span class="k">=</span><span class="nv">graphNodes</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'id</span><span class="o">=!=</span><span class="s">""</span><span class="o">).</span><span class="py">distinct</span>
+<span class="k">val</span> <span class="nv">graphEdgesArtistYearWord</span><span class="k">=</span><span class="nv">graphEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'src</span><span class="o">=!=</span><span class="s">""</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'dst</span><span class="o">=!=</span><span class="s">""</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'src</span><span class="o">=!=</span><span class="ss">'dst</span><span class="o">).</span><span class="py">distinct</span>
+<span class="k">val</span> <span class="nv">graphArtistYearWord</span> <span class="k">=</span> <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodesArtistYearWord</span><span class="o">,</span><span class="n">graphEdgesArtistYearWord</span><span class="o">)</span></code></pre></figure>
 
 
 </p><p>
@@ -621,22 +621,22 @@ Build a graph:
 We will combine these steps and create a function that builds a knowledge graph based on all possible column pairs in the table. This function will work for any DataFrame table.
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">table2graph</span><span class="o">(</span><span class="n">table</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">)</span><span class="k">:</span> <span class="kt">GraphFrame</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="k">var</span> <span class="n">graphNodes</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span><span class="nc">Seq</span><span class="o">((</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"nodeType"</span><span class="o">)</span>
-  <span class="k">var</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span><span class="nc">Seq</span><span class="o">((</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeType"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">table2graph</span><span class="o">(</span><span class="n">table</span><span class="k">:</span> <span class="kt">DataFrame</span><span class="o">)</span><span class="k">:</span> <span class="kt">GraphFrame</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">var</span> <span class="n">graphNodes</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span><span class="nc">Seq</span><span class="o">((</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span><span class="s">"nodeType"</span><span class="o">)</span>
+  <span class="k">var</span> <span class="n">graphEdges</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span><span class="nc">Seq</span><span class="o">((</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">,</span><span class="s">""</span><span class="o">)).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">,</span><span class="s">"edgeType"</span><span class="o">)</span>
   <span class="k">var</span> <span class="n">idx</span><span class="k">=</span><span class="mi">0</span>
-  <span class="k">val</span> <span class="n">columnList</span><span class="k">=</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span>
-  <span class="k">for</span> <span class="o">(</span><span class="n">columnx</span> <span class="k">&lt;-</span> <span class="n">columnList</span><span class="o">)</span> <span class="o">{</span>  
+  <span class="k">val</span> <span class="nv">columnList</span><span class="k">=</span><span class="nv">table</span><span class="o">.</span><span class="py">columns</span>
+  <span class="nf">for</span> <span class="o">(</span><span class="n">columnx</span> <span class="k">&lt;-</span> <span class="n">columnList</span><span class="o">)</span> <span class="o">{</span>  
     <span class="k">var</span> <span class="n">idy</span><span class="k">=</span><span class="mi">0</span>
-    <span class="n">graphNodes</span><span class="k">=</span><span class="n">graphNodes</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">table</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="n">columnx</span><span class="o">).</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"nodeType"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="n">columnx</span><span class="o">)))</span>
-    <span class="k">for</span> <span class="o">(</span><span class="n">columny</span> <span class="k">&lt;-</span> <span class="n">columnList</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">graphEdges</span><span class="k">=</span><span class="n">graphEdges</span><span class="o">.</span><span class="n">union</span><span class="o">(</span><span class="n">table</span><span class="o">.</span><span class="n">select</span><span class="o">(</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="o">(</span><span class="n">idx</span><span class="o">),</span><span class="n">columny</span><span class="o">).</span>
-      <span class="n">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span><span class="n">withColumn</span><span class="o">(</span><span class="s">"edgeType"</span><span class="o">,</span><span class="n">lit</span><span class="o">(</span><span class="n">columny</span><span class="o">))).</span><span class="n">distinct</span>
+    <span class="n">graphNodes</span><span class="k">=</span><span class="nv">graphNodes</span><span class="o">.</span><span class="py">union</span><span class="o">(</span><span class="nv">table</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="n">columnx</span><span class="o">).</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"nodeType"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="n">columnx</span><span class="o">)))</span>
+    <span class="nf">for</span> <span class="o">(</span><span class="n">columny</span> <span class="k">&lt;-</span> <span class="n">columnList</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">graphEdges</span><span class="k">=</span><span class="nv">graphEdges</span><span class="o">.</span><span class="py">union</span><span class="o">(</span><span class="nv">table</span><span class="o">.</span><span class="py">select</span><span class="o">(</span><span class="nv">table</span><span class="o">.</span><span class="py">columns</span><span class="o">(</span><span class="n">idx</span><span class="o">),</span><span class="n">columny</span><span class="o">).</span>
+      <span class="nf">toDF</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span><span class="s">"dst"</span><span class="o">).</span><span class="py">withColumn</span><span class="o">(</span><span class="s">"edgeType"</span><span class="o">,</span><span class="nf">lit</span><span class="o">(</span><span class="n">columny</span><span class="o">))).</span><span class="py">distinct</span>
       <span class="n">idy</span><span class="k">=</span><span class="n">idy</span><span class="o">+</span><span class="mi">1</span>
     <span class="o">}</span>
     <span class="n">idx</span><span class="k">=</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span>
    <span class="o">}</span>
- <span class="nc">GraphFrame</span><span class="o">(</span><span class="n">graphNodes</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'id=</span><span class="o">!=</span><span class="s">""</span><span class="o">).</span><span class="n">distinct</span><span class="o">,</span><span class="n">graphEdges</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'src=</span><span class="o">!=</span><span class="s">""</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dst=</span><span class="o">!=</span><span class="s">""</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'src=</span><span class="o">!='</span><span class="n">dst</span><span class="o">).</span><span class="n">distinct</span><span class="o">)</span>
+ <span class="nc">GraphFrame</span><span class="o">(</span><span class="nv">graphNodes</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'id</span><span class="o">=!=</span><span class="s">""</span><span class="o">).</span><span class="py">distinct</span><span class="o">,</span><span class="nv">graphEdges</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'src</span><span class="o">=!=</span><span class="s">""</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'dst</span><span class="o">=!=</span><span class="s">""</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'src</span><span class="o">=!=</span><span class="ss">'dst</span><span class="o">).</span><span class="py">distinct</span><span class="o">)</span>
 <span class="o">}</span></code></pre></figure>
 
 <p></p>
@@ -646,9 +646,9 @@ Build {Artist, Year, Word} graph :
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphArtistYearWord</span><span class="k">=</span><span class="n">table2graph</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"createdYear"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphArtistYearWord</span><span class="k">=</span><span class="nf">table2graph</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"createdYear"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">))</span></code></pre></figure>
 
 
 <a href="#">
@@ -661,8 +661,8 @@ Build {Artist, Year, Word} graph :
 To show subgraph around graph hubs, first we will find high degree nodes, next we will find neighbors of hubs.
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">degrees</span> <span class="k">=</span> <span class="n">graphArtistYearWord</span><span class="o">.</span><span class="n">degrees</span>
-<span class="n">display</span><span class="o">(</span><span class="n">degrees</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="n">desc</span><span class="o">(</span><span class="s">"degree"</span><span class="o">)))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">degrees</span> <span class="k">=</span> <span class="nv">graphArtistYearWord</span><span class="o">.</span><span class="py">degrees</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">degrees</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="nf">desc</span><span class="o">(</span><span class="s">"degree"</span><span class="o">)))</span>
 <span class="nc">Pablo</span> <span class="nc">Picasso</span><span class="o">,</span><span class="mi">232</span>
 <span class="nc">Henri</span> <span class="nc">Matisse</span><span class="o">,</span><span class="mi">188</span>
 <span class="nc">Joan</span> <span class="nc">Miró</span><span class="o">,</span><span class="mi">126</span>
@@ -691,13 +691,13 @@ To show subgraph around graph hubs, first we will find high degree nodes, next w
 To get dot language for subgraphs around hubs we will transform the whole graph to dot language using graph2dot function and select subsets of dot lines.
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">graph2dot</span><span class="o">(</span><span class="n">graph</span><span class="k">:</span> <span class="kt">GraphFrame</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">distinct</span><span class="o">.</span>
-    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
-      <span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+(</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">)+</span><span class="s">"\"];"</span><span class="o">)).</span>
-      <span class="n">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">graph2dot</span><span class="o">(</span><span class="n">graph</span><span class="k">:</span> <span class="kt">GraphFrame</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="nv">graph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">distinct</span><span class="o">.</span>
+    <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
+      <span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+(</span><span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">)+</span><span class="s">"\"];"</span><span class="o">)).</span>
+      <span class="nf">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">)</span>  
 <span class="o">}</span>
-<span class="k">val</span> <span class="n">dotlineArtistYearWord</span><span class="k">=</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">graphArtistYearWord</span><span class="o">)</span></code></pre></figure>
+<span class="k">val</span> <span class="nv">dotlineArtistYearWord</span><span class="k">=</span><span class="nf">graph2dot</span><span class="o">(</span><span class="n">graphArtistYearWord</span><span class="o">)</span></code></pre></figure>
 
 
 <p></p>
@@ -705,7 +705,7 @@ Example 1: nodes around 'Piet Mondrian':
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"Piet Mondrian"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">dotlineArtistYearWord</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"Piet Mondrian"</span><span class="o">)))</span></code></pre></figure>
 
 
 <a href="#">
@@ -717,7 +717,7 @@ Example 2: Neighbor nodes of year 1909:
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"1909"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">dotlineArtistYearWord</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"1909"</span><span class="o">)))</span></code></pre></figure>
 
 
 
@@ -729,7 +729,7 @@ Example 2: Neighbor nodes of year 1909:
 Example 3: Neighbors of title word: "portrait"
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"portrait"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">dotlineArtistYearWord</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"portrait"</span><span class="o">)))</span></code></pre></figure>
 
 
 
@@ -755,7 +755,7 @@ Example 5: Title word: "still"
 Graphs around title words 'still' and 'life' look very similar: probably most of these words came from 'still life' related titles. To see how 'still' and 'life' are connected we will combine their dot lines:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"life"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"still"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">dotlineArtistYearWord</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"life"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"still"</span><span class="o">)))</span></code></pre></figure>
 
 
 <a href="#">
@@ -765,9 +765,9 @@ Graphs around title words 'still' and 'life' look very similar: probably most of
 Artists, 'still life' painting titles and years when paintings were created:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="n">lower</span><span class="o">(</span><span class="ss">'Title)</span><span class="o">.</span><span class="n">contains</span><span class="o">(</span><span class="s">"still life"</span><span class="o">)).</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">).</span>
-  <span class="n">distinct</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">slpitTitleData</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="nf">lower</span><span class="o">(</span><span class="ss">'Title</span><span class="o">).</span><span class="py">contains</span><span class="o">(</span><span class="s">"still life"</span><span class="o">)).</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">).</span>
+  <span class="nv">distinct</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">,</span><span class="s">"Title"</span><span class="o">))</span>
 
   <span class="nc">Georges</span> <span class="nc">Braque</span><span class="o">,</span><span class="nc">The</span> <span class="nc">Table</span> <span class="o">(</span><span class="nc">Still</span> <span class="nc">Life</span> <span class="k">with</span> <span class="nc">Fan</span><span class="o">),</span><span class="mi">1910</span>
   <span class="nc">Henri</span> <span class="nc">Matisse</span><span class="o">,</span><span class="nc">Still</span> <span class="nc">Life</span><span class="o">,</span><span class="mi">1899</span>
@@ -794,8 +794,8 @@ Artists, 'still life' painting titles and years when paintings were created:
 In 'Painting Titles Words Analysis' section we showed that based on painting titles styles of Paul Signac and Kazimir Malevich are very different. Now we will look at nodes around their names and see that Paul Signac and Kazimir Malevich did not have overlaps in time and in title words:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"Paul Signac"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"Kazimir Malevich"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"Paul Signac"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"Kazimir Malevich"</span><span class="o">)))</span></code></pre></figure>
 
 
 <a href="#">
@@ -807,8 +807,8 @@ From some artist pairs you will expect high relationships. For example, let's lo
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"Georges Braque"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"Pablo Picasso"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"Georges Braque"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"Pablo Picasso"</span><span class="o">)))</span></code></pre></figure>
 
 
 
@@ -821,16 +821,16 @@ From some artist pairs you will expect high relationships. For example, let's lo
 Using motif 'find' function is an elegant way to calculate weights of artists pair links:
 </p><p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">artistPairWeight</span><span class="k">=</span><span class="n">graphArtistYearWord</span><span class="o">.</span>
-  <span class="n">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"c.nodeType"</span><span class="o">===</span><span class="s">"artist"</span> <span class="o">&amp;&amp;</span> <span class="n">$</span><span class="s">"a.nodeType"</span><span class="o">===</span><span class="s">"artist"</span><span class="o">).</span>
-  <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">"\\["</span><span class="o">)(</span><span class="mi">1</span><span class="o">).</span><span class="n">split</span><span class="o">(</span><span class="s">","</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
-  <span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">,</span><span class="n">s</span><span class="o">(</span><span class="mi">4</span><span class="o">).</span><span class="n">toString</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">"\\["</span><span class="o">)(</span><span class="mi">1</span><span class="o">).</span><span class="n">split</span><span class="o">(</span><span class="s">","</span><span class="o">)(</span><span class="mi">0</span><span class="o">))).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"artist1"</span><span class="o">,</span><span class="s">"link"</span><span class="o">,</span><span class="s">"artist2"</span><span class="o">).</span>
-  <span class="n">groupBy</span><span class="o">(</span><span class="s">"artist1"</span><span class="o">,</span><span class="s">"artist2"</span><span class="o">).</span><span class="n">count</span><span class="o">.</span><span class="n">toDF</span><span class="o">(</span><span class="s">"artist1"</span><span class="o">,</span><span class="s">"artist2"</span><span class="o">,</span><span class="s">"linkCount"</span><span class="o">)</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">artistPairWeight</span><span class="k">=</span><span class="n">graphArtistYearWord</span><span class="o">.</span>
+  <span class="nf">find</span><span class="o">(</span><span class="s">"(a) - [ab] -&gt; (b); (b) - [bc] -&gt; (c)"</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"a.id"</span><span class="o">=!=</span><span class="n">$</span><span class="s">"c.id"</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="n">$</span><span class="s">"c.nodeType"</span><span class="o">===</span><span class="s">"artist"</span> <span class="o">&amp;&amp;</span> <span class="n">$</span><span class="s">"a.nodeType"</span><span class="o">===</span><span class="s">"artist"</span><span class="o">).</span>
+  <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">"\\["</span><span class="o">)(</span><span class="mi">1</span><span class="o">).</span><span class="py">split</span><span class="o">(</span><span class="s">","</span><span class="o">)(</span><span class="mi">0</span><span class="o">),</span>
+  <span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">,</span><span class="nf">s</span><span class="o">(</span><span class="mi">4</span><span class="o">).</span><span class="py">toString</span><span class="o">.</span><span class="py">split</span><span class="o">(</span><span class="s">"\\["</span><span class="o">)(</span><span class="mi">1</span><span class="o">).</span><span class="py">split</span><span class="o">(</span><span class="s">","</span><span class="o">)(</span><span class="mi">0</span><span class="o">))).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"artist1"</span><span class="o">,</span><span class="s">"link"</span><span class="o">,</span><span class="s">"artist2"</span><span class="o">).</span>
+  <span class="nf">groupBy</span><span class="o">(</span><span class="s">"artist1"</span><span class="o">,</span><span class="s">"artist2"</span><span class="o">).</span><span class="py">count</span><span class="o">.</span><span class="py">toDF</span><span class="o">(</span><span class="s">"artist1"</span><span class="o">,</span><span class="s">"artist2"</span><span class="o">,</span><span class="s">"linkCount"</span><span class="o">)</span>
 
-<span class="n">display</span><span class="o">(</span><span class="n">artistPairWeight</span><span class="o">.</span><span class="n">orderBy</span><span class="o">(</span><span class="ss">'linkCount.</span><span class="n">desc</span><span class="o">))</span>
+<span class="nf">display</span><span class="o">(</span><span class="nv">artistPairWeight</span><span class="o">.</span><span class="py">orderBy</span><span class="o">(</span><span class="ss">'linkCount</span><span class="o">.</span><span class="py">desc</span><span class="o">))</span>
 <span class="nc">Pablo</span> <span class="nc">Picasso</span><span class="o">,</span><span class="nc">Henri</span> <span class="nc">Matisse</span><span class="o">,</span><span class="mi">23</span>
 <span class="nc">Henri</span> <span class="nc">Matisse</span><span class="o">,</span><span class="nc">Pablo</span> <span class="nc">Picasso</span><span class="o">,</span><span class="mi">23</span>
 <span class="nc">Joan</span> <span class="nc">Miró</span><span class="o">,</span><span class="nc">Pablo</span> <span class="nc">Picasso</span><span class="o">,</span><span class="mi">17</span>
@@ -856,10 +856,10 @@ To show weights of artist links we will slightly change the code of transforming
 </p><p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">artistPairWeight</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
-  <span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">"[label=\""</span>
-  <span class="o">+(</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">)</span> <span class="o">+</span><span class="s">"\",weight=\""</span>
-  <span class="o">+(</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">)</span> <span class="o">+</span> <span class="s">"\"];"</span><span class="o">)))</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">artistPairWeight</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
+  <span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">"[label=\""</span>
+  <span class="o">+(</span><span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">)</span> <span class="o">+</span><span class="s">"\",weight=\""</span>
+  <span class="o">+(</span><span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">)</span> <span class="o">+</span> <span class="s">"\"];"</span><span class="o">)))</span>
 
   <span class="s">"Pablo Picasso"</span> <span class="o">-&gt;</span> <span class="s">"Kazimir Malevich"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"6"</span> , <span class="kt">weight=</span><span class="err">"6"</span><span class="o">];</span>
   <span class="s">"Henri Matisse"</span> <span class="o">-&gt;</span> <span class="s">"Georges Braque"</span> <span class="o">[</span><span class="kt">label=</span><span class="err">"10"</span> , <span class="kt">weight=</span><span class="err">"10"</span><span class="o">];</span>
@@ -893,7 +893,7 @@ Some pairs of years that are far from each other, represent different periods of
 </p><p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"1890"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"1912"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">dotlineArtistYearWord</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"1890"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"1912"</span><span class="o">)))</span></code></pre></figure>
 
 
 </p><p>
@@ -910,7 +910,7 @@ Some years are next to each other and highly connected:
 
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">dotlineArtistYearWord</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"1913"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"1914"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nv">dotlineArtistYearWord</span><span class="o">.</span><span class="py">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"1913"</span><span class="o">)</span> <span class="o">||</span> <span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"1914"</span><span class="o">)))</span></code></pre></figure>
 
 
 <a href="#">
@@ -924,9 +924,9 @@ We will build {Artist, Year} graph with only two types of nodes - Artists and Pa
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphArtistYear</span><span class="k">=</span><span class="n">table2graph</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"createdYear"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphArtistYear</span><span class="k">=</span><span class="nf">table2graph</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"createdYear"</span><span class="o">))</span></code></pre></figure>
 
 
 <p></p>
@@ -934,8 +934,8 @@ Picasso's Painting Years:
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"Pablo Picasso"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">graph2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"Pablo Picasso"</span><span class="o">)))</span></code></pre></figure>
 
 
 <a href="#">
@@ -948,8 +948,8 @@ Artists with paintings of years 1913 or 1914:
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"1913"</span><span class="o">)||</span> <span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"1914"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">graph2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"1913"</span><span class="o">)||</span> <span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"1914"</span><span class="o">)))</span></code></pre></figure>
 
 <p></p>
 <a href="#">
@@ -962,12 +962,12 @@ To simlify dot language filtering queries we will slightly modify graph2dot func
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">edge2dot</span><span class="o">(</span><span class="n">graph</span><span class="k">:</span> <span class="kt">GraphFrame</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
-  <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">distinct</span><span class="o">.</span>
-    <span class="n">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
-      <span class="o">+</span><span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+(</span><span class="n">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="n">toString</span><span class="o">)+</span><span class="s">"\"];"</span><span class="o">,</span>
-      <span class="n">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">toString</span> <span class="o">,</span> <span class="n">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="n">toString</span><span class="o">)).</span>
-      <span class="n">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">,</span><span class="s">"node1"</span><span class="o">,</span><span class="s">"node2"</span><span class="o">)</span>  
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">edge2dot</span><span class="o">(</span><span class="n">graph</span><span class="k">:</span> <span class="kt">GraphFrame</span><span class="o">)</span><span class="k">:</span> <span class="kt">DataFrame</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="nv">graph</span><span class="o">.</span><span class="py">edges</span><span class="o">.</span><span class="py">distinct</span><span class="o">.</span>
+    <span class="nf">map</span><span class="o">(</span><span class="n">s</span><span class="o">=&gt;(</span><span class="s">"\""</span><span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\" -&gt; \""</span>
+      <span class="o">+</span><span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span> <span class="o">+</span><span class="s">"\""</span><span class="o">+</span><span class="s">" [label=\""</span><span class="o">+(</span><span class="nf">s</span><span class="o">(</span><span class="mi">2</span><span class="o">).</span><span class="py">toString</span><span class="o">)+</span><span class="s">"\"];"</span><span class="o">,</span>
+      <span class="nf">s</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="py">toString</span> <span class="o">,</span> <span class="nf">s</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">toString</span><span class="o">)).</span>
+      <span class="nf">toDF</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">,</span><span class="s">"node1"</span><span class="o">,</span><span class="s">"node2"</span><span class="o">)</span>  
 <span class="o">}</span></code></pre></figure>
 
 
@@ -976,9 +976,9 @@ Painting period [1932, 1938]:
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edge2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">((</span><span class="ss">'node1&gt;</span><span class="o">=</span><span class="s">"1932"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1 </span><span class="o">&lt;=</span><span class="s">"1938"</span><span class="o">)||</span>
-  <span class="o">(</span><span class="ss">'node2&gt;</span><span class="o">=</span><span class="s">"1932"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2 </span><span class="o">&lt;=</span><span class="s">"1938"</span><span class="o">)).</span><span class="n">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">edge2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">((</span><span class="ss">'node1</span><span class="o">&gt;=</span><span class="s">"1932"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1</span> <span class="o">&lt;=</span><span class="s">"1938"</span><span class="o">)||</span>
+  <span class="o">(</span><span class="ss">'node2</span><span class="o">&gt;=</span><span class="s">"1932"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2</span> <span class="o">&lt;=</span><span class="s">"1938"</span><span class="o">)).</span><span class="py">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
 
 
 <p></p>
@@ -993,9 +993,9 @@ Painting period [1912, 1917]:
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edge2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">((</span><span class="ss">'node1&gt;</span><span class="o">=</span><span class="s">"1912"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1 </span><span class="o">&lt;=</span><span class="s">"1917"</span><span class="o">)||</span>
-  <span class="o">(</span><span class="ss">'node2&gt;</span><span class="o">=</span><span class="s">"1912"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2 </span><span class="o">&lt;=</span><span class="s">"1917"</span><span class="o">)).</span><span class="n">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">edge2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">((</span><span class="ss">'node1</span><span class="o">&gt;=</span><span class="s">"1912"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1</span> <span class="o">&lt;=</span><span class="s">"1917"</span><span class="o">)||</span>
+  <span class="o">(</span><span class="ss">'node2</span><span class="o">&gt;=</span><span class="s">"1912"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2</span> <span class="o">&lt;=</span><span class="s">"1917"</span><span class="o">)).</span><span class="py">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
 
 
 <p></p>
@@ -1009,9 +1009,9 @@ Two painting periods [1903, 1908] and [1933, 1938]:
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edge2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(((</span><span class="ss">'node1&gt;</span><span class="o">=</span><span class="s">"1933"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1 </span><span class="o">&lt;=</span><span class="s">"1938"</span><span class="o">)||(</span> <span class="ss">'node2&gt;</span><span class="o">=</span><span class="s">"1933"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2 </span><span class="o">&lt;=</span><span class="s">"1938"</span><span class="o">))||</span>
-  <span class="o">((</span><span class="ss">'node1&gt;</span><span class="o">=</span><span class="s">"1903"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1 </span><span class="o">&lt;=</span><span class="s">"1908"</span><span class="o">)||(</span> <span class="ss">'node2&gt;</span><span class="o">=</span><span class="s">"1903"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2 </span><span class="o">&lt;=</span><span class="s">"1908"</span><span class="o">))).</span><span class="n">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">edge2dot</span><span class="o">(</span><span class="n">graphArtistYear</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(((</span><span class="ss">'node1</span><span class="o">&gt;=</span><span class="s">"1933"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1</span> <span class="o">&lt;=</span><span class="s">"1938"</span><span class="o">)||(</span> <span class="ss">'node2</span><span class="o">&gt;=</span><span class="s">"1933"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2</span> <span class="o">&lt;=</span><span class="s">"1938"</span><span class="o">))||</span>
+  <span class="o">((</span><span class="ss">'node1</span><span class="o">&gt;=</span><span class="s">"1903"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1</span> <span class="o">&lt;=</span><span class="s">"1908"</span><span class="o">)||(</span> <span class="ss">'node2</span><span class="o">&gt;=</span><span class="s">"1903"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2</span> <span class="o">&lt;=</span><span class="s">"1908"</span><span class="o">))).</span><span class="py">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
 
 
 <p></p>
@@ -1028,8 +1028,8 @@ We will build {Artist, Title Word} graph with two types of nodes - Artist and Ti
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphArtistWord</span><span class="k">=</span><span class="n">table2graph</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span><span class="n">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphArtistWord</span><span class="k">=</span><span class="nf">table2graph</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">).</span><span class="py">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"titleWord"</span><span class="o">))</span></code></pre></figure>
 
 
 <p></p>
@@ -1037,7 +1037,7 @@ Title words of Piet Mondrian:
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">graph2dot</span><span class="o">(</span><span class="n">graphArtistWord</span><span class="o">).</span><span class="n">filter</span><span class="o">(</span><span class="ss">'dotLine.</span><span class="n">rlike</span><span class="o">(</span><span class="s">"Piet Mondrian"</span><span class="o">)))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">graph2dot</span><span class="o">(</span><span class="n">graphArtistWord</span><span class="o">).</span><span class="py">filter</span><span class="o">(</span><span class="ss">'dotLine</span><span class="o">.</span><span class="py">rlike</span><span class="o">(</span><span class="s">"Piet Mondrian"</span><span class="o">)))</span></code></pre></figure>
 
 <p></p>
 <a href="#">
@@ -1049,9 +1049,9 @@ Piet Mondrian had a lot of color title words. Who else mentioned colors in their
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edge2dot</span><span class="o">(</span><span class="n">graphArtistWord</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'node1.</span><span class="n">isin</span><span class="o">(</span><span class="s">"blue"</span><span class="o">,</span><span class="s">"red"</span><span class="o">,</span><span class="s">"white"</span><span class="o">,</span><span class="s">"black"</span><span class="o">,</span><span class="s">"yellow"</span><span class="o">,</span><span class="s">"green"</span><span class="o">,</span><span class="s">"brown"</span><span class="o">,</span><span class="s">"gray"</span>  <span class="o">)||</span>
-          <span class="o">(</span> <span class="ss">'node2.</span><span class="n">isin</span><span class="o">(</span><span class="s">"blue"</span> <span class="o">,</span><span class="s">"red"</span><span class="o">,</span><span class="s">"white"</span><span class="o">,</span><span class="s">"black"</span><span class="o">,</span><span class="s">"yellow"</span><span class="o">,</span><span class="s">"green"</span><span class="o">,</span><span class="s">"brown"</span><span class="o">,</span><span class="s">"gray"</span>  <span class="o">))).</span><span class="n">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">edge2dot</span><span class="o">(</span><span class="n">graphArtistWord</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'node1</span><span class="o">.</span><span class="py">isin</span><span class="o">(</span><span class="s">"blue"</span><span class="o">,</span><span class="s">"red"</span><span class="o">,</span><span class="s">"white"</span><span class="o">,</span><span class="s">"black"</span><span class="o">,</span><span class="s">"yellow"</span><span class="o">,</span><span class="s">"green"</span><span class="o">,</span><span class="s">"brown"</span><span class="o">,</span><span class="s">"gray"</span>  <span class="o">)||</span>
+          <span class="o">(</span> <span class="ss">'node2</span><span class="o">.</span><span class="py">isin</span><span class="o">(</span><span class="s">"blue"</span> <span class="o">,</span><span class="s">"red"</span><span class="o">,</span><span class="s">"white"</span><span class="o">,</span><span class="s">"black"</span><span class="o">,</span><span class="s">"yellow"</span><span class="o">,</span><span class="s">"green"</span><span class="o">,</span><span class="s">"brown"</span><span class="o">,</span><span class="s">"gray"</span>  <span class="o">))).</span><span class="py">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
 
 <p></p>
 <a href="#">
@@ -1065,9 +1065,9 @@ It's a lot of overlaps between title words of Paul Cézanne and Georges Braque. 
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edge2dot</span><span class="o">(</span><span class="n">graphArtistWord</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'node1.</span><span class="n">isin</span><span class="o">(</span><span class="s">"Paul Cézanne"</span><span class="o">,</span><span class="s">"Georges Braque"</span> <span class="o">)||</span>
-          <span class="o">(</span> <span class="ss">'node2.</span><span class="n">isin</span><span class="o">(</span><span class="s">"Paul Cézanne"</span><span class="o">,</span><span class="s">"Georges Braque"</span> <span class="o">))).</span><span class="n">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">edge2dot</span><span class="o">(</span><span class="n">graphArtistWord</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'node1</span><span class="o">.</span><span class="py">isin</span><span class="o">(</span><span class="s">"Paul Cézanne"</span><span class="o">,</span><span class="s">"Georges Braque"</span> <span class="o">)||</span>
+          <span class="o">(</span> <span class="ss">'node2</span><span class="o">.</span><span class="py">isin</span><span class="o">(</span><span class="s">"Paul Cézanne"</span><span class="o">,</span><span class="s">"Georges Braque"</span> <span class="o">))).</span><span class="py">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
 
 <p></p>
 <a href="#">
@@ -1085,18 +1085,18 @@ It's a lot of overlaps between title words of Paul Cézanne and Georges Braque. 
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">graphArtistYear</span><span class="k">=</span><span class="n">table2graph</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span>
-  <span class="n">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">).</span>
-  <span class="n">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"createdYear"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">graphArtistYear</span><span class="k">=</span><span class="nf">table2graph</span><span class="o">(</span><span class="n">slpitTitleData</span><span class="o">.</span>
+  <span class="nf">select</span><span class="o">(</span><span class="s">"Artist"</span><span class="o">,</span><span class="s">"lastYear"</span><span class="o">).</span>
+  <span class="nf">toDF</span><span class="o">(</span><span class="s">"artist"</span><span class="o">,</span><span class="s">"createdYear"</span><span class="o">))</span></code></pre></figure>
 
 
 <p></p>
 Color title words by painting years:
 <p></p>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edge2dot</span><span class="o">(</span><span class="n">graphYearWord</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(</span><span class="ss">'node1.</span><span class="n">isin</span><span class="o">(</span><span class="s">"blue"</span><span class="o">,</span><span class="s">"red"</span><span class="o">,</span><span class="s">"white"</span><span class="o">,</span><span class="s">"black"</span><span class="o">,</span><span class="s">"yellow"</span><span class="o">,</span><span class="s">"green"</span><span class="o">,</span><span class="s">"brown"</span><span class="o">,</span><span class="s">"gray"</span>  <span class="o">)||</span>
-          <span class="o">(</span> <span class="ss">'node2.</span><span class="n">isin</span><span class="o">(</span><span class="s">"blue"</span> <span class="o">,</span><span class="s">"red"</span><span class="o">,</span><span class="s">"white"</span><span class="o">,</span><span class="s">"black"</span><span class="o">,</span><span class="s">"yellow"</span><span class="o">,</span><span class="s">"green"</span><span class="o">,</span><span class="s">"brown"</span><span class="o">,</span><span class="s">"gray"</span>  <span class="o">))).</span><span class="n">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">edge2dot</span><span class="o">(</span><span class="n">graphYearWord</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(</span><span class="ss">'node1</span><span class="o">.</span><span class="py">isin</span><span class="o">(</span><span class="s">"blue"</span><span class="o">,</span><span class="s">"red"</span><span class="o">,</span><span class="s">"white"</span><span class="o">,</span><span class="s">"black"</span><span class="o">,</span><span class="s">"yellow"</span><span class="o">,</span><span class="s">"green"</span><span class="o">,</span><span class="s">"brown"</span><span class="o">,</span><span class="s">"gray"</span>  <span class="o">)||</span>
+          <span class="o">(</span> <span class="ss">'node2</span><span class="o">.</span><span class="py">isin</span><span class="o">(</span><span class="s">"blue"</span> <span class="o">,</span><span class="s">"red"</span><span class="o">,</span><span class="s">"white"</span><span class="o">,</span><span class="s">"black"</span><span class="o">,</span><span class="s">"yellow"</span><span class="o">,</span><span class="s">"green"</span><span class="o">,</span><span class="s">"brown"</span><span class="o">,</span><span class="s">"gray"</span>  <span class="o">))).</span><span class="py">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
 
 
 <p></p>
@@ -1109,8 +1109,8 @@ Title words in painting years period [1929, 1932]:
 <p></p>
 
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">display</span><span class="o">(</span><span class="n">edge2dot</span><span class="o">(</span><span class="n">graphYearWord</span><span class="o">).</span>
-  <span class="n">filter</span><span class="o">(((</span><span class="ss">'node1&gt;</span><span class="o">=</span><span class="s">"1929"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1 </span><span class="o">&lt;=</span><span class="s">"1932"</span><span class="o">)||(</span> <span class="ss">'node2&gt;</span><span class="o">=</span><span class="s">"1929"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2 </span><span class="o">&lt;=</span><span class="s">"1932"</span><span class="o">))).</span><span class="n">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nf">display</span><span class="o">(</span><span class="nf">edge2dot</span><span class="o">(</span><span class="n">graphYearWord</span><span class="o">).</span>
+  <span class="nf">filter</span><span class="o">(((</span><span class="ss">'node1</span><span class="o">&gt;=</span><span class="s">"1929"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node1</span> <span class="o">&lt;=</span><span class="s">"1932"</span><span class="o">)||(</span> <span class="ss">'node2</span><span class="o">&gt;=</span><span class="s">"1929"</span> <span class="o">&amp;&amp;</span> <span class="ss">'node2</span> <span class="o">&lt;=</span><span class="s">"1932"</span><span class="o">))).</span><span class="py">select</span><span class="o">(</span><span class="s">"dotLine"</span><span class="o">))</span></code></pre></figure>
 
 <p></p>
 <a href="#">
