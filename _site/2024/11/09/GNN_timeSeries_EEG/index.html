@@ -84,7 +84,7 @@
 
 
     <!-- Post Header -->
-<header class="intro-header" style="background-image: url('/img/page107.jpg')">
+<header class="intro-header" style="background-image: url('/img/page116.jpg')">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
@@ -132,7 +132,7 @@
 </p>
 <ul>
     <li>
-        <strong>Study 1:</strong> Used CNNs and time series analysis to classify EEG signals, showing higher accuracy with Gramian Angular Field (GAF) transformations but limited success in distinguishing Alcoholic and Control groups for single-stimulus trials.
+        <i>Study 1:</i> Used CNNs and time series analysis to classify EEG signals, showing higher accuracy with Gramian Angular Field (GAF) transformations but limited success in distinguishing Alcoholic and Control groups for single-stimulus trials.
     </li>
     <p></p>
     <a href="#">
@@ -144,7 +144,7 @@
     </p>
 
     <li>
-        <strong>Study 2:</strong> Employed GNN Graph Classification models, representing each trial as a graph with EEG channels as nodes. While this approach improved classification accuracy, it struggled with single-stimulus trials and highlighted the need for more detailed connectivity analysis.
+        <i>Study 2:</i> Employed GNN Graph Classification models, representing each trial as a graph with EEG channels as nodes. While this approach improved classification accuracy, it struggled with single-stimulus trials and highlighted the need for more detailed connectivity analysis.
     </li>
 </ul>
 
@@ -173,7 +173,7 @@
 <ul>
     <li>We loaded the standard EEG montage (<code>'standard_1005'</code>) using the <strong>mne</strong> library.</li>
     <li>Channel positions were retrieved as (x, y, z) coordinates, representing each EEG channel in 3D space.</li>
-    <li>Pairwise Euclidean distances between channels were calculated using <strong>scipy.spatial.distance</strong>, capturing the spatial proximity between electrodes.</li>
+    <li>Pairwise Euclidean distances between channels were calculated using <b>scipy.spatial.distance</b>, capturing the spatial proximity between electrodes.</li>
 </ul>
 
 <h5>Distance Matrix Construction</h5>
@@ -194,15 +194,15 @@
     <li>We built an initial graph representing the spatial configuration of the EEG channels.</li>
     <li>In this graph:
         <ul>
-            <li><strong>Nodes:</strong> Represent EEG channels.</li>
-            <li><strong>Edges:</strong> Represent spatial proximity between channels.</li>
+            <li><i>Nodes:</i> Represent EEG channels.</li>
+            <li><i>Edges:</i> Represent spatial proximity between channels.</li>
         </ul>
     </li>
     <li>Time-series EEG signals for each channel were incorporated as node features, capturing both spatial and temporal dependencies within the EEG data.</li>
 </ul>
 
 <p>
-    <strong>Figure 2:</strong> An overview of the EEG graph analysis pipeline. The initial graph (left) is built using spatial and temporal EEG data. The GNN Link Prediction model (center) processes the graph to learn node connections, generating embedded vectors (right) that capture complex relationships within the EEG signals for further analysis.
+    Figure 2: An overview of the EEG graph analysis pipeline. The initial graph (left) is built using spatial and temporal EEG data. The GNN Link Prediction model (center) processes the graph to learn node connections, generating embedded vectors (right) that capture complex relationships within the EEG signals for further analysis.
 </p>
 <p></p>
 <p><a href="#">
@@ -230,9 +230,13 @@
 <p>This preprocessing step was crucial as it prepared the dataset for our deeper analysis, allowing us to model brain connectivity patterns effectively. Through this structured data, we could dive into the fascinating world of neural dynamics and uncover insights into how alcohol exposure might influence brain connectivity.</p>
 
 <h4>Prepare Input Data for GNN Link Prediction Model</h4>
+<p>
+The initial graph structure was created by calculating pairwise Euclidean distances between EEG channels, as outlined in the EEG Channel Position Mapping and Graph Construction subsection of the Methods section. These distances capture the spatial relationships between electrodes based on their physical positions on the scalp. The maximum of the minimum distances between EEG channels was calculated to be 0.038, and to prevent isolated nodes, a slightly higher threshold of 0.04 was used to filter and retain the closest channel pairs. This process resulted in a consistent graph structure with 61 nodes and 108 edges, representing the spatial layout of EEG channels across all subjects and trials. This shared graph provides a uniform topology for all subsequent subject-trial graphs, facilitating comparative analysis.
+</p>
+<p>
+After establishing the graph structure, we defined graph nodes and their features for each subject-trial combination. Each node corresponds to one of the 61 EEG channels, while node features are derived from the time series signals recorded at these positions during the trials. The data was grouped by type (Alcohol and Control), subject, trial, and channel position, forming structured datasets that capture both spatial and temporal characteristics of the EEG signals. While the spatial configuration of the graph remains constant, node features vary based on each subject and trial, enabling the GNN Link Prediction model to detect connectivity patterns specific to different experimental conditions. For further details on the data preparation process, refer to our related blog post [18].
 
-<p>The initial graph structure was created by calculating pairwise Euclidean distances between EEG channels, as outlined in the EEG Channel Position Mapping and Graph Construction subsection of the Methods section. These distances capture the spatial relationships between electrodes based on their physical positions on the scalp. The maximum of the minimum distances between EEG channels was calculated to be 0.038, and to prevent isolated nodes, a slightly higher threshold of 0.04 was used to filter and retain the closest channel pairs. This process resulted in a consistent graph structure with 61 nodes and 108 edges, representing the spatial layout of EEG channels across all subjects and trials. This shared graph provides a uniform topology for all subsequent subject-trial graphs, facilitating comparative analysis.
-After establishing the graph structure, we defined graph nodes and their features for each subject-trial combination. Each node corresponds to one of the 61 EEG channels, while node features are derived from the time series signals recorded at these positions during the trials. The data was grouped by type (Alcohol and Control), subject, trial, and channel position, forming structured datasets that capture both spatial and temporal characteristics of the EEG signals. While the spatial configuration of the graph remains constant, node features vary based on each subject and trial, enabling the GNN Link Prediction model to detect connectivity patterns specific to different experimental conditions. For further details on the data preparation process, refer to our related blog post [18].</p>
+</p>
 
 <h4>Data Preparation: Building the Initial Graph Structure</h4>
 
@@ -247,12 +251,15 @@ After establishing the graph structure, we defined graph nodes and their feature
 <span class="kn">from</span> <span class="n">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
 
 <span class="c1"># Load EEG channel positions using MNE's standard montage
-</span><span class="n">montage</span> <span class="o">=</span> <span class="n">mne</span><span class="p">.</span><span class="n">channels</span><span class="p">.</span><span class="nf">make_standard_montage</span><span class="p">(</span><span class="sh">'</span><span class="s">standard_1005</span><span class="sh">'</span><span class="p">)</span>
+</span>
+<span class="n">montage</span> <span class="o">=</span> <span class="n">mne</span><span class="p">.</span><span class="n">channels</span><span class="p">.</span><span class="nf">make_standard_montage</span><span class="p">(</span><span class="sh">'</span><span class="s">standard_1005</span><span class="sh">'</span><span class="p">)</span>
 <span class="n">pos</span> <span class="o">=</span> <span class="n">montage</span><span class="p">.</span><span class="nf">get_positions</span><span class="p">()[</span><span class="sh">'</span><span class="s">ch_pos</span><span class="sh">'</span><span class="p">]</span>
 <span class="n">uppercase_pos</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">.</span><span class="nf">upper</span><span class="p">():</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pos</span><span class="p">.</span><span class="nf">items</span><span class="p">()}</span>
 
 <span class="c1"># Filter positions to retain only the relevant EEG channels
-</span><span class="n">filtered_positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">positions</span> <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">uppercase_pos</span><span class="p">]</span>
+</span>
+<span class="n">filtered_positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">positions</span> <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">uppercase_pos</span><span class="p">]</span>
+
 <span class="nf">len</span><span class="p">(</span><span class="n">filtered_positions</span><span class="p">)</span>
 <span class="mi">61</span></code></pre></figure>
 
@@ -263,16 +270,19 @@ After establishing the graph structure, we defined graph nodes and their feature
 <p></p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Extract coordinates for the filtered EEG channels
-</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="n">uppercase_pos</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">filtered_positions</span><span class="p">])</span>
+</span>
+<span class="n">coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="n">uppercase_pos</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">filtered_positions</span><span class="p">])</span>
 <span class="n">distance_matrix</span> <span class="o">=</span> <span class="nf">squareform</span><span class="p">(</span><span class="nf">pdist</span><span class="p">(</span><span class="n">coordinates</span><span class="p">))</span>
 
 <span class="c1"># Calculate pairwise distances and store them in a list
-</span><span class="n">distance_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span>
+<span class="n">distance_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pos1</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">filtered_positions</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">pos2</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">filtered_positions</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>  <span class="c1"># Avoid duplicate pairs and self-distances
-</span>            <span class="n">distance</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>  
+            <span class="n">distance</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
             <span class="n">distance_list</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">pos1</span><span class="si">}</span><span class="s">, </span><span class="si">{</span><span class="n">pos2</span><span class="si">}</span><span class="s">, </span><span class="si">{</span><span class="n">distance</span><span class="si">:</span><span class="p">.</span><span class="mi">6</span><span class="n">f</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
 <span class="nf">len</span><span class="p">(</span><span class="n">distance_list</span><span class="p">)</span>
 <span class="mi">3660</span></code></pre></figure>
 
@@ -285,9 +295,11 @@ After establishing the graph structure, we defined graph nodes and their feature
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
 
 <span class="c1"># Split distance data into a structured DataFrame
-</span><span class="n">split_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="sh">"</span><span class="s">, </span><span class="sh">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">distance_list</span><span class="p">]</span>
+</span>
+<span class="n">split_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="sh">"</span><span class="s">, </span><span class="sh">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">distance_list</span><span class="p">]</span>
 <span class="n">distance_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">split_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">left</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">right</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">distance</span><span class="sh">"</span><span class="p">])</span>
 <span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
 <span class="n">distance_df</span><span class="p">.</span><span class="nf">head</span><span class="p">()</span>
 <span class="c1"># Example output
 # left    right    distance
@@ -298,15 +310,17 @@ After establishing the graph structure, we defined graph nodes and their feature
 # AF1     C1       0.107897
 </span>
 <span class="c1"># Calculate the maximum of the minimum distances
-</span><span class="n">min_distances</span> <span class="o">=</span> <span class="p">{}</span>
+</span>
+<span class="n">min_distances</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="nf">set</span><span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">]).</span><span class="nf">union</span><span class="p">(</span><span class="nf">set</span><span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">])):</span>
     <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">distance_df</span><span class="p">[(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">position</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">position</span><span class="p">)]</span>
     <span class="n">min_distance</span> <span class="o">=</span> <span class="n">filtered_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">].</span><span class="nf">min</span><span class="p">()</span>
     <span class="n">min_distances</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_distance</span>
 
 <span class="n">max_of_min_distances</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="n">min_distances</span><span class="p">.</span><span class="nf">values</span><span class="p">())</span>
+
 <span class="n">max_of_min_distances</span>
-<span class="c1"># Output: 0.038043</span></code></pre></figure>
+<span class="mf">0.038043</span></code></pre></figure>
 
 <p></p>
 
@@ -325,6 +339,7 @@ After establishing the graph structure, we defined graph nodes and their feature
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
 <span class="kn">import</span> <span class="n">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
 <span class="n">plt</span><span class="p">.</span><span class="nf">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">plt</span><span class="p">.</span><span class="nf">hist</span><span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="sh">'</span><span class="s">k</span><span class="sh">'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="nf">title</span><span class="p">(</span><span class="sh">'</span><span class="s">Distribution of Distances Between Electrode Positions</span><span class="sh">'</span><span class="p">)</span>
@@ -334,17 +349,18 @@ After establishing the graph structure, we defined graph nodes and their feature
 <span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
 
 <span class="c1"># Print basic statistics
-</span><span class="nf">print</span><span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">].</span><span class="nf">describe</span><span class="p">())</span></code></pre></figure>
+</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">].</span><span class="nf">describe</span><span class="p">())</span></code></pre></figure>
 
 <p></p>
 
 <p>Basic statistics of the distances:</p>
 <ul>
-    <li><strong>Count:</strong> 3660</li>
-    <li><strong>Mean:</strong> 0.119815</li>
-    <li><strong>Standard Deviation:</strong> 0.045156</li>
-    <li><strong>Min:</strong> 0.018912</li>
-    <li><strong>Max:</strong> 0.206672</li>
+    <li><i>Count:</i> 3660</li>
+    <li><i>Mean:</i> 0.119815</li>
+    <li><i>Standard Deviation:</i> 0.045156</li>
+    <li><i>Min:</i> 0.018912</li>
+    <li><i>Max:</i> 0.206672</li>
 </ul>
 
 <p>Filtered edges below the threshold distance (<code>0.04</code>) were selected to ensure a fully connected graph. The following code demonstrates the construction of the graph:</p>
@@ -354,15 +370,18 @@ After establishing the graph structure, we defined graph nodes and their feature
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
 
 <span class="c1"># Filter pairs below the threshold
-</span><span class="n">filtered_pairs</span> <span class="o">=</span> <span class="n">distance_df</span><span class="p">[</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.04</span><span class="p">]</span>
+</span>
+<span class="n">filtered_pairs</span> <span class="o">=</span> <span class="n">distance_df</span><span class="p">[</span><span class="n">distance_df</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.04</span><span class="p">]</span>
 
 <span class="c1"># Create the graph and add edges with weights
-</span><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nc">Graph</span><span class="p">()</span>
+</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nc">Graph</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">filtered_pairs</span><span class="p">.</span><span class="nf">iterrows</span><span class="p">():</span>
     <span class="n">G</span><span class="p">.</span><span class="nf">add_edge</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">],</span> <span class="n">weight</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="sh">'</span><span class="s">distance</span><span class="sh">'</span><span class="p">])</span>
 
 <span class="c1"># Visualize the graph
-</span><span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nf">kamada_kawai_layout</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nf">kamada_kawai_layout</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
 <span class="n">nx</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="sh">'</span><span class="s">white</span><span class="sh">'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span></code></pre></figure>
 
@@ -391,29 +410,35 @@ After establishing the graph structure, we defined graph nodes and their feature
 <span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
 
 <span class="c1"># Create an edges DataFrame from the graph's edges
-</span><span class="n">edges</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">G</span><span class="p">.</span><span class="n">edges</span><span class="p">)</span>
+</span>
+<span class="n">edges</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">G</span><span class="p">.</span><span class="n">edges</span><span class="p">)</span>
 <span class="n">edges</span><span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
 <span class="c1"># Separate feature and metadata columns
-</span><span class="n">values</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">262</span><span class="p">]</span>
+</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">262</span><span class="p">]</span>
 <span class="n">metavalues1</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
 <span class="n">metavalues2</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">262</span><span class="p">:]</span>
 <span class="n">metavalues</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">([</span><span class="n">metavalues1</span><span class="p">,</span> <span class="n">metavalues2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># Drop unnecessary metadata columns and merge with edges
-</span><span class="n">metaData</span> <span class="o">=</span> <span class="n">metavalues</span><span class="p">.</span><span class="nf">drop</span><span class="p">([</span><span class="sh">'</span><span class="s">trial</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">match</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">channel</span><span class="sh">'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span>
+<span class="n">metaData</span> <span class="o">=</span> <span class="n">metavalues</span><span class="p">.</span><span class="nf">drop</span><span class="p">([</span><span class="sh">'</span><span class="s">trial</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">match</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">channel</span><span class="sh">'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">edges_left</span> <span class="o">=</span> <span class="n">metaData</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="sh">'</span><span class="s">positionIdx</span><span class="sh">'</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">).</span><span class="nf">drop</span><span class="p">(</span><span class="sh">'</span><span class="s">position</span><span class="sh">'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">edges_left</span><span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">index</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">left_index</span><span class="sh">'</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">edges_right</span> <span class="o">=</span> <span class="n">edges_left</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">metaData</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="sh">'</span><span class="s">positionIdx</span><span class="sh">'</span><span class="p">).</span><span class="nf">drop</span><span class="p">(</span><span class="sh">'</span><span class="s">position</span><span class="sh">'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">edges_right</span> <span class="o">=</span> <span class="n">edges_left</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">metaData</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="sh">'</span><span class="s">right</span><span class="sh">'</span><span class="p">,</span>
+   <span class="n">right_on</span><span class="o">=</span><span class="sh">'</span><span class="s">positionIdx</span><span class="sh">'</span><span class="p">).</span><span class="nf">drop</span><span class="p">(</span><span class="sh">'</span><span class="s">position</span><span class="sh">'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">edges_right</span><span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">index</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">right_index</span><span class="sh">'</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
 <span class="c1"># Filter edges by group matching and reset index
-</span><span class="n">filtered_edges</span> <span class="o">=</span> <span class="n">edges_right</span><span class="p">[</span><span class="n">edges_right</span><span class="p">[</span><span class="sh">'</span><span class="s">group_x</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">edges_right</span><span class="p">[</span><span class="sh">'</span><span class="s">group_y</span><span class="sh">'</span><span class="p">]]</span>
+</span>
+<span class="n">filtered_edges</span> <span class="o">=</span> <span class="n">edges_right</span><span class="p">[</span><span class="n">edges_right</span><span class="p">[</span><span class="sh">'</span><span class="s">group_x</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">edges_right</span><span class="p">[</span><span class="sh">'</span><span class="s">group_y</span><span class="sh">'</span><span class="p">]]</span>
 <span class="n">edges_final</span> <span class="o">=</span> <span class="n">filtered_edges</span><span class="p">.</span><span class="nf">drop</span><span class="p">([</span><span class="sh">'</span><span class="s">group_y</span><span class="sh">'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">).</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="n">edges_final</span><span class="p">[</span><span class="sh">'</span><span class="s">index_final</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">edges_final</span><span class="p">.</span><span class="n">index</span>  <span class="c1"># Add final index as a column
 </span>
 <span class="c1"># Create the final NetworkX graph from the processed edges DataFrame
-</span><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nf">from_pandas_edgelist</span><span class="p">(</span><span class="n">edges_final</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="sh">'</span><span class="s">left_index</span><span class="sh">'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="sh">'</span><span class="s">right_index</span><span class="sh">'</span><span class="p">)</span></code></pre></figure>
+</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nf">from_pandas_edgelist</span><span class="p">(</span><span class="n">edges_final</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="sh">'</span><span class="s">left_index</span><span class="sh">'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="sh">'</span><span class="s">right_index</span><span class="sh">'</span><span class="p">)</span></code></pre></figure>
 
 <p></p>
 
@@ -425,19 +450,21 @@ After establishing the graph structure, we defined graph nodes and their feature
 <span class="kn">import</span> <span class="n">torch</span>
 
 <span class="c1"># Convert NetworkX graph to DGL graph
-</span><span class="n">g</span> <span class="o">=</span> <span class="n">dgl</span><span class="p">.</span><span class="nf">from_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">dgl</span><span class="p">.</span><span class="nf">from_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
 
 <span class="c1"># Convert EEG time series data to a tensor and add it as node features
-</span><span class="n">values</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">262</span><span class="p">]</span>
+</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">262</span><span class="p">]</span>
 <span class="n">features_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">values</span><span class="p">.</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">g</span><span class="p">.</span><span class="n">ndata</span><span class="p">[</span><span class="sh">'</span><span class="s">feat</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">features_tensor</span>
 
 <span class="c1"># Display the graph summary
-</span><span class="n">g</span>
-<span class="c1"># Output:
-# Graph(num_nodes=3721, num_edges=13176,
-#       ndata_schemes={'feat': Scheme(shape=(256,), dtype=torch.float32)}
-#       edata_schemes={})</span></code></pre></figure>
+</span>
+<span class="n">g</span>
+<span class="nc">Graph</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3721</span><span class="p">,</span> <span class="n">num_edges</span><span class="o">=</span><span class="mi">13176</span><span class="p">,</span>
+      <span class="n">ndata_schemes</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">feat</span><span class="sh">'</span><span class="p">:</span> <span class="nc">Scheme</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">)}</span>
+      <span class="n">edata_schemes</span><span class="o">=</span><span class="p">{})</span></code></pre></figure>
 
 <p></p>
 
@@ -450,9 +477,9 @@ After establishing the graph structure, we defined graph nodes and their feature
 <p>We utilized the GraphSAGE link prediction model, implemented with the Deep Graph Library (DGL), to train our model on the EEG graph data. GraphSAGE employs two layers to aggregate information from neighboring nodes, enabling the model to capture complex connectivity patterns and interactions between EEG channels.</p>
 
 <ul>
-    <li><strong>Total Nodes:</strong> 3,721</li>
-    <li><strong>Total Edges:</strong> 13,176</li>
-    <li><strong>Node Feature Size:</strong> 256</li>
+    <li><i>Total Nodes:</i> 3,721</li>
+    <li><i>Total Edges:</i> 13,176</li>
+    <li><i>Node Feature Size:</i> 256</li>
 </ul>
 
 <p>The model’s performance was evaluated using the Area Under the Curve (AUC) metric, achieving an accuracy of <strong>81.45%</strong>. This high AUC score demonstrates the model’s effectiveness in predicting connectivity patterns and capturing the underlying signal dependencies within the EEG data.</p>
@@ -478,31 +505,38 @@ After establishing the graph structure, we defined graph nodes and their feature
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">torch</span>
 
 <span class="c1"># Define a function to calculate cosine similarity using PyTorch
-</span><span class="k">def</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
+</span>
+<span class="k">def</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
     <span class="k">return</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
-    <span class="c1"># Ensure inputs are PyTorch tensors
-</span>    <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
+
+<span class="c1"># Ensure inputs are PyTorch tensors
+</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 
-    <span class="c1"># Adjust dimensions for single-row tensors
-</span>    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<span class="c1"># Adjust dimensions for single-row tensors
+</span>
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="c1"># Normalize the vectors
-</span>    <span class="n">a_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">functional</span><span class="p">.</span><span class="nf">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Normalize the vectors
+</span>
+    <span class="n">a_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">functional</span><span class="p">.</span><span class="nf">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">b_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">functional</span><span class="p">.</span><span class="nf">normalize</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="c1"># Compute cosine similarity
-</span>    <span class="k">return</span> <span class="n">torch</span><span class="p">.</span><span class="nf">mm</span><span class="p">(</span><span class="n">a_norm</span><span class="p">,</span> <span class="n">b_norm</span><span class="p">.</span><span class="n">T</span><span class="p">)</span>
+<span class="c1"># Compute cosine similarity
+</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="p">.</span><span class="nf">mm</span><span class="p">(</span><span class="n">a_norm</span><span class="p">,</span> <span class="n">b_norm</span><span class="p">.</span><span class="n">T</span><span class="p">)</span>
 
 <span class="c1"># Example usage: compute cosine similarity for matrix `h`
-</span><span class="n">cosine_scores</span> <span class="o">=</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span></code></pre></figure>
+</span>
+<span class="n">cosine_scores</span> <span class="o">=</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span></code></pre></figure>
 
 <p></p>
 
@@ -517,31 +551,40 @@ After establishing the graph structure, we defined graph nodes and their feature
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">group_scores</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="c1"># Iterate over each unique group in the 'group' column
-</span><span class="k">for</span> <span class="n">group_idx</span> <span class="ow">in</span> <span class="n">metaRawData</span><span class="p">[</span><span class="sh">'</span><span class="s">group</span><span class="sh">'</span><span class="p">].</span><span class="nf">unique</span><span class="p">():</span>
-    <span class="c1"># Filter rows that belong to the current group
-</span>    <span class="n">group_data</span> <span class="o">=</span> <span class="n">metaRawData</span><span class="p">[</span><span class="n">metaRawData</span><span class="p">[</span><span class="sh">'</span><span class="s">group</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">group_idx</span><span class="p">]</span>
+</span>
+<span class="k">for</span> <span class="n">group_idx</span> <span class="ow">in</span> <span class="n">metaRawData</span><span class="p">[</span><span class="sh">'</span><span class="s">group</span><span class="sh">'</span><span class="p">].</span><span class="nf">unique</span><span class="p">():</span>
 
-    <span class="c1"># Extract `type`, `match`, and `name` for the group (assuming they are the same for the group)
-</span>    <span class="n">group_type</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># Filter rows that belong to the current group
+</span>
+    <span class="n">group_data</span> <span class="o">=</span> <span class="n">metaRawData</span><span class="p">[</span><span class="n">metaRawData</span><span class="p">[</span><span class="sh">'</span><span class="s">group</span><span class="sh">'</span><span class="p">]</span> <span class="o">==</span> <span class="n">group_idx</span><span class="p">]</span>
+
+<span class="c1"># Extract `type`, `match`, and `name` for the group (assuming they are the same for the group)
+</span>
+    <span class="n">group_type</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">group_match</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="sh">'</span><span class="s">match</span><span class="sh">'</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">group_name</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="c1"># Get the indices of the rows for the current group
-</span>    <span class="n">group_indices</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">.</span><span class="n">index</span>
+<span class="c1"># Get the indices of the rows for the current group
+</span>
+    <span class="n">group_indices</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">.</span><span class="n">index</span>
 
-    <span class="c1"># Calculate self-join cosine similarity within the group
-</span>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row_i</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">group_indices</span><span class="p">):</span>
+<span class="c1"># Calculate self-join cosine similarity within the group
+</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row_i</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">group_indices</span><span class="p">):</span>
         <span class="n">position_i</span> <span class="o">=</span> <span class="n">metaRawData</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row_i</span><span class="p">,</span> <span class="sh">'</span><span class="s">position</span><span class="sh">'</span><span class="p">]</span>
 
-        <span class="c1"># Start from the next index to avoid duplicate pairs (i, j) and (j, i)
-</span>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">row_j</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">group_indices</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span> <span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+<span class="c1"># Start from the next index to avoid duplicate pairs (i, j) and (j, i)
+</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">row_j</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">group_indices</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span> <span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">position_j</span> <span class="o">=</span> <span class="n">metaRawData</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row_j</span><span class="p">,</span> <span class="sh">'</span><span class="s">position</span><span class="sh">'</span><span class="p">]</span>
 
-            <span class="c1"># Retrieve cosine similarity score from cosine_scores array
-</span>            <span class="n">cos</span> <span class="o">=</span> <span class="n">cosine_scores</span><span class="p">[</span><span class="n">row_i</span><span class="p">][</span><span class="n">row_j</span><span class="p">].</span><span class="nf">item</span><span class="p">()</span>
+<span class="c1"># Retrieve cosine similarity score from cosine_scores array
+</span>
+            <span class="n">cos</span> <span class="o">=</span> <span class="n">cosine_scores</span><span class="p">[</span><span class="n">row_i</span><span class="p">][</span><span class="n">row_j</span><span class="p">].</span><span class="nf">item</span><span class="p">()</span>
 
-            <span class="c1"># Append the results to the list
-</span>            <span class="n">group_scores</span><span class="p">.</span><span class="nf">append</span><span class="p">({</span>
+<span class="c1"># Append the results to the list
+</span>
+            <span class="n">group_scores</span><span class="p">.</span><span class="nf">append</span><span class="p">({</span>
                 <span class="sh">'</span><span class="s">group</span><span class="sh">'</span><span class="p">:</span> <span class="n">group_idx</span><span class="p">,</span>
                 <span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">:</span> <span class="n">group_type</span><span class="p">,</span>
                 <span class="sh">'</span><span class="s">match</span><span class="sh">'</span><span class="p">:</span> <span class="n">group_match</span><span class="p">,</span>
@@ -577,7 +620,9 @@ After establishing the graph structure, we defined graph nodes and their feature
 <p>Key Insights and Applications</p>
 <ul>
     <li>Condition-Wise Connectivity Analysis: Aggregating cosine similarity scores allows us to compare connectivity strength between experimental groups (e.g., Alcohol vs. Control) under various conditions (e.g., Single Stimulus, Two Stimuli).</li>
+
     <li>Node-Level Connectivity Patterns: The <code>position_i</code> and <code>position_j</code> fields enable spatial mapping of connectivity patterns across the brain.</li>
+
     <li>Group Comparisons: By grouping the results, we can identify statistically significant differences in connectivity patterns between conditions.</li>
 </ul>
 
@@ -596,15 +641,15 @@ After establishing the graph structure, we defined graph nodes and their feature
 <p>We instead focused on the <strong>‘Two stimuli - matched’</strong> and <strong>‘Two stimuli - non-matched’</strong> conditions, where clearer distinctions between the groups were observed:</p>
 
 <ul>
-    <li><strong>Alcohol group:</strong> Average cosine similarity of 0.546.</li>
-    <li><strong>Control group:</strong> Average cosine similarity of 0.645.</li>
+    <li><i>Alcohol group:</i> Average cosine similarity of 0.546.</li>
+    <li><i>Control group:</i> Average cosine similarity of 0.645.</li>
 </ul>
 
 <p>The higher average cosine similarity in the Control group suggests stronger overall connectivity compared to the Alcohol group. This finding may reflect differences in the efficiency or robustness of neural communication between the two groups. These variations could be indicative of the impact of alcohol on brain connectivity.</p>
 
 <p>In the following sections, we will delve deeper into these patterns at the node level, highlighting specific regions of the brain with both high and low signal correlations between the groups.</p>
 
-<h6>Table 1: Average Cosine Similarities by Condition and Group</h6>
+<p>This table shows average cosine similarities by condition and group:</p>
 <p></p>
 <p><a href="#">
     <img src="/img/eegTable1.jpg" alt="Post Sample Image" width="471" />

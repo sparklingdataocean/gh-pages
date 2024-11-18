@@ -4,7 +4,7 @@ title:      "Graph Neural Networks for EEG Connectivity Analysis"
 subtitle:   "Using GNN Link Prediction to Uncover Hidden Patterns in EEG Time Series Data"
 date:       2024-11-09 12:00:00
 author:     "Melenar"
-header-img: "img/page107.jpg"
+header-img: "img/page116.jpg"
 ---
 
 
@@ -34,7 +34,7 @@ header-img: "img/page107.jpg"
 </p>
 <ul>
     <li>
-        <strong>Study 1:</strong> Used CNNs and time series analysis to classify EEG signals, showing higher accuracy with Gramian Angular Field (GAF) transformations but limited success in distinguishing Alcoholic and Control groups for single-stimulus trials.
+        <i>Study 1:</i> Used CNNs and time series analysis to classify EEG signals, showing higher accuracy with Gramian Angular Field (GAF) transformations but limited success in distinguishing Alcoholic and Control groups for single-stimulus trials.
     </li>
     <p></p>
     <a href="#">
@@ -46,7 +46,7 @@ header-img: "img/page107.jpg"
     </p>
 
     <li>
-        <strong>Study 2:</strong> Employed GNN Graph Classification models, representing each trial as a graph with EEG channels as nodes. While this approach improved classification accuracy, it struggled with single-stimulus trials and highlighted the need for more detailed connectivity analysis.
+        <i>Study 2:</i> Employed GNN Graph Classification models, representing each trial as a graph with EEG channels as nodes. While this approach improved classification accuracy, it struggled with single-stimulus trials and highlighted the need for more detailed connectivity analysis.
     </li>
 </ul>
 
@@ -78,7 +78,7 @@ header-img: "img/page107.jpg"
 <ul>
     <li>We loaded the standard EEG montage (<code>'standard_1005'</code>) using the <strong>mne</strong> library.</li>
     <li>Channel positions were retrieved as (x, y, z) coordinates, representing each EEG channel in 3D space.</li>
-    <li>Pairwise Euclidean distances between channels were calculated using <strong>scipy.spatial.distance</strong>, capturing the spatial proximity between electrodes.</li>
+    <li>Pairwise Euclidean distances between channels were calculated using <b>scipy.spatial.distance</b>, capturing the spatial proximity between electrodes.</li>
 </ul>
 
 <h5>Distance Matrix Construction</h5>
@@ -99,15 +99,15 @@ header-img: "img/page107.jpg"
     <li>We built an initial graph representing the spatial configuration of the EEG channels.</li>
     <li>In this graph:
         <ul>
-            <li><strong>Nodes:</strong> Represent EEG channels.</li>
-            <li><strong>Edges:</strong> Represent spatial proximity between channels.</li>
+            <li><i>Nodes:</i> Represent EEG channels.</li>
+            <li><i>Edges:</i> Represent spatial proximity between channels.</li>
         </ul>
     </li>
     <li>Time-series EEG signals for each channel were incorporated as node features, capturing both spatial and temporal dependencies within the EEG data.</li>
 </ul>
 
 <p>
-    <strong>Figure 2:</strong> An overview of the EEG graph analysis pipeline. The initial graph (left) is built using spatial and temporal EEG data. The GNN Link Prediction model (center) processes the graph to learn node connections, generating embedded vectors (right) that capture complex relationships within the EEG signals for further analysis.
+    Figure 2: An overview of the EEG graph analysis pipeline. The initial graph (left) is built using spatial and temporal EEG data. The GNN Link Prediction model (center) processes the graph to learn node connections, generating embedded vectors (right) that capture complex relationships within the EEG signals for further analysis.
 </p>
 <p></p>
 <a href="#">
@@ -142,11 +142,12 @@ Using the EEG-Alcohol dataset from Kaggle, we preprocessed data from 61 EEG chan
 
 
 <h4>Prepare Input Data for GNN Link Prediction Model</h4>
-
+<p>
 The initial graph structure was created by calculating pairwise Euclidean distances between EEG channels, as outlined in the EEG Channel Position Mapping and Graph Construction subsection of the Methods section. These distances capture the spatial relationships between electrodes based on their physical positions on the scalp. The maximum of the minimum distances between EEG channels was calculated to be 0.038, and to prevent isolated nodes, a slightly higher threshold of 0.04 was used to filter and retain the closest channel pairs. This process resulted in a consistent graph structure with 61 nodes and 108 edges, representing the spatial layout of EEG channels across all subjects and trials. This shared graph provides a uniform topology for all subsequent subject-trial graphs, facilitating comparative analysis.
+</p><p>
 After establishing the graph structure, we defined graph nodes and their features for each subject-trial combination. Each node corresponds to one of the 61 EEG channels, while node features are derived from the time series signals recorded at these positions during the trials. The data was grouped by type (Alcohol and Control), subject, trial, and channel position, forming structured datasets that capture both spatial and temporal characteristics of the EEG signals. While the spatial configuration of the graph remains constant, node features vary based on each subject and trial, enabling the GNN Link Prediction model to detect connectivity patterns specific to different experimental conditions. For further details on the data preparation process, refer to our related blog post [18].
 
-
+</p>
 
 
 <h4>Data Preparation: Building the Initial Graph Structure</h4>
@@ -164,12 +165,15 @@ import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
 # Load EEG channel positions using MNE's standard montage
+
 montage = mne.channels.make_standard_montage('standard_1005')
 pos = montage.get_positions()['ch_pos']
 uppercase_pos = {k.upper(): v for k, v in pos.items()}
 
 # Filter positions to retain only the relevant EEG channels
+
 filtered_positions = [ch for ch in positions if ch in uppercase_pos]
+
 len(filtered_positions)
 61
 {% endhighlight %}
@@ -180,16 +184,19 @@ len(filtered_positions)
 <p></p>
 {% highlight python %}
 # Extract coordinates for the filtered EEG channels
+
 coordinates = np.array([uppercase_pos[ch] for ch in filtered_positions])
 distance_matrix = squareform(pdist(coordinates))
 
 # Calculate pairwise distances and store them in a list
+
 distance_list = []
 for i, pos1 in enumerate(filtered_positions):
     for j, pos2 in enumerate(filtered_positions):
-        if i != j:  # Avoid duplicate pairs and self-distances
+        if i != j:  
             distance = distance_matrix[i, j]
             distance_list.append(f"{pos1}, {pos2}, {distance:.6f}")
+
 len(distance_list)
 3660
 {% endhighlight %}
@@ -202,9 +209,11 @@ len(distance_list)
 import pandas as pd
 
 # Split distance data into a structured DataFrame
+
 split_data = [item.split(", ") for item in distance_list]
 distance_df = pd.DataFrame(split_data, columns=["left", "right", "distance"])
 distance_df['distance'] = distance_df['distance'].astype(float)
+
 distance_df.head()
 # Example output
 # left    right    distance
@@ -215,6 +224,7 @@ distance_df.head()
 # AF1     C1       0.107897
 
 # Calculate the maximum of the minimum distances
+
 min_distances = {}
 for position in set(distance_df['left']).union(set(distance_df['right'])):
     filtered_df = distance_df[(distance_df['left'] == position) | (distance_df['right'] == position)]
@@ -222,8 +232,9 @@ for position in set(distance_df['left']).union(set(distance_df['right'])):
     min_distances[position] = min_distance
 
 max_of_min_distances = max(min_distances.values())
+
 max_of_min_distances
-# Output: 0.038043
+0.038043
 {% endhighlight %}
 <p></p>
 
@@ -238,15 +249,13 @@ max_of_min_distances
 
 <p>This data preparation step was critical for constructing a meaningful graph structure that captures the spatial relationships between EEG channels. By incorporating both node positions and proximity-based edge definitions, this graph provides a solid foundation for analyzing connectivity patterns using Graph Neural Networks.</p>
 
-
-
-
 <p>The distribution of distances between electrode positions was analyzed to verify the spatial relationships used for graph construction. Below is a histogram illustrating the distance distribution:</p>
 
 <p></p>
 {% highlight python %}
 import pandas as pd
 import matplotlib.pyplot as plt
+
 plt.figure(figsize=(10, 6))
 plt.hist(distance_df['distance'], bins=30, edgecolor='k', alpha=0.7)
 plt.title('Distribution of Distances Between Electrode Positions')
@@ -256,6 +265,7 @@ plt.grid(True)
 plt.show()
 
 # Print basic statistics
+
 print(distance_df['distance'].describe())
 {% endhighlight %}
 <p></p>
@@ -264,11 +274,11 @@ print(distance_df['distance'].describe())
 
 <p>Basic statistics of the distances:</p>
 <ul>
-    <li><strong>Count:</strong> 3660</li>
-    <li><strong>Mean:</strong> 0.119815</li>
-    <li><strong>Standard Deviation:</strong> 0.045156</li>
-    <li><strong>Min:</strong> 0.018912</li>
-    <li><strong>Max:</strong> 0.206672</li>
+    <li><i>Count:</i> 3660</li>
+    <li><i>Mean:</i> 0.119815</li>
+    <li><i>Standard Deviation:</i> 0.045156</li>
+    <li><i>Min:</i> 0.018912</li>
+    <li><i>Max:</i> 0.206672</li>
 </ul>
 
 
@@ -279,14 +289,17 @@ print(distance_df['distance'].describe())
 import networkx as nx
 
 # Filter pairs below the threshold
+
 filtered_pairs = distance_df[distance_df['distance'] < 0.04]
 
 # Create the graph and add edges with weights
+
 G = nx.Graph()
 for index, row in filtered_pairs.iterrows():
     G.add_edge(row['left'], row['right'], weight=row['distance'])
 
 # Visualize the graph
+
 pos = nx.kamada_kawai_layout(G)
 nx.draw(G, pos, with_labels=True, node_color='white')
 plt.show()
@@ -320,29 +333,36 @@ import pandas as pd
 import networkx as nx
 
 # Create an edges DataFrame from the graph's edges
+
 edges = pd.DataFrame(G.edges)
 edges.rename(columns={0: 'left', 1: 'right'}, inplace=True)
 
 # Separate feature and metadata columns
+
 values = rawData.iloc[:, 6:262]
 metavalues1 = rawData.iloc[:, 0:6]
 metavalues2 = rawData.iloc[:, 262:]
 metavalues = pd.concat([metavalues1, metavalues2], axis=1)
 
 # Drop unnecessary metadata columns and merge with edges
+
 metaData = metavalues.drop(['trial', 'type', 'match', 'name', 'channel'], axis=1)
 edges_left = metaData.merge(edges, left_on='positionIdx', right_on='left').drop('position', axis=1)
 edges_left.rename(columns={'index': 'left_index'}, inplace=True)
-edges_right = edges_left.merge(metaData, left_on='right', right_on='positionIdx').drop('position', axis=1)
+edges_right = edges_left.merge(metaData, left_on='right',
+   right_on='positionIdx').drop('position', axis=1)
 edges_right.rename(columns={'index': 'right_index'}, inplace=True)
 
 # Filter edges by group matching and reset index
+
 filtered_edges = edges_right[edges_right['group_x'] == edges_right['group_y']]
 edges_final = filtered_edges.drop(['group_y'], axis=1).reset_index(drop=True)
 edges_final['index_final'] = edges_final.index  # Add final index as a column
 
 # Create the final NetworkX graph from the processed edges DataFrame
+
 G = nx.from_pandas_edgelist(edges_final, source='left_index', target='right_index')
+
 {% endhighlight %}
 <p></p>
 
@@ -355,19 +375,21 @@ import dgl
 import torch
 
 # Convert NetworkX graph to DGL graph
+
 g = dgl.from_networkx(G)
 
 # Convert EEG time series data to a tensor and add it as node features
+
 values = rawData.iloc[:, 6:262]
 features_tensor = torch.tensor(values.values, dtype=torch.float32)
 g.ndata['feat'] = features_tensor
 
 # Display the graph summary
+
 g
-# Output:
-# Graph(num_nodes=3721, num_edges=13176,
-#       ndata_schemes={'feat': Scheme(shape=(256,), dtype=torch.float32)}
-#       edata_schemes={})
+Graph(num_nodes=3721, num_edges=13176,
+      ndata_schemes={'feat': Scheme(shape=(256,), dtype=torch.float32)}
+      edata_schemes={})
 {% endhighlight %}
 <p></p>
 
@@ -377,9 +399,6 @@ g
 <p>For more information on the data preparation process and detailed GNN modeling steps, refer to our related <a href="#">blog post</a>.</p>
 
 
-
-
-
 <h4>Train the Model</h4>
 
 
@@ -387,9 +406,9 @@ g
 <p>We utilized the GraphSAGE link prediction model, implemented with the Deep Graph Library (DGL), to train our model on the EEG graph data. GraphSAGE employs two layers to aggregate information from neighboring nodes, enabling the model to capture complex connectivity patterns and interactions between EEG channels.</p>
 
 <ul>
-    <li><strong>Total Nodes:</strong> 3,721</li>
-    <li><strong>Total Edges:</strong> 13,176</li>
-    <li><strong>Node Feature Size:</strong> 256</li>
+    <li><i>Total Nodes:</i> 3,721</li>
+    <li><i>Total Edges:</i> 13,176</li>
+    <li><i>Node Feature Size:</i> 256</li>
 </ul>
 
 <p>The model’s performance was evaluated using the Area Under the Curve (AUC) metric, achieving an accuracy of <strong>81.45%</strong>. This high AUC score demonstrates the model’s effectiveness in predicting connectivity patterns and capturing the underlying signal dependencies within the EEG data.</p>
@@ -418,31 +437,39 @@ g
 import torch
 
 # Define a function to calculate cosine similarity using PyTorch
+
 def pytorch_cos_sim(a: torch.Tensor, b: torch.Tensor):
     return cos_sim(a, b)
 
 def cos_sim(a: torch.Tensor, b: torch.Tensor):
-    # Ensure inputs are PyTorch tensors
+
+# Ensure inputs are PyTorch tensors
+
     if not isinstance(a, torch.Tensor):
         a = torch.tensor(a)
     if not isinstance(b, torch.Tensor):
         b = torch.tensor(b)
 
-    # Adjust dimensions for single-row tensors
+# Adjust dimensions for single-row tensors
+
     if len(a.shape) == 1:
         a = a.unsqueeze(0)
     if len(b.shape) == 1:
         b = b.unsqueeze(0)
 
-    # Normalize the vectors
+# Normalize the vectors
+
     a_norm = torch.nn.functional.normalize(a, p=2, dim=1)
     b_norm = torch.nn.functional.normalize(b, p=2, dim=1)
 
-    # Compute cosine similarity
+# Compute cosine similarity
+
     return torch.mm(a_norm, b_norm.T)
 
 # Example usage: compute cosine similarity for matrix `h`
+
 cosine_scores = pytorch_cos_sim(h, h)
+
 {% endhighlight %}
 <p></p>
 
@@ -454,35 +481,42 @@ cosine_scores = pytorch_cos_sim(h, h)
 
 <p></p>
 {% highlight python %}
-
-
 group_scores = []
 
 # Iterate over each unique group in the 'group' column
+
 for group_idx in metaRawData['group'].unique():
-    # Filter rows that belong to the current group
+
+# Filter rows that belong to the current group
+
     group_data = metaRawData[metaRawData['group'] == group_idx]
 
-    # Extract `type`, `match`, and `name` for the group (assuming they are the same for the group)
+# Extract `type`, `match`, and `name` for the group (assuming they are the same for the group)
+
     group_type = group_data['type'].iloc[0]
     group_match = group_data['match'].iloc[0]
     group_name = group_data['name'].iloc[0]
 
-    # Get the indices of the rows for the current group
+# Get the indices of the rows for the current group
+
     group_indices = group_data.index
 
-    # Calculate self-join cosine similarity within the group
+# Calculate self-join cosine similarity within the group
+
     for i, row_i in enumerate(group_indices):
         position_i = metaRawData.loc[row_i, 'position']
 
-        # Start from the next index to avoid duplicate pairs (i, j) and (j, i)
+# Start from the next index to avoid duplicate pairs (i, j) and (j, i)
+
         for j, row_j in enumerate(group_indices[i+1:], start=i+1):
             position_j = metaRawData.loc[row_j, 'position']
 
-            # Retrieve cosine similarity score from cosine_scores array
+# Retrieve cosine similarity score from cosine_scores array
+
             cos = cosine_scores[row_i][row_j].item()
 
-            # Append the results to the list
+# Append the results to the list
+
             group_scores.append({
                 'group': group_idx,
                 'type': group_type,
@@ -520,7 +554,9 @@ for group_idx in metaRawData['group'].unique():
 Key Insights and Applications
 <ul>
     <li>Condition-Wise Connectivity Analysis: Aggregating cosine similarity scores allows us to compare connectivity strength between experimental groups (e.g., Alcohol vs. Control) under various conditions (e.g., Single Stimulus, Two Stimuli).</li>
+
     <li>Node-Level Connectivity Patterns: The <code>position_i</code> and <code>position_j</code> fields enable spatial mapping of connectivity patterns across the brain.</li>
+
     <li>Group Comparisons: By grouping the results, we can identify statistically significant differences in connectivity patterns between conditions.</li>
 </ul>
 
@@ -537,7 +573,6 @@ Key Insights and Applications
 <h4>Condition-wise Analysis of Cosine Similarities</h4>
 
 
-
 <p>To compare connectivity patterns between the Alcohol and Control groups, we computed the average cosine similarities from the embedded vectors generated by the model. These cosine similarities represent the strength of connectivity between brain regions, with higher values indicating stronger connections. The computed values were aggregated by condition type and match status to assess differences across the experimental groups.</p>
 
 <p>As shown in Table 1, the <strong>‘Single stimulus’</strong> condition revealed minimal differences between the Alcohol and Control groups. This finding aligns with results from our previous studies [2, 3]. Since the <strong>‘Single stimulus’</strong> condition did not show significant variation in connectivity patterns, it was excluded from further analysis.</p>
@@ -545,15 +580,15 @@ Key Insights and Applications
 <p>We instead focused on the <strong>‘Two stimuli - matched’</strong> and <strong>‘Two stimuli - non-matched’</strong> conditions, where clearer distinctions between the groups were observed:</p>
 
 <ul>
-    <li><strong>Alcohol group:</strong> Average cosine similarity of 0.546.</li>
-    <li><strong>Control group:</strong> Average cosine similarity of 0.645.</li>
+    <li><i>Alcohol group:</i> Average cosine similarity of 0.546.</li>
+    <li><i>Control group:</i> Average cosine similarity of 0.645.</li>
 </ul>
 
 <p>The higher average cosine similarity in the Control group suggests stronger overall connectivity compared to the Alcohol group. This finding may reflect differences in the efficiency or robustness of neural communication between the two groups. These variations could be indicative of the impact of alcohol on brain connectivity.</p>
 
 <p>In the following sections, we will delve deeper into these patterns at the node level, highlighting specific regions of the brain with both high and low signal correlations between the groups.</p>
 
-<h6>Table 1: Average Cosine Similarities by Condition and Group</h6>
+This table shows average cosine similarities by condition and group:
 <p></p>
 <a href="#">
     <img src="{{ site.baseurl }}/img/eegTable1.jpg" alt="Post Sample Image" width="471" >
@@ -662,10 +697,6 @@ Key Insights and Applications
 <p>
     Both groups demonstrate low connectivity in the central region, which is typically linked to motor and sensorimotor processing. The lower activity in these areas during visual trials suggests they are not heavily engaged, aligning with their expected limited role in visual perception and processing tasks.
 </p>
-
-
-
-
 
 
 
