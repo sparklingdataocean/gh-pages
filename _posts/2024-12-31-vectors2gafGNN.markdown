@@ -2,7 +2,7 @@
 layout:     post
 title:      "Pre-final222 Vector Caching in Graph Classification"
 subtitle:   "Enhancing Graph Neural Networks: Introducing Pre-final Vector Caching in Graph Classification"
-date:       2024-09-01 12:00:00
+date:       2024-12-31 12:00:00
 author:     "Melenar"
 header-img: "img/vectorPage6b.jpg"
 ---
