@@ -720,7 +720,7 @@ This table shows average cosine similarities by condition and group:
 
 <p></p>
 
-This study was presented in <i><a href="https://iwain.lucentia.es/programme/">"2024 International Workshop on Artificial Intelligence for Neuroscience"</a></i> - workshop in Alicante, Spain on November 26, 2024. Here are some slides from the presentation that are not described in this poster.
+This study was presented in <i><a href="https://iwain.lucentia.es/programme/">"2024 International Workshop on Artificial Intelligence for Neuroscience"</a></i> - workshop in Alicante, Spain on November 26, 2024. Here are some slides from the presentation that are not in this poster.
 <p></p>
 We started with explaining people that graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and even our social networks like Facebook as molecule graphs, traffic graph, and social network graph.
 
