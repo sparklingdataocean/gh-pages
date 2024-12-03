@@ -2,7 +2,7 @@
 layout:     post
 title:      "GNN Link Prediction for Country Population, Life Expectancy, Happiness "
 subtitle:   "Knowledge Graph of Country Populations: how to deal with variety of data domains"
-date:       2024-11-26 12:00:00
+date:       2024-12-26 12:00:00
 author:     "Melenar"
 header-img: "img/page125b.jpg"
 ---
