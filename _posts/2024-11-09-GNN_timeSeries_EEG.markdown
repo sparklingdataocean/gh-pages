@@ -715,12 +715,37 @@ This table shows average cosine similarities by condition and group:
     Beyond EEG analysis, this framework is adaptable to other types of time series data, making it a versatile tool for studying connectivity patterns and uncovering underlying physiological dynamics. By integrating AI with neuroscience, this work demonstrates how GNN Link Prediction models can enhance our understanding of brain connectivity and open new avenues for research and clinical applications.
 </p>
 
-
-
-
+<p></p>
+<h3>Workshop</h3>
 
 <p></p>
 
+This study was presented in <i><a href="https://iwain.lucentia.es/programme/">"2024 International Workshop on Artificial Intelligence for Neuroscience"</a></i> - workshop in Alicante, Spain on November 26, 2024. Here are some slides from the presentation that are not described in this poster.
+<p></p>
+We started with explaining people that graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and even our social networks like Facebook as molecule graphs, traffic graph, and social network graph.
+
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/alicante1.jpg" alt="Top Connected Node Pairs" width="711">
+</a>
+<p></p>
+Then we showed that perhaps the most important graph of all is the one inside us: the network of neurons and synapses that forms our brain and for neuroscience, understanding graphs is key to unraveling how our brains process information, learn, and adapt.
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/alicante2.jpg" alt="Top Connected Node Pairs" width="711">
+</a>
+<p></p>
+Then we introduced deep learning history, how GNN was created and what is the most important to know about GGN models.
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/alicante3.jpg" alt="Top Connected Node Pairs" width="711">
+</a>
+<p></p>
+Finally, we discussed why for neuroscience graph thinking is really important and how neuroscientists can start thinking in that direction.
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/alicante4.jpg" alt="Top Connected Node Pairs" width="711">
+</a>
 <p></p>
 
 <p></p>

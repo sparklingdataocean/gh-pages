@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Spark for Big Data Analytics.">
+
+    <title>GNN Link Prediction for Country Population, Life Expectancy, Happiness  - Sparkling Data Ocean</title>
+
+    <link rel="canonical" href="http://localhost:4000/2024/11/26/vectors2gafGNN/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Sparkling Data Ocean" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694347-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-114694347-1');
+    </script>
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sparkling Data Ocean</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+				
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+				
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/page125b.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>GNN Link Prediction for Country Population, Life Expectancy, Happiness </h1>
+                    
+                    <h2 class="subheading">Knowledge Graph of Country Populations: how to deal with variety of data domains</h2>
+                    
+                    <span class="meta">Posted by Melenar on November 26, 2024</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p><h3> Introduction</h3>
+<p></p>
+Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and even our social networks like Facebook, a molecule graph, a city map, a social network graph.
+<p></p>
+<p></p>
+<a href="#">
+    <img src="/img/gkgSlide1.jpg" alt="Post Sample Image" width="765" />
+</a>
+<p></p>
+<p></p>
+
+So why graphs?
+
+<p></p>
+
+People don’t think sequentially, especially when solving complex problems, often engaging in mind wandering.
+This may explain why the smartest people don’t have more neurons but instead have more connections, enabling dynamic and non-linear thinking.
+GNNs replicate this by modeling data as graphs, helping us uncover complex relationships and patterns in neuroscience.
+<p></p>
+What is graph thinking for data analysis: if humans think this way, why wouldn't we force machine to think this way?
+
+What is machine graph thinking? Data domains that can be represented as graphs can use graph thinking to get insights in data. GNN models were created for this reason.
+<p></p>
+To represent data as graph, start with thinking about relationships. Why relationships are important?
+<p></p>
+Using GNN for knowledge graphs that are built on variety of date domains is a challenge.
+<p></p>
+For spatial data, graph structure can be built based on coordinates. In EEG data we introduced it as
+<p></p>
+For countries neighbors can be defined by countries that they share borders with.
+
+<p></p>
+The next step will be to link these subgraphs through common connections. For example, when we have different domains for the same entities (countries), we connect the same countries across subgraphs.
+<p></p>
+Many data types can be converted to vectors -- everything -to- vector.
+<p></p>
+In this study we will put together information about:
+long time data for country populations
+a few years information about population by age;
+median, age 0-5, age 15-64,  65-older
+several years of information about country life expectancy
+income
+country territory
+density
+agriculture
+
+<p></p>
+
+<p></p>
+
+To define neighbors for countries we can use information about country borders -
+Getting information about pairs of countries that share borders will be interesting, especially if we have information about types and quality of borders -- how can people cross the borders.
+<p></p>
+Two types of country borders: land borders and sea borders.
+<p></p>
+
+Land Borders:
+<p></p>
+<a href="#">
+    <img src="/img/gkgMap1.jpg" alt="Post Sample Image" width="700" />
+</a>
+</p>
+<p>
+Sea Borders:
+<p></p>
+<a href="#">
+    <img src="/img/gkgMap2.jpg" alt="Post Sample Image" width="700" />
+</a>
+</p>
+<p>
+How locations can affect lives? For bigger countries it's more difficult to figure out, for example territory of Russia is very big with a variety of climates.
+
+<p></p>
+
+Borders between the countries are like synapses between neurons. The quality (edge weight) is changing with time: the open the borders are, the better are connections between the countries. The more closed borders are the stronger the conflict between countries.
+
+
+<p></p>
+
+We will analyze how the border qualities affect how similar are life quality and longertivity.
+<p></p>
+
+
+<p></p>
+
+<p></p>
+<a href="#">
+    <img src="/img/gkgSlide2.jpg" alt="Post Sample Image" width="479" />
+</a>
+<p></p>
+
+
+<p></p>
+
+<h3>Methodologies</h3>
+<h4>Prepare Input Data for the Model</h4>
+As input data for GNN Link Prediction model we need to create small labeled graphs:
+<p></p>
+<ul>
+<li>
+Edges
+</li><li>
+Nodes with features.
+</li><li>
+
+</li></ul>
+
+
+  <p></p>
+
+<h4>Train the GNN Graph Classification Model</h4>
+
+  In this study we uses a GCNConv model from PyTorch Geometric Library as a GNN graph classification model. The GCNConv model is a type of graph convolutional network that applies convolutional operations to extract meaningful features from the input graph data (edges, node features, and the graph-level labels). The code for the model is taken from a PyG tutorial.
+  </p>
+<p>
+  <p></p>
+
+<p></p>
+<h4>XXXd</h4>
+To calculate cosine similarities between pairs of vectors, we will use Cosine Similarities function:  
+    <p></p>
+    
+<figure class="highlight"><pre><code class="language-python" data-lang="python">    <span class="o">**</span>
+    </code></pre></figure>
+
+    <p></p>
+
+    <p></p>
+
+
+<p></p>      
+
+
+<p></p>
+
+
+<h4>Node Embedding: Catching Pre-Final Vectors in GNN Link Prediction</h4>
+<p>GNN Graph Classification with pre-final stop, .</p>
+
+<p></p>
+<h4>Interpreting Model Results: Cosine Similarity </h4>
+    <p>With node embeddings in place, .</p>
+
+    Select pairs of vectors with cosine similarities higher than 0.95.
+        <p></p>  
+    <p>This integrated approach allows us to delve deeper into .</p>
+<p></p>
+<h4>Interpreting Model Results: Symmetry Metrics </h4>
+
+
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<h3>Experiments Overview </h3>
+<p></p>
+<p></p>
+<p></p>
+<p>This section outlines the experimental framework used to </p>
+<p></p>
+<p></p>
+<p></p>     
+<h4>Data Sources</h4>
+<p></p>
+<p></p>
+<p></p>
+<h5>Data Sources for Country Land Borders</h5>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+Country land boundaries and associated metadata are sourced from Natural Earth’s Admin 0 - Countries dataset, version 5.0.1 (2023). This dataset is publicly available under the CC0 1.0 Public Domain Dedication and includes information on GDP, population, and administrative classifications.
+<p></p>
+
+Path to your zip file in Google Drive
+Path to extract the files
+Unzip the file
+<p></p>
+<p></p>
+<p></p>               
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">zipfile</span>
+<span class="kn">import</span> <span class="n">os</span>
+<span class="n">zip_file_path</span> <span class="o">=</span> <span class="sh">"</span><span class="s">/content/drive/My Drive/Geo/ne_10m_admin_0_countries.zip</span><span class="sh">"</span>
+<span class="n">extract_to_path</span> <span class="o">=</span> <span class="sh">"</span><span class="s">/content/drive/My Drive/Geo/</span><span class="sh">"</span>
+<span class="k">with</span> <span class="n">zipfile</span><span class="p">.</span><span class="nc">ZipFile</span><span class="p">(</span><span class="n">zip_file_path</span><span class="p">,</span> <span class="sh">'</span><span class="s">r</span><span class="sh">'</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+    <span class="n">zip_ref</span><span class="p">.</span><span class="nf">extractall</span><span class="p">(</span><span class="n">extract_to_path</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<h5>Data Sources for Country Sea Borders</h5>
+<p></p>
+<p></p>
+<p></p>
+<p></p>     
+Sea boundaries and Exclusive Economic Zones (EEZs) were obtained from Marineregions.org's World EEZ v12 dataset, version 12 (2023). The dataset is licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
+<p></p>
+<p></p>
+Path to the ZIP file
+Directory to extract files
+Unzip the file
+List the extracted files
+<p></p>
+Next,
+<p></p>               
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">zipfile</span>
+<span class="kn">import</span> <span class="n">os</span>
+<span class="n">zip_file_path</span> <span class="o">=</span> <span class="sh">"</span><span class="s">/content/drive/My Drive/Geo/World_EEZ_v12_20231025_gpkg.zip</span><span class="sh">"</span>
+<span class="n">extract_to_path</span> <span class="o">=</span> <span class="sh">"</span><span class="s">/content/drive/My Drive/Geo/World_EEZ_v12_20231025_gpkg/</span><span class="sh">"</span>
+<span class="k">with</span> <span class="n">zipfile</span><span class="p">.</span><span class="nc">ZipFile</span><span class="p">(</span><span class="n">zip_file_path</span><span class="p">,</span> <span class="sh">'</span><span class="s">r</span><span class="sh">'</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+    <span class="n">zip_ref</span><span class="p">.</span><span class="nf">extractall</span><span class="p">(</span><span class="n">extract_to_path</span><span class="p">)</span>
+<span class="n">extracted_files</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="nf">listdir</span><span class="p">(</span><span class="n">extract_to_path</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<h5>Data Sources for Country Life Expectancy</h5>
+<p></p>
+<p></p>
+<p></p>
+Next, Load the dataset with additional options
+Skip the first 4 rows (based on World Bank CSV format)
+Ensure the delimiter is a comma
+Use the Python engine for parsing flexibility
+<p></p>               
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="n">file_path</span> <span class="o">=</span><span class="sh">'</span><span class="s">/content/drive/My Drive/Geo/API_SP.DYN.LE00.IN_DS2_en_csv_v2_99.csv</span><span class="sh">'</span>
+<span class="n">life_expectancy</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_csv</span><span class="p">(</span>
+    <span class="n">file_path</span><span class="p">,</span>
+    <span class="n">skiprows</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>          
+    <span class="n">delimiter</span><span class="o">=</span><span class="sh">"</span><span class="s">,</span><span class="sh">"</span><span class="p">,</span>       
+    <span class="n">engine</span><span class="o">=</span><span class="sh">"</span><span class="s">python</span><span class="sh">"</span>      
+<span class="p">)</span></code></pre></figure>
+
+<p></p>
+<p></p>
+Next, Extract unique country names
+Print the total number of countries and their names
+<p></p>               
+
+<p></p>
+<p></p>
+Next,
+<p></p>               
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">xxxx</span></code></pre></figure>
+
+<p></p>
+<p></p>
+Next,
+<p></p>               
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">xxxx</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+<p></p>
+<h4>Input Data Preparation</h4>
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">xxxx</span></code></pre></figure>
+
+<p></p>
+<p></p>
+When integrating multiple datasets with potentially different country naming conventions, it's essential to standardize country names systematically. Below are best practices and tools for handling this efficiently. As country indicators, instead of country names we used ISO_A3 code.
+<p></p>
+<p></p>
+<h5>Step by Step</h5>
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">xxxx</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<h5>Land Neighbors Graph</h5>
+<p></p>
+To read borders between countries from the shapefile and extract them as connections (edges) in a graph, follow these steps:
+Load the Shapefile
+Ensure you've loaded the dataset correctly:
+<p></p>
+
+Load the shapefile
+Inspect the dataset
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">geopandas</span> <span class="k">as</span> <span class="n">gpd</span>
+<span class="n">shapefile_path</span> <span class="o">=</span> <span class="sh">"</span><span class="s">/content/drive/My Drive/natural_earth/ne_110m_admin_0_countries.shp</span><span class="sh">"</span>
+<span class="n">world</span> <span class="o">=</span> <span class="n">gpd</span><span class="p">.</span><span class="nf">read_file</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+Simplify the Dataset
+Focus on the necessary columns:
+
+Country Name: Typically NAME, SOVEREIGNT, or similar.
+Geometry: Contains polygon data for borders.
+Simplify the dataset:
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">world</span> <span class="o">=</span> <span class="n">world</span><span class="p">[[</span><span class="sh">'</span><span class="s">NAME</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">geometry</span><span class="sh">'</span><span class="p">]]</span>
+<span class="n">world</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">NAME</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">country</span><span class="sh">'</span><span class="p">})</span></code></pre></figure>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+Identify Neighboring Countries
+Use geopandas spatial operations to find countries that share borders:
+ Create a dictionary to store country neighbors
+Find all countries that touch the current country's borders
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">world</span><span class="p">[</span><span class="sh">'</span><span class="s">geometry</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">world</span><span class="p">[</span><span class="sh">'</span><span class="s">geometry</span><span class="sh">'</span><span class="p">].</span><span class="nf">buffer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">neighbors</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">world</span><span class="p">.</span><span class="nf">iterrows</span><span class="p">():</span>
+    <span class="n">touching</span> <span class="o">=</span> <span class="n">world</span><span class="p">[</span><span class="n">world</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="nf">touches</span><span class="p">(</span><span class="n">country</span><span class="p">.</span><span class="n">geometry</span><span class="p">)][</span><span class="sh">'</span><span class="s">country</span><span class="sh">'</span><span class="p">].</span><span class="nf">tolist</span><span class="p">()</span>
+    <span class="n">neighbors</span><span class="p">[</span><span class="n">country</span><span class="p">[</span><span class="sh">'</span><span class="s">country</span><span class="sh">'</span><span class="p">]]</span> <span class="o">=</span> <span class="n">touching</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<p></p>
+Create the Graph
+Convert the neighbors dictionary into a graph using networkx:
+<p></p>
+
+Initialize a graph
+
+Add edges (connections between countries)
+
+Inspect the graph
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nc">Graph</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">country</span><span class="p">,</span> <span class="n">neighbor_list</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">.</span><span class="nf">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">neighbor_list</span><span class="p">:</span>
+        <span class="n">G</span><span class="p">.</span><span class="nf">add_edge</span><span class="p">(</span><span class="n">country</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">)</span></code></pre></figure>
+<p></p>
+<p></p>
+<p></p>
+<h5>Sea Neighbors Graph</h5>
+<p></p>
+<p></p>
+
+Path to the ZIP file
+Directory to extract files
+Unzip the file
+List the extracted files
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">zipfile</span>
+<span class="kn">import</span> <span class="n">os</span>
+<span class="n">zip_file_path</span> <span class="o">=</span> <span class="sh">"</span><span class="s">/content/drive/My Drive/Geo/World_EEZ_v12_20231025_gpkg.zip</span><span class="sh">"</span>
+<span class="n">extract_to_path</span> <span class="o">=</span> <span class="sh">"</span><span class="s">/content/drive/My Drive/Geo/World_EEZ_v12_20231025_gpkg/</span><span class="sh">"</span>
+<span class="k">with</span> <span class="n">zipfile</span><span class="p">.</span><span class="nc">ZipFile</span><span class="p">(</span><span class="n">zip_file_path</span><span class="p">,</span> <span class="sh">'</span><span class="s">r</span><span class="sh">'</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+    <span class="n">zip_ref</span><span class="p">.</span><span class="nf">extractall</span><span class="p">(</span><span class="n">extract_to_path</span><span class="p">)</span>
+<span class="n">extracted_files</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="nf">listdir</span><span class="p">(</span><span class="n">extract_to_path</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+<p></p>
+Ensure Valid Geometry
+Some polygons might have invalid geometries, which can cause issues during spatial operations. Fix any invalid geometries using buffer(0):
+Confirm the geometries are valid -- # Should return True
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">eez</span><span class="p">[</span><span class="sh">'</span><span class="s">geometry</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">eez</span><span class="p">[</span><span class="sh">'</span><span class="s">geometry</span><span class="sh">'</span><span class="p">].</span><span class="nf">buffer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></code></pre></figure>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+To find overlapping EEZs (Sea Neighbors), find which countries share overlapping EEZ boundaries using spatial operations:
+Loop through each EEZ polygon to find overlaps
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">country_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">eez_sea</span><span class="p">.</span><span class="nf">iterrows</span><span class="p">():</span>
+    <span class="n">overlapping_countries</span> <span class="o">=</span> <span class="n">eez_sea</span><span class="p">[</span><span class="n">eez_sea</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="nf">intersects</span><span class="p">(</span><span class="n">country</span><span class="p">.</span><span class="n">geometry</span><span class="p">)][</span><span class="sh">'</span><span class="s">country</span><span class="sh">'</span><span class="p">].</span><span class="nf">tolist</span><span class="p">()</span>
+    <span class="n">overlapping_countries</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">overlapping_countries</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">country</span><span class="p">[</span><span class="sh">'</span><span class="s">country</span><span class="sh">'</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">overlapping_countries</span><span class="p">:</span>
+        <span class="n">pair</span> <span class="o">=</span> <span class="nf">tuple</span><span class="p">(</span><span class="nf">sorted</span><span class="p">([</span><span class="n">country</span><span class="p">[</span><span class="sh">'</span><span class="s">country</span><span class="sh">'</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">pair</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">country_pairs</span><span class="p">:</span>
+            <span class="n">country_pairs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+To create the Sea Neighbor Graph, convert the sea_neighbors dictionary into a graph using networkx:
+<p></p>
+
+Create the graph
+Initialize the graph
+
+ Add edges to the graph
+ Print basic graph info
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
+<span class="kn">import</span> <span class="n">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">sea_graph</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nc">Graph</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">country_pairs</span><span class="p">:</span>
+    <span class="n">sea_graph</span><span class="p">.</span><span class="nf">add_edge</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  
+<span class="n">isolated_nodes</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">nx</span><span class="p">.</span><span class="nf">isolates</span><span class="p">(</span><span class="n">sea_graph</span><span class="p">))</span>
+<span class="n">sea_graph</span><span class="p">.</span><span class="nf">remove_nodes_from</span><span class="p">(</span><span class="n">isolated_nodes</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<p></p>
+<h5>Combine Land and Sea Graphs </h5>
+<p></p>
+<p></p>
+<p></p>
+Add 'land' attribute to all land borders
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">land_graph</span><span class="p">.</span><span class="n">edges</span><span class="p">:</span>
+    <span class="n">land_graph</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">][</span><span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="sh">'</span><span class="s">land</span><span class="sh">'</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+Add 'sea' attribute to all sea borders
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sea_graph</span><span class="p">.</span><span class="n">edges</span><span class="p">:</span>
+    <span class="n">sea_graph</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">][</span><span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="sh">'</span><span class="s">sea</span><span class="sh">'</span></code></pre></figure>
+
+<p></p>
+
+<p></p>
+Combine land and sea graphs
+If an edge exists in both graphs, mark it as both land and sea
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">combined_graph</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nf">compose</span><span class="p">(</span><span class="n">land_graph</span><span class="p">,</span> <span class="n">sea_graph</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">combined_graph</span><span class="p">.</span><span class="n">edges</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">land_graph</span><span class="p">.</span><span class="nf">has_edge</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sea_graph</span><span class="p">.</span><span class="nf">has_edge</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="n">combined_graph</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">][</span><span class="sh">'</span><span class="s">type</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="sh">'</span><span class="s">both</span><span class="sh">'</span>  <span class="c1"># Mark as both land and sea</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<p></p>
+
+<h5>World Bank life expectancy dataset </h5>
+
+join it with the both_graph (representing countries as nodes), you can follow these steps
+
+Step 1: Load and Inspect the Data
+Load the CSV file to inspect its structure and contents.
+
+<p></p>
+<p></p>
+Filter and Reshape the Data
+Extract the relevant columns and reshape the data into a more usable format.
+<p></p>
+Keep relevant columns
+
+Melt the dataframe to long format (year as a variable)
+
+Convert year to integer
+Drop rows with NaN values
+ Preview the reshaped data
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">life_expectancy_filtered</span> <span class="o">=</span> <span class="n">life_expectancy</span><span class="p">.</span><span class="nf">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">Indicator Name</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Indicator Code</span><span class="sh">"</span><span class="p">])</span>
+<span class="n">life_expectancy_long</span> <span class="o">=</span> <span class="n">life_expectancy_filtered</span><span class="p">.</span><span class="nf">melt</span><span class="p">(</span>
+    <span class="n">id_vars</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">Country Name</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Country Code</span><span class="sh">"</span><span class="p">],</span>
+    <span class="n">var_name</span><span class="o">=</span><span class="sh">"</span><span class="s">Year</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">value_name</span><span class="o">=</span><span class="sh">"</span><span class="s">Life Expectancy</span><span class="sh">"</span>
+<span class="p">)</span>
+<span class="n">life_expectancy_long</span><span class="p">[</span><span class="sh">"</span><span class="s">Year</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">to_numeric</span><span class="p">(</span><span class="n">life_expectancy_long</span><span class="p">[</span><span class="sh">"</span><span class="s">Year</span><span class="sh">"</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="sh">"</span><span class="s">coerce</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">life_expectancy_long</span> <span class="o">=</span> <span class="n">life_expectancy_long</span><span class="p">.</span><span class="nf">dropna</span><span class="p">()</span></code></pre></figure>
+
+
+<p></p>
+To join the life expectancy data with the graph, map the Country Code or Country Name from the dataset to the nodes in your graph.
+Get a list of nodes in the graph
+Check if the graph uses country names or codes
+Example: If the graph uses country names
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
+<span class="n">mapped_data</span> <span class="o">=</span> <span class="n">life_expectancy_long</span><span class="p">[</span><span class="n">life_expectancy_long</span><span class="p">[</span><span class="sh">"</span><span class="s">Country Name</span><span class="sh">"</span><span class="p">].</span><span class="nf">isin</span><span class="p">(</span><span class="n">nodes</span><span class="p">)]</span></code></pre></figure>
+
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+Group life expectancy data by country for easy access
+
+Add life expectancy as node features
+
+Check a sample node's data
+For missing data, assign an empty dictionary
+<p></p>
+<p></p>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">life_expectancy_dict</span> <span class="o">=</span> <span class="n">life_expectancy_long</span><span class="p">.</span><span class="nf">groupby</span><span class="p">(</span><span class="sh">"</span><span class="s">Country Name</span><span class="sh">"</span><span class="p">)</span> \
+    <span class="p">.</span><span class="nf">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">.</span><span class="nf">set_index</span><span class="p">(</span><span class="sh">"</span><span class="s">Year</span><span class="sh">"</span><span class="p">)[</span><span class="sh">"</span><span class="s">Life Expectancy</span><span class="sh">"</span><span class="p">].</span><span class="nf">to_dict</span><span class="p">())</span> \
+    <span class="p">.</span><span class="nf">to_dict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">both_graph</span><span class="p">.</span><span class="n">nodes</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">life_expectancy_dict</span><span class="p">:</span>
+        <span class="n">nx</span><span class="p">.</span><span class="nf">set_node_attributes</span><span class="p">(</span><span class="n">both_graph</span><span class="p">,</span> <span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="n">life_expectancy_dict</span><span class="p">[</span><span class="n">node</span><span class="p">]},</span> <span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">life_expectancy</span><span class="sh">"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nx</span><span class="p">.</span><span class="nf">set_node_attributes</span><span class="p">(</span><span class="n">both_graph</span><span class="p">,</span> <span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="p">{}},</span> <span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">life_expectancy</span><span class="sh">"</span><span class="p">)</span></code></pre></figure>
+
+
+<p></p>
+<p></p>
+
+<h4>Model Training</h4>
+    <p>The model training phase
+<p></p>
+
+
+    <p></p>               
+
+
+
+<p></p>
+
+    <p></p>
+<h4>Rewiring Knowledge Graph</h4>
+
+
+
+    <p></p>
+
+<p></p>  
+
+<p></p>               
+
+
+    <p></p>
+Next,
+    <p></p>               
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">xxxx</span></code></pre></figure>
+
+    <p></p>
+
+
+<p></p>
+
+<p></p>
+
+
+
+
+
+
+<p></p>
+
+
+
+
+
+
+
+
+    <h3>In Conclusion</h3>
+<p></p>
+    In this study,
+<p></p>
+    Our work
+<p></p>
+    This research marks
+<p></p>    
+
+<p></p>
+One of the challenges with using GNN for knowledge graph is that knowledge graphs consist of variety of different data domains and different formats of data values. In this study we introduce a method to deal with these challenges.  
+<p></p>
+We start with domain specific subgraphs and run GNN link prediction models on each subgraphs. The output of these models will be vectors of the same size.
+
+
+
+<p></p>
+We also can combine across domains different entities if connections exist in initial knowledge graph. For example, in one domain has artists as nodes, another domain paintings,  and another domain art museums than we can connect artists with paintings and pinting with museums that have that paintings.
+<p></p>
+<p></p>
+
+<p></p>
+<p></p>
+</p></p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2024/11/09/GNN_timeSeries_EEG/" data-toggle="tooltip" data-placement="top" title="Graph Neural Networks for EEG Connectivity Analysis">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<hr>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="mailto:sparkling.dataocean@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Melenar 2024</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-114694347-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+
+</html>
