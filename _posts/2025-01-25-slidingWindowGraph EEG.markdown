@@ -2,7 +2,7 @@
 layout:     post
 title:      "Sliding Window Graph in GNN Graph Classification"
 subtitle:   "GNN Graph Classification for Time Series: A New Perspective on Climate Change Analysis"
-date:       2025-1-25 12:00:00
+date:       2025-01-25 12:00:00
 author:     "Melenar"
 header-img: "img/page115e.jpg"
 ---

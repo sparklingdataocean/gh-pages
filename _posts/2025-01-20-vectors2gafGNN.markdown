@@ -1,14 +1,14 @@
 ---
 layout:     post
-title:      "GNN Link Prediction for Country Population, Life Expectancy, Happiness "
-subtitle:   "Knowledge Graph of Country Populations: how to deal with variety of data domains"
-date:       2025-2-4 12:00:00
+title:      "Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs"
+subtitle:   "How Country Borders and Features Shape International Dynamics"
+date:       2025-01-20 12:00:00
 author:     "Melenar"
 header-img: "img/page125b.jpg"
 ---
 <p><h2> Introduction</h2>
 <p></p>
-Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and even our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.
+Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.
 <p></p>
 <p></p>
 <a href="#">
@@ -18,11 +18,7 @@ Graphs are everywhere in our lives. They represent molecules in chemistry, roads
 
 People don’t think sequentially, especially when solving complex problems. Instead, our brains rely on networks of connections, enabling dynamic and non-linear thinking. Graph Neural Networks (GNNs) replicate this process by modeling data as graphs, helping uncover hidden relationships and patterns in everything from neuroscience to social networks.
 <p></p>
-<p></p>
-<a href="#">
-    <img src="{{ site.baseurl }}/img/gkgSlide2.jpg" alt="Post Sample Image" width="479" >
-</a>
-<p></p>
+
 
 <p></p>
 <p>
@@ -39,9 +35,30 @@ People don’t think sequentially, especially when solving complex problems. Ins
 </p>
 <p></p>
 
-    <h2>Methods</h2>
 
-    <h3>Graph Construction</h3>
+
+<h2>Methods</h2>
+
+
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/graphBorders13c.jpg" alt="Post Sample Image" width="711" >
+</a>
+<p></p>
+
+<h3>Pipeline Overview</h3>
+<p>The methodology integrates country features and border information to construct a unified graph, enabling comprehensive analysis of global relationships:</p>
+
+<ul>
+    <li><strong>Country-Feature Subgraphs:</strong> Edges are based on land and sea borders, representing geographical connections. Subgraphs were enriched with attributes such as life expectancy, GDP, and internet usage, combining spatial relationships with socio-economic and health data.</li>
+    <li><strong>Unified Dual-Layer Graph:</strong> Subgraphs were combined into a dual-layer graph by adding intra-country edges that link nodes corresponding to the same country across different features.</li>
+    <li><strong>Final Embeddings:</strong> A second GNN was applied to the dual-layer graph to generate final embeddings. These embeddings integrate the combined graph structure and relationships across all features and borders.</li>
+    <li><strong>Country-Level Aggregation:</strong> Node embeddings were aggregated at the country level, creating average vectors that summarize each country’s overall profile, incorporating its socio-economic features and geographic relationships.</li>
+    <li><strong>GNN Link Prediction:</strong> A Graph Neural Network (GNN) was applied to each subgraph using the GraphSAGE Link Prediction model, embedding time-series features of varying lengths into fixed-size vectors. The Deep Graph Library (DGL) framework was used for efficient training and evaluation, capturing both feature-based and structural relationships.</li>
+</ul>
+
+
+<h3>Graph Construction</h3>
     <p>
         We began by constructing a graph where countries were represented as nodes, and edges corresponded to borders between countries. Nodes were identified using country codes, and edges were created for countries sharing either land or sea borders. This foundational graph structure captures geographic connectivity and serves as the basis for modeling socio-economic relationships between countries.
     </p>
@@ -98,17 +115,15 @@ People don’t think sequentially, especially when solving complex problems. Ins
 <h3>Graph Edges: Data Sources and Data Preparation </h3>
 <p></p>
 
-Borders between the countries are like synapses between neurons. The quality (edge weight) is changing with time: the open the borders are, the better are connections between the countries. The more closed borders are the stronger the conflict between countries.
+Borders between countries can be compared to synapses between neurons, serving as points of connection or division. The nature and quality of these connections evolve over time: open borders foster stronger connections and collaboration between countries, while closed borders often signify increased tension or conflict. This dynamic makes borders a critical factor in understanding international relationships.
 <p></p>
+To define neighboring countries, we rely on information about shared borders. Identifying pairs of countries that share borders is particularly valuable, especially when enriched with data about the type and quality of these borders—such as how easily people or goods can cross them. This additional context provides deeper insights into cross-country interactions and their socio-political implications.
 <p></p>
-<p>This section outlines the experimental framework used to </p>
+There are two primary types of country borders: land borders and sea borders. Each type offers unique insights into the nature of geographic and economic connectivity, making them essential elements in analyzing global relationships.
+<p></p>
 <p></p>
 
-To define neighbors for countries we can use information about country borders -
-Getting information about pairs of countries that share borders will be interesting, especially if we have information about types and quality of borders -- how can people cross the borders.
-<p></p>
-Two types of country borders: land borders and sea borders.
-<p></p>
+
 <p></p>
 <p></p>
 <h4>Data Sources for Country Land Borders</h4>
@@ -217,37 +232,18 @@ Sea Borders:
 <a href="#">
     <img src="{{ site.baseurl }}/img/gkgMap2.jpg" alt="Post Sample Image" width="700" >
 </a>
-</p><p>
-<p></p>
-Next,
 
-<p></p>
-Next,
-<p></p>               
-{% highlight python %}
-xxxx
-{% endhighlight %}
-<p></p>
+
 
 <p></p>
 <p></p>
 
 <p></p>
-<p></p>
-<p></p>
-{% highlight python %}
-xxxx
-{% endhighlight %}
-<p></p>
 
 <p></p>
 
 <p></p>
-<p></p>
-<p></p>
-{% highlight python %}
-xxxx
-{% endhighlight %}
+
 <p></p>
 <h4>Land Neighbors Graph</h4>
 <p>
@@ -442,7 +438,7 @@ sea_graph.remove_nodes_from(isolated_nodes)
     To create a unified representation of geographic relationships, we combined the Land Neighbors Graph and the Sea Neighbors Graph. This unified graph includes all connections based on both land and sea borders, enabling a holistic analysis of country relationships.
 </p>
 <p>
-    The first step was to annotate the edges in each graph with attributes indicating the type of connection. For the Land Neighbors Graph, all edges were marked with the attribute <code>'type': 'land'</code>. Similarly, for the Sea Neighbors Graph, all edges were labeled with <code>'type': 'sea'</code>.
+    The process began by annotating edges in each graph with attributes that indicate the type of connection. For the Land Neighbors Graph, all edges were marked with the attribute <code>'type': 'land'</code>. Similarly, for the Sea Neighbors Graph, all edges were labeled with <code>'type': 'sea'</code>.
 </p>
 
 
@@ -463,7 +459,7 @@ for u, v in sea_graph.edges:
 
 <p></p>
 <p>
-    After labeling the edges, we combined the two graphs using NetworkX's composition operation. If an edge existed in both the land and sea graphs, it was marked as <code>'type': 'both'</code> to indicate that the connection represents both land and sea borders.
+    Next, the two graphs were combined using NetworkX's composition operation. If an edge existed in both the land and sea graphs, it was marked as <code>'type': 'both'</code> to indicate that the connection represents both land and sea borders.
 </p>
 <p></p>
 <p></p>
@@ -477,7 +473,7 @@ for u, v in combined_graph.edges:
 <p></p>
 
 <p>
-    This combined graph captures the complexity of geographic relationships by integrating land and maritime connectivity into a single structure. It serves as a foundation for analyzing various aspects of international relationships and their influence on socio-economic and environmental factors.
+    The resulting combined graph captures the complexity of geographic relationships by integrating both land and maritime connectivity into a single structure. Each node in the graph corresponds to a country, labeled with its ISO 3166-1 alpha-3 code for easy identification. This unified graph serves as a foundation for analyzing various aspects of international relationships and their influence on socio-economic and environmental factors.
 </p>
 
 This image represents the combined graph of countries connected by both land and sea borders. Each node in the graph corresponds to a country, labeled with its ISO 3166-1 alpha-3 code for easy identification.
@@ -498,13 +494,16 @@ plt.show()
 <p></p>
 <h3>Graph Nodes: Data Sources and Preparation</h3>
 <p></p>
-In this study we will put together information about:
-long time data for country populations
-a few years information about population by age;
 
-several years of information about country life expectancy
-income
-happiness
+<p>We constructed graph nodes by incorporating socio-economic and health data from the World Bank:</p>
+<ul>
+    <li><strong>Life Expectancy:</strong> Extracted from the World Development Indicators (WDI) dataset, capturing the average years a newborn is expected to live.</li>
+    <li><strong>Poverty Levels:</strong> Percentage of the population living below $2.15 a day (2017 PPP), reflecting economic disparities.</li>
+    <li><strong>GDP Per Capita:</strong> Measuring economic performance and living standards.</li>
+    <li><strong>Internet Usage:</strong> Percentage of individuals using the Internet, indicating global connectivity.</li>
+</ul>
+
+
 <p></p>
 The World Bank provides comprehensive time-series data on various global indicators, including life expectancy. This dataset includes the average number of years a newborn is expected to live under current mortality rates. The data is categorized by country, year, and additional metadata, ensuring broad applicability for global analyses. It is part of the World Development Indicators (WDI) and is publicly accessible, supporting studies in health, socio-economic development, and policy-making.
 
@@ -618,9 +617,9 @@ def replace_zeros_with_closest_nonzero(row):
         if row[i] == 0.0:
             row[i] = row[i + 1] if row[i + 1] > 0.0 else 0.0
     return row
-
 columns_to_process = merged_data.select_dtypes(include=[np.number]).columns
-merged_data[columns_to_process] = merged_data[columns_to_process].apply(replace_zeros_with_closest_nonzero, axis=1)
+merged_data[columns_to_process] = merged_data[columns_to_process]
+  .apply(replace_zeros_with_closest_nonzero, axis=1)
 {% endhighlight %}
 <p></p>
 <p>
@@ -640,7 +639,7 @@ merged_data[columns_to_process] = merged_data[columns_to_process].apply(replace_
 {% highlight python %}
 import numpy as np
 from sklearn.preprocessing import normalize
-time_series_data = merged_data.iloc[:, 2:].values  # Assuming columns 2 onward are numeric
+time_series_data = merged_data.iloc[:, 2:].values  
 normalized_data = normalize(time_series_data, norm='l2', axis=1)
 merged_data.iloc[:, 2:] = normalized_data
 {% endhighlight %}
@@ -771,7 +770,7 @@ Graph(num_nodes=200, num_edges=776,
     </p>
 
 
-        <p></p>               
+<p></p>               
 {% highlight python %}
 u, v = g.edges()
 eids = np.arange(g.number_of_edges())
@@ -991,7 +990,6 @@ This approach ensured that the relationships specific to each feature were prese
 features = ['Poor', 'GDP per capita','Life expectancy','Internet']
 edges_for_global = []
 for feature in features:
-    # Filter dataNodes for the current feature
     filtered_data = dataNodes[dataNodes['Feature'] == feature]
     country_to_index =
       filtered_data.set_index('Country Code')['globalIndex'].to_dict()
@@ -1025,10 +1023,10 @@ The generated edges capture the multi-feature connections for each country, enha
 </p>
 
 {% highlight python %}
-global_index_mapping = dataNodes.groupby('Country Code')['globalIndex'].apply(list).to_dict()
+global_index_mapping = dataNodes.groupby('Country Code')['globalIndex']
+  .apply(list).to_dict()
 edges_with_equal_country_codes = []
 for country_code, global_indices in global_index_mapping.items():
-    # Add edges between every pair of global indices for the same country code
     for i in range(len(global_indices)):
         for j in range(i + 1, len(global_indices)):
 edges_for_global.append(edges_with_equal_country_codes)
@@ -1131,7 +1129,7 @@ import pandas as pd
 import torch
 h_numpy = h.detach().numpy()
 h_df = pd.DataFrame(h_numpy)
-h_df['globalIndex'] = h_df.index  # Add a globalIndex column to align with dataNodes
+h_df['globalIndex'] = h_df.index  
 nodes=nodes[['Country Code', 'Feature','globalIndex']]
 h_nodes = pd.merge(nodes, h_df, on='globalIndex', how='inner')
 {% endhighlight %}
@@ -1140,10 +1138,11 @@ h_nodes = pd.merge(nodes, h_df, on='globalIndex', how='inner')
 <p></p>
 <h4>Aggregating Node Embeddings by Country</h4>
 <p></p>
+
 To analyze the data at the country level, we calculated the average embedding vectors for each <code>Country Code</code>. This process involved grouping the unified table (<code>h_nodes</code>) by <code>Country Code</code>, computing the mean for all embedding columns, and resetting the index to ensure <code>Country Code</code> remained a visible column. The resulting <code>average_vectors</code> table provides a single, unified vector for each country, capturing multidimensional relationships across features.
 <p></p>
 {% highlight python %}
-embedding_columns = h_nodes.columns[3:]  # Assuming embedding vectors start at column 3
+embedding_columns = h_nodes.columns[3:]  
 average_vectors = h_nodes.groupby('Country Code')[embedding_columns].mean()
 average_vectors = average_vectors.reset_index()
 {% endhighlight %}
@@ -1174,19 +1173,18 @@ average_vectors['Country Name'] = average_vectors['Country Code'].apply(get_coun
 <p></p>
 <h4>Interpreting Model Results: Cosine Similarity</h4>
 <p></p>
-With node embeddings in place, we calculated cosine similarities between embedding vectors to analyze relationships between countries. This approach highlights similarities across multiple dimensions, such as health, economy, and connectivity.
-<p></p>
-Pairs of vectors with cosine similarities higher than 0.95 were identified to uncover clusters of countries sharing significant patterns. These insights reveal deeper connections and trends among nations based on the integrated features in the graph.
-<p></p>
-Cosine similarity analysis provides a foundation for comparative studies, aiding in policy-making and identifying shared challenges or opportunities between countries.
-<p></p>
+
+
+
+<p>Using node embeddings, we calculated cosine similarities to explore relationships between countries. This method captures similarities across various dimensions, such as health, economy, and connectivity.
+Cosine similarity analysis serves as a basis for comparative studies, helping to identify shared challenges or opportunities and informing policy-making decisions.</p>
 
 <p></p>
 {% highlight python %}
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from itertools import combinations
-vectors = average_vectors.iloc[:, 1:-1].values  # Select vector columns
+vectors = average_vectors.iloc[:, 1:-1].values  
 countries_info = average_vectors[['Country Code', 'Country Name']]
 results = []
 for (idx1, row1), (idx2, row2) in combinations(countries_info.iterrows(), 2):
@@ -1202,12 +1200,10 @@ cosine_similarity_df = pd.DataFrame(results)
 {% endhighlight %}
 <p></p>
 
-<p>
-To enrich the cosine similarity analysis, we incorporated border type information into the results. By checking each country pair in the graph, we determined whether they shared a border and the type of border (e.g., land, sea, or both). If no edge existed between the countries, it was labeled as "no border."
-</p>
-<p>
-This step adds a geographical context to the similarity analysis, allowing us to compare countries with shared borders against those without direct geographical connections.
-</p>
+We added border type information to the cosine similarity analysis, identifying whether countries shared land, sea, both, or no borders.This inclusion provides geographical context, enabling comparisons between countries with and without direct geographical connections.
+
+
+
 <p></p>
 {% highlight python %}
 def get_border_type(graph, source, target):
@@ -1312,40 +1308,27 @@ plt.show()
     <img src="{{ site.baseurl }}/img/graphBorders8.jpg" alt="Post Sample Image" width="567" >
 </a>
 <p></p>
-<p><strong>Key Observations:</strong></p>
+
 <p>
 Countries with shared borders, whether by land, sea, or both, tend to have higher cosine similarity, suggesting stronger connections influenced by their geographic proximity. On the other hand, countries without borders show much lower or even negative similarity, emphasizing their distinct differences in socio-economic and other multidimensional features.
 </p>
 
 <p></p>
 
-<p></p>
-{% highlight python %}
-xxxx
-{% endhighlight %}
-<p></p>
 
 
 <h2>Conclusion</h2>
 <p></p>
-    In this study,
-<p></p>
-    Our work
-<p></p>
-    This research marks
+
 <p></p>    
 
+
+This study explores a novel way of analyzing global relationships using graph-based methodologies, specifically GNN Link Prediction models. By representing countries as nodes and their shared borders as edges, we combined geographic connections with diverse indicators, including economic, health, and cultural dimensions. This approach helps capture the complexity of global relationships in a meaningful way.
 <p></p>
-One of the challenges with using GNN for knowledge graph is that knowledge graphs consist of variety of different data domains and different formats of data values. In this study we introduce a method to deal with these challenges.  
+Our findings suggest that shared borders often correspond to stronger similarities between countries, while differences within border groups point to the influence of other factors, such as cultural or economic systems. This method provides a flexible framework for understanding international relationships and uncovering new insights.
 <p></p>
-We start with domain specific subgraphs and run GNN link prediction models on each subgraphs. The output of these models will be vectors of the same size.
+Looking ahead, these techniques could be applied to a wide range of scenarios involving multi-modal graph data. By transforming diverse features into unified vectors, the GNN Link Prediction model offers a way to analyze relationships in a cohesive space. There is great potential to expand this approach further by incorporating new data, evolving trends, and additional dimensions to deepen our understanding of global connections.
+<p></p>
 
 
-
-<p></p>
-We also can combine across domains different entities if connections exist in initial knowledge graph. For example, in one domain has artists as nodes, another domain paintings,  and another domain art museums than we can connect artists with paintings and pinting with museums that have that paintings.
-<p></p>
-<p></p>
-
-<p></p>
 <p></p>
