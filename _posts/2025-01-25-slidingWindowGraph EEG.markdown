@@ -44,13 +44,13 @@ For a deeper dive into this work, check out our post <a href="http://sparklingda
 <p></p>
 <h4>Study 2: Graph Neural Networks for Trial Classification</h4>
 <p></p>
-Building on our first study, we introduced <strong>Graph Neural Networks (GNNs)</strong> to analyze EEG data at the trial level. Each graph represented an entire EEG trial, encapsulating the connectivity across all channels.
+On the second study, we introduced <strong>Graph Neural Networks (GNNs)</strong> to analyze EEG data at the trial level. Each graph represented an entire EEG trial, encapsulating the connectivity across all channels.
 <p></p>
 Why GNNs? GNNs brought a new level of sophistication by enabling the model to learn spatial relationships and connectivity dynamics within the graph.
 <p></p>
 Key Findings:
 <ul>
-    <li><strong>Improved Classification Accuracy:</strong> GNNs significantly outperformed traditional methods in differentiating between Alcoholic and Control groups.</li>
+    <li><strong>Improved Classification Accuracy:</strong> GNN Graph Classification models significantly outperformed traditional methods in differentiating between Alcoholic and Control groups.</li>
     <li><strong>Enhanced Connectivity Insights:</strong> Subtle variations in connectivity, previously missed, were captured.</li>
     <li><strong>Challenges:</strong> Misclassifications within the Control group highlighted the complexity of EEG connectivity patterns.</li>
 </ul>
@@ -68,7 +68,7 @@ In our third study, the focus shifted to <strong>link prediction</strong>, using
 <p></p>
 Key Findings:
 <ul>
-    <li><strong>Revealing Hidden Connectivity:</strong> GNNs highlighted relationships between electrodes that were previously unobserved.</li>
+    <li><strong>Revealing Hidden Connectivity:</strong> GNN Link Prediction models highlighted relationships between electrodes that were previously unobserved.</li>
     <li><strong>Node Importance:</strong> Certain electrodes emerged as more central to connectivity patterns.</li>
     <li><strong>Limitations:</strong> This method focused primarily on short-term EEG segments, leaving the dynamics of long-term recordings unexplored.</li>
 </ul>
@@ -86,7 +86,12 @@ For more on this work, check out our <a href="http://sparklingdataocean.com/2024
 <p></p>
 <h4>Looking Ahead: Current Study</h4>
 <p></p>  
-This study applies sliding graphs to long-time EEG series, capturing evolving neural activity during sleep and rest. This approach reveals extended brain states, uncovering transitions and sustained neural processes, offering deeper insights into EEG dynamics over time.
+
+
+This study applies GNN Sliding Graph Classification to long-time EEG series, capturing evolving neural activity during sleep and rest. This approach reveals extended brain states, uncovering transitions and sustained neural processes, offering deeper insights into EEG dynamics over time.
+
+
+
 <p></p>
 
 
@@ -106,10 +111,10 @@ In our previous work, we introduced two key methods for time series analysis. Th
     <strong>Sliding Graph Construction:</strong> Transform time series data into graph structures by segmenting it into overlapping windows. Each graph captures localized temporal and spatial relationships, representing distinct patterns over the chosen time frame.
   </li>
   <li>
-    <strong>GNN-Based Graph Classification:</strong> Utilize GNNs to classify these graphs, extracting high-level features from their topology while preserving the structural and temporal dependencies in the data.
+    <strong>GNN Graph Classification:</strong> Utilize GNNs to classify these graphs, extracting high-level features from their topology while preserving the structural and temporal dependencies in the data.
   </li>
   <li>
-    <strong>Pre-final Vectors:</strong> Obtain graph embeddings (pre-final vectors) from the GNN model during classification. These embeddings represent the learned topological features and are further analyzed to reveal temporal and structural patterns in the time series.
+    <strong>Pre-final Vectors:</strong> Obtain graph embeddings (pre-final vectors) from the GNN Graph Classification model during classification. These embeddings represent the learned topological features and are further analyzed to reveal temporal and structural patterns in the time series.
   </li>
 </ul>
 
@@ -145,47 +150,64 @@ For information about catching embedded graphs, look at our post <a href="http:/
 
 <h2>Methods</h2>
 <p></p>
+<h3>Pipeline</h3>
+<p></p>
+<a href="#">
+      <img src="{{ site.baseurl }}/img/slide1b.jpg" alt="Post Sample Image" width="808" >
+</a>
+<p></p>
+Our pipeline for <strong>Graph Neural Network (GNN) Graph Classification</strong> consists of several stages.
+<ul>
+
+    <li>The process begins with <strong>data input</strong>, where EEG data representing brain activity during sleep and rest states is collected.</li>
+    <li><strong>Graph construction:</strong>
+        <ul>
+            <li><strong>Sliding window method:</strong> Segments time series data into overlapping graphs to maintain temporal structure.</li>
+            <li><strong>Virtual nodes:</strong> Act as central hubs, improving model accuracy and information flow.</li>
+        </ul>
+    </li>
+    <li>The <strong>GNN model</strong> classifies these graphs based on detected patterns.</li>
+    <li>To enhance interpretability, <strong>pre-final vectors</strong> are extracted from the model, capturing deeper structural information before classification.</li>
+    <li><strong>Linear algebra analysis</strong> applies cosine similarity computations to these embeddings, uncovering connectivity trends over time.</li>
+    <li>This approach enables effective modeling of long-duration EEG dynamics by integrating graph-based learning with temporal analysis techniques.</li>
+</ul>
+
+
+<p></p>
+<p></p>
+
+<p></p>
+<p></p>
+
+<p></p>
+
+
 <h3>Sliding Graph Construction</h3>
 <p></p>
-In our study, we introduce a novel approach to constructing graphs from EEG data using the
+
+In our previous study, <a href="https://dl.acm.org/doi/10.1145/3674029.3674059">GNN Graph Classification for Time Series: A New Perspective on Climate Change Analysis</a>, we introduced an approach to constructing graphs using the
 <em>Sliding Window Method</em>.
 
 <p></p>
 <a href="#">
-      <img src="{{ site.baseurl }}/img/eegSlide3.jpg" alt="Post Sample Image" width="600" >
+      <img src="{{ site.baseurl }}/img/slide3.jpg" alt="Post Sample Image" width="600" >
 </a>
   <p></p>
   <p></p>
-<h3>Sliding Window Method</h3>
+<h4>Sliding Window Method</h4>
   <ul>
     <li>
       <strong>Nodes</strong>: Represent data points within each sliding window, with features reflecting their respective values.
     </li>
     <li>
-      <strong>Edges</strong>: Connect sequential points to preserve the temporal sequence and structure.
+      <strong>Edges</strong>: Connect pairs of points to preserve the temporal sequence and structure.
     </li>
     <li>
       <strong>Labels</strong>: Assigned to detect and analyze patterns within the time series.
     </li>
   </ul>
 <p></p>
-<h3>Pipeline</h3>
-<p></p>
-Our pipeline for <strong>Graph Neural Network (GNN) Graph Classification</strong> consists of the following stages:
-  <ol>
-    <li><strong>Data Input</strong>: For instance, EEG data representing brain activity during sleep and rest states.</li>
-    <li>
-      <strong>Graph Construction</strong>:
-      <ul>
-        <li><em>Sliding Window Method</em>: Segmenting time series data into smaller, overlapping graphs.</li>
-        <li>
-          <em>Virtual Nodes</em>: Acting as central hubs in small graphs, improving accuracy and enabling model tuning.
-        </li>
-      </ul>
-    </li>
-    <li><strong>GNN Model Application</strong>: Classifying graphs based on detected patterns using a GNN model.</li>
-  </ol>
-<p></p>
+
 <h3>Methodology for Sliding Window Graph Construction</h3>
 <p></p>
 <h4>Data to Graph Transformation</h4>
@@ -200,7 +222,7 @@ In these graphs:
       <strong>Nodes</strong>: Represent data points within the window, with features derived from their values.
     </li>
     <li>
-      <strong>Edges</strong>: Connect sequential nodes to maintain temporal relationships.
+      <strong>Edges</strong>: Connect pairs of nodes to maintain temporal relationships.
     </li>
   </ul>
 <p></p>
@@ -310,22 +332,35 @@ This framework effectively captures both local and global patterns within the ti
 <p></p>
 <h4>Graph Classification</h4>
 <p></p>
-We employ the <em>GCNConv</em> model from the PyTorch Geometric Library for graph classification tasks. This model performs convolutional operations, leveraging edges, node attributes, and graph labels to extract features and analyze graph structures comprehensively.
+We employ the <em>GCNConv</em> model from the PyTorch Geometric Library for GNN Graph Classification tasks. This model performs convolutional operations, leveraging edges, node attributes, and graph labels to extract features and analyze graph structures comprehensively.
 <p></p>
-By combining the sliding window technique with Graph Neural Networks, our approach offers a robust framework for analyzing time series data. It captures intricate temporal dynamics and provides actionable insights into both local and global patterns, making it particularly well-suited for applications such as EEG analysis and classification tasks.
-
-<p></p>
-
-
-This method allows us to analyze time series data effectively by capturing both local and global patterns, providing valuable insights into temporal dynamics.
-<p></p>
-<h4>Model Training</h4>
+By combining the sliding window technique with Graph Neural Networks, our approach offers a robust framework for analyzing time series data. It captures intricate temporal dynamics and provides actionable insights into both local and global patterns, making it particularly well-suited for applications such as EEG data analysis. This method allows us to analyze time series data effectively by capturing both local and global patterns, providing valuable insights into temporal dynamics.
 <p></p>
 
-Our methodology involves processing both city-centric and sliding window graphs. We start by generating cosine similarity matrices from time series data, which are then converted into graph adjacency matrices. This process includes creating edges for vector pairs with cosine values above a set threshold and adding a virtual node to ensure network connectivity, a critical step for preparing the graph structure.
+
+<h3>Pairwise GNN Sliding Graph Classification</h3>
 <p></p>
-For graph classification tasks, we use the GCNConv model from the PyTorch Geometric Library. This model excels in feature extraction through its convolutional operations, taking into account edges, node attributes, and graph labels for comprehensive graph analysis. The approach concludes with the training phase of the GNN model, applying these techniques to both types of graphs for robust classification.
-<p></p>
+<a href="#">
+      <img src="{{ site.baseurl }}/img/slide2b.jpg" alt="Post Sample Image" width="717" >
+</a>
+  <p></p>
+
+This figure illustrates the process of pairwise GNN Sliding Graph Classification, where pairs of long time series are analyzed using graph-based methods to capture dynamic connectivity patterns. Channels F3-F4 during sleep are used as an illustrative example. Below is a breakdown of the methodology:
+  <p></p>
+  <ul>
+      <li><strong>Input Time Series as Pairs:</strong> Two long time series (e.g., Sleep F3 and Sleep F4) are taken as input, each representing continuous data points over time.</li>
+      <li><strong>Sliding Graph Construction:</strong> Each time series is segmented into overlapping windows, and graphs are created from these segments. These graphs are labeled according to their respective time series (e.g., F3 and F4).</li>
+      <li><strong>GNN Graph Classification:</strong> The sliding graphs are processed by a GNN Graph Classification model. The model learns pairwise relationships between the graph labels, capturing interactions between the time series.</li>
+      <li><strong>Pre-Final Vector Extraction:</strong> The GNN generates pre-final vectors (graph embeddings) for each segment. These embeddings are aligned with the time points of the original time series.</li>
+      <li><strong>Cosine Similarity Computation:</strong> For each pair of embeddings at corresponding time points, cosine similarity is calculated to measure the relationship between the time series.</li>
+      <li><strong>Temporal Analysis of Similarities:</strong> The cosine similarity values are plotted over time, revealing how the connectivity between the time series evolves dynamically.</li>
+  </ul>
+  <p>
+  This approach bridges time series analysis and graph theory, offering a robust method to study pairwise relationships in applications like EEG connectivity or multi-channel sensor data.
+  </p>
+
+
+  <p></p>
 
 <p></p>
 <h2>Experiments Overview</h2>
@@ -1057,10 +1092,13 @@ The consistent improvement in both training and test accuracy demonstrates the m
 <p></p>
 <p></p>
 The table summarizes cosine similarity values and graph neural network (GNN) performance for selected EEG channel pairs across sleep and rest sessions. It provides insights into how these pairs interact during different states and how well the GNN model captures these patterns.
+
+
+
 <p></p>
 <h4>Analysis of Cosine Similarity and GNN Performance for Selected EEG Pairs</h4>
 <p></p>
-The table summarizes cosine similarity values and graph neural network (GNN) performance for selected EEG channel pairs across sleep and rest sessions. It provides insights into how these pairs interact during different states and how well the GNN model captures these patterns.
+
 
 <p></p>
 <a href="#">
@@ -1068,23 +1106,52 @@ The table summarizes cosine similarity values and graph neural network (GNN) per
 </a>
 <p></p>
 
-Key Observations:
+This table presents cosine similarity values and GNN Graph Classification performance for selected EEG channel pairs across sleep and rest states, offering insights into connectivity patterns and classification accuracy.
+
+<p></p>
 <ul>
-  <li><b>Channel Pairs and Cosine Similarity:</b> Cosine similarity values highlight the relationship between EEG signals. For example, the C4-Cz pair showed stronger similarity during sleep, while the O1-O2 pair maintained consistently high similarity across both states.</li>
-  <li><b>Brain Regions Affected:</b> The F3-F4 pair, associated with frontal brain activity, showed notable differences in similarity between sleep and rest, reflecting the frontal lobe's role in decision-making and reduced cognitive activity during sleep. The occipital pair (O1-O2), responsible for visual processing, showed consistently high similarity across both states, indicating stable interactions in this region.</li>
-  <li><b>Training Accuracy:</b> The GNN model effectively learned patterns from the training data, with the F3-F4 pair achieving the highest training accuracy during sleep.</li>
-  <li><b>Test Accuracy:</b> Performance on test data varied across pairs and states. The F3-F4 pair demonstrated strong generalization during sleep, while other pairs showed moderate accuracy differences between states.</li>
+
+
+    <li>Cosine Similarity & Channel Interactions:
+        <ul>
+            <li><strong>F3-F4 (Frontal Lobe):</strong> Moderate similarity in both states with the highest training and test accuracy, indicating strong differentiation between sleep and rest.</li>
+            <li><strong>C4-Cz (Central Region):</strong> Higher similarity during sleep, suggesting stronger functional connectivity in this state. However, its stable patterns across conditions resulted in moderate classification accuracy.</li>
+            <li><strong>O1-O2 (Occipital Lobe):</strong> Consistently high similarity across both states, limiting classification performance due to minimal variation.</li>
+        </ul>
+    </li>
+
+    <li>Brain Regions & Functional Roles:
+        <ul>
+            <li><strong>Frontal Activity (F3-F4):</strong> Notable differences in similarity between sleep and rest align with the frontal lobe’s role in cognitive processing, which decreases during sleep.</li>
+            <li><strong>Visual Processing (O1-O2):</strong> The occipital lobe pair maintained stable interactions across states, reflecting consistent neural activity in visual regions.</li>
+        </ul>
+    </li>
+
+    <li>Model Performance & Interpretation:
+        <ul>
+            <li><strong>Training Accuracy:</strong> The GNN effectively learned EEG patterns, with F3-F4 achieving the highest accuracy, reinforcing its distinct connectivity changes across states.</li>
+            <li><strong>Test Accuracy:</strong> Performance varied across pairs; F3-F4 demonstrated strong generalization, while others showed moderate accuracy shifts.</li>
+            <li><strong>High Similarity & Lower Accuracy:</strong> While strong cosine similarity suggests stable EEG interactions, it can reduce variability needed for classification. This is evident in O1-O2, where consistently high similarity limited the model’s ability to distinguish between sleep and rest.</li>
+        </ul>
+    </li>
+
+
 </ul>
-<p></p>
-Interpreting High Cosine Similarity and Low Accuracy:
 
 <p></p>
-
-While high cosine similarity values suggest stable and predictable relationships between EEG signals, they can reduce the variability necessary for effective machine learning classification. When similarity values are consistently high, the model struggles to differentiate patterns, resulting in lower classification accuracy. This is particularly evident in the O1-O2 pair, where consistently high cosine similarity across both states contributed to reduced GNN accuracy.
 <p></p>
-These results underscore the variability in EEG signal relationships and model performance, reflecting the distinct dynamics of sleep and rest states, as well as the challenges of analyzing highly correlated data.</p>
+These findings highlight the complex dynamics of EEG signal relationships and the challenges of analyzing highly correlated data. The results also demonstrate how GNN-based approaches can capture distinct neural patterns, offering a powerful framework for studying sleep-state transitions and functional connectivity.
+<p></p>
+<p></p>
+<h4>Note on O1-O2 Analysis</h4>
+<p></p>
+Although <strong>O1-O2</strong> was initially included as part of the analysis, its results have been excluded from the figures and detailed discussion due to the very low model training and testing accuracy observed for this channel pair. This suggests that the model failed to capture meaningful patterns or dynamics for O1-O2, likely due to insufficient signal quality or inherent limitations in the data for this pair.
 
-These results underscore the variability in EEG signal relationships and model performance, reflecting the distinct dynamics of sleep and rest states.
+
+<p></p>
+<p></p>
+
+
 
 <p></p>
 
@@ -1099,7 +1166,7 @@ These results underscore the variability in EEG signal relationships and model p
 <h3>Model Results Interpretation</h3>
 <p></p>
 
-The results interpretation phase of the study focused on analyzing the predictions and embeddings generated by the graph neural network (GNN) model. Using a softmax function, the model's outputs were transformed into probabilities to better understand the classification predictions and identify the most likely labels for each graph.
+The results interpretation phase analyzed the predictions and embeddings from the GNN Graph Classification model. A softmax function transformed the model’s outputs into probabilities, making classification predictions more interpretable. This process helped identify the most likely labels for each graph.
 
 Process:
 <ul>
@@ -1177,7 +1244,30 @@ for i in range(len(graphList_1)):
 <p></p>
 
 This analysis bridges the gap between model outputs and interpretability, offering a clearer understanding of how the GNN captures and distinguishes temporal patterns. By identifying regions of high and low similarity, this step enables further exploration of brain dynamics during sleep and rest states, paving the way for advanced graph-based analyses.
+<p></p>
 
+
+
+
+<p></p>
+<h3>Analysis of Embedded Graphs: Statistics</h3>
+<p></p>
+<figure>
+    <img src="{{ site.baseurl }}/img/slide4.jpg" alt="Cosine Similarity Statistics for Channel Pairs F3-F4 and C4-Cz" style="width:90%; margin:auto;">
+    <figcaption>Cosine similarity statistics for EEG channel pairs F3-F4 and C4-Cz during sleep and rest sessions, highlighting shifts in connectivity patterns and variability across states.</figcaption>
+</figure>
+
+<p></p>
+This process aligns embeddings with their corresponding time points, enabling a structured temporal analysis. Cosine similarity is computed between paired embeddings (e.g., F3 and F4) at each time point, generating a dynamic connectivity profile that reveals evolving relationships within the time series.
+<p></p>
+Table 2 presents cosine similarity statistics for EEG channel pairs F3-F4 and C4-Cz across sleep and rest sessions, highlighting shifts in connectivity behavior. The mean similarity for F3-F4 shifts from negative during sleep (-0.1529) to positive in rest (0.1522), indicating a state-dependent connectivity change. In contrast, C4-Cz remains positive in both sleep (0.1069) and rest (0.2889), suggesting stable connectivity with an increase in rest.
+<p></p>
+Higher standard deviations in rest for both pairs reflect greater variability, demonstrating that neural interactions fluctuate more during wakeful rest than in sleep. These findings further emphasize the distinct temporal dynamics of frontal and central brain regions across different states.
+
+<p></p>
+<h3>Temporal Analysis of Connectivity Within Sleep and Rest</h3>
+<p></p>
+Understanding how connectivity evolves within each state requires a detailed temporal analysis. While statistical comparisons provide an overview of differences between sleep and rest, examining connectivity patterns over time within each session offers deeper insights. Figures below present a time-resolved views of cosine similarities for F3-F4 and C4-Cz, capturing fluctuations in connectivity as they unfold. This approach helps identify transient changes, sustained trends, and potential transitions in neural activity, providing a more nuanced understanding of brain dynamics in sleep and rest.
 <p></p>
 <h4>Transforming Time Points</h4>
 <p></p>
@@ -1193,7 +1283,11 @@ cosine_sim_pairs_df['time_label'] = cosine_sim_pairs_df['minutes']
 <p></p>
 <p></p>
 
+<p></p>
 
+
+
+<p></p>
 
 <h4>Smoothing Cosine Similarity Values</h4>
 <p></p>
@@ -1253,9 +1347,9 @@ plt.show()
 <p></p>
 
 <p></p>
-<h3>Explanation and Suggested Descriptions for the Figures</h3>
+
 <p></p>
-<h4>Figure 1: Cosine Similarity at Sleep Time: F3-F4 vs. C4-Cz</h4>
+<h4>Cosine Similarity at Sleep Time: F3-F4 vs. C4-Cz</h4>
 <p></p>
 This figure illustrates the temporal dynamics of cosine similarity for two EEG channel pairs, <strong>F3-F4</strong> and <strong>C4-Cz</strong>, during sleep. The x-axis represents time in minutes and seconds, while the y-axis shows the cosine similarity values. The red line corresponds to the F3-F4 channel pair, and the green line corresponds to the C4-Cz channel pair. The fluctuations in similarity values over time highlight differences in connectivity between these brain regions during sleep. This visualization offers a detailed view of how specific brain areas interact dynamically during sleep, capturing subtle connectivity changes.
 
@@ -1266,9 +1360,8 @@ This figure illustrates the temporal dynamics of cosine similarity for two EEG c
     <figcaption>Temporal dynamics of cosine similarity during sleep for EEG channel pairs F3-F4 and C4-Cz, showcasing distinct connectivity patterns in brain regions associated with motor and sensory processing..</figcaption>
 </figure>
 
-
 <p></p>
-<h4>Figure 2: Cosine Similarity at Rest Time: F3-F4 vs. C4-Cz</h4>
+<h4>Cosine Similarity at Rest Time: F3-F4 vs. C4-Cz</h4>
 <p></p>
 This figure depicts the cosine similarity for the same EEG channel pairs, <strong>F3-F4</strong> and <strong>C4-Cz</strong>, during rest. Similar to the sleep plot, the x-axis indicates time in minutes and seconds, and the y-axis represents cosine similarity values. The trends for F3-F4 (red) and C4-Cz (green) reveal distinct patterns of connectivity during rest, differing from the sleep state. These patterns reflect how brain activity and connectivity are modulated across different states.
 
@@ -1284,10 +1377,6 @@ This figure depicts the cosine similarity for the same EEG channel pairs, <stron
 
 
 
-<h4>Note on O1-O2 Analysis</h4>
-<p></p>
-Although <strong>O1-O2</strong> was initially included as part of the analysis, its results have been excluded from the figures and detailed discussion due to the very low model training and testing accuracy observed for this channel pair. This suggests that the model failed to capture meaningful patterns or dynamics for O1-O2, likely due to insufficient signal quality or inherent limitations in the data for this pair.
-
 
 
 
@@ -1295,7 +1384,7 @@ Although <strong>O1-O2</strong> was initially included as part of the analysis, 
 <p></p>
 
 
-<p></p>
+
 
 
 
@@ -1305,9 +1394,25 @@ Although <strong>O1-O2</strong> was initially included as part of the analysis, 
 <p></p>
 <h2>Conclusion</h2>
 <p></p>
+<p>This study explores how <strong>sliding graph neural networks</strong> can help analyze <strong>EEG time series</strong>, capturing <strong>shifting connectivity patterns</strong> in the brain. By transforming EEG signals into overlapping graphs, <strong>GNN Graph Classification</strong> not only tracks how brain activity changes over time but also provides deeper insights into neural interactions beyond simple classification.</p>
 
-Bridging neuroscience and graph theory isn’t just a challenge—it’s an opportunity. Sliding graphs offer neuroscientists a fresh way to uncover EEG patterns that traditional methods might miss, while graph experts get to see their tools applied to real-world, high-impact challenges like sleep research. By bringing these perspectives together, we’re not just analyzing data—we’re building connections between fields, showing how graph-based techniques can transform the way we study the brain.
+<p>Our findings highlight clear differences between <strong>sleep and rest</strong>, especially in the <strong>frontal (F3-F4) and central (C4-Cz) regions</strong>. <strong>Cosine similarity analysis</strong> shows that while <strong>C4-Cz remains strongly connected during rest</strong>, <strong>F3-F4 shifts more between states</strong>, reflecting how different brain areas behave across conditions.</p>
+
+<p>Bringing <strong>neuroscience and graph theory</strong> together opens exciting possibilities. <strong>Sliding graphs</strong> give neuroscientists a fresh way to uncover EEG patterns that might go unnoticed with traditional methods, while <strong>graph-based techniques</strong> gain new applications in sleep research. This collaboration isn’t just about analyzing data—it’s about connecting disciplines and discovering new ways to study the brain.</p>
+
+<p>Beyond EEG, <strong>GNN Sliding Graph Classification</strong> has potential in many fields, from <strong>tracking climate trends</strong> to <strong>understanding financial markets</strong>. With opportunities to <strong>scale, improve interpretability, and tackle real-world challenges</strong>, this approach could offer fresh insights into complex systems far beyond neuroscience.</p>
+
+
+
+
+<!-- This study demonstrates the effectiveness of sliding graph neural networks for EEG time series analysis. By transforming EEG signals into overlapping graph structures, GNN Graph Classification captures dynamic connectivity patterns over time, while pre-final vector embeddings provide deeper insights into neural interactions beyond classification.
 <p></p>
+Our analysis reveals distinct connectivity differences between rest and sleep states, particularly in the frontal (F3-F4) and central (C4-Cz) regions. Cosine similarity analysis shows that while C4-Cz exhibits stronger connectivity during rest, F3-F4 varies more across states, aligning with neurophysiological patterns.
+<p></p>
+Bridging neuroscience and graph theory presents both challenges and opportunities. Sliding graphs offer neuroscientists a new lens to uncover EEG patterns that conventional methods may miss, while graph experts see their tools applied to real-world challenges like sleep research. By merging these perspectives, we go beyond data analysis—building connections between disciplines and demonstrating how graph-based techniques can reshape brain research.
+<p></p>
+These findings suggest sliding graph-based GNNs as a powerful framework for modeling long-duration EEG dynamics. Future work will focus on scalability to larger datasets, clinical validation, and enhanced interpretability for sleep research and neurodiagnostics.
+<p></p> -->
 
 
 
