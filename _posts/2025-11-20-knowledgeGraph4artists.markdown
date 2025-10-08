@@ -2,12 +2,12 @@
 layout:     post
 title:      "Connecting Artists through Unified Knowledge Graph"
 subtitle:   "Integrating Text and Images with Graph Neural Networks to Explore Artistic Relationships"
-date:       2025-11-22 12:00:00
+date:       2025-11-20 12:00:00
 author:     "Melenar"
 header-img: "img/artPage2d.jpg"
 ---
 
-<p><h2>Introduction: Knowledge Graphs Exploration</h2>
+<p><h2>IntroductionXXX: Knowledge Graphs Exploration</h2>
 
 Art and artists are deeply connected, reflecting creativity, culture, and history. Graphs provide a powerful way to explore these relationships by representing artists, artworks, and movements as nodes, and their connections as edges. This helps us uncover patterns, find hidden links, and better understand the evolution of art. With advanced tools like Graph Neural Networks (GNNs), we can predict new connections, group related ideas, and gain even deeper insights into the art world.
 <p></p>

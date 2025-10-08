@@ -84,7 +84,7 @@
 
 
     <!-- Post Header -->
-<header class="intro-header" style="background-image: url('/img/pageVoronoi11.jpg')">
+<header class="intro-header" style="background-image: url('/img/pageVec19.jpg')">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
@@ -106,26 +106,71 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
-				<p></p>
-<h2>Introduction</h2>
-<p></p>
+				<h2>Fusing Space &amp; Time with Graph Neural Networks</h2>
+<p>
+  Climate isn’t only about <em>where</em> you are; it’s about how conditions <em>evolve together</em> across the map.
+  Here we use <strong>Graph Neural Networks (GNNs)</strong> to connect <strong>1,000 cities</strong> across
+  <strong>40 years</strong> of daily temperatures, revealing hidden climate “neighborhoods” and long-range “bridges”
+  that geography alone can’t explain. Modeling both space and time as graphs shows when distant regions behave like
+  close neighbors—and when nearby cities drift apart.
+</p>
 
-<p></p>
-<p>We explore how climate behaves across geography and time, using 40 years of daily temperatures for 1,000 major cities. By modeling spatial and temporal connections together, we reveal climate patterns geography alone would miss.</p>
-<p></p>
+<figure>
+  <img src="/img/voronoi34.jpg" alt="Four perspectives: Average, Spatial, Temporal, Spatial+Temporal" />
+  <figcaption>Figure 1. Four perspectives combining spatial and temporal graph inputs for climate analysis.</figcaption>
+</figure>
 
-<p>To explore these patterns in more depth, we applied <strong>Graph Neural Networks (GNNs)</strong> across four main scenarios:</p>
-
-<p></p>
+<p>This diagram shows the four different ways we explore climate similarity, based on combinations of input data and graph structures. Here is color guide:
 <ul>
-  <li><strong>Average:</strong> based on a city's typical year-round temperature profile</li>
-  <li><strong>Spatial:</strong> based on proximity to other cities using the Voronoi graph</li>
-  <li><strong>Temporal:</strong> based on how climate evolves over time within a single location</li>
-  <li><strong>Spatial + Temporal:</strong> combining both location and long-term behavior for a richer perspective</li>
+  <li><strong>Yellow area</strong> — represents the use of <strong>raw data</strong>, specifically the <em>average temperature vectors</em> for each city.</li>
+  <li><strong>Light green area</strong> — represents the use of <strong>temporal data</strong>, meaning the <em>city-level graphs</em> built from year-to-year climate patterns.</li>
+  <li><strong>Purple area</strong> — represents the use of <strong>spatial data</strong>, specifically the <em>Voronoi graph</em> that defines proximity between cities.</li>
 </ul>
+
+
+<h3>Four perspectives we analyze</h3>
+<ul>
+  <li><strong>Average:</strong> a city’s typical year-round temperature profile</li>
+  <li><strong>Spatial:</strong> proximity connections via a Voronoi graph</li>
+  <li><strong>Temporal:</strong> how climate evolves across years within one city</li>
+  <li><strong>Spatial + Temporal:</strong> fusion of both for the richest signal</li>
+</ul>
+
+<h3>Why this matters</h3>
+<p>
+  Most climate work emphasizes either geography or time series. This study fuses both:
+  <strong>space</strong> (how cities influence one another through adjacency) and
+  <strong>time</strong> (how each city’s climate changes year to year). The joint view exposes patterns a single axis
+  misses—regional belts that shift together, regime matches across oceans, and nearby microclimates that diverge.
+</p>
+
+<h3>How the model learns similarity</h3>
+<p>We build two complementary graph families and train GNNs with link prediction to learn embeddings:</p>
+<ul>
+  <li><strong>Spatial graphs:</strong> nodes are cities; edges come from Voronoi adjacency.</li>
+  <li><strong>Temporal city-year graphs:</strong> each city becomes a chain of yearly nodes; edges link years with high cosine similarity of their daily temperature vectors.</li>
+</ul>
+
+<h3>Feature spaces produced</h3>
+<ol>
+  <li><strong>Average temperature vectors</strong> (365-dim per city)</li>
+  <li><strong>City graph embeddings</strong> from GNN graph classification over city-year structures</li>
+  <li><strong>Link-prediction embeddings (average vectors):</strong> predict spatial edges from average profiles</li>
+  <li><strong>Link-prediction embeddings (city-graph vectors):</strong> same task using city-level GNN vectors, fusing spatial and temporal signals</li>
+</ol>
+
+<h3>Reusable blueprint</h3>
+<p>
+  Although the focus is temperature, this two-stream graph fusion is a reusable approach for evolving systems—mobility,
+  pollution, public health, and more.
+</p>
+
+
+
 <p></p>
-<p>By layering these perspectives, we aim to uncover how climate behaves across connected regions — where it stays consistent, where it shifts, and where unexpected patterns emerge.</p>
-<p></p>
+
+
+
 
 <p></p>
 <h2>Transforming Data to Graphs</h2>
@@ -134,130 +179,167 @@
 <h3>Raw Data</h3>
 <p></p>
 
-<p>This project is based on a large and detailed dataset: 40 years of daily temperature data for the 1,000 most populated cities around the world. Each city has one temperature value per day, per year — giving us long-term, high-resolution climate information across the globe.</p>
+This study is based on a large and detailed dataset: 
+
+
+<ol>
+  <li>1,000 the most populous cities worldwide </li>
+  <li>Geo-coordinates</li>
+  <li>40 years of daily temperatures (1980–2019)</li>
+</ol>
+
+<p></p>
+This data is giving us long-term, high-resolution climate information across the globe. It allows us to fuse geography (space) with decades of daily temperatures (time) and
+reveal hidden climate neighborhoods &amp; bridges.
+
+<p></p>
+<h3>Spatial Graph -- Voronoi</h3>
+<p></p>
+To model geography we use a Voronoi diagram. Think of several coffee shops in a town: each shop “owns” the area closer to it than to any other shop. We apply the same idea to cities. Each city becomes a node; two cities are connected if their Voronoi regions share a boundary. Some neighbors are nearby; others can be surprisingly far apart (see the Québec–Porto example).
 <p></p>
 
-<h3>Temporal Graphs</h3>
 <p></p>
-<p>We looked at the <strong>temporal behavior</strong> of climate in each city — how daily temperatures have changed (or remained consistent) across decades. Some locations show highly stable seasonal cycles, while others exhibit more variation year to year.
-A temporal graph for each city built by connecting years with similar temperature patterns.
-Each node is a city - year, with a 365-value vector of daily temperatures. This captures how each city’s climate has changed or stayed stable over time</p>
 
-<p>
-
-</p>
+<a href="#">
+    <img src="/img/voronoi41.jpg" alt="Post Sample Image" width="333" />
+</a>
 <p></p>
-<h3>Spatial Graph</h3>
-<p>
 
+<ul>
+  <li><strong>Coffee shops → areas:</strong> each site covers its closest region.</li>
+  <li><strong>Neighbors →  edges:</strong> regions that share a border become connected.</li>
+  <li><strong>Cities → nodes:</strong> cities sit at Voronoi centers; shared borders define graph edges.</li>
+
+</ul>
+
+
+<p></p>
+We use the Voronoi diagram to define natural neighbors between cities: space is partitioned so every location belongs to its closest city. Cities are connected if their regions share a border. For example, Québec, Canada and Porto, Portugal are neighbors because no more-populated cities lie between them at that scale; the shared Voronoi boundary falls near the midpoint of the great-circle path.
+   <a href="#">
+       <img src="/img/voronoi17.jpg" alt="Post Sample Image" width="777" />
+   </a>
+
+<p></p>
+Because cities are on the curved Earth, we first project latitude/longitude into a planar coordinate system (EPSG:3857) so the Voronoi algorithm—which expects Cartesian coordinates—can run. Any equal, consistent projection is acceptable here; the goal is topological adjacency, not precise distances.
+<p></p>
+This produces a spatial graph over 1,000 cities in which each node carries a 365-value average-temperature vector (mean daily temperatures across 40 years). The result captures true proximity determined by spatial partitioning—not arbitrary distance thresholds—and highlights dense regional clusters as well as isolated cities.
+<p></p>
 A spatial graph that connects all 1,000 cities built using a Voronoi diagram, which links cities that are geographically close
 Each city is a node, described by a 365-value vector (its average daily temperatures across 40 years)
 This gives us a global view of how nearby climates relate
 
 To understand the <strong>spatial structure</strong>, we used <strong>Voronoi diagrams</strong> to define natural neighborhoods. Cities are connected if their regions share a border, creating a network that reflects true proximity — not based on arbitrary distance cutoffs, but shaped by how space is divided. This helps capture how some cities are part of dense regional clusters, while others are more isolated.
-</p>
 
+<p></p>
+<h3>Temporal City Graphs</h3>
 <p></p>
 
 <p></p>
+We looked at the <strong>temporal behavior</strong> of climate in each city — how daily temperatures have changed (or remained consistent) across decades. Some locations show highly stable seasonal cycles, while others exhibit more variation year to year. We constructed temporal graphs for each city, with nodes representing city - year, with a 365-value vector of daily temperatures. Graph edges we defined by pairs of nodes with cosine similarities higher than threshold. Temporal graphs represent relationships between daily temperature vectors for different years.
+For each graph we added a virtual node to transform disconnected graphs into single connected components.
+<p></p>
+<ul>
+  <li><strong>Nodes</strong> = city-year; features = daily temperature</li>
+  <li><strong>Edges</strong> = high cosine similarity (year↔year)</li>
+  <li><strong>Virtual nodes</strong> to ensure connectivity</li>
+
+</ul>
 
 <p></p>
 
+
+
+<a href="#">
+    <img src="/img/voronoi42.jpg" alt="Post Sample Image" width="555" />
+</a>
+<p></p>
+You can see as examples city graph for Malaga, Spain with stable weather and highly similar yearly weather and Orenburg, Russia where daily temperature vectors are very different year by year.
 <p></p>
 <p></p>
 <h2>GNN Models</h2>
 <p></p>
-<p>We will use Graph Neural Networks (GNNs) to learn more from these graphs by turning each city (or each city-year) into a meaningful vector. In both cases, the GNN models help us represent each city as a learned vector, shaped by its spatial context or its climate history over time. These new vectors can then be used to compare cities, group them, or detect unusual patterns. From each model, we extract the pre-final output vectors — these are 128-dimensional embeddings that capture the learned information.</p>
+We will use Graph Neural Networks (GNNs) to learn more from these graphs by turning each city (or each city-year) into a meaningful vector. In both cases, the GNN models help us represent each city as a learned vector, shaped by its spatial context or its climate history over time. These new vectors can then be used to compare cities, group them, or detect unusual patterns. From each model, we extract the pre-final output vectors — these are 128-dimensional embeddings that capture the learned information.
 
 <p></p>
 <h3>Temporal GNN - Graph Classification</h3>
 <p></p>
-<p>To capture how each city’s climate has changed over time, we applied a GNN Graph Classification model to 1,000 city-level temporal graphs. The model learns from the structure and connections within each graph, summarizing a city’s long-term climate behavior — whether it’s stable, variable, or somewhere in between.</p>
+To capture how each city’s climate has changed over time, we applied a GNN Graph Classification model to 1,000 city-level temporal graphs. The model learns from the structure and connections within each graph, summarizing a city’s long-term climate behavior — whether it’s stable, variable, or somewhere in between.
 <p></p>
-<p>The model requires small graphs with labels. As a simple proxy, we labeled cities based on their distance from the equator, using latitude as an indicator of climate variability. The model outputs a 128-dimensional vector that represents each city’s climate history. Future work could refine these labels with more detailed, data-driven methods.</p>
+The model requires small graphs with labels. As a simple proxy, we labeled cities based on their distance from the equator, using latitude as an indicator of climate variability. The model outputs a 128-dimensional vector that represents each city’s climate history. Future work could refine these labels with more detailed, data-driven methods.
+<p></p>
+
+<p></p>
+
+<p></p>
+For classifying city graphs, we used the Graph Convolutional Network (GCNConv) model from the PyTorch Geometric Library (PyG). The GCNConv model allowed us to extract feature vectors from the graph data, enabling us to perform a binary classification to determine whether the climate for each city was 'stable' or 'unstable'.
+<p></p>
+
+<p></p>
 
 <p></p>
 <p></p>
 <h3>Spatial GNN - Link Prediction</h3>
 <p></p>
-<p>For the spatial analysis, we build a Voronoi-based graph that links all 1 000 cities worldwide and train a GNN link-prediction model on it. Each node is initialized with a 365-dimensional “average-temperature” vector, enabling the network to learn how climate patterns propagate among neighboring cities. The model then produces a fresh embedding for every city—one that blends its own climate signature with the influence of its Voronoi neighbors.</p>
+For the spatial analysis, we build a Voronoi-based graph that links all 1 000 cities worldwide and train a GNN link-prediction model on it. Each node is initialized with a 365-dimensional “average-temperature” vector, enabling the network to learn how climate patterns propagate among neighboring cities. The model then produces a fresh embedding for every city—one that blends its own climate signature with the influence of its Voronoi neighbors.
 <p></p>
+
+<p></p>
+For spatial graphs we used GNN Link Prediction model based on GraphSAGE algorithm, which generates node embeddings based on attributes and neighbors without retraining. Our study employs a GNN Link Prediction model from the Deep Graph Library (DGL) library.
+
 <p></p>
 <h3>Joint Spatial and Temporal Modeling</h3>
 <p></p>
-<p>To capture both temporal and spatial influences on climate, we apply a GNN Link Prediction model. The graph structure comes from Voronoi-based city connections, while the node features are the learned embeddings from the city-level temporal graphs produced by the GNN Classification model. This allows us to explore how geography and long-term climate behavior interact together.</p>
+To capture both temporal and spatial influences on climate, we apply a GNN Link Prediction model. The graph structure comes from Voronoi-based city connections, while the node features are the learned embeddings from the city-level temporal graphs produced by the GNN Classification model. This allows us to explore how geography and long-term climate behavior interact together.
 
 <p></p>
 <h2>Methods</h2>
 
 <p></p>
-<p>The diagram below shows how we built a climate similarity model using graph neural networks. First, we connected the 1000 most populated cities using Voronoi-based geography — cities are linked if their zones share a border. Then, we used 40 years of temperature data to describe each city in two ways: one based on raw daily averages, and one using advanced GNN models that learn from how each city’s climate changed over time. These feature vectors help us compare cities and uncover deep climate patterns around the world.</p>
+The diagram below shows how we built a climate similarity model using graph neural networks. First, we connected the 1000 most populated cities using Voronoi-based geography — cities are linked if their zones share a border. Then, we used 40 years of temperature data to describe each city in two ways: one based on raw daily averages, and one using advanced GNN models that learn from how each city's climate changed over time. These feature vectors help us compare cities and uncover deep climate patterns around the world.
 
-<p><a href="#">
+
+
+
+   <a href="#">
        <img src="/img/voronoi16b.jpg" alt="Post Sample Image" width="404" />
    </a>
-Fig. 1. Overview of the proposed method combining Voronoi-based spatial graphs with GNN pipelines for climate similarity and classification.</p>
+Fig. 1. Overview of the proposed method combining Voronoi-based spatial graphs with GNN pipelines for climate similarity and classification.
 <p></p>
+
 
 <p></p>
 <p></p>
-<p></p>
-<h3>City Graphs</h3>
-<p></p>
-<p>Small labeled graphs created from nodes and edges. We constructed graphs for each city, with nodes representing specific city-year pairs and edges defined by pairs of nodes with cosine similarities higher than threshold values. Each graph was labeled as either ‘stable’ or ‘unstable’ based on the city’s geographical latitude.</p>
-<p></p>
 
-<p></p>
-<h3>Voronoi Graph</h3>
-<p></p>
-<p>We used a Voronoi diagram to define natural neighbors between cities. In this approach, space is divided so that each area belongs to the closest city. Cities are considered connected if their regions share a border.</p>
-<p></p>
-<p>For example, Quebec, Canada and Porto, Portugal are neighbors because there are no highly populated cities between them. Geometrically, the shares Voronoi diagram border line will cross the midpoint between them.
-   <a href="#">
-       <img src="/img/voronoi17.jpg" alt="Post Sample Image" width="777" />
-   </a>
-Distance Distribution by Regions</p>
-<p></p>
-<p>Because cities are located on the curved surface of the Earth, we first converted their latitude and longitude into a flat 2D coordinate system using a map projection (EPSG:3857). This step is crucial because the Voronoi algorithm expects Cartesian coordinates in a Euclidean space.</p>
 
-<p></p>
-<h3>GNN Graph Classification Model</h3>
-<p></p>
 
-<p></p>
-<p>For classifying city graphs, we used the Graph Convolutional Network (GCNConv) model from the PyTorch Geometric Library (PyG). The GCNConv model allowed us to extract feature vectors from the graph data, enabling us to perform a binary classification to determine whether the climate for each city was ‘stable’ or ‘unstable’.</p>
-<p></p>
 
-<p></p>
 
-<p></p>
-
-<h3>GNN Link Prediction Model</h3>
-<p></p>
-<p>For spatial graphs we used GNN Link Prediction model based on GraphSAGE algorithm, which generates node embeddings based on attributes and neighbors without retraining. Our study employs a GNN Link Prediction model from the Deep Graph Library (DGL) library.</p>
 
 <h2>Coding and Observations</h2>
-<p></p>
+
 
 <p></p>
 <h3>Data Source: Climate Data</h3>
 <p></p>
-<p>Our primary dataset, sourced from Kaggle, is titled:
-<i><a href=" https://www.kaggle.com/hansukyang/temperature-history-of-1000-cities-1980-to-2020">“Temperature History of 1000 cities 1980 to 2020”</a></i> - daily temperature from 1980 to 2020 years for 1000 most populous cities in the world. This dataset provides a comprehensive record of average daily temperatures in Celsius for the 1000 most populous cities worldwide, spanning from 1980 to 2019.</p>
+Our primary dataset, sourced from Kaggle, is titled:
+<i><a href="
+https://www.kaggle.com/hansukyang/temperature-history-of-1000-cities-1980-to-2020">"Temperature History of 1000 cities 1980 to 2020"</a></i> - daily temperature from 1980 to 2020 years for 1000 most populous cities in the world. This dataset provides a comprehensive record of average daily temperatures in Celsius for the 1000 most populous cities worldwide, spanning from 1980 to 2019.
 <p></p>
+
+
 
 <p></p>
 
-<p><a href="#">
+   <a href="#">
        <img src="/img/preFinFig1.jpg" alt="Post Sample Image" width="678" />
    </a>
-Fig. 1. Latitude Distribution of the 1000 Most Populous Cities.</p>
-<p></p>
+Fig. 1. Latitude Distribution of the 1000 Most Populous Cities.
+<p></p>  
 
-<p>To begin our climate analysis, we created a simple but effective climate profile for each city. The dataset includes daily temperature readings for 1000 cities across multiple years. By averaging the temperatures for each day of the year across all available years, we produced a single 365-dimensional vector per city.</p>
+To begin our climate analysis, we created a simple but effective climate profile for each city. The dataset includes daily temperature readings for 1000 cities across multiple years. By averaging the temperatures for each day of the year across all available years, we produced a single 365-dimensional vector per city.
 
-<p>This average vector captures the city’s typical annual temperature pattern and serves as a foundational node feature for later graph-based models.
-&lt;/p&gt;</p>
+This average vector captures the city’s typical annual temperature pattern and serves as a foundational node feature for later graph-based models.
+</p>
 
 <p></p>
 
@@ -995,103 +1077,9 @@ To make the embeddings easier to analyze and merge with other datasets, we conve
 
 <h2>Findings</h2>
 
-<p>
-To uncover patterns in global climate behavior, we combined several types of data and learned representations into a unified graph-based framework. We examined four types of node features:
-</p>
-<ul>
-  <li><strong>Average Temperature Vectors:</strong> Basic yearly climate profiles averaged over time (365 values per city).</li>
-  <li><strong>City Graph Embeddings:</strong> Learned vectors from a GNN Graph Classification model, based on structural changes across years.</li>
-  <li><strong>Link Prediction Embeddings (on average vectors):</strong> Node embeddings learned to predict spatial connectivity using average climate patterns.</li>
-  <li><strong>Link Prediction Embeddings (on city graph vectors):</strong> Embeddings trained on Voronoi edges but using city-level GNN vectors as input features — a fusion of spatial and temporal signals.</li>
-</ul>
-
-<p></p>
-<p><a href="#">
-    <img src="/img/voronoi34.jpg" alt="Post Sample Image" width="876" />
-</a></p>
-
-<p></p>
-<p>This diagram shows the four different ways we explore climate similarity, based on combinations of input data and graph structures. Here is color guide:
-<ul>
-  <li><strong>Yellow area</strong> — represents the use of <strong>raw data</strong>, specifically the <em>average temperature vectors</em> for each city.</li>
-  <li><strong>Light green area</strong> — represents the use of <strong>temporal data</strong>, meaning the <em>city-level graphs</em> built from year-to-year climate patterns.</li>
-  <li><strong>Purple area</strong> — represents the use of <strong>spatial data</strong>, specifically the <em>Voronoi graph</em> that defines proximity between cities.</li>
-</ul>
-
-
-<p></p>
-The spatial Voronoi graph and the four types of vectors create many opportunities to explore climate patterns across cities. We can look for similarities, differences, clusters, or unexpected relationships. But including all these analyses in one blog post would make it too long and hard to follow.
-<p></p>
-In this post, we’ll share just a few simple examples to show what’s possible. More detailed results and additional patterns will be covered in separate posts.
-<p></p>
-<p>
-The combination of the <strong>spatial Voronoi graph</strong> and the four types of vectors opens up many ways to explore global climate patterns. There’s an almost endless list of questions we can ask — from obvious ones like which cities have similar climate profiles, to more complex ideas like how geographic structure interacts with long-term climate change.
-</p>
-
-<p>
-But trying to pack all those analyses into a single blog post would quickly become overwhelming.
-</p>
-
-<p>
-To keep this technical blog readable and focused, we’ll start simple. In this post, we’ll show just a few examples that illustrate what’s possible with this framework — without diving into every detail.
-</p>
-
 <p></p>
 
-<h4>How Similar Are Distant or Nearby Cities?</h4>
-
-<p></p>
-The tables below highlight two interesting groups of city pairs based on both their physical distance and climate similarity across different types of vectors.
-
-<p></p>
-<a href="#">
-    <img src="/img/voronoi36.jpg" alt="Post Sample Image" width="600" />
-</a>
-
-<p></p>
-Despite being thousands of kilometers apart, these cities show high climate similarity — especially when considering temporal patterns and spatial relationships together. This suggests that geographic distance alone doesn't tell the full story when it comes to climate behavior.
-<p></p>  
-<p></p>
-<a href="#">
-    <img src="/img/voronoi37.jpg" alt="Post Sample Image" width="600" />
-</a>
-
-<p></p>
-In most cases, neighboring cities naturally share highly similar climates. But there are exceptions — like New York and Brooklyn, where spatial and combined similarity scores are unexpectedly low. This reflects how factors like microclimates, urban environments, or modeling limitations can produce unexpected results, even at small distances.
-<p></p>
-
-
-
-
-<p></p>  
-
-
-
-
-<p></p>
-<h4>How Cities Are Distributed in the Voronoi Graph</h4>
-
-<p>
-Before looking at climate patterns, it helps to see how the world’s 1,000 most populated cities are distributed — and how that shapes our Voronoi graph.
-</p>
-<p></p>
-<a href="#">
-    <img src="/img/voronoi22.jpg" alt="Post Sample Image" width="876" />
-</a>
-<p></p>
-<p>
-The map shows each city as a colored dot, where the color reflects how much space that city covers in the graph. This gives a quick picture of where cities are packed close together and where they’re more isolated.
-</p>
-
-<ul>
-  <li><strong>Red areas</strong> show cities with very small Voronoi regions. These are places where cities are packed closely together — typical of dense urban clusters like parts of Europe, South Asia, and East Asia.</li>
-  <li><strong>Green areas</strong> show cities with large Voronoi regions. These are often isolated cities surrounded by sparsely populated land — such as parts of Australia, Canada, Africa, or the Pacific.</li>
-</ul>
-
-<p>
-</p>
-
-
+<h3>Voronoi Graph Observations</h3>
 
 <p></p>
 
@@ -1101,9 +1089,9 @@ The map shows each city as a colored dot, where the color reflects how much spac
 This map shows the largest "triangle" formed by neighboring cities in our Voronoi graph.
 </p>
 <p></p>
-<a href="#">
+<p><a href="#">
     <img src="/img/voronoi35.jpg" alt="Post Sample Image" width="876" />
-</a>
+</a></p>
 <p></p>
 <p>
 <strong>Wellington, New Zealand</strong> is one corner of this triangle. Its two nearest neighbors aren’t even nearby — they’re across the ocean in <strong>Port Elizabeth, South Africa</strong> and <strong>Mar del Plata, Argentina</strong>.
@@ -1113,8 +1101,107 @@ This map shows the largest "triangle" formed by neighboring cities in our Vorono
 This triangle highlights how the Voronoi graph connects cities based on available neighbors, not strict distance. In isolated parts of the world, cities can be far apart yet still linked — an effect that’s especially important when exploring global climate patterns.
 </p>
 
+<h4>How Cities Are Distributed in the Voronoi Graph</h4>
 
-<h3>To Be Continued...</h3>
+<p>
+Through areas of Voronoi diagrams we can see how the world’s 1,000 most populated cities are distributed — and how that shapes our Voronoi graph. The map shows each city as a colored dot, where the color reflects how much space that city covers in the graph. This gives a picture of where cities are packed close together and where they’re more isolated.
+<p></p>
+
+</p>
+<p></p>
+<p><a href="#">
+    <img src="/img/voronoi45.jpg" alt="Post Sample Image" width="876" />
+</a></p>
+<p></p>
+
+<p></p>
+
+<ul>
+  <li><strong>Green = </strong>small cells (dense).</li>
+  <li><strong>Yellow = </strong>medium.</li>
+  <li><strong>Red = </strong>large (sparse).</li>
+</ul>
+
+<p>
+</p>
+<p>You can see on the map that countries with the highest population —India and China —have large green areas. In Europe it’s interesting to compare Germany and France: similar title population and similar territories, but population distribution by cities are very different.</p>
+<p></p>
+
+<p>Populated-city distribution may reflect geography and climate.</p>
+<p></p>
+
+<h3>Nearby vs. Distant Similarities</h3>
+
+<p></p>
+<p>The spatial Voronoi graph and the four types of vectors create many opportunities to explore climate patterns across cities. We can look for similarities, differences, clusters, or unexpected relationships. But including all these analyses in one blog post would make it too long and hard to follow.</p>
+<p></p>
+<p>In this post, we’ll share just a few simple examples to show what’s possible. More detailed results and additional patterns will be covered in separate posts.</p>
+<p></p>
+
+<p>The combination of the <strong>spatial Voronoi graph</strong> and the four types of vectors opens up many ways to explore global climate patterns. There’s an almost endless list of questions we can ask — from obvious ones like which cities have similar climate profiles, to more complex ideas like how geographic structure interacts with long-term climate change.</p>
+<p></p>
+<p></p>
+
+<h4>Distant but similar: Wellington ↔ Mar del Plata (regime match) </h4>
+
+<p></p>
+<p>The tables below highlight two interesting groups of city pairs based on both their physical distance and climate similarity across different types of vectors.</p>
+
+<p></p>
+<p><a href="#">
+    <img src="/img/voronoi43.jpg" alt="Post Sample Image" width="800" />
+</a></p>
+
+<p></p>
+<p>Despite being thousands of kilometers apart, these cities show high climate similarity — especially when considering temporal patterns and spatial relationships together. This suggests that geographic distance alone doesn’t tell the full story when it comes to climate behavior.</p>
+<p></p>
+<h4>Nearby but different: New York ↔ Brooklyn (microclimate)</h4>
+<p></p>
+<p><a href="#">
+    <img src="/img/voronoi44.jpg" alt="Post Sample Image" width="800" />
+</a></p>
+
+<p></p>
+<p>In most cases, neighboring cities naturally share highly similar climates. But there are exceptions — like New York and Brooklyn, where spatial and combined similarity scores are unexpectedly low. This reflects how factors like microclimates, urban environments, or modeling limitations can produce unexpected results, even at small distances.</p>
+<p></p>
+
+<p></p>
+
+<h3>New Graph Metrics: Closeness and Betweenness</h3>
+
+<p>Throughout, climate similarity means cosine similarity between the indicated vectors; for path-based metrics we use edge weights 𝑤 = 1 − cosine. Each set of maps uses the same spatial backbone: edges come from the Voronoi graph, where two cities are adjacent if their cells share a border.</p>
+
+<p></p>
+<p>What changes across panels is the edge weight, derived from cosine similarity computed from one of four representations (Average, Temporal, Spatial, Spatial+Temporal), with vectors normalized prior to cosine. The topology stays fixed; the weights—and therefore any shortest- path–based measures—change with the chosen vectors. Smaller weights mean higher climate similarity.</p>
+<p></p>
+
+<p></p>
+<h4>Closeness Centrality</h4>
+<p></p>
+
+<p></p>
+<p><a href="#">
+    <img src="/img/centrality_all.jpg" alt="Post Sample Image" width="800" />
+</a></p>
+<p></p>
+<p>In the closeness centrality maps, cities with high closeness are, on average, at short weighted distance from many others—i.e., they are similar to many cities. Dense climate regions such as Europe and East Asia typically stand out. Differences between panels reveal how each representation defines “similar,” shifting which cities appear most central.</p>
+
+<p></p>
+<p></p>
+<h4>Betweenness Centrality</h4>
+<p></p>
+<p></p>
+<p><a href="#">
+    <img src="/img/Betweenness_all.jpg" alt="Post Sample Image" width="800" />
+</a></p>
+
+<p></p>
+
+<p>In the betweenness maps, different weightings emphasize different connectors: high-betweenness cities lie on many shortest routes. The Spatial+Temporal view surfaces more long- range intermediaries than Average (notably in Africa, South America, and the Pacific). We also observe slight polarization in Spatial and Spatial+Temporal; the reason for this requires further research.</p>
+
+<p></p>
+
+<h2>To Be Continued...</h2>
 
 <p>
 In future posts, we’ll dig deeper into the questions this approach opens up, like:
@@ -1131,34 +1218,25 @@ In future posts, we’ll dig deeper into the questions this approach opens up, l
 There’s a lot more to explore. These first examples are just a glimpse of how spatial graphs and climate data together can uncover hidden patterns.
 </p>
 
+<p></p>
+
+<h3>Broader Impact</h3>
+
+<p></p>
+<ul>
+  <li><strong>New perspective:</strong> Graph-based AI reveals hidden relationships across space and time — beyond what traditional text or image analyses capture.</li>
+  <li><strong>Transferable method:</strong> The same fusion pipeline applies to cities, mobility, environmental systems, and public health.</li>
+  <li><strong>Next steps — vectors:</strong> We showed only a few examples; many more applications and vector analyses remain to explore.</li>
+  <li><strong>Next steps — healthcare:</strong> Extend the approach to disease-spread modeling and hospital-capacity planning.</li>
+</ul>
 
 <p></p>
 
-<p>
-
-
-<p></p>  
-<p></p>    
-
-
-
-
-
-
 <p></p>
 
 <p></p>
 
-
-
-
-
-
-
-
 <p></p>
-
-
 
 <p></p>
 
@@ -1166,7 +1244,6 @@ There’s a lot more to explore. These first examples are just a glimpse of how 
 
 <p></p>
 <p></p>
-</p></p>
 
 
                 <hr>
