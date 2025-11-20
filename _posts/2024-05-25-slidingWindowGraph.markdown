@@ -7,21 +7,47 @@ author:     "Melenar"
 header-img: "img/pageVec20.jpg"
 ---
 
-<p></p>
+<h2>Graph AI for Time-Series Change Detection</h2>
+<p>
+  Sliding time series graphs transform long, noisy signals into a sequence of short, structured snapshots,
+  each captured as its own graph. By analyzing these snapshots with graph-based AI, we can pinpoint when a
+  system shifts from normal to unusual behavior, highlight emerging regimes, and separate stable periods
+  from early warning signals. Instead of a single summary label for an entire asset, customer base, or
+  region, this approach shows <em>when</em> and <em>where</em> change is happening, enabling faster, more
+  targeted decisions.
+</p>
+
+
+
+<h2>Conference &amp; Publication</h2>
+<p>
+  This work was presented at <strong>ICMLT 2024</strong> in Oslo, Norway, on
+  <strong>24–25 May 2024</strong>, as the paper
+  <em>“GNN Graph Classification for Time Series: A New Perspective on Climate Change Analysis”</em>,
+  doi:
+  <a href="https://doi.org/10.1145/3674029.3674059" target="_blank" rel="noopener">
+    10.1145/3674029.3674059
+  </a>.
+</p>
+<p>
+  In that presentation, we combined and compared two GNN-based methods for time series climate
+  analysis. Our earlier work,
+  <a href="http://sparklingdataocean.com/2023/02/11/cityTempGNNgraphs/" target="_blank" rel="noopener">
+    “GNN Graph Classification for Climate Change Patterns”
+  </a>,
+  introduced the <strong>city-graph method</strong>, which captures static temporal snapshots to sort
+  cities into “stable” and “unstable” climate categories. The ICMLT paper extended this with a
+  new <strong>sliding window graph method</strong>, which breaks time series into overlapping
+  segments, turns each segment into a graph, and uses GNN graph classification to reveal how
+  short-term climate behavior shifts over time.
+</p>
+
+
+
+<h2> Time Series Meets GNN Graph Classification</h2>
 The use of Graph Neural Networks (GNNs) in time series analysis represents a rising field of study, particularly in the context of GNN Graph Classification, a technique traditionally applied in disciplines such as biology and chemistry. Our research repurposes GNN Graph Classification for the analysis of time series climate data, focusing on two distinct methodologies: the city-graph method, which effectively captures static temporal snapshots, and the sliding window graph method, adept at tracking dynamic temporal changes. This innovative application of GNN Graph Classification within time series data enables the uncovering of nuanced data trends.
 <p></p>
 We demonstrate how GNNs can construct meaningful graphs from time series data, showcasing their versatility across different analytical contexts. A key finding is GNNs’ adeptness at adapting to changes in graph structure, which significantly improves outlier detection. This enhances our understanding of climate patterns and suggests broader applications of GNN Graph Classification in analyzing complex data systems beyond traditional time series analysis. Our research seeks to fill a gap in current studies by providing an examination of GNNs in climate change analysis, highlighting the potential of these methods in capturing and interpreting intricate data trends.
-
-<p></p>
-<h3> Conference Presentation: ICMLT 2024</h3>
-<p></p>
-This study was presented at the [International Conference on Machine Learning Technologies (ICMLT)](https://www.icmlt.org/index.html) and is included in the proceedings.
-<p></p>
-In our research, we combined and compared two methods for analyzing time series climate data using Graph Neural Networks (GNNs). Our previous study, <a href="http://sparklingdataocean.com/2023/02/11/cityTempGNNgraphs/">"GNN Graph Classification for Climate Change Patterns: Graph Neural Network (GNN) Graph Classification - A Novel Method for Analyzing Time Series Data"</a>, introduced the city-graph method, which captures static temporal snapshots to sort climate data into 'stable' and 'unstable' categories.
-In this post, we focus on our new technique: the sliding window graph method. This approach breaks down time series data into overlapping sections to capture specific time-related features. These sections are then used to create graphs, providing a new way to understand short-term changes in climate patterns.
-<p></p>
-
-
 
 <h3> Introduction</h3>
 <p></p>

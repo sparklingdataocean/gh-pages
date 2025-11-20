@@ -1,4 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-10-08T09:00:33+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Temporal–Spatial GNN Fusion for Climate Analytics</title><link href="http://localhost:4000/2025/06/25/voronoiGNN/" rel="alternate" type="text/html" title="Temporal–Spatial GNN Fusion for Climate Analytics" /><published>2025-06-25T08:00:00-04:00</published><updated>2025-06-25T08:00:00-04:00</updated><id>http://localhost:4000/2025/06/25/voronoiGNN</id><content type="html" xml:base="http://localhost:4000/2025/06/25/voronoiGNN/"><![CDATA[<h2>Fusing Space &amp; Time with Graph Neural Networks</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-11-20T16:55:29-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Temporal–Spatial GNN Fusion for Climate Analytics</title><link href="http://localhost:4000/2025/06/25/voronoiGNN/" rel="alternate" type="text/html" title="Temporal–Spatial GNN Fusion for Climate Analytics" /><published>2025-06-25T14:00:00+02:00</published><updated>2025-06-25T14:00:00+02:00</updated><id>http://localhost:4000/2025/06/25/voronoiGNN</id><content type="html" xml:base="http://localhost:4000/2025/06/25/voronoiGNN/"><![CDATA[<h2>Spatio-Temporal Graphs for Climate Patterns</h2>
+<p>
+  Here we combine <strong>time series graphs</strong> with a global <strong>spatial graph</strong>
+  of cities to create a spatio-temporal view of climate. Decades of daily temperatures are turned
+  into graph-based climate fingerprints for each city, then injected into a Voronoi-based world
+  graph where neighboring regions share borders. A GNN refines this fused graph so we can see
+  which distant cities behave almost identically, which nearby cities quietly diverge, and which
+  “bridge cities” connect climate regions. The same method can be applied to any setting where
+  signals evolve over time and are anchored in space—sensors, assets, patients, or networks.
+</p>
+
+<h2>Conference</h2>
+<p>
+  The work <em>“GNN Fusion of Voronoi Spatial Graphs and City–Year Temporal Graphs for Climate Analysis”</em>
+  was presented at <strong>SCAI 2025</strong> in Ljubljana, Slovenia, on <strong>8 October 2025</strong>.
+  The corresponding paper is currently not yet published in archival proceedings.
+</p>
+
+<h2>Fusing Space &amp; Time with Graph Neural Networks</h2>
 <p>
   Climate isn’t only about <em>where</em> you are; it’s about how conditions <em>evolve together</em> across the map.
   Here we use <strong>Graph Neural Networks (GNNs)</strong> to connect <strong>1,000 cities</strong> across
@@ -1135,7 +1153,25 @@ There’s a lot more to explore. These first examples are just a glimpse of how 
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Fusing Space &amp; Time with Graph Neural Networks Climate isn’t only about where you are; it’s about how conditions evolve together across the map. Here we use Graph Neural Networks (GNNs) to connect 1,000 cities across 40 years of daily temperatures, revealing hidden climate “neighborhoods” and long-range “bridges” that geography alone can’t explain. Modeling both space and time as graphs shows when distant regions behave like close neighbors—and when nearby cities drift apart.]]></summary></entry><entry><title type="html">Sliding Graph Neural Networks for EEG Analysis</title><link href="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/" rel="alternate" type="text/html" title="Sliding Graph Neural Networks for EEG Analysis" /><published>2025-01-25T07:00:00-05:00</published><updated>2025-01-25T07:00:00-05:00</updated><id>http://localhost:4000/2025/01/25/slidingWindowGraph%20EEG</id><content type="html" xml:base="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/"><![CDATA[<p></p>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Spatio-Temporal Graphs for Climate Patterns Here we combine time series graphs with a global spatial graph of cities to create a spatio-temporal view of climate. Decades of daily temperatures are turned into graph-based climate fingerprints for each city, then injected into a Voronoi-based world graph where neighboring regions share borders. A GNN refines this fused graph so we can see which distant cities behave almost identically, which nearby cities quietly diverge, and which “bridge cities” connect climate regions. The same method can be applied to any setting where signals evolve over time and are anchored in space—sensors, assets, patients, or networks.]]></summary></entry><entry><title type="html">Sliding Graph Neural Networks for EEG Analysis</title><link href="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/" rel="alternate" type="text/html" title="Sliding Graph Neural Networks for EEG Analysis" /><published>2025-01-25T13:00:00+01:00</published><updated>2025-01-25T13:00:00+01:00</updated><id>http://localhost:4000/2025/01/25/slidingWindowGraph%20EEG</id><content type="html" xml:base="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/"><![CDATA[<h2>Sliding Graphs: Watching Signals Change Like a Movie</h2>
+<p>
+  Sliding graphs are a way to let AI watch how a signal behaves over time, not just look at a
+  summary. Instead of treating a long recording as one big block, we break it into many small,
+  overlapping moments and let AI see which moments look alike and which don’t. Put together, these
+  moments form an evolving map of the signal, showing when things are calm, when they shift, and
+  when something unusual starts to happen. We illustrate this with EEG sleep vs rest, but the same
+  idea works for machines, sensors, markets, climate, or any long signal—anywhere you want AI to
+  say not only what is happening, but when things start to change.
+</p>
+
+<p></p>
+<h2>Conference</h2>
+<p>
+  The work <em>“Time Aligned Sliding Graph Embeddings for Dynamic Time Series Analysis”</em>
+  was presented at <strong>Brain Informatics 2025</strong> in Bari, Italy, on
+  <strong>11 November 2025</strong>. The corresponding paper is not yet published
+  in archival proceedings.
+</p>
 
 <p></p>
 
@@ -1209,10 +1245,18 @@ each step uncovering deeper insights into neural dynamics. Let’s take a closer
 </figure>
 
 <p></p>
-<h4>Looking Ahead: Current Study</h4>
+<h2>Looking Ahead: Current Study</h2>
 <p></p>
 
 <p>This study applies GNN Sliding Graph Classification to long-time EEG series, capturing evolving neural activity during sleep and rest. This approach reveals extended brain states, uncovering transitions and sustained neural processes, offering deeper insights into EEG dynamics over time.</p>
+<p></p>
+<p>Imagine moving a sliding window through EEG data—like watching a movie, scene by scene. Each window captures a brief moment in time. Now imagine building a graph that doesn’t just follow the timeline, but connects moments that belong to the same theme—even if they’re far apart. Like linking “research” and “presentation” as part of the same goal. That graph becomes a story—showing how different moments are connected by meaning, not just time.</p>
+<p></p>
+<figure>
+    <img src="/img/brain41.jpg" alt="Traditional EEG Graph Example" style="width:99%; margin:auto;" />
+    <figcaption>Slide from demo on conference Brain Informatics (BI 2025) in Bari, Italy.</figcaption>
+</figure>
+<p></p>
 
 <p></p>
 
@@ -2532,7 +2576,7 @@ These findings suggest sliding graph-based GNNs as a powerful framework for mode
 
 <p></p>
 <p></p>
-</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs</title><link href="http://localhost:4000/2025/01/20/vectors2gafGNN/" rel="alternate" type="text/html" title="Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs" /><published>2025-01-20T07:00:00-05:00</published><updated>2025-01-20T07:00:00-05:00</updated><id>http://localhost:4000/2025/01/20/vectors2gafGNN</id><content type="html" xml:base="http://localhost:4000/2025/01/20/vectors2gafGNN/"><![CDATA[<p><h2> Introduction</h2>
+</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Sliding Graphs: Watching Signals Change Like a Movie Sliding graphs are a way to let AI watch how a signal behaves over time, not just look at a summary. Instead of treating a long recording as one big block, we break it into many small, overlapping moments and let AI see which moments look alike and which don’t. Put together, these moments form an evolving map of the signal, showing when things are calm, when they shift, and when something unusual starts to happen. We illustrate this with EEG sleep vs rest, but the same idea works for machines, sensors, markets, climate, or any long signal—anywhere you want AI to say not only what is happening, but when things start to change.]]></summary></entry><entry><title type="html">Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs</title><link href="http://localhost:4000/2025/01/20/vectors2gafGNN/" rel="alternate" type="text/html" title="Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs" /><published>2025-01-20T13:00:00+01:00</published><updated>2025-01-20T13:00:00+01:00</updated><id>http://localhost:4000/2025/01/20/vectors2gafGNN</id><content type="html" xml:base="http://localhost:4000/2025/01/20/vectors2gafGNN/"><![CDATA[<p><h2> Introduction</h2>
 <p></p>
 Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.
 <p></p>
@@ -3859,7 +3903,30 @@ Looking ahead, these techniques could be applied to a wide range of scenarios in
 
 
 <p></p>
-</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Introduction Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.]]></summary></entry><entry><title type="html">Connecting Art and Data: Building a Unified Knowledge Graph</title><link href="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/" rel="alternate" type="text/html" title="Connecting Art and Data: Building a Unified Knowledge Graph" /><published>2025-01-01T07:00:00-05:00</published><updated>2025-01-01T07:00:00-05:00</updated><id>http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings</id><content type="html" xml:base="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/"><![CDATA[<p><h2>Introduction: Knowledge Graphs Exploration</h2>
+</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Introduction Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.]]></summary></entry><entry><title type="html">Connecting Art and Data: Building a Unified Knowledge Graph</title><link href="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/" rel="alternate" type="text/html" title="Connecting Art and Data: Building a Unified Knowledge Graph" /><published>2025-01-01T13:00:00+01:00</published><updated>2025-01-01T13:00:00+01:00</updated><id>http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings</id><content type="html" xml:base="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/"><![CDATA[<h2>Unified Knowledge Graph for Artists and Paintings</h2>
+<p>
+  Think of this project as one map of the art world, where artists and paintings are dots and
+  their relationships form the lines between them. We turn biographies and images into a single
+  unified knowledge graph, then use Graph AI to see which artists and works are close, far, or
+  unexpectedly linked. Instead of scrolling through lists, you can explore art as a connected
+  network and discover relationships you wouldn’t notice from text or images alone. The same
+  pattern extends far beyond art: this pipeline can fuse text, images, time series, and other data
+  into a unified knowledge graph in any domain, keeping everything analyzable with one Graph AI
+  workflow.
+</p>
+
+<h2>Conference &amp; Publication</h2>
+<p>
+  This work was presented at <strong>CVIT 2025</strong> in Florence, Italy, on
+  <strong>June 20, 2025</strong>, and published as:
+
+  <em>Romanova, A. (2025). “Rewiring Multi-Modal Knowledge Graphs with GNN Link
+  Prediction: Insights from Art History.”
+  doi: <a href="https://doi.org/10.1117/12.3078062" target="_blank" rel="noopener">
+  10.1117/12.3078062</a>.</em>
+</p>
+
+<p><h2>Introduction: Knowledge Graphs Exploration</h2>
 
 Art and artists are deeply connected, reflecting creativity, culture, and history. Graphs provide a powerful way to explore these relationships by representing artists, artworks, and movements as nodes, and their connections as edges. This helps us uncover patterns, find hidden links, and better understand the evolution of art. With advanced tools like Graph Neural Networks (GNNs), we can predict new connections, group related ideas, and gain even deeper insights into the art world.
 <p></p>
@@ -5399,7 +5466,27 @@ This study presented a Unified Knowledge Graph framework that combines text and 
 <p>
 The Unified Knowledge Graph provides a powerful tool for analyzing complex datasets, offering fresh perspectives on art history. It also paves the way for applications in recommendation systems, classification tasks, and cultural analysis. Future work will focus on expanding the graph with additional data types and improving model interpretability.
 </p>
-</p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Introduction: Knowledge Graphs Exploration]]></summary></entry><entry><title type="html">Graph Neural Networks for EEG Connectivity Analysis</title><link href="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/" rel="alternate" type="text/html" title="Graph Neural Networks for EEG Connectivity Analysis" /><published>2024-11-09T07:00:00-05:00</published><updated>2024-11-09T07:00:00-05:00</updated><id>http://localhost:4000/2024/11/09/GNN_timeSeries_EEG</id><content type="html" xml:base="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/"><![CDATA[<h3>Introduction</h3>
+</p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Unified Knowledge Graph for Artists and Paintings Think of this project as one map of the art world, where artists and paintings are dots and their relationships form the lines between them. We turn biographies and images into a single unified knowledge graph, then use Graph AI to see which artists and works are close, far, or unexpectedly linked. Instead of scrolling through lists, you can explore art as a connected network and discover relationships you wouldn’t notice from text or images alone. The same pattern extends far beyond art: this pipeline can fuse text, images, time series, and other data into a unified knowledge graph in any domain, keeping everything analyzable with one Graph AI workflow.]]></summary></entry><entry><title type="html">Graph Neural Networks for EEG Connectivity Analysis</title><link href="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/" rel="alternate" type="text/html" title="Graph Neural Networks for EEG Connectivity Analysis" /><published>2024-11-09T13:00:00+01:00</published><updated>2024-11-09T13:00:00+01:00</updated><id>http://localhost:4000/2024/11/09/GNN_timeSeries_EEG</id><content type="html" xml:base="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/"><![CDATA[<h2>Brain Graphs with Time Series Signals</h2>
+<p>
+  In this project, we model the brain as a <strong>spatial graph</strong>: each node is an EEG
+  electrode on the scalp, and edges connect nearby positions in the standard montage. The time
+  series data are used as <strong>node features</strong> for each trial, so every channel carries
+  its full signal while staying embedded in the brain’s geometry. A GNN link prediction model then
+  learns how these nodes connect under different conditions, revealing changes in functional
+  connectivity and highlighting which regions act as key connectors in Control vs Alcohol groups.
+</p>
+
+<h2>Conference &amp; Workshop</h2>
+<p>
+  The work <em>“Graph Neural Networks in Action: Uncovering Patterns in EEG Time Series Data”</em>
+  was presented at the <strong>1st International Workshop on Artificial Intelligence for Neuroscience (IWAIN’24)</strong>
+  in Alicante, Spain, on <strong>26 November 2024</strong>. The contribution is currently available as
+  a conference paper via ResearchGate and is associated with the IWAIN’24 workshop program. The full
+  paper can be accessed by visiting the author’s profile or the paper page on ResearchGate and
+  downloading the PDF directly from there.
+</p>
+
+<h2>Introduction</h2>
 
 <p>
     Electroencephalography (EEG) is a widely used non-invasive neuroimaging technique that captures electrical activity in the brain. By recording voltage fluctuations across the scalp, EEG enables researchers to monitor real-time brain activity, providing insights into cognitive processes, mental states, and neurological disorders. It is a valuable tool for understanding how different brain regions coordinate to support functions such as attention, memory, and motor control, making EEG essential for studying neural connectivity.
@@ -6091,9 +6178,27 @@ After establishing the graph structure, we defined graph nodes and their feature
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Introduction]]></summary></entry><entry><title type="html">Unlocking the Power of Pre-Final Vectors in GNN Graph Classification</title><link href="http://localhost:4000/2024/07/04/vectorsGNN/" rel="alternate" type="text/html" title="Unlocking the Power of Pre-Final Vectors in GNN Graph Classification" /><published>2024-07-04T08:00:00-04:00</published><updated>2024-07-04T08:00:00-04:00</updated><id>http://localhost:4000/2024/07/04/vectorsGNN</id><content type="html" xml:base="http://localhost:4000/2024/07/04/vectorsGNN/"><![CDATA[<p>This study highlights how linear algebra can enhance deep learning by making data representation and manipulation more efficient. We extract pre-final vectors from Graph Neural Networks (GNN) Graph Classification models and analyze the small graphs embedded within them. By applying these techniques to climate time series data, we show that combining linear algebra with GNN Graph Classification models improves the analysis of climate data. Additionally, we use these embedded small graphs for statistical analysis and build meta-graphs on top of them. This layered approach enhances our analytical capabilities and leads to better overall results.</p>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Brain Graphs with Time Series Signals In this project, we model the brain as a spatial graph: each node is an EEG electrode on the scalp, and edges connect nearby positions in the standard montage. The time series data are used as node features for each trial, so every channel carries its full signal while staying embedded in the brain’s geometry. A GNN link prediction model then learns how these nodes connect under different conditions, revealing changes in functional connectivity and highlighting which regions act as key connectors in Control vs Alcohol groups.]]></summary></entry><entry><title type="html">Unlocking the Power of Pre-Final Vectors in GNN Graph Classification</title><link href="http://localhost:4000/2024/07/04/vectorsGNN/" rel="alternate" type="text/html" title="Unlocking the Power of Pre-Final Vectors in GNN Graph Classification" /><published>2024-07-04T14:00:00+02:00</published><updated>2024-07-04T14:00:00+02:00</updated><id>http://localhost:4000/2024/07/04/vectorsGNN</id><content type="html" xml:base="http://localhost:4000/2024/07/04/vectorsGNN/"><![CDATA[<h2>Graph-Level Embeddings</h2>
+<p>
+  Graph-level embeddings are the <strong>pre-final vectors</strong> produced by a GNN graph
+  classification model, giving one compact fingerprint for each graph—whether it represents a
+  city’s climate, an EEG trial, a machine, or a document. Once we have these embeddings, we can
+  use simple vector-space tools (similarity, clustering, thresholds) to compare graphs, group
+  similar cases, spot outliers, and even build a “graph of graphs” on top of them. In other words,
+  graph-level embeddings turn single GNN predictions into a reusable layer for deeper analysis
+  across many small graphs.
+</p>
+
+<h2>Conference &amp; Poster</h2>
+<p>
+  This work, <em>“Utilizing Pre-Final Vectors from GNN Graph Classification for Enhanced Climate Analysis”</em>,
+  was presented as a peer-reviewed poster at the 21st International Workshop on Mining and Learning with Graphs (MLG 2024),
+  co-located with <strong>ECML-PKDD 2024</strong> in Vilnius, Lithuania, on <strong>9 September 2024</strong>.
+  The paper appears in the non-archival online workshop proceedings and is available via the MLG 2024 website.
+</p>
+
 <p></p>
-<p><h3> Introduction</h3>
+<p><h2> Introduction</h2>
 
 <p></p>
 Linear algebra plays a crucial role in machine learning and artificial intelligence by providing efficient ways to represent and manipulate data. Whether dealing with matrices or vectors, these mathematical structures help model complex problems in a manageable form. The rise of deep learning models has shown just how versatile linear algebra can be across various fields.
@@ -6651,7 +6756,27 @@ The results suggest that combining linear algebra with GNNs enhances the models'
 
 <p></p>
 <p></p>
-</p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[This study highlights how linear algebra can enhance deep learning by making data representation and manipulation more efficient. We extract pre-final vectors from Graph Neural Networks (GNN) Graph Classification models and analyze the small graphs embedded within them. By applying these techniques to climate time series data, we show that combining linear algebra with GNN Graph Classification models improves the analysis of climate data. Additionally, we use these embedded small graphs for statistical analysis and build meta-graphs on top of them. This layered approach enhances our analytical capabilities and leads to better overall results. Introduction]]></summary></entry><entry><title type="html">Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction</title><link href="http://localhost:4000/2024/06/21/knowledgeGraphEmail/" rel="alternate" type="text/html" title="Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction" /><published>2024-06-21T08:00:00-04:00</published><updated>2024-06-21T08:00:00-04:00</updated><id>http://localhost:4000/2024/06/21/knowledgeGraphEmail</id><content type="html" xml:base="http://localhost:4000/2024/06/21/knowledgeGraphEmail/"><![CDATA[<p><h3> </h3>
+</p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Graph-Level Embeddings Graph-level embeddings are the pre-final vectors produced by a GNN graph classification model, giving one compact fingerprint for each graph—whether it represents a city’s climate, an EEG trial, a machine, or a document. Once we have these embeddings, we can use simple vector-space tools (similarity, clustering, thresholds) to compare graphs, group similar cases, spot outliers, and even build a “graph of graphs” on top of them. In other words, graph-level embeddings turn single GNN predictions into a reusable layer for deeper analysis across many small graphs.]]></summary></entry><entry><title type="html">Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction</title><link href="http://localhost:4000/2024/06/21/knowledgeGraphEmail/" rel="alternate" type="text/html" title="Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction" /><published>2024-06-21T14:00:00+02:00</published><updated>2024-06-21T14:00:00+02:00</updated><id>http://localhost:4000/2024/06/21/knowledgeGraphEmail</id><content type="html" xml:base="http://localhost:4000/2024/06/21/knowledgeGraphEmail/"><![CDATA[<h2>Semantic Graphs for Communication Networks</h2>
+<p>
+  In this project, we move beyond simple “who emailed whom” graphs and build a
+  <strong>semantic graph</strong> of communication. Instead of treating edges as raw message
+  counts, we create nodes for individual interactions (who wrote to whom, with what text), enrich
+  them with transformer-based text embeddings, and use a GNN link prediction model to learn which
+  interactions are genuinely related. This text-enriched graph lets us recompute centrality and see
+  a different set of key players: not just the loudest senders, but the quiet connectors who bridge
+  topics and conversation clusters—hidden connectors that a plain traffic graph would never reveal.
+</p>
+
+<h2>Conference &amp; Workshop</h2>
+<p>
+  The work <em>“Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction”</em>
+  was presented at the <strong>MLH 2024 – Mining and Learning with Hypergraphs</strong> workshop,
+  co-located with <strong>ECML-PKDD 2024</strong>, in Vilnius, Lithuania, on
+  <strong>13 September 2024</strong>. The contribution appears in the non-archival online
+  workshop program and is available via the MLH 2024 website.
+</p>
+
+<p><h2>Multi-Layer Graph Analysis for Communication Networks </h2>
 <p></p>
 
 Analyzing complex graphs can be quite challenging, especially when the whole is greater than the sum of its parts. To address these challenges, we dive into the Enron email dataset, using its rich information to create a strong multi-layer graph analysis framework.
@@ -7082,19 +7207,43 @@ By focusing on both semantics and graph topology, and leveraging higher graph la
 
 <p></p>
 <p></p>
-</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">Sliding Window Graph in GNN Graph Classification</title><link href="http://localhost:4000/2024/05/25/slidingWindowGraph/" rel="alternate" type="text/html" title="Sliding Window Graph in GNN Graph Classification" /><published>2024-05-25T08:00:00-04:00</published><updated>2024-05-25T08:00:00-04:00</updated><id>http://localhost:4000/2024/05/25/slidingWindowGraph</id><content type="html" xml:base="http://localhost:4000/2024/05/25/slidingWindowGraph/"><![CDATA[<p></p>
+</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Semantic Graphs for Communication Networks In this project, we move beyond simple “who emailed whom” graphs and build a semantic graph of communication. Instead of treating edges as raw message counts, we create nodes for individual interactions (who wrote to whom, with what text), enrich them with transformer-based text embeddings, and use a GNN link prediction model to learn which interactions are genuinely related. This text-enriched graph lets us recompute centrality and see a different set of key players: not just the loudest senders, but the quiet connectors who bridge topics and conversation clusters—hidden connectors that a plain traffic graph would never reveal.]]></summary></entry><entry><title type="html">Sliding Window Graph in GNN Graph Classification</title><link href="http://localhost:4000/2024/05/25/slidingWindowGraph/" rel="alternate" type="text/html" title="Sliding Window Graph in GNN Graph Classification" /><published>2024-05-25T14:00:00+02:00</published><updated>2024-05-25T14:00:00+02:00</updated><id>http://localhost:4000/2024/05/25/slidingWindowGraph</id><content type="html" xml:base="http://localhost:4000/2024/05/25/slidingWindowGraph/"><![CDATA[<h2>Graph AI for Time-Series Change Detection</h2>
+<p>
+  Sliding time series graphs transform long, noisy signals into a sequence of short, structured snapshots,
+  each captured as its own graph. By analyzing these snapshots with graph-based AI, we can pinpoint when a
+  system shifts from normal to unusual behavior, highlight emerging regimes, and separate stable periods
+  from early warning signals. Instead of a single summary label for an entire asset, customer base, or
+  region, this approach shows <em>when</em> and <em>where</em> change is happening, enabling faster, more
+  targeted decisions.
+</p>
+
+<h2>Conference &amp; Publication</h2>
+<p>
+  This work was presented at <strong>ICMLT 2024</strong> in Oslo, Norway, on
+  <strong>24–25 May 2024</strong>, as the paper
+  <em>“GNN Graph Classification for Time Series: A New Perspective on Climate Change Analysis”</em>,
+  doi:
+  <a href="https://doi.org/10.1145/3674029.3674059" target="_blank" rel="noopener">
+    10.1145/3674029.3674059
+  </a>.
+</p>
+<p>
+  In that presentation, we combined and compared two GNN-based methods for time series climate
+  analysis. Our earlier work,
+  <a href="http://sparklingdataocean.com/2023/02/11/cityTempGNNgraphs/" target="_blank" rel="noopener">
+    “GNN Graph Classification for Climate Change Patterns”
+  </a>,
+  introduced the <strong>city-graph method</strong>, which captures static temporal snapshots to sort
+  cities into “stable” and “unstable” climate categories. The ICMLT paper extended this with a
+  new <strong>sliding window graph method</strong>, which breaks time series into overlapping
+  segments, turns each segment into a graph, and uses GNN graph classification to reveal how
+  short-term climate behavior shifts over time.
+</p>
+
+<h2> Time Series Meets GNN Graph Classification</h2>
 <p>The use of Graph Neural Networks (GNNs) in time series analysis represents a rising field of study, particularly in the context of GNN Graph Classification, a technique traditionally applied in disciplines such as biology and chemistry. Our research repurposes GNN Graph Classification for the analysis of time series climate data, focusing on two distinct methodologies: the city-graph method, which effectively captures static temporal snapshots, and the sliding window graph method, adept at tracking dynamic temporal changes. This innovative application of GNN Graph Classification within time series data enables the uncovering of nuanced data trends.</p>
 <p></p>
 <p>We demonstrate how GNNs can construct meaningful graphs from time series data, showcasing their versatility across different analytical contexts. A key finding is GNNs’ adeptness at adapting to changes in graph structure, which significantly improves outlier detection. This enhances our understanding of climate patterns and suggests broader applications of GNN Graph Classification in analyzing complex data systems beyond traditional time series analysis. Our research seeks to fill a gap in current studies by providing an examination of GNNs in climate change analysis, highlighting the potential of these methods in capturing and interpreting intricate data trends.</p>
-
-<p></p>
-<h3> Conference Presentation: ICMLT 2024</h3>
-<p></p>
-<p>This study was presented at the <a href="https://www.icmlt.org/index.html">International Conference on Machine Learning Technologies (ICMLT)</a> and is included in the proceedings.</p>
-<p></p>
-<p>In our research, we combined and compared two methods for analyzing time series climate data using Graph Neural Networks (GNNs). Our previous study, <a href="http://sparklingdataocean.com/2023/02/11/cityTempGNNgraphs/">“GNN Graph Classification for Climate Change Patterns: Graph Neural Network (GNN) Graph Classification - A Novel Method for Analyzing Time Series Data”</a>, introduced the city-graph method, which captures static temporal snapshots to sort climate data into ‘stable’ and ‘unstable’ categories.
-In this post, we focus on our new technique: the sliding window graph method. This approach breaks down time series data into overlapping sections to capture specific time-related features. These sections are then used to create graphs, providing a new way to understand short-term changes in climate patterns.</p>
-<p></p>
 
 <h3> Introduction</h3>
 <p></p>
@@ -7429,15 +7578,34 @@ This comprehensive dataset served as the foundation for both the city-centric an
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[The use of Graph Neural Networks (GNNs) in time series analysis represents a rising field of study, particularly in the context of GNN Graph Classification, a technique traditionally applied in disciplines such as biology and chemistry. Our research repurposes GNN Graph Classification for the analysis of time series climate data, focusing on two distinct methodologies: the city-graph method, which effectively captures static temporal snapshots, and the sliding window graph method, adept at tracking dynamic temporal changes. This innovative application of GNN Graph Classification within time series data enables the uncovering of nuanced data trends. We demonstrate how GNNs can construct meaningful graphs from time series data, showcasing their versatility across different analytical contexts. A key finding is GNNs’ adeptness at adapting to changes in graph structure, which significantly improves outlier detection. This enhances our understanding of climate patterns and suggests broader applications of GNN Graph Classification in analyzing complex data systems beyond traditional time series analysis. Our research seeks to fill a gap in current studies by providing an examination of GNNs in climate change analysis, highlighting the potential of these methods in capturing and interpreting intricate data trends.]]></summary></entry><entry><title type="html">Uncovering Hidden Triangles</title><link href="http://localhost:4000/2023/11/23/hiddenTriangles/" rel="alternate" type="text/html" title="Uncovering Hidden Triangles" /><published>2023-11-23T07:00:00-05:00</published><updated>2023-11-23T07:00:00-05:00</updated><id>http://localhost:4000/2023/11/23/hiddenTriangles</id><content type="html" xml:base="http://localhost:4000/2023/11/23/hiddenTriangles/"><![CDATA[<p><h3>Conference Highlights</h3>
-This research was presented at the 17th International Conference on Information Technology and Applications (ICITA 2023) that was held in Turin, Italy from October 20–22, 2023.
-<p></p>
-Paper 'Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge Graphs' is estimated to be published in February, 2024.
-<p></p>
-To complement the text understanding, in this post we will feature some slides from the conference presentation.
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Graph AI for Time-Series Change Detection Sliding time series graphs transform long, noisy signals into a sequence of short, structured snapshots, each captured as its own graph. By analyzing these snapshots with graph-based AI, we can pinpoint when a system shifts from normal to unusual behavior, highlight emerging regimes, and separate stable periods from early warning signals. Instead of a single summary label for an entire asset, customer base, or region, this approach shows when and where change is happening, enabling faster, more targeted decisions.]]></summary></entry><entry><title type="html">Uncovering Hidden Triangles</title><link href="http://localhost:4000/2023/11/23/hiddenTriangles/" rel="alternate" type="text/html" title="Uncovering Hidden Triangles" /><published>2023-11-23T13:00:00+01:00</published><updated>2023-11-23T13:00:00+01:00</updated><id>http://localhost:4000/2023/11/23/hiddenTriangles</id><content type="html" xml:base="http://localhost:4000/2023/11/23/hiddenTriangles/"><![CDATA[<h2>Hidden Connectors in Knowledge Graphs</h2>
+<p>
+  In this project, we dive into a semantic knowledge graph built from art biographies and go
+  beyond the simple question “who is linked to whom?”. We use Graph AI to embed nodes in a
+  vector space and measure how strongly they connect, then examine tiny three-node patterns
+  (triangles) to find cases where one link is much stronger than the others. Those nodes often
+  act as quiet bridges between otherwise distant concepts or artists.
+</p>
+<p>
+  The same idea scales far beyond art. In medicine, hidden connectors can illuminate critical genetic pathways that influence disease and point toward targeted therapies. In social networks, they reveal quiet influencers and emerging trends. In finance, connector analysis can surface firms that quietly support market stability; in criminal intelligence, it can highlight organizers who sit behind fragmented activity.
+</p>
+
+<h2>Conference Highlights</h2>
+<p>
+  This research was presented at the 17th International Conference on Information Technology and
+  Applications (ICITA 2023), held in Turin, Italy from <strong>October 20–22, 2023</strong>.
+  The paper, <em>“Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge Graphs”</em>,
+  was published as
+  <em>Romanova, A. Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge
+  Graphs</em>, in the ICITA 2023 proceedings, doi:
+  <a href="https://doi.org/10.1007/978-981-99-8324-7_2" target="_blank" rel="noopener">
+    10.1007/978-981-99-8324-7_2
+  </a>.
+  To complement the text understanding, in this post we will feature some slides from the conference presentation.
+</p>
 
 <p></p>
-<p><h3>Uncovering Hidden Triangles in Knowledge Graphs </h3>
+<p><h2>Uncovering Hidden Triangles in Knowledge Graphs </h2>
 
 <p>In recent years, knowledge graphs have become a powerful tool for integrating and analyzing data and shedding lights on the connections between entities. This study narrows its focus on unraveling detailed relationships within knowledge graphs, placing special emphasis on the role of graph connectors through link predictions and triangle analysis.</p>
 
@@ -8042,7 +8210,36 @@ Our study reveals new ways to understand complex connections in knowledge graphs
 
 In the next spost we will continue exploring graph connector techniques.
 <p></p>
-</p></p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Conference Highlights This research was presented at the 17th International Conference on Information Technology and Applications (ICITA 2023) that was held in Turin, Italy from October 20–22, 2023. Paper 'Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge Graphs' is estimated to be published in February, 2024. To complement the text understanding, in this post we will feature some slides from the conference presentation.]]></summary></entry><entry><title type="html">Exploring Document Comparison with GNN Graph Classification</title><link href="http://localhost:4000/2023/07/07/knowledgeGraph4NlpGnn2/" rel="alternate" type="text/html" title="Exploring Document Comparison with GNN Graph Classification" /><published>2023-07-07T08:00:00-04:00</published><updated>2023-07-07T08:00:00-04:00</updated><id>http://localhost:4000/2023/07/07/knowledgeGraph4NlpGnn2</id><content type="html" xml:base="http://localhost:4000/2023/07/07/knowledgeGraph4NlpGnn2/"><![CDATA[<p><h3>GNN Graph Classification for Semantic Graphs</h3>
+</p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Hidden Connectors in Knowledge Graphs In this project, we dive into a semantic knowledge graph built from art biographies and go beyond the simple question “who is linked to whom?”. We use Graph AI to embed nodes in a vector space and measure how strongly they connect, then examine tiny three-node patterns (triangles) to find cases where one link is much stronger than the others. Those nodes often act as quiet bridges between otherwise distant concepts or artists. The same idea scales far beyond art. In medicine, hidden connectors can illuminate critical genetic pathways that influence disease and point toward targeted therapies. In social networks, they reveal quiet influencers and emerging trends. In finance, connector analysis can surface firms that quietly support market stability; in criminal intelligence, it can highlight organizers who sit behind fragmented activity.]]></summary></entry><entry><title type="html">Exploring Document Comparison with GNN Graph Classification</title><link href="http://localhost:4000/2023/07/07/knowledgeGraph4NlpGnn2/" rel="alternate" type="text/html" title="Exploring Document Comparison with GNN Graph Classification" /><published>2023-07-07T14:00:00+02:00</published><updated>2023-07-07T14:00:00+02:00</updated><id>http://localhost:4000/2023/07/07/knowledgeGraph4NlpGnn2</id><content type="html" xml:base="http://localhost:4000/2023/07/07/knowledgeGraph4NlpGnn2/"><![CDATA[<h2>Semantic Graph for Text Understanding</h2>
+<p>
+  In this project, we treat text as a semantic graph rather than a flat sequence of words.
+  From Wikipedia biographies of modern artists, we build a graph where nodes are meaningful
+  word pairs and edges connect them when they appear together or in related contexts.
+  Each node carries a transformer embedding, and a Graph Neural Network learns to “rewire”
+  this graph—strengthening important links, downplaying weak ones, and revealing which
+  artists and concepts truly sit close together or far apart in meaning.
+</p>
+<p>
+  This semantic graph becomes a foundation for NLP tasks: it supports richer recommendations
+  (finding both similar and contrastive artists or documents), cleans and enriches the
+  underlying knowledge graph, and provides structure-aware representations that go beyond
+  simple embedding cosine similarity. Instead of just asking “how similar are these texts?”,
+  we can ask “how is their semantic neighborhood wired?” and let Graph AI answer from the
+  topology of the semantic graph itself.
+</p>
+
+<h2>Conference &amp; Publication</h2>
+<p>
+  This work was presented at <strong>FRUCT35</strong>, the 35th Conference of the Open Innovations
+  Association, held in Tampere, Finland, from <strong>24–26 April 2024</strong>, as the paper
+  <em>“Enhancing NLP through GNN-Driven Knowledge Graph Rewiring and Document Classification”</em>.
+  It was published in the conference proceedings with the doi:
+  <a href="https://doi.org/10.23919/FRUCT61870.2024.10516410" target="_blank" rel="noopener">
+    10.23919/FRUCT61870.2024.10516410
+  </a>.
+</p>
+
+<p><h2>GNN Graph Classification for Semantic Graphs</h2>
 <p></p>
 In our previous studies, we focused on the exploration of knowledge graph rewiring to uncover unknown relationships between modern art artists. In one study
 <u><a href="https://www.springerprofessional.de/en/building-knowledge-graph-in-spark-without-sparql/18375090">'Building Knowledge Graph in Spark Without SPARQL'</a></u>, we utilized artist biographies, known artist relationships, and data on modern art movements to employ graph-specific techniques, revealing hidden patterns within the knowledge graph.
@@ -8680,4 +8877,4 @@ In conclusion, our study advances document comparison using GNN graph classifica
 
 In the next spost we will start a new topic related to knowledge graphs and GNN.
 <p></p>
-</p></p></p></p></p></p></p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[GNN Graph Classification for Semantic Graphs In our previous studies, we focused on the exploration of knowledge graph rewiring to uncover unknown relationships between modern art artists. In one study 'Building Knowledge Graph in Spark Without SPARQL', we utilized artist biographies, known artist relationships, and data on modern art movements to employ graph-specific techniques, revealing hidden patterns within the knowledge graph. In more recent study 'Rewiring Knowledge Graphs by Link Predictions' our approach involved the application of GNN link prediction models. We trained these models on Wikipedia articles, specifically focusing on biographies of modern art artists. By leveraging GNN, we successfully identified previously unknown relationships between artists.]]></summary></entry></feed>
+</p></p></p></p></p></p></p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Semantic Graph for Text Understanding In this project, we treat text as a semantic graph rather than a flat sequence of words. From Wikipedia biographies of modern artists, we build a graph where nodes are meaningful word pairs and edges connect them when they appear together or in related contexts. Each node carries a transformer embedding, and a Graph Neural Network learns to “rewire” this graph—strengthening important links, downplaying weak ones, and revealing which artists and concepts truly sit close together or far apart in meaning. This semantic graph becomes a foundation for NLP tasks: it supports richer recommendations (finding both similar and contrastive artists or documents), cleans and enriches the underlying knowledge graph, and provides structure-aware representations that go beyond simple embedding cosine similarity. Instead of just asking “how similar are these texts?”, we can ask “how is their semantic neighborhood wired?” and let Graph AI answer from the topology of the semantic graph itself.]]></summary></entry></feed>

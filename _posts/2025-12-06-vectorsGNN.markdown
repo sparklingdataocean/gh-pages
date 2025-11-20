@@ -2,10 +2,13 @@
 layout:     post
 title:      "Unlocking the Power of Pre-Final Vectors in GNN Graph Classification"
 subtitle:   "Utilizing Intermediate Vectors from GNN Graph Classification to Enhance Climate Analysis"
-date:       2025-10-11 12:00:00
+date:       2025-12-06 12:00:00
 author:     "Melenar"
-header-img: "img/pageVec44.jpg"
+header-img: "img/gnnge5b.jpg"
 ---
+
+
+
 <p></p>
 <p><h2> Introduction</h2>
 <p></p>
@@ -64,7 +67,7 @@ In this post, we’ll use climate data as a hands-on example to show how differe
 Climate Data Flow: From Raw Data to Pre-final Vectors.
 <p></p>
 <p></p>
-From there, we’ll walk through how these graphs are processed with PyTorch Geometric for GNN classification, producing pre-final vectors that we can use for deeper analysis. This way, abstract graph concepts become more concrete, with real code examples grounded in climate data.
+From there, we’ll walk through how these graphs are processed with PyTorch Geometric for GNN graph classification, producing pre-final vectors that we can use for deeper analysis. This way, abstract graph concepts become more concrete, with real code examples grounded in climate data.
 <p></p>
 
 
@@ -87,21 +90,18 @@ This mix of temporal and spatial information lets us represent the data in sever
 <p></p>
 The raw dataset is organized as a table where each row corresponds to a city. Alongside identifiers like city name, coordinates, and country, the table includes sequences of daily temperature values for each year. This tabular form is the starting point for transforming climate records into graph structures.
 <p></p>
-
+Climate: Raw Data:
+ <p></p>
  <a href="#">
      <img src="{{ site.baseurl }}/img/gnnge1a.jpg" alt="Post Sample Image" width="777" >
  </a>
-Climate: Raw Data.
- <p></p>
+
+
 
  <p></p>
 
 
- <p></p>
- {% highlight python %}
- xxx
- {% endhighlight %}
- <p></p>
+
 
  <h4>Function: <code>climate_matrix_to_long</code></h4>
 <p>
@@ -136,22 +136,26 @@ def climate_matrix_to_long(df: pd.DataFrame) -> pd.DataFrame:
         .copy()
     )
     city_lat["abs_lat"] = city_lat["lat"].abs()
-    city_lat = city_lat.sort_values(["abs_lat", "city_ascii", "country"]).reset_index(drop=True)
+    city_lat = city_lat.sort_values(["abs_lat", "city_ascii", "country"])
+       .reset_index(drop=True)
     cut = len(city_lat) // 2
-    city_lat["city_label"] = (city_lat.index >= cut).astype(int)  # 0 = closer, 1 = farther
+    city_lat["city_label"] = (city_lat.index >= cut).astype(int)  
     def _is_intlike(c):
         try:
             int(c); return True
         except:
             return False
-    daily_cols = sorted([c for c in df.columns if _is_intlike(c)], key=lambda x: int(x))
-    id_vars = ["cityName","city_ascii","country","lat","lng","zone","cityInd","nextYear"]
+    daily_cols =
+       sorted([c for c in df.columns if _is_intlike(c)], key=lambda x: int(x))
+    id_vars =
+       ["cityName","city_ascii","country","lat","lng","zone","cityInd","nextYear"]
     long = df.melt(id_vars=id_vars, value_vars=daily_cols,
-                   var_name="doy", value_name="value")
+        var_name="doy", value_name="value")
     long["doy"] = long["doy"].astype(int)
     long["value"] = pd.to_numeric(long["value"], errors="coerce")
     long = long.dropna(subset=["value"])
-    base = pd.to_datetime(long["nextYear"].astype(int).astype(str) + "-01-01", errors="coerce")
+    base = pd.to_datetime(long["nextYear"].astype(int).astype(str)
+       + "-01-01", errors="coerce")
     long["date"] = base + pd.to_timedelta(long["doy"], unit="D")
     long = long.rename(columns={"nextYear": "year"})
     long = long.merge(city_lat[["city_ascii","country","city_label"]],
@@ -181,21 +185,19 @@ climate_long = climate_matrix_to_long(rawData)
 climate_long.head()
 {% endhighlight %}
 <p></p>
+Climate Data transformed to long matrix:
 <p></p>
 
  <a href="#">
      <img src="{{ site.baseurl }}/img/gnnge1b.jpg" alt="Post Sample Image" width="654" >
  </a>
-Climate Data: raw data.
- <p></p>
-
-
 
  <p></p>
- {% highlight python %}
- climate_long = climate_matrix_to_long(rawData)
- climate_long.head()
- {% endhighlight %}
+
+
+
+ <p></p>
+
  <p></p>
  <p></p>
 
@@ -213,7 +215,11 @@ Climate Data: raw data.
    Edges link pairs of city–year nodes when their temperature vectors exceed a cosine-similarity threshold.
    The graph label (e.g., <code>stable</code> vs <code>unstable</code>) comes from the city’s latitude group.
  </p>
+ <a href="#">
+     <img src="{{ site.baseurl }}/img/voronoi42.jpg" alt="Post Sample Image" width="489" >
+ </a>
 
+ <p></p>
  <p><strong>Node table for single-graph construction</strong></p>
  <ul>
    <li><strong>graph_name</strong>: <code>str(cityInd)</code> (one graph per city)</li>
@@ -240,14 +246,16 @@ Climate Data: raw data.
          values="value",
          aggfunc="first"
      )
-     wide = wide.reindex(columns=range(365))  # drop 365 if present
+     wide = wide.reindex(columns=range(365))  
      wide.columns = [f"f{i}" for i in range(365)]
      wide = wide.reset_index()
-     wide["graph_name"]  = wide["cityInd"].astype(int).astype(str)
+     wide["graph_name"] = wide["cityInd"].astype(int).astype(str)
      wide["graph_label"] = wide["city_label"].astype(int)
-     wide["node_name"]   = wide["cityInd"].astype(int).astype(str) + "~" + wide["year"].astype(int).astype(str)
-     cols = ["graph_name", "graph_label", "node_name"] + [f"f{i}" for i in range(365)]
-     return wide[cols]
+     wide["node_name"] = wide["cityInd"].astype(int).astype(str) + "~"
+        + wide["year"].astype(int).astype(str)
+     cols = ["graph_name", "graph_label", "node_name"]
+        + [f"f{i}" for i in range(365)]
+  return wide[cols]
  {% endhighlight %}
  <p></p>
  <p></p>
@@ -269,12 +277,11 @@ Climate Data: raw data.
  </a>
  <p></p>
  For one-dimensional small graphs, we’ll use the sliding-graph technique introduced in our earlier post and paper. We take a long time series and cut it into overlapping segments; each segment becomes a node with the segment’s values as features. Nodes are connected when their segments exceed a cosine-similarity threshold, and consecutive nodes are grouped into small graph snapshots that move along the series. This yields a stream of compact graphs that capture short-term patterns while preserving temporal order.
- <p></p>
- <p></p>
+
 
  <p></p>
  <p></p>
- <img src="{{ site.baseurl }}/img/eegSlide3.jpg" alt="Sliding graphs" width="314"
+ <img src="{{ site.baseurl }}/img/eegSlide3.jpg" alt="Sliding graphs" width="478"
      style="border:2px solid #ccc; border-radius:6px;">
 
 <p></p>
@@ -289,7 +296,8 @@ def extract_cityInd_year_doy_values_sorted(df, month, day):
     ].copy()
     sub = sub.sort_values(["year", "cityInd"], kind="stable")
     sub["cityInd~year~doy"] = (
-        sub["cityInd"].astype(str) + "~" + sub["year"].astype(str) + "~" + sub["doy"].astype(str)
+        sub["cityInd"].astype(str) + "~"
+           + sub["year"].astype(str) + "~" + sub["doy"].astype(str)
     )
     return sub[["cityInd~year~doy", "value"]].reset_index(drop=True)
 {% endhighlight %}
@@ -358,7 +366,8 @@ def build_sliding_graph_nodes(
         block_names = node_names[gs:gs+G]
         block_feats = X[gs:gs+G]
         for nm, feat in zip(block_names, block_feats):
-            row = {"graph_name": gname, "graph_label": int(graph_label), "node_name": nm}
+            row = {"graph_name": gname, "graph_label": int(graph_label),
+               "node_name": nm}
             row.update({f"f{i}": float(feat[i]) for i in range(W)})
             rows.append(row)
     return pd.DataFrame(rows, columns=empty_cols)
@@ -374,12 +383,20 @@ def build_sliding_graph_nodes(
 <p></p>
 {% highlight python %}
 nodes_table_0 = build_sliding_graph_nodes
-   (jan1_vals, W=32, S=8, G=32, Sg=10,indicator_col="cityInd~year~doy", value_col="value",graph_label=0)
+   (jan1_vals, W=32, S=8, G=32, Sg=10,
+   indicator_col="cityInd~year~doy", value_col="value",graph_label=0)
 nodes_table_1 = build_sliding_graph_nodes
-   (apr1_vals, W=32, S=8, G=32, Sg=10,indicator_col="cityInd~year~doy", value_col="value",graph_label=1)
-sliding_nodes_table = pd.concat([nodes_table_0, nodes_table_1], ignore_index=True)
+   (apr1_vals, W=32, S=8, G=32, Sg=10,
+   indicator_col="cityInd~year~doy", value_col="value",graph_label=1)
+sliding_nodes_table = pd.concat([nodes_table_0, nodes_table_1],
+   ignore_index=True)
 {% endhighlight %}
 <p></p>
+
+<a href="#">
+    <img src="{{ site.baseurl }}/img/gnnge6c.jpg" alt="Post Sample Image" width="789" >
+</a>
+
 
 <p></p>
 <h3>Nodes of Single and Sliding Graphs</h3>
@@ -432,7 +449,8 @@ def build_cosine_edges_with_virtual(
     cosine_threshold: float = 0.9,
     virtual_node_name: str = "__VIRTUAL__"
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    fcols = [c for c in nodes_table.columns if isinstance(c, str) and c.startswith("f")]
+    fcols = [c for c in nodes_table.columns if isinstance(c, str)
+       and c.startswith("f")]
     fcols.sort(key=lambda x: int(x[1:]))
     if not fcols:
         raise ValueError("No feature columns found (expected f0..fK).")
@@ -458,7 +476,8 @@ def build_cosine_edges_with_virtual(
                     left, right = right, left
                 edges.append((gname, left, right))
         vfeat = np.nanmean(X_full, axis=0)
-        vrow = {"graph_name": gname, "graph_label": glabel, "node_name": virtual_node_name}
+        vrow = {"graph_name": gname, "graph_label": glabel,
+           "node_name": virtual_node_name}
         vrow.update({c: float(v) for c, v in zip(fcols, vfeat)})
         virtual_rows.append(vrow)
         all_names = g["node_name"].astype(str).to_numpy()
@@ -467,11 +486,33 @@ def build_cosine_edges_with_virtual(
             if left > right:
                 left, right = right, left
             edges.append((gname, left, right))
-    nodes_out = pd.concat([nodes_table, pd.DataFrame(virtual_rows)], ignore_index=True)
-    edges_df = pd.DataFrame(edges, columns=["graph_name", "left", "right"]).drop_duplicates()
+    nodes_out =
+       pd.concat([nodes_table, pd.DataFrame(virtual_rows)],
+       ignore_index=True)
+    edges_df =
+       pd.DataFrame(edges, columns=["graph_name", "left", "right"])
+       .drop_duplicates()
     return nodes_out, edges_df{% endhighlight %}
 <p></p>
 
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/gnnge6a.jpg" alt="Post Sample Image" width="521" >
+</a>
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/gnnge6b.jpg" alt="Post Sample Image" width="521" >
+</a>
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/gnnge6d.jpg" alt="Post Sample Image" width="999" >
+</a>
+<p></p>
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/gnnge6e.jpg" alt="Post Sample Image" width="999" >
+</a>
+<p></p>
 <p></p>
 <h3>Local Subgraphs</h3>
 <p></p>
@@ -479,8 +520,27 @@ def build_cosine_edges_with_virtual(
     <img src="{{ site.baseurl }}/img/gnnge3h.jpg" alt="Post Sample Image" width="489" >
 </a>
 <p></p>
-For multi-dimensional small graphs, we’ll use a Voronoi-based approach from our earlier work. First we build one globe-spanning backbone graph: each node is a city, and two cities are linked if their Voronoi cells touch. In practice, we project latitude/longitude to a planar map (e.g., EPSG:3857), compute the Voronoi diagram, and turn every shared border into an undirected edge (optionally cross-checking with the Delaunay triangulation).
+To build multi-dimensional small subgraphs on climate data, first we will build one globe-spanning backbone graph. To build this spatial graph we will use Voronoi diagram. To figure out Voronoi graph, imagine several Starbucks in town. Each of them covers the territory that is closer to it then to other Starbucks. We will consider two Starbucks as neighbors if they share the Voronoi borders.   
 <p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/voronoi41.jpg" alt="Post Sample Image" width="314" >
+</a>
+<p></p>
+For climate based Voronoi graph, each city becomes a node. They are connected to others that share a geographical boundary. Some neighbors will be close to each other, some neighbors far away, like Porto and Québec.
+<p></p>
+<a href="#">
+    <img src="{{ site.baseurl }}/img/voronoi17.jpg" alt="Post Sample Image" width="628" >
+</a>
+<p></p>
+<p></p>
+
+In practice, we project latitude/longitude to a planar map (e.g., EPSG:3857), compute the Voronoi diagram, and turn every shared border into an undirected edge (optionally cross-checking with the Delaunay triangulation).
+<p></p>
+
+<p></p>
+
+
+
 Onto this backbone we attach city-level features—starting with 365-day climatology vectors (average day-of-year temperatures), and later swapping in richer temporal or spatio-temporal embeddings. When helpful, we turn cosine similarity between city vectors into an edge weight. This “big graph” then acts like a map: to study any place or region, we simply crop a local subgraph (k-hop or radius neighborhood) and analyze that focused piece without rebuilding the world each time.
 <p></p>
 
@@ -507,11 +567,14 @@ def build_city_avg_vectors_long(
     df = df.dropna(subset=["doy", "value"])
     df["doy"] = df["doy"].astype(int)
     if drop_day_365:
-        df = df[df["doy"] <= 364]
+       df = df[df["doy"] <= 364]
     gd = (df.groupby(["cityInd", "doy"], as_index=False)["value"]
-            .aggregate(agg))
+       .aggregate(agg))
     wide = gd.pivot(index="cityInd", columns="doy", values="value")
-    max_doy = 364 if drop_day_365 else (365 if (df["doy"].max() >= 365) else df["doy"].max())
+    max_doy = 364
+       if drop_day_365 else (365
+       if (df["doy"].max() >= 365)
+       else df["doy"].max())
     wide = wide.reindex(columns=range(0, max_doy + 1), fill_value=np.nan)
     wide.columns = [f"f{int(c)}" for c in wide.columns]
     out = wide.reset_index()
@@ -557,20 +620,24 @@ import pandas as pd
 from pyproj import Transformer
 from scipy.spatial import Voronoi
 def build_voronoi_edges(city_avg_vectors: pd.DataFrame,
-                        lon_col="lng", lat_col="lat",
-                        id_col="cityInd",
-                        jitter_m=10.0) -> pd.DataFrame:
+    lon_col="lng", lat_col="lat",
+    id_col="cityInd",
+    jitter_m=10.0) -> pd.DataFrame:
     df = city_avg_vectors[[id_col, lon_col, lat_col]].dropna().copy()
     df = df.sort_values(id_col).reset_index(drop=True)
-    transformer = Transformer.from_crs("epsg:4326", "epsg:3857", always_xy=True)
-    XY = np.array([transformer.transform(lon, lat) for lon, lat in zip(df[lon_col], df[lat_col])])
+    transformer =
+       Transformer.from_crs("epsg:4326", "epsg:3857", always_xy=True)
+    XY = np.array([transformer.transform(lon, lat)
+       for lon, lat in zip(df[lon_col], df[lat_col])])
     rounded = np.round(XY, 6)
-    dup_mask = pd.Series(map(tuple, rounded)).duplicated(keep=False).to_numpy()
+    dup_mask =
+       pd.Series(map(tuple, rounded)).duplicated(keep=False).to_numpy()
     if dup_mask.any():
         rng = np.random.default_rng(42)
         XY[dup_mask] += rng.normal(scale=jitter_m, size=(dup_mask.sum(), 2))
     vor = Voronoi(XY)
-    idx_pairs = set(tuple(sorted((int(i), int(j)))) for i, j in vor.ridge_points)
+    idx_pairs =
+       set(tuple(sorted((int(i), int(j)))) for i, j in vor.ridge_points)
     edges = pd.DataFrame(
         [(df.loc[i, id_col], df.loc[j, id_col]) for i, j in idx_pairs],
         columns=["city1", "city2"]
@@ -612,35 +679,29 @@ To create many small subgraphs, we take each city as a center and collect all ci
 {% highlight python %}
 import pandas as pd
 import networkx as nx
-
-def local_edges_for_nodes(voronoi_edges: pd.DataFrame, node_ids: list, graph_name: str):
-
-    sub = voronoi_edges[
-        voronoi_edges["city1"].isin(node_ids) &
-        voronoi_edges["city2"].isin(node_ids)
-    ].copy()
-
-    left  = sub[["city1","city2"]].min(axis=1)
-    right = sub[["city1","city2"]].max(axis=1)
-    out = pd.DataFrame({"graph_name": graph_name, "left": left, "right": right})
-    return out.drop_duplicates()
-
+def local_edges_for_nodes(voronoi_edges: pd.DataFrame,
+   node_ids: list, graph_name: str):
+   sub = voronoi_edges[
+      voronoi_edges["city1"].isin(node_ids) &
+      voronoi_edges["city2"].isin(node_ids)
+   ].copy()
+   left  = sub[["city1","city2"]].min(axis=1)
+   right = sub[["city1","city2"]].max(axis=1)
+   out = pd.DataFrame({"graph_name": graph_name, "left": left, "right": right})
+return out.drop_duplicates()
 def build_local_voronoi_edges(city_avg_vectors: pd.DataFrame,
-                              voronoi_edges: pd.DataFrame,
-                              graph_prefix: str = "local"):
-
-
-    G = nx.from_pandas_edgelist(voronoi_edges, "city1", "city2", create_using=nx.Graph())
-
-    k = 2  
-    all_edges = []
-    for cid in city_avg_vectors["cityInd"].astype(int):
-        node_ids = list(nx.single_source_shortest_path_length(G, cid, cutoff=k).keys())
-        gname = f"{graph_prefix}_{cid}_k{k}"
-        all_edges.append(local_edges_for_nodes(voronoi_edges, node_ids, gname))
-
-    edges = pd.concat(all_edges, ignore_index=True).drop_duplicates()
-    return edges
+   voronoi_edges: pd.DataFrame,graph_prefix: str = "local"):
+   G = nx.from_pandas_edgelist(voronoi_edges, "city1", "city2",
+      create_using=nx.Graph())
+   k = 2  
+   all_edges = []
+   for cid in city_avg_vectors["cityInd"].astype(int):
+      node_ids = list(nx.single_source_shortest_path_length(G, cid,
+      cutoff=k).keys())
+   gname = f"{graph_prefix}_{cid}_k{k}"
+   all_edges.append(local_edges_for_nodes(voronoi_edges, node_ids, gname))
+   edges = pd.concat(all_edges, ignore_index=True).drop_duplicates()
+return edges
 {% endhighlight %}
 <p></p>
 
@@ -704,28 +765,28 @@ import numpy as np
 import torch
 from torch_geometric.data import Data
 def tables_to_pyg(nodes_table, edges_table):
-    fcols = sorted([c for c in nodes_table.columns if str(c).startswith("f")],
-                   key=lambda s: int(str(s)[1:]))
-    data_list = []
-    for gname, nd in nodes_table.groupby("graph_name", sort=False):
-        X = nd[fcols].to_numpy(dtype=np.float32)
-        x = torch.from_numpy(np.nan_to_num(X))
-        y = torch.tensor([int(nd["graph_label"].iloc[0])], dtype=torch.long)
-        name_to_idx = {n: i for i, n in enumerate(nd["node_name"].astype(str))}
-        ed = edges_table[edges_table["graph_name"] == gname]
-        src, dst = [], []
-        for a, b in zip(ed["left"].astype(str), ed["right"].astype(str)):
-            if a in name_to_idx and b in name_to_idx:
-                ia, ib = name_to_idx[a], name_to_idx[b]
-                src += [ia, ib]
-                dst += [ib, ia]
-        edge_index = (torch.tensor([src, dst], dtype=torch.long)
-        if len(src) > 0 else torch.empty((2, 0), dtype=torch.long))
-        data = Data(x=x, edge_index=edge_index, y=y)
-        data.graph_name = str(gname)               
-        data.node_names = nd["node_name"].tolist()
-        data_list.append(data)
-    return data_list
+   fcols = sorted([c for c in nodes_table.columns
+      if str(c).startswith("f")],key=lambda s: int(str(s)[1:]))
+   data_list = []
+   for gname, nd in nodes_table.groupby("graph_name", sort=False):
+      X = nd[fcols].to_numpy(dtype=np.float32)
+      x = torch.from_numpy(np.nan_to_num(X))
+      y = torch.tensor([int(nd["graph_label"].iloc[0])], dtype=torch.long)
+      name_to_idx = {n: i for i, n in enumerate(nd["node_name"].astype(str))}
+      ed = edges_table[edges_table["graph_name"] == gname]
+      src, dst = [], []
+      for a, b in zip(ed["left"].astype(str), ed["right"].astype(str)):
+         if a in name_to_idx and b in name_to_idx:
+            ia, ib = name_to_idx[a], name_to_idx[b]
+         src += [ia, ib]
+         dst += [ib, ia]
+      edge_index = (torch.tensor([src, dst], dtype=torch.long)
+      if len(src) > 0 else torch.empty((2, 0), dtype=torch.long))
+         data = Data(x=x, edge_index=edge_index, y=y)
+      data.graph_name = str(gname)               
+      data.node_names = nd["node_name"].tolist()
+      data_list.append(data)
+return data_list
 {% endhighlight %}
 <p></p>
 
@@ -1167,7 +1228,11 @@ The results suggest that combining linear algebra with GNNs enhances the models'
 <p></p>    
 
 
-
+<p></p>
+{% highlight python %}
+xxx
+{% endhighlight %}
+<p></p>
 
 
 <p></p>

@@ -2,7 +2,7 @@
 layout:     post
 title:      "Connecting Artists through Unified Knowledge Graph"
 subtitle:   "Integrating Text and Images with Graph Neural Networks to Explore Artistic Relationships"
-date:       2025-11-20 12:00:00
+date:       2025-12-20 12:00:00
 author:     "Melenar"
 header-img: "img/artPage2d.jpg"
 ---

@@ -6,7 +6,35 @@ date:       2022-11-09 12:00:00
 author:     "Melenar"
 header-img: "img/page1w.jpg"
 ---
-<p><h3>Link Prediction for Knowledge Graphs</h3>
+<h2>Semantic Graph &amp; Recommendations for Artists</h2>
+<p>
+  Think of this project as a semantic map of the art world, where artists and their stories
+  are dots and the meanings between them form the lines. We turn biographies into a
+  <strong>semantic graph</strong>, then use Graph AI to gently “rewire” it—strengthening hidden
+  connections and revealing who is truly similar or strikingly different.
+</p>
+<p>
+  On top of that, a <strong>graph-based recommendation</strong> layer helps you explore nearby artists
+  or jump to surprising opposites, instead of scrolling through flat lists.
+</p>
+
+<h2>Conference &amp; Publication</h2>
+<p>
+  This work was presented at <strong>ICAART 2023</strong> in Lisbon, Portugal, on
+  <strong>22–24 February, 2023</strong>, and published as:
+</p>
+<p>
+  <em>
+    Romanova, A. (2023). “Rewiring Knowledge Graphs by Graph Neural Network Link Predictions.”
+    doi:
+    <a href="https://doi.org/10.5220/0011664400003393" target="_blank" rel="noopener">
+      10.5220/0011664400003393
+    </a>.
+  </em>
+</p>
+
+
+<p><h2>Link Prediction for Knowledge Graphs</h2>
 <p></p>
 <p>
 In our previous post <i><a href="http://sparklingdataocean.com/2022/07/23/knowledgeGraph4GNN/"> 'Rewiring Knowledge Graphs by Link Predictions'</a></i> we showed how to rewire knowledge graph through GNN Link Prediction models. In this post we will continue discussion of applications of GNN Link Prediction techniques to rewiring knowledge graphs.

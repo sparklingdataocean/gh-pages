@@ -7,6 +7,27 @@ author:     "Melenar"
 header-img: "img/pageVec19.jpg"
 ---
 
+<h2>Spatio-Temporal Graphs for Climate Patterns</h2>
+<p>
+  Here we combine <strong>time series graphs</strong> with a global <strong>spatial graph</strong>
+  of cities to create a spatio-temporal view of climate. Decades of daily temperatures are turned
+  into graph-based climate fingerprints for each city, then injected into a Voronoi-based world
+  graph where neighboring regions share borders. A GNN refines this fused graph so we can see
+  which distant cities behave almost identically, which nearby cities quietly diverge, and which
+  “bridge cities” connect climate regions. The same method can be applied to any setting where
+  signals evolve over time and are anchored in space—sensors, assets, patients, or networks.
+</p>
+
+
+<h2>Conference</h2>
+<p>
+  The work <em>“GNN Fusion of Voronoi Spatial Graphs and City–Year Temporal Graphs for Climate Analysis”</em>
+  was presented at <strong>SCAI 2025</strong> in Ljubljana, Slovenia, on <strong>8 October 2025</strong>.
+  The corresponding paper is currently not yet published in archival proceedings.
+</p>
+
+
+
 <h2>Fusing Space &amp; Time with Graph Neural Networks</h2>
 <p>
   Climate isn’t only about <em>where</em> you are; it’s about how conditions <em>evolve together</em> across the map.

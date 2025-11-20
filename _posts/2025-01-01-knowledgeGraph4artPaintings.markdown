@@ -7,6 +7,31 @@ author:     "Melenar"
 header-img: "img/page112c.jpg"
 ---
 
+<h2>Unified Knowledge Graph for Artists and Paintings</h2>
+<p>
+  Think of this project as one map of the art world, where artists and paintings are dots and
+  their relationships form the lines between them. We turn biographies and images into a single
+  unified knowledge graph, then use Graph AI to see which artists and works are close, far, or
+  unexpectedly linked. Instead of scrolling through lists, you can explore art as a connected
+  network and discover relationships you wouldn’t notice from text or images alone. The same
+  pattern extends far beyond art: this pipeline can fuse text, images, time series, and other data
+  into a unified knowledge graph in any domain, keeping everything analyzable with one Graph AI
+  workflow.
+</p>
+
+
+
+<h2>Conference &amp; Publication</h2>
+<p>
+  This work was presented at <strong>CVIT 2025</strong> in Florence, Italy, on
+  <strong>June 20, 2025</strong>, and published as:
+
+  <em>Romanova, A. (2025). “Rewiring Multi-Modal Knowledge Graphs with GNN Link
+  Prediction: Insights from Art History.”
+  doi: <a href="https://doi.org/10.1117/12.3078062" target="_blank" rel="noopener">
+  10.1117/12.3078062</a>.</em>
+</p>
+
 <p><h2>Introduction: Knowledge Graphs Exploration</h2>
 
 Art and artists are deeply connected, reflecting creativity, culture, and history. Graphs provide a powerful way to explore these relationships by representing artists, artworks, and movements as nodes, and their connections as edges. This helps us uncover patterns, find hidden links, and better understand the evolution of art. With advanced tools like Graph Neural Networks (GNNs), we can predict new connections, group related ideas, and gain even deeper insights into the art world.

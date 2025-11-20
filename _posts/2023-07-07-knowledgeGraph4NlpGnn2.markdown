@@ -6,7 +6,39 @@ date:       2023-07-07 12:00:00
 author:     "Melenar"
 header-img: "img/pageNlpGc1e.jpg"
 ---
-<p><h3>GNN Graph Classification for Semantic Graphs</h3>
+<h2>Semantic Graph for Text Understanding</h2>
+<p>
+  In this project, we treat text as a semantic graph rather than a flat sequence of words.
+  From Wikipedia biographies of modern artists, we build a graph where nodes are meaningful
+  word pairs and edges connect them when they appear together or in related contexts.
+  Each node carries a transformer embedding, and a Graph Neural Network learns to “rewire”
+  this graph—strengthening important links, downplaying weak ones, and revealing which
+  artists and concepts truly sit close together or far apart in meaning.
+</p>
+<p>
+  This semantic graph becomes a foundation for NLP tasks: it supports richer recommendations
+  (finding both similar and contrastive artists or documents), cleans and enriches the
+  underlying knowledge graph, and provides structure-aware representations that go beyond
+  simple embedding cosine similarity. Instead of just asking “how similar are these texts?”,
+  we can ask “how is their semantic neighborhood wired?” and let Graph AI answer from the
+  topology of the semantic graph itself.
+</p>
+
+<h2>Conference &amp; Publication</h2>
+<p>
+  This work was presented at <strong>FRUCT35</strong>, the 35th Conference of the Open Innovations
+  Association, held in Tampere, Finland, from <strong>24–26 April 2024</strong>, as the paper
+  <em>“Enhancing NLP through GNN-Driven Knowledge Graph Rewiring and Document Classification”</em>.
+  It was published in the conference proceedings with the doi:
+  <a href="https://doi.org/10.23919/FRUCT61870.2024.10516410" target="_blank" rel="noopener">
+    10.23919/FRUCT61870.2024.10516410
+  </a>.
+</p>
+
+
+
+
+<p><h2>GNN Graph Classification for Semantic Graphs</h2>
 <p></p>
 In our previous studies, we focused on the exploration of knowledge graph rewiring to uncover unknown relationships between modern art artists. In one study
 <u><a href="https://www.springerprofessional.de/en/building-knowledge-graph-in-spark-without-sparql/18375090">'Building Knowledge Graph in Spark Without SPARQL'</a></u>, we utilized artist biographies, known artist relationships, and data on modern art movements to employ graph-specific techniques, revealing hidden patterns within the knowledge graph.

@@ -6,16 +6,36 @@ date:       2023-11-23 12:00:00
 author:     "Melenar"
 header-img: "img/pageEgg1m.jpg"
 ---
+<h2>Hidden Connectors in Knowledge Graphs</h2>
+<p>
+  In this project, we dive into a semantic knowledge graph built from art biographies and go
+  beyond the simple question “who is linked to whom?”. We use Graph AI to embed nodes in a
+  vector space and measure how strongly they connect, then examine tiny three-node patterns
+  (triangles) to find cases where one link is much stronger than the others. Those nodes often
+  act as quiet bridges between otherwise distant concepts or artists.
+</p>
+<p>
+  The same idea scales far beyond art. In medicine, hidden connectors can illuminate critical genetic pathways that influence disease and point toward targeted therapies. In social networks, they reveal quiet influencers and emerging trends. In finance, connector analysis can surface firms that quietly support market stability; in criminal intelligence, it can highlight organizers who sit behind fragmented activity.
+</p>
 
-<p><h3>Conference Highlights</h3>
-This research was presented at the 17th International Conference on Information Technology and Applications (ICITA 2023) that was held in Turin, Italy from October 20–22, 2023.
-<p></p>
-Paper 'Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge Graphs' is estimated to be published in February, 2024.
-<p></p>
-To complement the text understanding, in this post we will feature some slides from the conference presentation.
+
+<h2>Conference Highlights</h2>
+<p>
+  This research was presented at the 17th International Conference on Information Technology and
+  Applications (ICITA 2023), held in Turin, Italy from <strong>October 20–22, 2023</strong>.
+  The paper, <em>“Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge Graphs”</em>,
+  was published as
+  <em>Romanova, A. Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge
+  Graphs</em>, in the ICITA 2023 proceedings, doi:
+  <a href="https://doi.org/10.1007/978-981-99-8324-7_2" target="_blank" rel="noopener">
+    10.1007/978-981-99-8324-7_2
+  </a>.
+  To complement the text understanding, in this post we will feature some slides from the conference presentation.
+</p>
+
 
 <p></p>
-<p><h3>Uncovering Hidden Triangles in Knowledge Graphs </h3>
+<p><h2>Uncovering Hidden Triangles in Knowledge Graphs </h2>
 
 <p>In recent years, knowledge graphs have become a powerful tool for integrating and analyzing data and shedding lights on the connections between entities. This study narrows its focus on unraveling detailed relationships within knowledge graphs, placing special emphasis on the role of graph connectors through link predictions and triangle analysis.</p>
 

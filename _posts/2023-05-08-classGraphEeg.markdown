@@ -6,7 +6,38 @@ date:       2023-05-08 12:00:00
 author:     "Melenar"
 header-img: "img/pageEgg1l.jpg"
 ---
-<p><h3>GNN for pattern discovery in time series data</h3>
+
+  <h2>Time Series Graphs for EEG Pattern Analysis</h2>
+  <p>
+    Here we treat EEG recordings as <strong>time series graphs</strong> rather than flat lines.
+    Each trial becomes a graph: nodes represent channels or time slices, node features store the
+    full signal for that segment, and edges connect nodes whose activity is similar. A Graph
+    Neural Network then learns a single fingerprint for each graph, allowing us to classify
+    whole trials while capturing both local signal details and the relationships between them.
+  </p>
+  <p>
+    Because the model is highly sensitive to graph structure, small changes in how nodes connect
+    can flip a prediction. We use this sensitivity as a tool: misclassifications and low-confidence
+    cases highlight trials whose time series graphs do not match typical patterns. In practice,
+    these topology-driven outliers help us spot unusual EEG behavior and point to the most
+    interesting parts of the data for deeper analysis.
+  </p>
+
+  <h2>Conference &amp; Publication</h2>
+  <p>
+    This work was presented at <strong>COMPLEX NETWORKS 2023</strong> in Menton, France,
+    from <strong>28–30 November 2023</strong>, as the paper
+    <em>“Enhancing Time Series Analysis with GNN Graph Classification Models”</em>.
+    It was published in the conference proceedings with the doi:
+    <a href="https://doi.org/10.1007/978-3-031-53468-3_3" target="_blank" rel="noopener">
+      10.1007/978-3-031-53468-3_3
+    </a>.
+  </p>
+
+
+
+
+<p><h2>GNN for Pattern Discovery in Time Series Data</h2>
 
 In one of our previous posts <i><a href="http://sparklingdataocean.com/2020/08/19/brainGraphEeg/">
 "EEG Patterns by Deep Learning and Graph Mining"</a></i> we studied how to use CNN image classification to distinguish between Alcoholic person behavior and behavior of person from Control group based on EEG data. This study was presented

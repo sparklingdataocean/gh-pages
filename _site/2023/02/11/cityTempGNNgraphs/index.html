@@ -106,7 +106,58 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
-				<p><h3>GNN Graph Classification for Climate Data Analysis</h3>
+				<h2>Time Series Graphs</h2>
+<p>
+    In this project, each city’s climate history becomes a graph instead of a simple line chart.
+    Every year of daily temperatures is turned into a node, and edges connect years that behave
+    similarly. This creates a <strong>time series graph</strong> that captures both how climate
+    changes from one year to the next and how distant years echo each other. A Graph Neural
+    Network then learns a single “fingerprint” for each city-graph, telling us whether its climate
+    pattern looks stable or unstable over the long term.
+  </p>
+<p>
+    Once the model learns what “stable” and “unstable” look like, the interesting part begins:
+    we can see which cities behave differently from what their latitude or region would suggest.
+    Some high-latitude coastal cities look surprisingly stable, while others in warmer zones show
+    unexpected instability. These <strong>hidden patterns and anomalies</strong> highlight places
+    where climate behavior doesn’t fit the usual story and point to regions that may deserve a
+    closer look.
+  </p>
+
+<h2>Conference &amp; Publication</h2>
+<p>
+    The climate time series graph results were first presented at
+    <strong>ICANN 2023</strong> in Crete, Greece, on <strong>26–29 September 2023</strong>, as
+    <em>Romanova, A. “GNN Graph Classification Method to Discover Climate Change Patterns.”</em>
+    In <em>Artificial Neural Networks and Machine Learning – ICANN 2023</em>, doi:
+    <a href="https://doi.org/10.1007/978-3-031-44216-2_32" target="_blank" rel="noopener">
+      10.1007/978-3-031-44216-2_32
+    </a>.
+  </p>
+<p>
+    The broader framework that unifies these climate experiments with EEG time series analysis was
+    later presented at <strong>COMPLEX NETWORKS 2023</strong> in Menton, France, from
+    <strong>28–30 November 2023</strong>, as the paper
+    <em>“Enhancing Time Series Analysis with GNN Graph Classification Models”</em>, published in the
+    conference proceedings, doi:
+    <a href="https://doi.org/10.1007/978-3-031-53468-3_3" target="_blank" rel="noopener">
+      10.1007/978-3-031-53468-3_3
+    </a>.
+  </p>
+
+<h2>Conference &amp; Publication</h2>
+<p>
+    This work was presented at <strong>ICANN 2023</strong> in Crete, Greece, on
+    <strong>26–29 September 2023</strong>, and published as
+    <em>Romanova, A. “GNN Graph Classification Method to Discover Climate Change Patterns.”
+    In Artificial Neural Networks and Machine Learning – ICANN 2023</em>,
+    doi:
+    <a href="https://doi.org/10.1007/978-3-031-44216-2_32" target="_blank" rel="noopener">
+      10.1007/978-3-031-44216-2_32
+    </a>.
+  </p>
+
+<p><h2>GNN Graph Classification for Climate Data Analysis</h2>
 
 This post represents Graph Neural Network (GNN) graph classification model as a novel method for analyzing stability of temperature patterns over time. Our method involves building graphs based on cosine similarities between daily temperature vectors, training graph classification model and making predictions about temperature stability by graph location.
 

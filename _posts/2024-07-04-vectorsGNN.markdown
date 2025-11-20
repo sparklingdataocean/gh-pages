@@ -6,9 +6,29 @@ date:       2024-07-04 12:00:00
 author:     "Melenar"
 header-img: "img/pageVec44.jpg"
 ---
-This study highlights how linear algebra can enhance deep learning by making data representation and manipulation more efficient. We extract pre-final vectors from Graph Neural Networks (GNN) Graph Classification models and analyze the small graphs embedded within them. By applying these techniques to climate time series data, we show that combining linear algebra with GNN Graph Classification models improves the analysis of climate data. Additionally, we use these embedded small graphs for statistical analysis and build meta-graphs on top of them. This layered approach enhances our analytical capabilities and leads to better overall results.
+
+
+<h2>Graph-Level Embeddings</h2>
+<p>
+  Graph-level embeddings are the <strong>pre-final vectors</strong> produced by a GNN graph
+  classification model, giving one compact fingerprint for each graph—whether it represents a
+  city’s climate, an EEG trial, a machine, or a document. Once we have these embeddings, we can
+  use simple vector-space tools (similarity, clustering, thresholds) to compare graphs, group
+  similar cases, spot outliers, and even build a “graph of graphs” on top of them. In other words,
+  graph-level embeddings turn single GNN predictions into a reusable layer for deeper analysis
+  across many small graphs.
+</p>
+
+<h2>Conference &amp; Poster</h2>
+<p>
+  This work, <em>“Utilizing Pre-Final Vectors from GNN Graph Classification for Enhanced Climate Analysis”</em>,
+  was presented as a peer-reviewed poster at the 21st International Workshop on Mining and Learning with Graphs (MLG 2024),
+  co-located with <strong>ECML-PKDD 2024</strong> in Vilnius, Lithuania, on <strong>9 September 2024</strong>.
+  The paper appears in the non-archival online workshop proceedings and is available via the MLG 2024 website.
+</p>
+
 <p></p>
-<p><h3> Introduction</h3>
+<p><h2> Introduction</h2>
 
 <p></p>
 Linear algebra plays a crucial role in machine learning and artificial intelligence by providing efficient ways to represent and manipulate data. Whether dealing with matrices or vectors, these mathematical structures help model complex problems in a manageable form. The rise of deep learning models has shown just how versatile linear algebra can be across various fields.

@@ -6,7 +6,30 @@ date:       2024-06-21 12:00:00
 author:     "Melenar"
 header-img: "img/pageVec33.jpg"
 ---
-<p><h3> </h3>
+<h2>Semantic Graphs for Communication Networks</h2>
+<p>
+  In this project, we move beyond simple “who emailed whom” graphs and build a
+  <strong>semantic graph</strong> of communication. Instead of treating edges as raw message
+  counts, we create nodes for individual interactions (who wrote to whom, with what text), enrich
+  them with transformer-based text embeddings, and use a GNN link prediction model to learn which
+  interactions are genuinely related. This text-enriched graph lets us recompute centrality and see
+  a different set of key players: not just the loudest senders, but the quiet connectors who bridge
+  topics and conversation clusters—hidden connectors that a plain traffic graph would never reveal.
+</p>
+
+<h2>Conference &amp; Workshop</h2>
+<p>
+  The work <em>“Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction”</em>
+  was presented at the <strong>MLH 2024 – Mining and Learning with Hypergraphs</strong> workshop,
+  co-located with <strong>ECML-PKDD 2024</strong>, in Vilnius, Lithuania, on
+  <strong>13 September 2024</strong>. The contribution appears in the non-archival online
+  workshop program and is available via the MLH 2024 website.
+</p>
+
+
+
+
+<p><h2>Multi-Layer Graph Analysis for Communication Networks </h2>
 <p></p>
 
 Analyzing complex graphs can be quite challenging, especially when the whole is greater than the sum of its parts. To address these challenges, we dive into the Enron email dataset, using its rich information to create a strong multi-layer graph analysis framework.
