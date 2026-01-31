@@ -2,7 +2,7 @@
 layout:     post
 title:      "Unlocking the Power of Pre-Final Vectors in GNN Graph Classification"
 subtitle:   "Utilizing Intermediate Vectors from GNN Graph Classification to Enhance Climate Analysis"
-date:       2026-01-06 12:00:00
+date:       2026-03-06 12:00:00
 author:     "Melenar"
 header-img: "img/gnnge5b.jpg"
 ---

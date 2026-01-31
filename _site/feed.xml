@@ -1,4 +1,926 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-12-25T21:39:53-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Sparkling Data Ocean</title><subtitle>Spark for Big Data Analytics.</subtitle><entry><title type="html">Giving AI a Shared Language with Unified Knowledge Graphs</title><link href="http://localhost:4000/2025/12/25/knowledgeGraph4artists/" rel="alternate" type="text/html" title="Giving AI a Shared Language with Unified Knowledge Graphs" /><published>2025-12-25T07:00:00-05:00</published><updated>2025-12-25T07:00:00-05:00</updated><id>http://localhost:4000/2025/12/25/knowledgeGraph4artists</id><content type="html" xml:base="http://localhost:4000/2025/12/25/knowledgeGraph4artists/"><![CDATA[<section>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-01-31T08:00:09-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Sparkling Data Ocean</title><subtitle>Boutique consulting -- AI &amp; Data Analytics.</subtitle><entry><title type="html">Monitoring Market Topology Shifts</title><link href="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/" rel="alternate" type="text/html" title="Monitoring Market Topology Shifts" /><published>2026-01-26T07:00:00-05:00</published><updated>2026-01-26T07:00:00-05:00</updated><id>http://localhost:4000/2026/01/26/slidingWindowGraphFIN</id><content type="html" xml:base="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/"><![CDATA[<p>LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.</p>
+
+<p></p>
+<h2>Introduction</h2>
+
+<section class="post-section" id="why-sliding-graphs-for-finance">
+  <p>
+    Large language models (LLMs) have become remarkably good at generating and summarizing text, but their limits show up when we ask
+    them to act like general reasoning engines. As Yann LeCun and others have noted, LLMs are fundamentally <em>sequential</em>:
+    their native representation is a one-dimensional ordering of symbols. That sequential topology is great for fluent continuation,
+    but it is a poor fit for problems where the signal is structural, relational, or shaped by global constraints. In those settings,
+    outputs can sound plausible while still being hard to verify or reconcile at the system level.
+  </p>
+
+  <p>
+    This points to a broader issue of representation. Human reasoning does not rely on natural language alone; we use formal
+    languages—mathematics, diagrams, programs—to make structure explicit. Mathematics is not the world itself, but a language for
+    representing quantities and manipulating them under well-defined rules, which makes constraint checking and transformation
+    possible. Graphs play a similar role for relationships. Nodes encode persistent entities, edges encode connections, and topology
+    defines neighborhoods by connectivity rather than positional proximity. Many real-world signals depend on multi-hop dependencies,
+    shared intermediaries, and global relational consistency—properties that are difficult to express faithfully in purely sequential
+    form.
+  </p>
+
+  <p>
+    Time series analysis inherits similar constraints. Standard financial time series models represent data as sequences of values
+    indexed by time. This works well for trends, volatility, and local temporal dependence, but it often treats relationships between
+    entities as secondary. Correlations are typically computed pairwise and regime changes inferred indirectly from aggregate metrics,
+    even though relational reorganization across assets can happen before obvious changes appear in individual series.
+  </p>
+
+  <p>
+    To address this gap for financial time series, we use <strong>Sliding Graphs</strong> and adapt them to market data. We construct
+    overlapping temporal windows, build a graph representation for each window, and compute graph embeddings that capture how recent
+    behavior is organized across assets. This produces structure-aware similarity timelines that help detect and localize relationship
+    change (for example, sector reconfiguration or regime shifts) that value-based rolling comparisons can miss. Practically, we
+    flag periods where standard rolling-window similarity and sliding-graph similarity disagree, treating that disagreement as a
+    measurable indicator that market relationships are reorganizing.
+  </p>
+</section>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<h2>From Prior Work to This Study</h2>
+
+<p>
+  This study builds directly on our prior work; the four items below are the key building blocks
+  that made the current workflow possible.
+</p>
+
+<p>
+  <strong>1) GNN Graph Classification for time series</strong><br />
+  We first adapted <strong>GNN graph classification</strong> (commonly used for molecular graph labeling) to
+  <strong>time series</strong> by turning time-local segments into graph snapshots and training a graph classifier
+  on those graphs. A key practical detail in this line of work is the <strong>virtual node</strong>, added to stabilize
+  message passing and produce a consistent graph-level representation.<br />
+  Blog: <a href="https://sparklingdataocean.com/2023/02/11/cityTempGNNgraphs/" target="_blank" rel="noopener">https://sparklingdataocean.com/2023/02/11/cityTempGNNgraphs/</a><br />
+  Presented at: <strong>ICANN 2023</strong> — Crete, Greece (Sep 2023) and <strong>COMPLEX NETWORKS 2023</strong> — Menton, France (Nov 2023).
+</p>
+
+<p>
+  <strong>2) Sliding graphs (introduced on climate time series)</strong><br />
+  We then formalized <strong>sliding graphs</strong>: instead of treating a long sequence as one object, we represent it
+  as a <strong>sequence of overlapping graph snapshots</strong>, each capturing recent local behavior and structure.<br />
+  Blog: <a href="http://sparklingdataocean.com/2024/05/25/slidingWindowGraph/" target="_blank" rel="noopener">http://sparklingdataocean.com/2024/05/25/slidingWindowGraph/</a><br />
+  Presented at: <strong>ICMLT 2024</strong> — Oslo, Norway (May 2024).
+</p>
+
+<p>
+  <strong>3) Pre-final vectors from GNN graph classification</strong><br />
+  Next, we showed how to reuse the model’s <strong>pre-final vectors</strong> (graph embeddings right before the last layer)
+  as a stable representation you can track, compare, and analyze beyond classification.<br />
+  Blog: <a href="https://sparklingdataocean.com/2024/07/04/vectorsGNN/" target="_blank" rel="noopener">https://sparklingdataocean.com/2024/07/04/vectorsGNN/</a><br />
+  Presented at: <strong>MLG 2024 (ECML-PKDD 2024 workshop)</strong> — Vilnius, Lithuania (Sep 2024).
+</p>
+
+<p>
+  <strong>4) Time-aligned sliding-graph embeddings for new time series (EEG)</strong><br />
+  Finally, we applied the same <strong>sliding graphs + embeddings</strong> workflow to EEG and introduced
+  <strong>time-aligned embedding streams</strong> for comparing structure over time.<br />
+  Blog: <a href="https://sparklingdataocean.com/2025/01/25/slidingWindowGraph-EEG/" target="_blank" rel="noopener">https://sparklingdataocean.com/2025/01/25/slidingWindowGraph-EEG/</a><br />
+  Presented at: <strong>Brain Informatics 2025</strong> — Bari, Italy (Nov 2025).
+</p>
+
+<h2>Methods</h2>
+<p></p>
+
+<section>
+  <h3>Pipeline overview: from time series to a time-aligned similarity signal</h3>
+
+  <p>
+    This pipeline converts a pair of time series into a single, time-aligned similarity timeline.
+    The key idea is to compare two <em>streams of learned graph embeddings</em> at matching time points,
+    rather than comparing raw values directly.
+  </p>
+Our pipeline for this study consists of several stages.
+<p></p>
+  <ol>
+    <li>
+      <strong>Start with two time series (A and B).</strong><br />
+      The goal is to track how their relationship evolves over time, not just compute one global similarity.
+    </li>
+
+    <li>
+      <strong>Create overlapping sliding windows.</strong><br />
+      Each window captures a short, recent segment of behavior. Overlap ensures a dense sequence of
+      time-local snapshots.
+    </li>
+
+    <li>
+      <strong>Construct sliding graphs.</strong><br />
+      For every window, build a small graph snapshot that encodes local structure (e.g., which
+      window-elements behave similarly and how they connect). This turns time into a <em>sequence of graphs</em>.
+    </li>
+
+    <li>
+      <strong>Run a GNN and keep the pre-final embeddings.</strong><br />
+      A graph neural network processes each graph snapshot and produces a compact embedding vector
+      that summarizes the structure of that window. Doing this for both series yields two embedding
+      streams over time: <em>Vectors A</em> and <em>Vectors B</em>.
+    </li>
+
+    <li>
+      <strong>Align embeddings by timestamp and compute similarity at each time point.</strong><br />
+      At each aligned window time, compute a similarity score (e.g., cosine similarity) between the
+      embedding from A and the embedding from B.
+    </li>
+
+    <li>
+      <strong>Obtain a similarity timeline.</strong><br />
+      The output is a time series of similarity scores that reflects how the two series compare
+      window-by-window in the learned embedding space—capturing changes in the organization/structure
+      of recent patterns.
+    </li>
+  </ol>
+
+  <p>
+    In practice, this similarity timeline can be scanned for intervals where relationships strengthen,
+    weaken, or reorganize—providing time-local “periods of interest” for deeper interpretation.
+  </p>
+</section>
+
+<p></p>
+<p><a href="#">
+      <img src="/img/fings17b.jpg" alt="Post Sample Image" width="808" />
+</a></p>
+<p></p>
+
+<p></p>
+<p></p>
+
+<p></p>
+<p></p>
+
+<p></p>
+
+<h3>Sliding graph definition</h3>
+<p></p>
+
+<p>In our previous study, <a href="https://dl.acm.org/doi/10.1145/3674029.3674059">GNN Graph Classification for Time Series: A New Perspective on Climate Change Analysis</a>, we introduced an approach to constructing graphs using the
+<em>Sliding Window Method</em>.</p>
+
+<p></p>
+<p><a href="#">
+      <img src="/img/slide3.jpg" alt="Post Sample Image" width="404" />
+</a></p>
+<p></p>
+<p></p>
+
+<p></p>
+<h3>Data to Graph Transformation</h3>
+<p></p>
+<p>Time series data is segmented into overlapping windows using the sliding
+window technique. Each segment forms a unique graph, allowing for the analysis of local temporal dynamics.</p>
+<p></p>
+<p>In these graphs:</p>
+
+<ul>
+    <li>
+      <strong>Nodes</strong>: Represent data points within the window, with features derived from their values.
+    </li>
+    <li>
+      <strong>Edges</strong>: Connect pairs of nodes to maintain temporal relationships.
+    </li>
+  </ul>
+<p></p>
+<p>Key Parameters:</p>
+<ul>
+    <li>
+      <strong>Window Size (W)</strong>: Determines the size of each segment.
+    </li>
+    <li>
+      <strong>Shift Size (S)</strong>: Defines the degree of overlap between windows.
+    </li>
+    <li>
+      <strong>Edge Definitions</strong>: Tailored to the specific characteristics of the time series, helping detect meaningful
+      patterns.
+    </li>
+  </ul>
+
+<p></p>
+<p></p>
+<h3>Node calculation</h3>
+<p></p>
+<p>For a dataset with N data points, we apply a sliding window of size W with a shift of S to create nodes. The number of nodes, N<sub>nodes</sub>, is calculated as:
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mrow>
+            <msub>
+                <mi>N</mi>
+                <mi>nodes</mi>
+            </msub>
+            <mo>=</mo>
+            <mrow>
+                <mo>&lfloor;</mo>
+                <mfrac>
+                    <mrow>
+                        <mi>N</mi>
+                        <mo>-</mo>
+                        <mi>W</mi>
+                    </mrow>
+                    <mi>S</mi>
+                </mfrac>
+                <mo>&rfloor;</mo>
+            </mrow>
+            <mo>+</mo>
+            <mn>1</mn>
+        </mrow>
+    </math></p>
+<p></p>
+<p></p>
+<p></p>
+
+<p></p>
+<h3>Graph calculation</h3>
+<p></p>
+<p>With the nodes determined, we construct graphs, each comprising G nodes, with a shift of S<sub>g</sub> between successive graphs. The number of graphs, N<sub>graphs</sub>, is calculated by:
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mrow>
+            <msub>
+                <mi>N</mi>
+                <mi>graphs</mi>
+            </msub>
+            <mo>=</mo>
+            <mrow>
+                <mo>&lfloor;</mo>
+                <mfrac>
+                    <mrow>
+                        <msub>
+                            <mi>N</mi>
+                            <mi>nodes</mi>
+                        </msub>
+                        <mo>-</mo>
+                        <mi>G</mi>
+                    </mrow>
+                    <msub>
+                        <mi>S</mi>
+                        <mi>g</mi>
+                    </msub>
+                </mfrac>
+                <mo>&rfloor;</mo>
+            </mrow>
+            <mo>+</mo>
+            <mn>1</mn>
+        </mrow>
+    </math></p>
+<p></p>
+<p></p>
+<h3>Graph construction</h3>
+<p></p>
+<p>Cosine similarity matrices are generated from the time series data and transformed into graph adjacency matrices.</p>
+<p></p>
+<ul>
+    <li>
+      <strong>Edge Creation</strong>: Edges are established for vector pairs with cosine values above a defined threshold.
+    </li>
+    <li>
+      <strong>Virtual Nodes</strong>: Added to ensure network connectivity, enhancing graph representation.
+    </li>
+  </ul>
+<p></p>
+
+<p></p>
+<p></p>
+<p>This framework effectively captures both local and global patterns within the time series, yielding valuable insights into temporal dynamics.</p>
+<p></p>
+
+<p></p>
+<h3>GNN graph classification</h3>
+<p></p>
+<p>We employ the <em>GCNConv</em> model from the PyTorch Geometric Library for GNN Graph Classification tasks. This model performs convolutional operations, leveraging edges, node attributes, and graph labels to extract features and analyze graph structures comprehensively.</p>
+<p></p>
+<p>By combining the sliding window technique with Graph Neural Networks, our approach offers a robust framework for analyzing time series data. It captures intricate temporal dynamics and provides actionable insights into both local and global patterns, making it particularly well-suited for applications such as EEG data analysis. This method allows us to analyze time series data effectively by capturing both local and global patterns, providing valuable insights into temporal dynamics.</p>
+<p></p>
+
+<p>
+  </p>
+
+<p></p>
+
+<p></p>
+<h2>Experiments</h2>
+<p></p>
+
+<p></p>
+<section>
+  <h3>Data</h3>
+
+  <section class="post-section" id="raw-data">
+    <p>
+      For this project, we keep the dataset intentionally small: <strong>five liquid U.S. ETFs</strong> that tend to behave differently
+      across market regimes—so shifts in “relationships” and sector rotation have a chance to show up:
+    </p>
+
+    <ul>
+      <li><strong>SPY</strong> (S&amp;P 500)</li>
+      <li><strong>XLK</strong> (Technology)</li>
+      <li><strong>XLE</strong> (Energy)</li>
+      <li><strong>XLF</strong> (Financials)</li>
+      <li><strong>XLU</strong> (Utilities)</li>
+    </ul>
+
+    <p>
+      We pull <strong>daily prices from Yahoo Finance</strong> using <code>yfinance</code>, and we use <strong>Adjusted Close</strong> so
+      splits and dividends don’t create artificial jumps in the series. In our run, we request data starting <strong>1998-12-01</strong>,
+      then align all tickers to the <strong>intersection of trading dates</strong> (shared window
+      <strong>1998-12-22 to 2026-01-21</strong>, <strong>6811</strong> rows per ETF). The aligned series are saved to
+      <strong>Parquet</strong> (one file per ticker) so downstream steps load instantly without re-downloading.
+    </p>
+
+    <p>
+      Because these ETFs trade at very different price levels, we don’t plot raw prices. Instead, we normalize each series so it starts
+      at <strong>1.0</strong> on the first shared trading day:
+    </p>
+  </section>
+
+  &lt;/p&gt;
+  <p></p>
+  <a href="#">
+        <img src="/img/finsg3.jpg" alt="Post Sample Image" width="808" />
+  </a>
+  <p></p>
+
+</section>
+
+<p></p>
+<p>
+<section class="post-section" id="spy-ratios-illustration">
+  <p>
+    We’re going to analyze how relationships evolve between <strong>SPY</strong> and each sector ETF. As a quick illustration, the chart
+    below shows <strong>price ratios</strong> of each ETF versus SPY, which makes it easier to see when a sector is leading or lagging
+    the broad market.
+  </p>
+  <p></p>
+  <a href="#">
+        <img src="/img/finsg6.jpg" alt="Post Sample Image" width="808" />
+  </a>
+  <p></p>
+  <p>
+    A few major periods stand out. <strong>Tech (XLK)</strong> shows two clear eras of relative leadership: a surge during the
+    <strong>dot-com period</strong> (late 1990s into the early 2000s) followed by a sharp reversal, and then a renewed, sustained push
+    in the recent <strong>AI-driven boom</strong> (2023–present). <strong>Financials (XLF)</strong> is dominated by the
+    <strong>2008 crisis</strong>, where the ratio collapses and the recovery afterward follows a noticeably different trajectory.
+    Finally, <strong>COVID (2020)</strong> appears as a sharp relationship shock, with a rapid drawdown, quick rebound, and a clear
+    reshuffling of sector leadership.
+  </p>
+</section>
+
+</p>
+
+<section class="post-section" id="creating-graph-nodes">
+    <h3>Creating graph nodes</h3>
+
+    <p>
+      For each ETF, we start with its <strong>Adjusted Close</strong> time series and turn it into a set of
+      <strong>graph nodes</strong>, where each node represents a short, fixed-length “recent history” of price movement.
+      Concretely, we slide a window of length <strong>W</strong> over the series (step <strong>S</strong>). Each window becomes one node.
+    </p>
+
+    <p>
+      Before we do anything graph-like, we normalize each window so that it starts at the same baseline. The simplest view is price
+      normalization:
+    </p>
+
+    <p>
+      <strong>Normalized price(t) = AdjClose(t) / AdjClose(t₀)</strong>
+    </p>
+
+    <p>
+      This forces every window to start at <strong>1.0</strong> on day one, so we focus on <em>shape</em> rather than absolute price level.
+    </p>
+
+    <p>
+      In the implementation, we use the log version of the same idea because it behaves better numerically and aligns with how finance
+      often models returns. For a window starting at time <span style="white-space:nowrap;">t₀</span>, we compute a
+      <strong>relative log-price path</strong>:
+    </p>
+
+    <p>
+      <strong>features = log(price_window) − log(price_window[0])</strong>
+    </p>
+
+    <p>
+      So each node feature vector encodes the <em>trajectory</em> of that ETF over the next <strong>W</strong> points, expressed relative
+      to the first value in the window. Intuitively: every node says, “starting from here, what did the local path look like?”
+      This gives us a clean, comparable node representation across different ETFs and time periods—exactly what we need before
+      constructing sliding graphs over these nodes.
+    </p>
+
+  </section>
+
+<section class="post-section" id="fin-graph-nodes-io">
+
+
+    <p><strong>Inputs</strong></p>
+    <ul>
+      <li>
+        <code>df</code> (DataFrame) with at least:
+        <ul>
+          <li><code>timestamp_col</code> (default <code>"timestamp"</code>)</li>
+          <li><code>price_col</code> (default <code>"adj_close"</code>, must be &gt; 0; non-positive rows are dropped)</li>
+        </ul>
+      </li>
+      <li><code>symbol</code> (string) used to build unique node names</li>
+      <li>
+        Windowing parameters:
+        <ul>
+          <li><code>W = 32</code>: node window length (feature vector size)</li>
+          <li><code>S = 1</code>: node stride (step between windows)</li>
+          <li><code>G = 32</code>: nodes per graph snapshot</li>
+          <li><code>Sg = 6</code>: snapshot stride</li>
+        </ul>
+      </li>
+      <li><code>graph_label</code> (int) assigned to all snapshots from this call</li>
+      <li><code>eps</code> protects the log transform</li>
+    </ul>
+
+
+
+    <p><strong>Output</strong></p>
+    <p>
+      A DataFrame where each row is a node-in-snapshot, with columns:
+      <code>graph_name</code>, <code>graph_label</code>, <code>node_name</code>, and
+      <code>f0</code> … <code>f{W-1}</code>.
+      If there isn’t enough data to form windows (<code>N &lt; W</code>) or snapshots (<code>n_nodes &lt; G</code>), the function returns
+      an empty DataFrame with the expected columns.
+    </p>
+  </section>
+
+<h4>Function: fin_graph_nodes.py</h4>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="k">def</span> <span class="nf">fin_graph_nodes</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">timestamp_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">"</span><span class="s">timestamp</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">price_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">"</span><span class="s">adj_close</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">W</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+    <span class="n">S</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">G</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+    <span class="n">Sg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="n">graph_label</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>   <span class="c1"># protects log(0)
+</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">W</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">G</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">S</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">Sg</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">"</span><span class="s">W, G, S, Sg must be positive integers.</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">timestamp_col</span><span class="p">,</span> <span class="n">price_col</span><span class="p">]].</span><span class="nf">copy</span><span class="p">()</span>
+    <span class="n">d</span><span class="p">[</span><span class="n">timestamp_col</span><span class="p">]</span> <span class="o">=</span>
+       <span class="n">pd</span><span class="p">.</span><span class="nf">to_datetime</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">timestamp_col</span><span class="p">],</span> <span class="n">utc</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="sh">"</span><span class="s">coerce</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">d</span><span class="p">[</span><span class="n">price_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">to_numeric</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">price_col</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="sh">"</span><span class="s">coerce</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="p">.</span><span class="nf">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">timestamp_col</span><span class="p">,</span> <span class="n">price_col</span><span class="p">])</span>
+       <span class="p">.</span><span class="nf">sort_values</span><span class="p">(</span><span class="n">timestamp_col</span><span class="p">).</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="n">price_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">].</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">prices</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">price_col</span><span class="p">].</span><span class="nf">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">timestamp_col</span><span class="p">].</span><span class="nf">to_list</span><span class="p">()</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nf">len</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
+    <span class="n">out_cols</span> <span class="o">=</span> <span class="p">[</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">graph_label</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">node_name</span><span class="sh">"</span><span class="p">]</span> <span class="o">+</span>
+      <span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">f</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="sh">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">W</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="n">W</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">out_cols</span><span class="p">)</span>
+    <span class="n">logp</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">maximum</span><span class="p">(</span><span class="n">prices</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
+    <span class="n">node_starts</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span> <span class="o">-</span> <span class="n">W</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">node_names</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s">_</span><span class="si">{</span><span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="nf">isoformat</span><span class="p">()</span><span class="si">}</span><span class="sh">"</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">node_starts</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">stack</span><span class="p">(</span>
+        <span class="p">[(</span><span class="n">logp</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">W</span><span class="p">]</span> <span class="o">-</span> <span class="n">logp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">node_starts</span><span class="p">],</span>  
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  
+    <span class="n">n_nodes</span> <span class="o">=</span> <span class="n">X</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">n_nodes</span> <span class="o">&lt;</span> <span class="n">G</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">out_cols</span><span class="p">)</span>
+    <span class="n">graph_starts</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_nodes</span> <span class="o">-</span> <span class="n">G</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Sg</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">gs</span> <span class="ow">in</span> <span class="n">graph_starts</span><span class="p">:</span>
+        <span class="n">gname</span> <span class="o">=</span> <span class="n">node_names</span><span class="p">[</span><span class="n">gs</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+            <span class="n">nm</span> <span class="o">=</span> <span class="n">node_names</span><span class="p">[</span><span class="n">gs</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">feat</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">gs</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">:</span> <span class="n">gname</span><span class="p">,</span> <span class="sh">"</span><span class="s">graph_label</span><span class="sh">"</span><span class="p">:</span> <span class="nf">int</span><span class="p">(</span><span class="n">graph_label</span><span class="p">),</span>
+            <span class="sh">"</span><span class="s">node_name</span><span class="sh">"</span><span class="p">:</span> <span class="n">nm</span><span class="p">}</span>
+            <span class="n">row</span><span class="p">.</span><span class="nf">update</span><span class="p">({</span><span class="sa">f</span><span class="sh">"</span><span class="s">f</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="sh">"</span><span class="p">:</span> <span class="nf">float</span><span class="p">(</span><span class="n">feat</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">W</span><span class="p">)})</span>
+            <span class="n">rows</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">out_cols</span><span class="p">)</span></code></pre></figure>
+
+<p></p>
+
+<section class="post-section" id="graph-edges">
+<h3>Graph edges </h3>
+    <p>
+      Once we have the <strong>node windows table</strong>, we build edges for each <strong>sliding graph snapshot</strong>. Edges define
+      which nodes are “related” within that snapshot and control how information flows in the GNN.
+    </p>
+
+    <p><strong>Virtual-node edges (always on)</strong><br />
+      For every snapshot, we add one special <strong>virtual node</strong> and connect it to every real node (a star pattern). This makes
+      each input graph a <strong>single connected component</strong>, which helps <strong>GNN graph classification models</strong> learn a
+      stable graph-level representation. The virtual node acts as a <strong>global anchor</strong>, aggregating signals from all nodes.
+    </p>
+
+    <p><strong>Cosine-similarity edges (optional)</strong><br />
+      Within each snapshot, we optionally connect node pairs whose feature vectors are highly similar (above a cosine threshold). This
+      links windows with similar local shape, capturing repeating patterns.
+    </p>
+
+
+
+
+    <p>
+  <strong>Inputs:</strong> the previously created nodes table, a
+  <code style="background:#fdecef;color:#b42318;padding:0.1em 0.35em;border-radius:0.25em;">cosine_threshold = 0.95</code>.<br />
+  <strong>Outputs:</strong> a new nodes table with one virtual node added per graph, and an edges table with
+  <code>graph_name</code>, <code>left</code>, <code>right</code>, and <code>edge_type</code>.
+</p>
+
+  </section>
+
+<p></p>
+<h4>Function: fin_graph_edges.py</h4>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span> <span class="n">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="n">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="n">PathLike</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">_feature_cols</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">fcols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="p">.</span><span class="n">columns</span>
+    <span class="k">if</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">c</span><span class="p">.</span><span class="nf">startswith</span><span class="p">(</span><span class="sh">"</span><span class="s">f</span><span class="sh">"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">:].</span><span class="nf">isdigit</span><span class="p">()]</span>
+    <span class="n">fcols</span><span class="p">.</span><span class="nf">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">fcols</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">"</span><span class="s">No feature columns found (expected f0..fK).</span><span class="sh">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fcols</span>
+
+<span class="k">def</span> <span class="nf">_normalize_windows</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">"</span><span class="s">zscore</span><span class="sh">"</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">)</span>
+   <span class="o">-&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="sh">"</span><span class="s">none</span><span class="sh">"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">X</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">nanmean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">Xc</span> <span class="o">=</span> <span class="n">X</span> <span class="o">-</span> <span class="n">mu</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="sh">"</span><span class="s">demean</span><span class="sh">"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Xc</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="sh">"</span><span class="s">zscore</span><span class="sh">"</span><span class="p">:</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">nanstd</span><span class="p">(</span><span class="n">Xc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">sd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Xc</span> <span class="o">/</span> <span class="p">(</span><span class="n">sd</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">"</span><span class="s">window_norm must be one of: </span><span class="sh">'</span><span class="s">zscore</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="s">demean</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="s">none</span><span class="sh">'"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">build_cosine_edges_with_virtual</span><span class="p">(</span>
+    <span class="n">nodes_table</span><span class="p">:</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">cosine_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.92</span><span class="p">,</span>
+    <span class="n">virtual_node_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">"</span><span class="s">__VIRTUAL__</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">normalize_windows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="n">window_norm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">"</span><span class="s">zscore</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">nodes_table</span><span class="p">,</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="nc">TypeError</span><span class="p">(</span><span class="sh">"</span><span class="s">nodes_table must be a pandas DataFrame</span><span class="sh">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nodes_table</span><span class="p">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">nodes_table</span><span class="p">.</span><span class="nf">copy</span><span class="p">(),</span>
+          <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">left</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">right</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">edge_type</span><span class="sh">"</span><span class="p">])</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="p">{</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">graph_label</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">node_name</span><span class="sh">"</span><span class="p">}</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="n">required</span> <span class="o">-</span> <span class="nf">set</span><span class="p">(</span><span class="n">nodes_table</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Missing required columns: </span><span class="si">{</span><span class="nf">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">fcols</span> <span class="o">=</span> <span class="nf">_feature_cols</span><span class="p">(</span><span class="n">nodes_table</span><span class="p">)</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">virtual_rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">gname</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">nodes_table</span><span class="p">.</span><span class="nf">groupby</span><span class="p">(</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">glabel</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="sh">"</span><span class="s">graph_label</span><span class="sh">"</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">X_full</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">fcols</span><span class="p">].</span><span class="nf">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">names_all</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="sh">"</span><span class="s">node_name</span><span class="sh">"</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">).</span><span class="nf">to_numpy</span><span class="p">()</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="p">.</span><span class="nf">isnan</span><span class="p">(</span><span class="n">X_full</span><span class="p">).</span><span class="nf">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nf">int</span><span class="p">(</span><span class="n">valid</span><span class="p">.</span><span class="nf">sum</span><span class="p">())</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X_full</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+            <span class="n">names_valid</span> <span class="o">=</span> <span class="n">g</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">valid</span><span class="p">,</span> <span class="sh">"</span><span class="s">node_name</span><span class="sh">"</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">).</span><span class="nf">to_numpy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">normalize_windows</span><span class="p">:</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="nf">_normalize_windows</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">window_norm</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>
+            <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="nf">norm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">norms</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">norms</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">Xn</span> <span class="o">=</span> <span class="n">X</span> <span class="o">/</span> <span class="p">(</span><span class="n">norms</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>
+            <span class="n">sim</span> <span class="o">=</span> <span class="n">Xn</span> <span class="o">@</span> <span class="n">Xn</span><span class="p">.</span><span class="n">T</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">sim</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">iu</span><span class="p">,</span> <span class="n">ju</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">triu_indices</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">keep</span> <span class="o">=</span> <span class="n">sim</span><span class="p">[</span><span class="n">iu</span><span class="p">,</span> <span class="n">ju</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nf">float</span><span class="p">(</span><span class="n">cosine_threshold</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nf">zip</span><span class="p">(</span><span class="n">iu</span><span class="p">[</span><span class="n">keep</span><span class="p">],</span> <span class="n">ju</span><span class="p">[</span><span class="n">keep</span><span class="p">]):</span>
+                <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">names_valid</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">names_valid</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">left</span> <span class="o">&gt;</span> <span class="n">right</span><span class="p">:</span>
+                    <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">,</span> <span class="n">left</span>
+                <span class="n">edges</span><span class="p">.</span><span class="nf">append</span><span class="p">((</span><span class="n">gname</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="sh">"</span><span class="s">cosine</span><span class="sh">"</span><span class="p">))</span>
+        <span class="n">vfeat</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">nanmean</span><span class="p">(</span><span class="n">X_full</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">vrow</span> <span class="o">=</span> <span class="p">{</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">:</span> <span class="n">gname</span><span class="p">,</span> <span class="sh">"</span><span class="s">graph_label</span><span class="sh">"</span><span class="p">:</span> <span class="n">glabel</span><span class="p">,</span>
+           <span class="sh">"</span><span class="s">node_name</span><span class="sh">"</span><span class="p">:</span> <span class="n">virtual_node_name</span><span class="p">}</span>
+        <span class="n">vrow</span><span class="p">.</span><span class="nf">update</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="nf">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nf">zip</span><span class="p">(</span><span class="n">fcols</span><span class="p">,</span> <span class="n">vfeat</span><span class="p">)})</span>
+        <span class="n">virtual_rows</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">vrow</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">nm</span> <span class="ow">in</span> <span class="n">names_all</span><span class="p">:</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">virtual_node_name</span><span class="p">,</span> <span class="n">nm</span>
+            <span class="k">if</span> <span class="n">left</span> <span class="o">&gt;</span> <span class="n">right</span><span class="p">:</span>
+                <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">,</span> <span class="n">left</span>
+            <span class="n">edges</span><span class="p">.</span><span class="nf">append</span><span class="p">((</span><span class="n">gname</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="sh">"</span><span class="s">virtual</span><span class="sh">"</span><span class="p">))</span>
+    <span class="n">nodes_out</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">([</span><span class="n">nodes_table</span><span class="p">,</span>
+      <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">virtual_rows</span><span class="p">)],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">edges_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">,</span>
+      <span class="sh">"</span><span class="s">left</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">right</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">edge_type</span><span class="sh">"</span><span class="p">]).</span><span class="nf">drop_duplicates</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">nodes_out</span><span class="p">,</span> <span class="n">edges_df</span>
+
+<span class="k">def</span> <span class="nf">fin_graph_edges</span><span class="p">(</span>
+    <span class="n">nodes_input</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">PathLike</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">cosine_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.92</span><span class="p">,</span>
+    <span class="n">virtual_node_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">"</span><span class="s">__VIRTUAL__</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">normalize_windows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="n">window_norm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">"</span><span class="s">zscore</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">save_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PathLike</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+    <span class="n">out_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">"</span><span class="s">etf</span><span class="sh">"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">nodes_input</span><span class="p">,</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="n">nodes_table</span> <span class="o">=</span> <span class="n">nodes_input</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nc">Path</span><span class="p">(</span><span class="n">nodes_input</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="p">.</span><span class="nf">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="nc">FileNotFoundError</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span><span class="p">.</span><span class="n">suffix</span><span class="p">.</span><span class="nf">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="sh">"</span><span class="s">.parquet</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">.pq</span><span class="sh">"</span><span class="p">]:</span>
+            <span class="n">nodes_table</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_parquet</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">p</span><span class="p">.</span><span class="n">suffix</span><span class="p">.</span><span class="nf">lower</span><span class="p">()</span> <span class="o">==</span> <span class="sh">"</span><span class="s">.csv</span><span class="sh">"</span><span class="p">:</span>
+            <span class="n">nodes_table</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">"</span><span class="s">Unsupported file type. Use .parquet or .csv.</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">nodes_out</span><span class="p">,</span> <span class="n">edges_df</span> <span class="o">=</span> <span class="nf">build_cosine_edges_with_virtual</span><span class="p">(</span>
+        <span class="n">nodes_table</span><span class="p">,</span>
+        <span class="n">cosine_threshold</span><span class="o">=</span><span class="n">cosine_threshold</span><span class="p">,</span>
+        <span class="n">virtual_node_name</span><span class="o">=</span><span class="n">virtual_node_name</span><span class="p">,</span>
+        <span class="n">normalize_windows</span><span class="o">=</span><span class="n">normalize_windows</span><span class="p">,</span>
+        <span class="n">window_norm</span><span class="o">=</span><span class="n">window_norm</span><span class="p">,)</span>
+    <span class="k">if</span> <span class="n">save_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">out_dir</span> <span class="o">=</span> <span class="nc">Path</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+        <span class="n">out_dir</span><span class="p">.</span><span class="nf">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">nodes_out</span><span class="p">.</span><span class="nf">to_parquet</span><span class="p">(</span><span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">out_prefix</span><span class="si">}</span><span class="s">_nodes_virtual.parquet</span><span class="sh">"</span><span class="p">,</span>
+          <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">edges_df</span><span class="p">.</span><span class="nf">to_parquet</span><span class="p">(</span><span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">out_prefix</span><span class="si">}</span><span class="s">_edges.parquet</span><span class="sh">"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nodes_out</span><span class="p">,</span> <span class="n">edges_df</span></code></pre></figure>
+
+<p></p>
+
+<section class="post-section" id="create-graph-list">
+    <h3>Create graph list</h3>
+
+    <p>
+      At this stage, we convert each ticker’s saved tables into a list of small graph snapshots that a GNN can consume. We run
+      <code>fin_graph_list</code> <strong>once per ticker</strong> (SPY, XLK, XLE, XLF, XLU), load that ticker’s
+      <code>nodes_with_virtual</code> and <code>edges</code>, and export a PyTorch Geometric <code>Data</code> object for each
+      <code>graph_name</code> window. The result is a <strong>graph list per ticker</strong>, saved to disk so we can reuse it without
+      rebuilding features and edges.
+    </p>
+
+    <p>
+      Later, in the GNN graph classification step, we reuse the <strong>SPY</strong> graph list four times—paired with each sector ETF
+      list—so the comparison is always “SPY vs ETF,” but the graph lists themselves are created and stored independently.
+    </p>
+
+    <p>
+      <strong>Inputs:</strong> one ticker’s <code>nodes_with_virtual</code> table and its <code>edges</code> table (paths to
+      <code>.parquet</code>/<code>.csv</code>).<br />
+      <strong>Outputs:</strong> a <code>data_list</code> of PyG <code>Data</code> graphs (one per <code>graph_name</code>), saved as a
+      <code>.pkl</code> file for that ticker.
+    </p>
+  </section>
+
+<p></p>
+<h4>Function: fin_graph_list.py</h4>
+<p></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span> <span class="n">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="n">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="n">PathLike</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">_load_table</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">path</span><span class="p">.</span><span class="n">suffix</span><span class="p">.</span><span class="nf">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="sh">"</span><span class="s">.parquet</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">.pq</span><span class="sh">"</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_parquet</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span><span class="p">.</span><span class="n">suffix</span><span class="p">.</span><span class="nf">lower</span><span class="p">()</span> <span class="o">==</span> <span class="sh">"</span><span class="s">.csv</span><span class="sh">"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Unsupported file type: </span><span class="si">{</span><span class="n">path</span><span class="p">.</span><span class="n">suffix</span><span class="si">}</span><span class="s">. Use .parquet or .csv</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">fin_graph_list</span><span class="p">(</span>
+    <span class="n">nodes0_path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
+    <span class="n">edges0_path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
+    <span class="n">nodes1_path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
+    <span class="n">edges1_path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">save</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="n">out_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="sh">"</span><span class="s">Data</span><span class="sh">"</span><span class="p">]:</span>
+    <span class="kn">import</span> <span class="n">pickle</span>
+    <span class="kn">import</span> <span class="n">torch</span>
+    <span class="kn">from</span> <span class="n">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Data</span>
+    <span class="n">n0p</span><span class="p">,</span> <span class="n">e0p</span><span class="p">,</span> <span class="n">n1p</span><span class="p">,</span>
+    <span class="n">e1p</span> <span class="o">=</span> <span class="nf">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nc">Path</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="p">[</span><span class="n">nodes0_path</span><span class="p">,</span> <span class="n">edges0_path</span><span class="p">,</span> <span class="n">nodes1_path</span><span class="p">,</span> <span class="n">edges1_path</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">n0p</span><span class="p">,</span> <span class="n">e0p</span><span class="p">,</span> <span class="n">n1p</span><span class="p">,</span> <span class="n">e1p</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="p">.</span><span class="nf">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="nc">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">File not found: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">nodes0</span> <span class="o">=</span> <span class="nf">_load_table</span><span class="p">(</span><span class="n">n0p</span><span class="p">)</span>
+    <span class="n">edges0</span> <span class="o">=</span> <span class="nf">_load_table</span><span class="p">(</span><span class="n">e0p</span><span class="p">)</span>
+    <span class="n">nodes1</span> <span class="o">=</span> <span class="nf">_load_table</span><span class="p">(</span><span class="n">n1p</span><span class="p">)</span>
+    <span class="n">edges1</span> <span class="o">=</span> <span class="nf">_load_table</span><span class="p">(</span><span class="n">e1p</span><span class="p">)</span>
+    <span class="n">nodes_table</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">([</span><span class="n">nodes0</span><span class="p">,</span> <span class="n">nodes1</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">edges_table</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">([</span><span class="n">edges0</span><span class="p">,</span> <span class="n">edges1</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">fcols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nodes_table</span><span class="p">.</span><span class="n">columns</span> <span class="k">if</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+       <span class="ow">and</span> <span class="n">c</span><span class="p">.</span><span class="nf">startswith</span><span class="p">(</span><span class="sh">"</span><span class="s">f</span><span class="sh">"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">:].</span><span class="nf">isdigit</span><span class="p">()]</span>
+    <span class="n">fcols</span><span class="p">.</span><span class="nf">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">fcols</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">"</span><span class="s">No feature columns found (expected f0..fK).</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">required_edges</span> <span class="o">=</span> <span class="p">{</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">left</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">right</span><span class="sh">"</span><span class="p">}</span>
+    <span class="n">miss_e</span> <span class="o">=</span> <span class="n">required_edges</span> <span class="o">-</span> <span class="nf">set</span><span class="p">(</span><span class="n">edges_table</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">miss_e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Edges table missing columns: </span><span class="si">{</span><span class="nf">sorted</span><span class="p">(</span><span class="n">miss_e</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">data_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Data</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">gname</span><span class="p">,</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">nodes_table</span><span class="p">.</span><span class="nf">groupby</span><span class="p">(</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">nd</span><span class="p">[</span><span class="n">fcols</span><span class="p">].</span><span class="nf">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">nan_to_num</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>  
+        <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">([</span><span class="nf">int</span><span class="p">(</span><span class="n">nd</span><span class="p">[</span><span class="sh">"</span><span class="s">graph_label</span><span class="sh">"</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="nb">long</span><span class="p">)</span>
+        <span class="n">name_to_idx</span> <span class="o">=</span>
+           <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">nd</span><span class="p">[</span><span class="sh">"</span><span class="s">node_name</span><span class="sh">"</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">).</span><span class="nf">tolist</span><span class="p">())}</span>
+        <span class="n">ed</span> <span class="o">=</span> <span class="n">edges_table</span><span class="p">[</span><span class="n">edges_table</span><span class="p">[</span><span class="sh">"</span><span class="s">graph_name</span><span class="sh">"</span><span class="p">]</span> <span class="o">==</span> <span class="n">gname</span><span class="p">]</span>
+        <span class="n">src</span><span class="p">,</span> <span class="n">dst</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nf">zip</span><span class="p">(</span><span class="n">ed</span><span class="p">[</span><span class="sh">"</span><span class="s">left</span><span class="sh">"</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="n">ed</span><span class="p">[</span><span class="sh">"</span><span class="s">right</span><span class="sh">"</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">name_to_idx</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">name_to_idx</span><span class="p">:</span>
+                <span class="n">ia</span><span class="p">,</span> <span class="n">ib</span> <span class="o">=</span> <span class="n">name_to_idx</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">name_to_idx</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+                <span class="n">src</span> <span class="o">+=</span> <span class="p">[</span><span class="n">ia</span><span class="p">,</span> <span class="n">ib</span><span class="p">]</span>
+                <span class="n">dst</span> <span class="o">+=</span> <span class="p">[</span><span class="n">ib</span><span class="p">,</span> <span class="n">ia</span><span class="p">]</span>
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">([</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="nb">long</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">src</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="k">else</span> <span class="n">torch</span><span class="p">.</span><span class="nf">empty</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="nb">long</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nc">Data</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">.</span><span class="n">graph_name</span> <span class="o">=</span> <span class="nf">str</span><span class="p">(</span><span class="n">gname</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">.</span><span class="n">node_names</span> <span class="o">=</span> <span class="n">nd</span><span class="p">[</span><span class="sh">"</span><span class="s">node_name</span><span class="sh">"</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">).</span><span class="nf">tolist</span><span class="p">()</span>
+        <span class="n">data_list</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+        <span class="n">out_dir</span> <span class="o">=</span> <span class="n">n0p</span><span class="p">.</span><span class="n">parent</span>
+        <span class="k">if</span> <span class="n">out_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">sym0</span> <span class="o">=</span> <span class="n">n0p</span><span class="p">.</span><span class="n">stem</span><span class="p">.</span><span class="nf">replace</span><span class="p">(</span><span class="sh">"</span><span class="s">_with_virtual</span><span class="sh">"</span><span class="p">,</span> <span class="sh">""</span><span class="p">)</span>
+            <span class="n">sym1</span> <span class="o">=</span> <span class="n">n1p</span><span class="p">.</span><span class="n">stem</span><span class="p">.</span><span class="nf">replace</span><span class="p">(</span><span class="sh">"</span><span class="s">_with_virtual</span><span class="sh">"</span><span class="p">,</span> <span class="sh">""</span><span class="p">)</span>
+            <span class="n">out_name</span> <span class="o">=</span> <span class="sa">f</span><span class="sh">"</span><span class="s">fin_graphs_</span><span class="si">{</span><span class="n">sym0</span><span class="si">}</span><span class="s">__</span><span class="si">{</span><span class="n">sym1</span><span class="si">}</span><span class="s">.pkl</span><span class="sh">"</span>
+        <span class="n">out_path</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="n">out_name</span>
+        <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="sh">"</span><span class="s">wb</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="p">.</span><span class="nf">dump</span><span class="p">(</span><span class="n">data_list</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data_list</span></code></pre></figure>
+
+<p></p>
+<p></p>
+
+<section class="post-section" id="gnn-graph-classification">
+    <h3>GNN graph classification</h3>
+
+    <p>
+      Next, we train a PyG GNN graph classification model on pairs of graph lists. Each run combines
+      SPY with one sector ETF: <strong>SPY–XLK</strong>, <strong>SPY–XLE</strong>, <strong>SPY–XLF</strong>,
+      <strong>SPY–XLU</strong>. The graph lists were created earlier and reused here; this step is purely about learning from those
+      prebuilt sliding-graph snapshots.
+    </p>
+
+    <p>
+      The model predicts a binary graph label, but the main artifact we keep is the pre-final vectors:
+      the sliding-graph embeddings (one embedding per snapshot).
+    </p>
+
+    <p>
+      <strong>Inputs:</strong> two precomputed graph lists (one for SPY, one for the sector ETF).<br />
+      <strong>Outputs:</strong> a time-aligned table of <strong>graph embeddings</strong> (one row per snapshot) plus
+      <strong>accuracy metrics</strong>:
+    </p>
+
+    <ul>
+      <li><strong>SPY–XLE:</strong> train 0.791, test 0.713</li>
+      <li><strong>SPY–XLF:</strong> train 0.668, test 0.607</li>
+      <li><strong>SPY–XLK:</strong> train 0.713, test 0.633</li>
+      <li><strong>SPY–XLU:</strong> train 0.708, test 0.589</li>
+    </ul>
+  </section>
+
+<h3>From GNN outputs to similarity timelines</h3>
+
+<p>
+    After training the GNN graph-classification model, we keep the <strong>pre-final embedding vectors</strong>
+    produced for each sliding-graph snapshot. Because each snapshot corresponds to a specific time window,
+    stacking these vectors in order gives a <strong>time-aligned embedding stream</strong> for each series.
+  </p>
+
+<p>
+    To convert embeddings into a similarity timeline, we: (1) attach each embedding to its window timestamp,
+    (2) align the two embedding streams on the same timestamps, and (3) compute a single
+    <strong>cosine similarity</strong> score between the two embedding vectors at each aligned time point.
+  </p>
+
+<p>
+    In parallel, we compute a <strong>sliding-window similarity</strong> baseline directly from the original
+    rolling window (node) vectors. Plotting the <strong>sliding-graph</strong> and <strong>sliding-window</strong>
+    similarity timelines together makes it easy to see when the two views track each other—and when they diverge.
+  </p>
+
+<h3>Interpreting the similarity timelines</h3>
+
+<p></p>
+<p><a href="#">
+      <img src="/img/finsd14.jpg" alt="Post Sample Image" width="808" />
+</a></p>
+<p></p>
+
+<p>
+We plot two similarity timelines for each pair (SPY, sector ETF) on the same dates. The goal is to compare two different “views” of how closely a sector is behaving relative to the broad market over time.
+</p>
+
+<p>
+The first line is a sliding-window baseline (shown in grey). It answers a simple question: <em>do the recent price paths look similar right now?</em> In other words, it’s a local, short-horizon comparison of how the two series have been moving recently.
+</p>
+
+<p>
+The second line is a sliding-graph similarity (shown in color). It uses learned graph embeddings from our sliding-graph representation. This view is meant to capture similarity in the <em>organization</em> of recent patterns, not just whether two recent paths look alike point-by-point.
+</p>
+
+<p>
+Across pairs, the two timelines are often broadly consistent, but they are not identical. There are clear intervals where the window baseline stays relatively high while the graph-based similarity drops (and sometimes the reverse). That divergence is the key signal we use next — it suggests the two representations are emphasizing different aspects of the same market behavior.
+</p>
+
+<h3>Finding time periods of interest from disagreement</h3>
+
+<p>
+To identify time periods worth investigating, we focus on where the two similarity timelines disagree the most. For each pair (SPY, sector ETF), we align the two signals on the same timestamps and compute a simple “difference” timeline: when the graph-based similarity is much higher or much lower than the sliding-window baseline.
+</p>
+
+<p>
+We then scan this difference signal for unusually large deviations, and group nearby deviations into short contiguous episodes. This turns scattered spikes into more interpretable time intervals.
+</p>
+
+<p>
+Finally, we keep the strongest 1–2 episodes per sector as candidate periods of interest. In the current run, this produced clear episodes for Energy and Financials, only a single episode for Technology, and none for Utilities at the chosen sensitivity threshold. These episodes give us concrete, time-localized targets for deeper interpretation — moments when the graph view and the window view tell meaningfully different stories about similarity.
+</p>
+<p></p>
+<p><a href="#">
+      <img src="/img/finsg10.jpg" alt="Post Sample Image" width="707" />
+</a></p>
+<p></p>
+<p></p>
+<p><a href="#">
+      <img src="/img/finsg11.jpg" alt="Post Sample Image" width="707" />
+</a></p>
+<p></p>
+<p></p>
+<p><a href="#">
+      <img src="/img/finsg12.jpg" alt="Post Sample Image" width="707" />
+</a></p>
+<p></p>
+
+<p></p>
+
+<p></p>
+<p>
+
+</p>
+
+<h2>Conclusion</h2>
+
+<p>
+  In this post, we showed how to treat time series as a sequence of small graph snapshots, then use a GNN to produce time-aligned graph embeddings. By comparing embedding similarity to a simple rolling-window similarity baseline, we get two complementary views of how relationships evolve over time.
+</p>
+
+<p>
+  The main takeaway is that the most interesting signal often appears where these two views disagree. When the window baseline and the graph-based similarity diverge, it suggests that “recent values” may look similar while the organization of patterns has changed (or vice versa). We use that disagreement as a practical way to flag candidate periods of relationship reconfiguration.
+</p>
+
+<p>
+  In this run, the disagreement detector produced clear periods of interest for some sectors (notably Energy and Financials), only one for Technology, and none for Utilities at the chosen sensitivity. That’s exactly what we want at this stage: a small set of time-localized intervals worth interpreting, rather than a noisy stream of alerts.
+</p>
+
+<p>
+  This is an intentionally small, public-data experiment on daily prices. The goal is not to claim predictive power from a single chart, but to demonstrate a representation and a workflow that turns “relationship change” into something measurable and reviewable.
+</p>
+
+<p>
+  Looking ahead, we currently compute similarity at aligned timestamps, but we can generalize this to lagged similarity to produce lead–lag timelines—measuring whether structural changes in one series tend to precede another. While lagged similarity is not a causal proof, it can be a practical screening tool for identifying directed relationship episodes. With richer, non-public market data, the same approach can go further—for example: (1) minute-by-minute trading and pricing data can show when the market’s “health” changes and when connections between assets suddenly tighten or snap, (2) short-horizon buy/sell activity can reveal who tends to move first and when large, mechanical repositioning dominates everyday trading, and (3) internal trade records can uncover repeatable trading patterns and flag unusual periods when the usual relationships between instruments abruptly change.
+</p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.]]></summary></entry><entry><title type="html">Giving AI a Shared Language with Unified Knowledge Graphs</title><link href="http://localhost:4000/2025/12/25/knowledgeGraph4artists/" rel="alternate" type="text/html" title="Giving AI a Shared Language with Unified Knowledge Graphs" /><published>2025-12-25T07:00:00-05:00</published><updated>2025-12-25T07:00:00-05:00</updated><id>http://localhost:4000/2025/12/25/knowledgeGraph4artists</id><content type="html" xml:base="http://localhost:4000/2025/12/25/knowledgeGraph4artists/"><![CDATA[<section>
   <h2>Why AI Needs a Shared Language</h2>
 
   <p>
@@ -8102,636 +9024,4 @@ This comprehensive dataset served as the foundation for both the city-centric an
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Graph AI for Time-Series Change Detection Sliding time series graphs transform long, noisy signals into a sequence of short, structured snapshots, each captured as its own graph. By analyzing these snapshots with graph-based AI, we can pinpoint when a system shifts from normal to unusual behavior, highlight emerging regimes, and separate stable periods from early warning signals. Instead of a single summary label for an entire asset, customer base, or region, this approach shows when and where change is happening, enabling faster, more targeted decisions.]]></summary></entry><entry><title type="html">Uncovering Hidden Triangles</title><link href="http://localhost:4000/2023/11/23/hiddenTriangles/" rel="alternate" type="text/html" title="Uncovering Hidden Triangles" /><published>2023-11-23T07:00:00-05:00</published><updated>2023-11-23T07:00:00-05:00</updated><id>http://localhost:4000/2023/11/23/hiddenTriangles</id><content type="html" xml:base="http://localhost:4000/2023/11/23/hiddenTriangles/"><![CDATA[<h2>Hidden Connectors in Knowledge Graphs</h2>
-<p>
-  In this project, we dive into a semantic knowledge graph built from art biographies and go
-  beyond the simple question “who is linked to whom?”. We use Graph AI to embed nodes in a
-  vector space and measure how strongly they connect, then examine tiny three-node patterns
-  (triangles) to find cases where one link is much stronger than the others. Those nodes often
-  act as quiet bridges between otherwise distant concepts or artists.
-</p>
-<p>
-  The same idea scales far beyond art. In medicine, hidden connectors can illuminate critical genetic pathways that influence disease and point toward targeted therapies. In social networks, they reveal quiet influencers and emerging trends. In finance, connector analysis can surface firms that quietly support market stability; in criminal intelligence, it can highlight organizers who sit behind fragmented activity.
-</p>
-
-<h2>Conference Highlights</h2>
-<p>
-  This research was presented at the 17th International Conference on Information Technology and
-  Applications (ICITA 2023), held in Turin, Italy from <strong>October 20–22, 2023</strong>.
-  The paper, <em>“Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge Graphs”</em>,
-  was published as
-  <em>Romanova, A. Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge
-  Graphs</em>, in the ICITA 2023 proceedings, doi:
-  <a href="https://doi.org/10.1007/978-981-99-8324-7_2" target="_blank" rel="noopener">
-    10.1007/978-981-99-8324-7_2
-  </a>.
-  To complement the text understanding, in this post we will feature some slides from the conference presentation.
-</p>
-
-<p></p>
-<p><h2>Uncovering Hidden Triangles in Knowledge Graphs </h2>
-
-<p>In recent years, knowledge graphs have become a powerful tool for integrating and analyzing data and shedding lights on the connections between entities. This study narrows its focus on unraveling detailed relationships within knowledge graphs, placing special emphasis on the role of graph connectors through link predictions and triangle analysis.</p>
-
-<p>Using Graph Neural Network (GNN) Link Prediction models and graph triangle analysis in knowledge graphs, we have managed to uncover relationships that had been previously undetected or overlooked. Our findings mark a significant milestone, paving the way for more comprehensive exploration into the complex relationships that exist within knowledge graphs.</p>
-
-<p>This study initiates further research in the area of unveiling the hidden dynamics and connections in knowledge graphs. The insights from this work promise to redefine our understanding of knowledge graphs and their potential for unlocking the complexities of data interrelationships.</p>
-
-<p><h3>Introduction</h3>
-
-<h4>Deep Learning, Knowledge Graphs and the Emergence of GNN</h4>
-
-<p>The year 2012 was pivotal for deep learning and knowledge graphs. In that year, after AlexNet was introduced, a Convolutional Neural Network (CNN) highlighted the power of image classification techniques. Simultaneously, Google's introduction of knowledge graphs transformed data integration and management.</p>
-
-<p>For many years, deep learning and knowledge graphs developed independently. CNN proved effective with grid-structured data but struggled with graph-structured data. On the other hand, graph techniques excelled in representing and reasoning about graph data but lacked deep learning's power. The late 2010s Graph Neural Networks (GNN) bridged this gap and emerged as a potent tool for processing graph-structured data through deep learning techniques.</p>
-
-<p>For years, we've relied on binary graph structures, simplifying complex relationships into 'yes' or 'no', '1' or '0'. But in our ever-evolving world, is that enough? We believed there was more depth to be explored. Thus, we turned to Graph Neural Networks, a frontier technology, to help us transition from these fixed binaries to a more fluid, continuous space. </p>
-
-<h4>Our Past Experiments in Rewiring of Knowledge Graphs</h4>
-
-<p>In our previous study <u><a href="https://www.scitepress.org/Link.aspx?doi=10.5220/0011664400003393">'Rewiring Knowledge Graphs by Link Predictions'</a></u>
-
-we delved into the exploration of knowledge graph rewiring to reveal unknown relationships between modern art artists, employing GNN link prediction models. By training these models on Wikipedia articles about modern art artists' biographies and leveraging GNN link prediction models, we identified previously unknown relationships between artists.</p>
-
-<p>To rewire knowledge graphs, we adopted two distinct methods. First, we utilized a traditional method that involved a full-text analysis of articles and calculation of cosine similarities between embedded nodes. The second method involved the construction of semantic graphs based on the distribution of pairs of co-located words, and edges between nodes that share common words.</p>
-
-
-<h4>New Study: Focusing on Graph Triangles</h4>
-<p></p>
-
-In this study, we continue to leverage the same data source and employ similar techniques for graph representation. However, we introduce a novel approach of comparing two documents and examining entity relationships at granular level. Specifically, we concentrate on analyzing graph triangles, where one side displays a stronger connection than the other two sides.</p>
-
-<p>Let's take a moment to appreciate the evolution and elevation that GNN Link Prediction brings to the table. Remember the days of black and white television? Now imagine transitioning from that to a high-definition colored TV. That's the kind of transformative leap we're talking about when moving from traditional graph representations to GNN Link Prediction. Instead of just binary relationships, we're now operating on a continuous spectrum. Why is this so revolutionary? Because it allows us to see the subtle intricacies, the patterns that were once invisible. We're no longer just categorizing relationships as 'connected' or 'not connected'; we're exploring the depth, the weight, the very essence of these connections. It's like being given a magnifying glass to see the intricate patterns that were always there but previously overlooked. This shift not only boosts our prediction accuracy but also broadens our understanding of the complex web of relationships within our data.</p>
-
-
-
-<p>In the vast network of relationships, it's essential to understand not just who is connected to whom, but also the depth and nature of these connections. Let's take a simplified example featuring Alice, Beth, and their college. Alice and Beth shared a close bond during their college days, so their connection is strong. But when we look at their individual relationships with the college, it's more of an association by attendance, making it a weaker connection. Picture a triangle with its vertices representing Alice, Beth, and their college. The strength of the links in this triangle varies. The college acts as a 'Graph Connector'—a node that forms a bridge between different entities. Now, why is this distinction crucial? Because understanding these nuanced connections ensures we don't treat all relationships equally. It enables us to discern, prioritize, and gain richer insights into our network, ensuring our analysis is both detailed and accurate.</p>
-
-<p></p>
-<a href="#">
-    <img src="/img/slideTurino1.jpg" alt="Post Sample Image" width="628" />
-</a>
-<p></p>
-
-<p>Analyzing graph triangles offers insights into the strength of connections between nodes within a network. Looking at the relationships among nodes A, B, and C, we are focusing on the strength of the connection between nodes A and B compared to the connections involving node C. Node C, identified as a 'graph connector' node, is critical in facilitating communication and interaction between nodes A and B. Serving as a link, node C allows the smooth flow of information and relationships between the strongly connected nodes A and B.
-<p></p>
-<p></p>
-
-<p></p>
-As analogy, imagine early 20th-century Vienna's intellectual scene as a dynamic network. Berta Zuckerkandl's salon stood out as one of central nodes, orchestrating and facilitating connections.
-Her salon served as the platform, connecting diverse talents like artists, scientists, and doctors. Each gathering at her salon can be seen as the creation of 'links' between nodes.
-Berta stands as a quintessential 'graph connector' and her role ensures not just random interactions, but impactful connections, emphasizing her integral position in this vibrant intellectual web.
-<p></p>
-<a href="#">
-    <img src="/img/salon1c.jpg" alt="Post Sample Image" width="1000" />
-</a>
-<p></p>
-
-
-<p></p>
-This characterizes the importance of graph connector nodes in enhancing the network's overall connectivity and functionality, fostering collective behaviors and dynamics among interconnected nodes.
-
-<p></p>
-<h4>Depicting Graph Connectors</h4>
-<p></p>
-To find graph connectors, we will look for graph triangles where one cosine similarity between the nodes is higher than other two cosine similarity values.  This implies a stronger connection between two nodes relative to the connections of two other node pairs.
-
-<p></p>
-When delving into the world of graphs, it's essential to recognize the key players, the 'Graph Connectors'. These connectors serve as bridges within the intricate web of nodes. So, how do we uncover them? Let's take a journey through our method.
-First, we train our GNN Link Prediction model, which gives us the embeddings for each node. Think of these embeddings as unique signatures, encapsulating the essence of each node.
-<p></p>
-<a href="#">
-    <img src="/img/slideTurino2.jpg" alt="Post Sample Image" width="628" />
-</a>
-<p></p>
-With these embeddings in hand, we compute the cosines between every pair of nodes in each graph triangle. These cosine values measure the similarity between nodes, indicating the strength of their connection.
-Finally, the crux of our methodology: identifying the Graph Connectors. Based on our cosine computations, we determine which node acts as a bridge between the other two. For instance, in a triangle comprising nodes A, B, and C - if the connection strength between A and B surpasses the other two connections, it's clear that C plays the pivotal role of the connector.
-This method thus allows us to highlight nodes that play an essential role in maintaining the structure and connectivity of the graph.
-<p></p>
-
-
-<p></p>
-
-Graph representation traditionally operates in binary terms: either pairs of nodes are connected by edges or they are not. When using binary edges in graph triangle analysis, we are limited to recognizing the presence or absence of connections between nodes. Such a black-and-white perspective can overlook the nuanced graph connectors.
-<p></p>
-By employing GNN link prediction models, we move beyond this limitation. GNN link prediction model transcends this binary structure by embedding nodes into continuous vector space, providing a spectrum of ways to compare and evaluate these vectors. This deeper representation makes it possible to identify and understand graph connectors that a simple binary analysis might overlook.
-
-In essence, understanding the nuances of node relationships allows for more robust, dynamic, and insightful analyses, enabling richer interpretations and predictions based on graph data.
-<p></p>
-
-<h4>Employing Graph Triangle Analysis and the GraphSAGE Model</h4>
-
-<p>In this study, we aim to compare our previous study's results with the findings obtained through granular graph triangle analysis. Specifically, we'll examine the Wikipedia articles related to Paul Klee and Joan Miró, who were deemed as highly disconnected artists in the previous study. By employing graph triangle analysis techniques, we'll unveil previously overlooked graph connectors and patterns between these artists.</p>
-
-<p>For our GNN link prediction model, we'll use the GraphSAGE model. Unlike traditional approaches relying on the entire adjacency matrix information, GraphSAGE focuses on learning aggregator functions. This allows us to generate embeddings for new nodes based on their features and neighborhood information without the need to retrain the entire model.</p>
-
-<p>It's crucial to note that the outputs of the GraphSAGE model in our study are not actual predicted links, but embedded graphs. These embedded graphs capture the relationships and structural information within the original graphs. While these embeddings can be used for predicting graph edges, we will specifically utilize them for graph triangle analysis to identify and explore graph connectors within the network. These graph connectors play a pivotal role in facilitating connections and interactions between nodes, offering valuable insights into network dynamics and relationships.</p>
-
-
-<p></p>
-
-<p><h3>Methods</h3>
-
-<h4>Building a Knowledge Graph</h4>
-<p></p>
-In this section, we'll outline our strategy to formulate an introductory knowledge graph for each article. Our approach uses co-located word pairs as nodes, establishing links between pairs sharing common words. The method can be detailed in the following steps:
-<p></p>
-<ul>
-<li><strong>Text Tokenization:</strong> Begin by breaking down the text from Wikipedia into individual words or 'tokens', while also excluding common stop words that don't contribute much to the overall meaning.</li>
-
-<li><strong>Node Generation:</strong> Nodes in our knowledge graph are created from these co-located word pairs. These pairs of adjacent words from the text will form the basis of our graph.</li>
-
-<li><strong>Edge Calculation:</strong> Edges are established between nodes that share common words. This generates a network of word chains within each article and enables the connection of different articles through these word chains. Conceptually, consider two pairs, pair1 and pair2, represented as:</li>
-<p></p>
-<pre>
-    pair1=[leftWord1, rightWord1],
-    pair2=[leftWord2, rightWord2]
-</pre>
-<p></p>
-<li>If rightWord1 and leftWord2 are the same, then we have an edge, edge12, linking pair1 and pair2:</li>
-<p></p>
-<pre>
-    edge12={pair1, pair2}
-</pre>
-<p></p>
-<li><strong>Knowledge Graph Construction:</strong> With the nodes and edges defined, we can build the initial knowledge graph, visually representing the relationships between different co-located word pairs within and across the articles.</li>
-</ul>
-<p></p>
-
-<p></p>
-<a href="#">
-    <img src="/img/slideTurino7.jpg" alt="Post Sample Image" width="628" />
-</a>
-<p></p>
-<h4>Node Embedding</h4>
-<p></p>
-
-To encapsulate the complexities of the knowledge graph into our nodes and translate the text information into vectors, we're utilizing the 'all-MiniLM-L6-v2' transformer model from Hugging Face. This model is a part of the sentence-transformers family, purposely built to convert text into a dense vector space. The resultant vector space has 384 dimensions, providing a rich and multidimensional representation of our textual information.
-<p></p>
-<h4>Training a GNN Link Prediction Model</h4>
-<p></p>
-In our research, we've chosen to implement the GraphSAGE link prediction model proposed by Hamilton and others. This model is operationalized using the code provided in the DGL (Deep Graph Library) tutorial. It necessitates the transformation of the input graph data into an appropriate DGL data format. This transformation is a crucial step in preparing the data for the model training process.
-<p></p>
-
-
-<p></p>
-<h4>Triangle Analysis on Graphs</h4>
-<p></p>
-
-
-    <p>To delve deeper into the intricacies of graph structures, we used <strong>graph triangle analysis</strong>. Here's a step-by-step breakdown of our methodology:</p>
-
-    <ol>
-        <li>First, potential triangles are generated by considering all possible combinations of three distinct nodes from within the graph.</li>
-        <li>Second, for each identified triangle, we compute the cosine similarities between the nodes. This involves calculating three cosine similarity values for each triangle - one for each pairing of nodes.</li>
-        <li>Triangles of interest are those where one cosine similarity stands out as being notably higher compared to the other two values. This implies a stronger connection between two nodes relative to the connections of the other node pairs.</li>
-    </ol>
-
-    <p>By focusing on such triangles, we can derive more insight into the underlying relationships between nodes. This allows us to uncover intricate patterns and gain a deeper understanding of the structural nuances present within the graph.</p>
-
-<p></p>
-<a href="#">
-    <img src="/img/slideTurino4.jpg" alt="Post Sample Image" width="628" />
-</a>
-<p></p>
-
-<h3>Experiments</h3>
-<p></p>
-In our exploration, we embarked on a transformative journey. We began by constructing semantic graphs, a process much like piecing together a puzzle, where each word forms a crucial piece, connecting with others to build a comprehensive picture. However, merely building the graph wasn't our end goal. To delve deeper into its intricate maze, we utilized Graph Triangle Analysis. This methodology allowed us to zoom in on specific relationships, akin to highlighting crucial intersections in a vast city map. It's through this refined lens that we transitioned from a broad understanding of the semantic landscape to pinpointing the connectors - the linchpins that hold the entire framework together, revealing a richer, more connected narrative.
-<p></p>
-
-<h4>Data Source</h4>
-<p></p>
-
-As the data source for this study we used a subset of text data from Wikipedia articles about 20 modern art artists:
-<p></p>
-<a href="#">
-    <img src="/img/slideTurino6.jpg" alt="Post Sample Image" width="628" />
-</a>
-<p></p>
-Building on our previous 'Knowledge Graph Rewiring' research, we initially identified artist connections. Now, we're digging deeper to uncover more intricate relationships between artists, using our past findings as a starting point.
-
-<p></p>
-In our pursuit of understanding artist interconnections, we took a focused look at two iconic figures of the art world: Paul Klee and Joan Miró. In our previous research, a curious observation emerged. Despite both artists being immersed in significant art movements, our data showed a pronounced disconnect between them. Klee, a Swiss maestro, was deeply rooted in Expressionism, while Miró, the Spanish virtuoso, was an embodiment of Surrealism. On the surface, these movements and their geographic roots seem to keep them apart. Yet, why did we zero in on these two? The intrigue lies in an understated influence: Miró's artistry was, in fact, inspired by Klee. This revelation hints at more profound, nuanced connections between them, suggesting that artistic interplay goes beyond just the obvious associations.
-
-<p></p>
-<a href="#">
-    <img src="/img/slideTurino3.jpg" alt="Post Sample Image" width="628" />
-</a>
-<p></p>
-<p></p>
-<h4>Preparation of Input Data</h4>
-<p></p>
-
-We constructed a knowledge graph based on co-located word pairs as described in the Methods. section. For model input data for this study we selected Wikipedia articles about Paul Klee and Joan Miró:
-</p><p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">subsetWordpair</span> <span class="o">=</span> <span class="n">cleanPairWords</span><span class="p">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="sh">'</span><span class="s">idxArtist</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">wordpair</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">word1</span><span class="sh">'</span><span class="p">,</span>	<span class="sh">'</span><span class="s">word2</span><span class="sh">'</span>	<span class="p">]]</span>
-<span class="n">subsetWordpair</span> <span class="o">=</span> <span class="n">subsetWordpair</span><span class="p">[</span><span class="n">subsetWordpair</span><span class="p">[</span><span class="sh">'</span><span class="s">idxArtist</span><span class="sh">'</span><span class="p">].</span><span class="nf">isin</span><span class="p">([</span><span class="mi">13</span><span class="p">,</span><span class="mi">19</span><span class="p">])]</span>
-<span class="n">subsetWordpair</span><span class="p">.</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">nodeList</span><span class="o">=</span><span class="n">subsetWordpair</span>
-<span class="n">nodeList</span><span class="p">[</span><span class="sh">'</span><span class="s">idxPair</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodeList</span><span class="p">.</span><span class="n">index</span></code></pre></figure>
-
-
-</p><p>
-Node list:
-
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">nodeList1</span><span class="o">=</span><span class="n">nodeList</span><span class="p">.</span><span class="nf">rename</span><span class="p">({</span><span class="sh">'</span><span class="s">word2</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">theWord</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">wordpair</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">wordpair1</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">wordPairIdx</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">wordPairIdx1</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">idxArtist</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">idxArtist1</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">idxPair</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">idxPair1</span><span class="sh">'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">nodeList2</span><span class="o">=</span><span class="n">nodeList</span><span class="p">.</span><span class="nf">rename</span><span class="p">({</span><span class="sh">'</span><span class="s">word1</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">theWord</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">wordpair</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">wordpair2</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">wordPairIdx</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">wordPairIdx2</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">idxArtist</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">idxArtist2</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">idxPair</span><span class="sh">'</span><span class="p">:</span><span class="sh">'</span><span class="s">idxPair2</span><span class="sh">'</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">allNodes</span><span class="o">=</span><span class="n">pd</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">nodeList1</span><span class="p">,</span><span class="n">nodeList2</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="sh">'</span><span class="s">theWord</span><span class="sh">'</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="sh">'</span><span class="s">inner</span><span class="sh">'</span><span class="p">)</span></code></pre></figure>
-
-
-</p><p>
-Get unique word pairs for embedding:
-
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">bagOfPairWords</span><span class="o">=</span><span class="n">nodeList</span>
-<span class="n">bagOfPairWords</span><span class="p">.</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">bagOfPairWords</span><span class="p">[</span><span class="sh">'</span><span class="s">bagPairWordsIdx</span><span class="sh">'</span><span class="p">]</span><span class="o">=</span><span class="n">bagOfPairWords</span><span class="p">.</span><span class="n">index</span></code></pre></figure>
-
-
-
-</p><p>
-Node embedding:
-
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">wordpair_embeddings</span> <span class="o">=</span> <span class="n">modelST</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="n">bagOfPairWords</span><span class="p">[</span><span class="sh">"</span><span class="s">wordpair</span><span class="sh">"</span><span class="p">],</span><span class="n">convert_to_tensor</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
-
-<p></p>
-Save embedded word pairs:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">imgPath</span><span class="o">=</span><span class="sh">'</span><span class="s">/content/drive/My Drive/NLP/</span><span class="sh">'</span>
-<span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">imgPath</span><span class="o">+</span><span class="sh">'</span><span class="s">wordpairs13b.pkl</span><span class="sh">'</span><span class="p">,</span> <span class="sh">"</span><span class="s">wb</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fOut</span><span class="p">:</span>
-    <span class="n">pickle</span><span class="p">.</span><span class="nf">dump</span><span class="p">({</span><span class="sh">'</span><span class="s">idx</span><span class="sh">'</span><span class="p">:</span> <span class="n">bagOfPairWords</span><span class="p">[</span><span class="sh">"</span><span class="s">bagPairWordsIdx</span><span class="sh">"</span><span class="p">],</span>
-                 <span class="sh">'</span><span class="s">words</span><span class="sh">'</span><span class="p">:</span> <span class="n">bagOfPairWords</span><span class="p">[</span><span class="sh">"</span><span class="s">wordpair</span><span class="sh">"</span><span class="p">],</span>
-                 <span class="sh">'</span><span class="s">artist</span><span class="sh">'</span><span class="p">:</span> <span class="n">bagOfPairWords</span><span class="p">[</span><span class="sh">"</span><span class="s">idxArtist</span><span class="sh">"</span><span class="p">],</span>
-                 <span class="sh">'</span><span class="s">embeddings</span><span class="sh">'</span><span class="p">:</span> <span class="n">wordpair_embeddings</span><span class="p">.</span><span class="nf">cpu</span><span class="p">()},</span> <span class="n">fOut</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="p">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></code></pre></figure>
-
-<p></p>
-<h4>Transform Data to DGL Format</h4>
-
-
-<p></p>
-
-We trained our GNN link prediction model using the GraphSAGE model from the DGL library. More in-depth information and coding techniques for data preparation and encoding data into the DGL data format are available in our post <u><a href="http://sparklingdataocean.com/2022/11/09/knowledgeGraph4NlpGnn/"> 'Find Semantic Similarities by GNN Link Predictions'</a></u>.
-<p></p>
-
-<p></p>
-Import DGL andd read saved data:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">dgl</span>
-<span class="kn">import</span> <span class="n">torch</span>
-<span class="kn">import</span> <span class="n">torch.nn</span> <span class="k">as</span> <span class="n">nn</span>
-<span class="kn">import</span> <span class="n">torch.nn.functional</span> <span class="k">as</span> <span class="n">F</span>
-<span class="kn">import</span> <span class="n">itertools</span>
-<span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="kn">import</span> <span class="n">scipy.sparse</span> <span class="k">as</span> <span class="n">sp</span>
-<span class="kn">import</span> <span class="n">dgl.data</span>
-<span class="kn">from</span> <span class="n">dgl.data</span> <span class="kn">import</span> <span class="n">DGLDataset</span>
-<span class="kn">import</span> <span class="n">os</span>
-<span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">imgPath</span><span class="o">+</span><span class="sh">'</span><span class="s">wordpairs13b.pkl</span><span class="sh">'</span><span class="p">,</span> <span class="sh">"</span><span class="s">rb</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fIn</span><span class="p">:</span>
-    <span class="n">stored_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">fIn</span><span class="p">)</span>
-    <span class="n">gnn_index</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="sh">'</span><span class="s">idx</span><span class="sh">'</span><span class="p">]</span>
-    <span class="n">gnn_artist</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="sh">'</span><span class="s">artist</span><span class="sh">'</span><span class="p">]</span>
-    <span class="n">gnn_words</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="sh">'</span><span class="s">words</span><span class="sh">'</span><span class="p">]</span>
-    <span class="n">gnn_embeddings</span> <span class="o">=</span> <span class="n">stored_data</span><span class="p">[</span><span class="sh">'</span><span class="s">embeddings</span><span class="sh">'</span><span class="p">]</span>
-<span class="n">df_gnn_words</span><span class="o">=</span><span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">gnn_words</span><span class="p">)</span>
-<span class="n">df_gnn_words</span><span class="p">[</span><span class="sh">'</span><span class="s">idxNode</span><span class="sh">'</span><span class="p">]</span><span class="o">=</span><span class="n">df_gnn_words</span><span class="p">.</span><span class="n">index</span></code></pre></figure>
-
-
-</p><p>
-Transform data to DGL format:
-
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">art_edges</span><span class="o">=</span><span class="n">allNodes</span><span class="p">[[</span><span class="sh">'</span><span class="s">idxPair1</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">idxPair2</span><span class="sh">'</span><span class="p">]]</span>
-<span class="n">unpickEdges</span><span class="o">=</span><span class="n">art_edges</span>
-<span class="n">edge_index</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">unpickEdges</span><span class="p">[[</span><span class="sh">'</span><span class="s">idxPair1</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">idxPair2</span><span class="sh">'</span><span class="p">]].</span><span class="n">T</span><span class="p">.</span><span class="n">values</span><span class="p">)</span>
-<span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="o">=</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">gNew</span><span class="o">=</span><span class="n">dgl</span><span class="p">.</span><span class="nf">graph</span><span class="p">((</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
-<span class="n">gNew</span><span class="p">.</span><span class="n">ndata</span><span class="p">[</span><span class="sh">'</span><span class="s">feat</span><span class="sh">'</span><span class="p">]</span><span class="o">=</span><span class="n">gnn_embeddings</span>
-<span class="n">gNew</span><span class="o">=</span><span class="n">dgl</span><span class="p">.</span><span class="nf">add_self_loop</span><span class="p">(</span><span class="n">gNew</span><span class="p">)</span>
-<span class="n">g</span><span class="o">=</span><span class="n">gNew</span></code></pre></figure>
-
-
-<p></p>
-<h4>Model Training</h4>
-<p></p>
-Split edge set for training and testing
-<p></p>
-
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">g</span><span class="p">.</span><span class="nf">edges</span><span class="p">()</span>
-<span class="n">eids</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">arange</span><span class="p">(</span><span class="n">g</span><span class="p">.</span><span class="nf">number_of_edges</span><span class="p">())</span>
-<span class="n">eids</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="nf">permutation</span><span class="p">(</span><span class="n">eids</span><span class="p">)</span>
-<span class="n">test_size</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">eids</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span>
-<span class="n">train_size</span> <span class="o">=</span> <span class="n">g</span><span class="p">.</span><span class="nf">number_of_edges</span><span class="p">()</span> <span class="o">-</span> <span class="n">test_size</span>
-<span class="n">test_pos_u</span><span class="p">,</span> <span class="n">test_pos_v</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]],</span> <span class="n">v</span><span class="p">[</span><span class="n">eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]]</span>
-<span class="n">train_pos_u</span><span class="p">,</span> <span class="n">train_pos_v</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">eids</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]],</span> <span class="n">v</span><span class="p">[</span><span class="n">eids</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]]</span></code></pre></figure>
-
-
-<p></p>
-Find all negative edges and split them for training and testing
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">adj</span> <span class="o">=</span> <span class="n">sp</span><span class="p">.</span><span class="nf">coo_matrix</span><span class="p">((</span><span class="n">np</span><span class="p">.</span><span class="nf">ones</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">u</span><span class="p">)),</span> <span class="p">(</span><span class="n">u</span><span class="p">.</span><span class="nf">numpy</span><span class="p">(),</span> <span class="n">v</span><span class="p">.</span><span class="nf">numpy</span><span class="p">())))</span>
-<span class="n">adj_neg</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">adj</span><span class="p">.</span><span class="nf">todense</span><span class="p">()</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="nf">eye</span><span class="p">(</span><span class="n">g</span><span class="p">.</span><span class="nf">number_of_nodes</span><span class="p">())</span>
-<span class="n">neg_u</span><span class="p">,</span> <span class="n">neg_v</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">adj_neg</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">neg_eids</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="nf">choice</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">neg_u</span><span class="p">),</span> <span class="n">g</span><span class="p">.</span><span class="nf">number_of_edges</span><span class="p">())</span>
-<span class="n">test_neg_u</span><span class="p">,</span> <span class="n">test_neg_v</span> <span class="o">=</span> <span class="n">neg_u</span><span class="p">[</span><span class="n">neg_eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]],</span> <span class="n">neg_v</span><span class="p">[</span><span class="n">neg_eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]]</span>
-<span class="n">train_neg_u</span><span class="p">,</span> <span class="n">train_neg_v</span> <span class="o">=</span> <span class="n">neg_u</span><span class="p">[</span><span class="n">neg_eids</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]],</span> <span class="n">neg_v</span><span class="p">[</span><span class="n">neg_eids</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]]</span>
-<span class="n">train_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="p">.</span><span class="nf">remove_edges</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">eids</span><span class="p">[:</span><span class="n">test_size</span><span class="p">])</span>
-<span class="kn">from</span> <span class="n">dgl.nn</span> <span class="kn">import</span> <span class="n">SAGEConv</span></code></pre></figure>
-
-
-<p></p>
-Create model: build a two-layer GraphSAGE model
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">GraphSAGE</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">in_feats</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">):</span>
-        <span class="nf">super</span><span class="p">(</span><span class="n">GraphSAGE</span><span class="p">,</span> <span class="n">self</span><span class="p">).</span><span class="nf">__init__</span><span class="p">()</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="nc">SAGEConv</span><span class="p">(</span><span class="n">in_feats</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">,</span> <span class="sh">'</span><span class="s">mean</span><span class="sh">'</span><span class="p">)</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="nc">SAGEConv</span><span class="p">(</span><span class="n">h_feats</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">,</span> <span class="sh">'</span><span class="s">mean</span><span class="sh">'</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">in_feat</span><span class="p">):</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">conv1</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">in_feat</span><span class="p">)</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="n">F</span><span class="p">.</span><span class="nf">relu</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">conv2</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">h</span>
-
-<span class="n">train_pos_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="p">.</span><span class="nf">graph</span><span class="p">((</span><span class="n">train_pos_u</span><span class="p">,</span> <span class="n">train_pos_v</span><span class="p">),</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">g</span><span class="p">.</span><span class="nf">number_of_nodes</span><span class="p">())</span>
-<span class="n">train_neg_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="p">.</span><span class="nf">graph</span><span class="p">((</span><span class="n">train_neg_u</span><span class="p">,</span> <span class="n">train_neg_v</span><span class="p">),</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">g</span><span class="p">.</span><span class="nf">number_of_nodes</span><span class="p">())</span>
-
-<span class="n">test_pos_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="p">.</span><span class="nf">graph</span><span class="p">((</span><span class="n">test_pos_u</span><span class="p">,</span> <span class="n">test_pos_v</span><span class="p">),</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">g</span><span class="p">.</span><span class="nf">number_of_nodes</span><span class="p">())</span>
-<span class="n">test_neg_g</span> <span class="o">=</span> <span class="n">dgl</span><span class="p">.</span><span class="nf">graph</span><span class="p">((</span><span class="n">test_neg_u</span><span class="p">,</span> <span class="n">test_neg_v</span><span class="p">),</span> <span class="n">num_nodes</span><span class="o">=</span><span class="n">g</span><span class="p">.</span><span class="nf">number_of_nodes</span><span class="p">())</span>
-
-<span class="kn">import</span> <span class="n">dgl.function</span> <span class="k">as</span> <span class="n">fn</span>
-
-<span class="k">class</span> <span class="nc">DotPredictor</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">g</span><span class="p">.</span><span class="nf">local_scope</span><span class="p">():</span>
-            <span class="n">g</span><span class="p">.</span><span class="n">ndata</span><span class="p">[</span><span class="sh">'</span><span class="s">h</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span>
-            <span class="c1"># Compute a new edge feature named 'score' by a dot-product between the
-</span>            <span class="c1"># source node feature 'h' and destination node feature 'h'.
-</span>            <span class="n">g</span><span class="p">.</span><span class="nf">apply_edges</span><span class="p">(</span><span class="n">fn</span><span class="p">.</span><span class="nf">u_dot_v</span><span class="p">(</span><span class="sh">'</span><span class="s">h</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">h</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">score</span><span class="sh">'</span><span class="p">))</span>
-            <span class="c1"># u_dot_v returns a 1-element vector for each edge so you need to squeeze it.
-</span>            <span class="k">return</span> <span class="n">g</span><span class="p">.</span><span class="n">edata</span><span class="p">[</span><span class="sh">'</span><span class="s">score</span><span class="sh">'</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span>
-
-<span class="k">class</span> <span class="nc">MLPPredictor</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">):</span>
-        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">()</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">W1</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">h_feats</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">h_feats</span><span class="p">)</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">W2</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">h_feats</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">apply_edges</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">edges</span><span class="p">):</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">cat</span><span class="p">([</span><span class="n">edges</span><span class="p">.</span><span class="n">src</span><span class="p">[</span><span class="sh">'</span><span class="s">h</span><span class="sh">'</span><span class="p">],</span> <span class="n">edges</span><span class="p">.</span><span class="n">dst</span><span class="p">[</span><span class="sh">'</span><span class="s">h</span><span class="sh">'</span><span class="p">]],</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="sh">'</span><span class="s">score</span><span class="sh">'</span><span class="p">:</span> <span class="n">self</span><span class="p">.</span><span class="nc">W2</span><span class="p">(</span><span class="n">F</span><span class="p">.</span><span class="nf">relu</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nc">W1</span><span class="p">(</span><span class="n">h</span><span class="p">))).</span><span class="nf">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)}</span>
-
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">g</span><span class="p">.</span><span class="nf">local_scope</span><span class="p">():</span>
-            <span class="n">g</span><span class="p">.</span><span class="n">ndata</span><span class="p">[</span><span class="sh">'</span><span class="s">h</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span>
-            <span class="n">g</span><span class="p">.</span><span class="nf">apply_edges</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">apply_edges</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">g</span><span class="p">.</span><span class="n">edata</span><span class="p">[</span><span class="sh">'</span><span class="s">score</span><span class="sh">'</span><span class="p">]</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="nc">GraphSAGE</span><span class="p">(</span><span class="n">train_g</span><span class="p">.</span><span class="n">ndata</span><span class="p">[</span><span class="sh">'</span><span class="s">feat</span><span class="sh">'</span><span class="p">].</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">64</span><span class="p">)</span>
-<span class="n">pred</span> <span class="o">=</span> <span class="nc">DotPredictor</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">):</span>
-    <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">cat</span><span class="p">([</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">])</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">cat</span><span class="p">([</span><span class="n">torch</span><span class="p">.</span><span class="nf">ones</span><span class="p">(</span><span class="n">pos_score</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">torch</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">neg_score</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
-    <span class="k">return</span> <span class="n">F</span><span class="p">.</span><span class="nf">binary_cross_entropy_with_logits</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">compute_auc</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">):</span>
-    <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">cat</span><span class="p">([</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">]).</span><span class="nf">numpy</span><span class="p">()</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">cat</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">torch</span><span class="p">.</span><span class="nf">ones</span><span class="p">(</span><span class="n">pos_score</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">torch</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">neg_score</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]).</span><span class="nf">numpy</span><span class="p">()</span>
-    <span class="k">return</span> <span class="nf">roc_auc_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">scores</span><span class="p">)</span></code></pre></figure>
-
-
-
-<p></p>
-Set up loss and optimizer:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">optim</span><span class="p">.</span><span class="nc">Adam</span><span class="p">(</span><span class="n">itertools</span><span class="p">.</span><span class="nf">chain</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="nf">parameters</span><span class="p">(),</span> <span class="n">pred</span><span class="p">.</span><span class="nf">parameters</span><span class="p">()),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span></code></pre></figure>
-
-
-<p></p>
-Model training:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">all_logits</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">200</span><span class="p">):</span>
-    <span class="c1"># forward
-</span>    <span class="n">h</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="n">train_g</span><span class="p">,</span> <span class="n">train_g</span><span class="p">.</span><span class="n">ndata</span><span class="p">[</span><span class="sh">'</span><span class="s">feat</span><span class="sh">'</span><span class="p">])</span>
-    <span class="n">pos_score</span> <span class="o">=</span> <span class="nf">pred</span><span class="p">(</span><span class="n">train_pos_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    <span class="n">neg_score</span> <span class="o">=</span> <span class="nf">pred</span><span class="p">(</span><span class="n">train_neg_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">)</span>
-
-    <span class="c1"># backward
-</span>    <span class="n">optimizer</span><span class="p">.</span><span class="nf">zero_grad</span><span class="p">()</span>
-    <span class="n">loss</span><span class="p">.</span><span class="nf">backward</span><span class="p">()</span>
-    <span class="n">optimizer</span><span class="p">.</span><span class="nf">step</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">e</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">In epoch {}, loss: {}</span><span class="sh">'</span><span class="p">.</span><span class="nf">format</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">loss</span><span class="p">))</span></code></pre></figure>
-
-
-
-<p></p>
-Check results:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
-<span class="k">with</span> <span class="n">torch</span><span class="p">.</span><span class="nf">no_grad</span><span class="p">():</span>
-    <span class="n">pos_score</span> <span class="o">=</span> <span class="nf">pred</span><span class="p">(</span><span class="n">test_pos_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    <span class="n">neg_score</span> <span class="o">=</span> <span class="nf">pred</span><span class="p">(</span><span class="n">test_neg_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">AUC</span><span class="sh">'</span><span class="p">,</span> <span class="nf">compute_auc</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">))</span></code></pre></figure>
-
-
-<p></p>
-The model was trained using the following parameters:
-<p></p>
-<ul>
-  <li>Number of nodes: 3,274</li>
-  <li>Number of edges: 13,709</li>
-</ul>
-Embedded node features were represented as PyTorch tensors of size [3274, 384]. The re-embedded nodes resulted in a tensor of size [3274, 64].
-
-<p></p>
-To evaluate our model's performance, we calculated the Area Under the Curve (AUC) accuracy metric, which offers an indication of the model's predictive power. In our case, the accuracy metric was 0.848, demonstrating a high level of accuracy in the model's predictions.
-
-<p></p>
-<h4>Interpret Model Results</h4>
-<p></p>
-<p></p>
-Model results:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">gnnResults</span><span class="o">=</span><span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="nf">detach</span><span class="p">().</span><span class="nf">numpy</span><span class="p">())</span></code></pre></figure>
-
-<p></p>
-Cosine similarity function and model scores:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
-<span class="kn">from</span> <span class="n">math</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">atan2</span><span class="p">,</span> <span class="n">radians</span>
-<span class="kn">import</span> <span class="n">torch</span>
-<span class="k">def</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">a_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">functional</span><span class="p">.</span><span class="nf">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">b_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">functional</span><span class="p">.</span><span class="nf">normalize</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="p">.</span><span class="nf">mm</span><span class="p">(</span><span class="n">a_norm</span><span class="p">,</span> <span class="n">b_norm</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></code></pre></figure>
-
-
-<p></p>
-Model scores:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cosine_scores_gnn</span> <span class="o">=</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span></code></pre></figure>
-
-<p></p>
-
-<p></p>
-<h4>Graph Triangle Analysis</h4>
-<p></p>
-
-<p></p>
-Define graph and graph triangles:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
-<span class="n">G</span><span class="o">=</span><span class="n">nx</span><span class="p">.</span><span class="nf">from_pandas_edgelist</span><span class="p">(</span><span class="n">allNodes</span><span class="p">,</span>  <span class="sh">"</span><span class="s">wordpair1</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">wordpair2</span><span class="sh">"</span><span class="p">)</span>
-<span class="n">triangles</span> <span class="o">=</span> <span class="p">[</span><span class="n">clique</span> <span class="k">for</span> <span class="n">clique</span> <span class="ow">in</span> <span class="n">nx</span><span class="p">.</span><span class="nf">enumerate_all_cliques</span><span class="p">(</span><span class="n">G</span><span class="p">)</span> <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">clique</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">]</span></code></pre></figure>
-
-
-<p></p>
-Calculate cosine similarities within graph triangles:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">triangleStats</span><span class="o">=</span><span class="p">[]</span>
-<span class="k">for</span> <span class="n">triangle</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">:</span>
-  <span class="n">idx3</span><span class="o">=</span><span class="nf">list</span><span class="p">(</span><span class="n">nodeList</span><span class="p">[</span><span class="n">nodeList</span><span class="p">[</span><span class="sh">'</span><span class="s">wordpair</span><span class="sh">'</span><span class="p">].</span><span class="nf">isin</span><span class="p">(</span><span class="n">triangle</span><span class="p">)][</span><span class="sh">'</span><span class="s">bagPairWordsIdx</span><span class="sh">'</span><span class="p">])</span>
-  <span class="k">for</span> <span class="n">pair1</span> <span class="ow">in</span> <span class="n">idx3</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">pair2</span> <span class="ow">in</span> <span class="n">idx3</span><span class="p">:</span>
-      <span class="nf">if </span><span class="p">(</span><span class="n">pair1</span><span class="o">&lt;</span><span class="n">pair2</span><span class="p">):</span>
-        <span class="n">score</span><span class="o">=</span><span class="n">dfWordPairs</span><span class="p">[(</span><span class="n">dfWordPairs</span><span class="p">[</span><span class="sh">'</span><span class="s">idx1</span><span class="sh">'</span><span class="p">]</span><span class="o">==</span><span class="n">pair1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">dfWordPairs</span><span class="p">[</span><span class="sh">'</span><span class="s">idx2</span><span class="sh">'</span><span class="p">]</span><span class="o">==</span><span class="n">pair2</span><span class="p">)][</span><span class="sh">'</span><span class="s">score</span><span class="sh">'</span><span class="p">].</span><span class="n">values</span>
-        <span class="n">triangleStats</span><span class="p">.</span><span class="nf">append</span><span class="p">({</span><span class="sh">'</span><span class="s">triangle</span><span class="sh">'</span><span class="p">:</span><span class="n">triangle</span><span class="p">,</span><span class="sh">'</span><span class="s">pair1</span><span class="sh">'</span><span class="p">:</span><span class="n">pair1</span><span class="p">,</span><span class="sh">'</span><span class="s">pair2</span><span class="sh">'</span><span class="p">:</span><span class="n">pair2</span><span class="p">,</span><span class="sh">'</span><span class="s">score</span><span class="sh">'</span><span class="p">:</span><span class="n">score</span><span class="p">})</span></code></pre></figure>
-
-
-<p></p>
-Convert to triangle statistics to pandas data frame and save the results:
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">triangleStatsDF</span><span class="o">=</span><span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">triangleStats</span><span class="p">)</span>
-<span class="n">triangleStatsDF</span><span class="p">.</span><span class="nf">to_csv</span><span class="p">(</span><span class="n">imgPath</span><span class="o">+</span><span class="sh">'</span><span class="s">triangleStats.csv</span><span class="sh">'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></code></pre></figure>
-
-
-<p></p>
-<h3>Insights from Graph Triangles</h3>
-<p></p>
-In our exploration of the embedded graph triangles, we utilized ordered edge weights as a basis for analysis. From this process, we identified a total of 46 graph triangles. Among these, several met the criteria for containing a graph connector node, acting as a bridge or link between the other nodes within the graph triangle.
-
-
-<p></p>
-<p></p>
-<a href="#">
-    <img src="/img/slideTurino5.jpg" alt="Post Sample Image" width="628" />
-</a>
-<p></p>
-<!-- <p></p>
-<a href="#">
-    <img src="/img/connectors5.jpg" alt="Post Sample Image" width="567">
-</a> -->
-
-
-<p></p>
-Our graph triangle analysis is illustrated in the fugure above. In this figure, the numbers you see next to each edge represent the cosine similarities between the vectors of the corresponding nodes. These numbers essentially reflect the strength of the connection between two nodes.
-<p></p>
-Imagine a vast network, a spider web of connections. Within this web, our goal was to uncover specific points, the linchpins holding everything together. These are our Graph Connectors. How do we identify them? We delve into Triangle Analysis. In this analysis, the sides of the triangles, the 'edges', represent how similar two nodes are to each other, quantified using cosine similarities. The Graph Connectors stand out as the acute-angled vertices, the points where threads converge sharply, indicating their pivotal role in the network's architecture. It's akin to finding the central anchors in our intricate web.
-
-<p></p>
-The patterns observed in these graph triangles provide valuable insights into the intricate relationships within our knowledge graph. More importantly, they shed light on the crucial role of graph connectors - the nodes that act as bridges, facilitating communication and interaction between other nodes within the graph triangle.</p>
-<p></p>
-<h4>Observations and Insights</h4>
-<p></p>
-As we compare the results of our previous study <u><a href="https://www.scitepress.org/Link.aspx?doi=10.5220/0011664400003393">'Rewiring Knowledge Graphs by Link Predictions'</a></u>
-with the findings of this current study, we can notice both similarities and differences in the outcomes.
-
-<h5>Similarities:</h5>
-
-<ul>
-  <li>Both studies utilized Wikipedia articles focusing on the biographies of modern art artists.</li>
-  <li>The same semantic knowledge graph building method was employed in both studies.</li>
-  <li>The GraphSAGE GNN link prediction model was utilized for graph embedding in both studies.</li>
-</ul>
-
-<h5>Differences:</h5>
-
-<ul>
-  <li>In the previous study, the GNN link prediction model results were aggregated by artists. The analysis suggested that Paul Klee and Joan Miró were highly disconnected artists.</li>
-  <li>In contrast, the current study adopts a more granular approach to analyze the relationships between the artists. By using graph triangle analysis techniques, we were able to uncover potentially interesting relationships that were not previously identified.</li>
-</ul>
-
-<p>The example graph triangles, like those seen in picture above, demonstrate the crucial role of graph connectors. The numbers placed next to the edges represent the cosine similarities between the vectors of the corresponding nodes, providing valuable insights into the relationships and patterns within the knowledge graph.</p>
-
-
-<p></p>
-<p><h3>Conclusion</h3>
-
-
-
-<p>In this study, we utilized GNN link prediction techniques and graph triangle analysis to delve deeper into the intricacies of relationships within knowledge graphs. Leveraging these techniques, we demonstrated their potency in revealing patterns that might have previously gone unnoticed.</p>
-
-<p>Our comparison between granular relationship analysis and aggregated relationships unveiled some compelling insights. In our previous study, based on an aggregated view, the artists Paul Klee and Joan Miró were deemed highly disconnected. However, that analysis failed to capture the finer nuances of their relationships. By applying graph triangle analysis techniques in this study, we found potentially significant connections and patterns between these artists, overlooked in the aggregated results.</p>
-
-<p>This demonstrates the significance of granular analysis in comprehending the complex relationships within knowledge graphs. A deeper probe into the relationships between entities uncovers hidden associations and provides fresh insights into the interconnected data.</p>
-
-<p>We have taken a step in exploring the concept of knowledge graph connectors. Through the use of GNN link prediction models and graph triangle analysis techniques, we have exposed the presence of graph connectors. These connectors play a critical role in facilitating connections and interactions between entities within the knowledge graphs.</p>
-
-<p></p>
-
-<p>
-
-Our study reveals new ways to understand complex connections in knowledge graphs, shedding light on hidden relationships and dynamics. This study is the beginning of a journey towards gaining a deeper understanding of the hidden relationships and dynamics within knowledge graphs.
-</p>
-<p></p>
-
-<p><h3>Exploring Future Horizons with Graph Connectors</h3>
-
-<p>Envision the transformative impact of applying our advanced graph connector techniques across various fields:</p>
-
-<ul>
-    <li><strong>Medicine:</strong> Illuminate critical genetic pathways influencing diseases, paving the way for bespoke therapies and preventive measures.</li>
-    <li><strong>Social Networks:</strong> Uncover hidden influencers and emergent trends, reshaping our understanding of digital interactions.</li>
-    <li><strong>Finance:</strong> Identify key firms integral to market stability, potentially revolutionizing investment and economic strategies.</li>
-    <li><strong>Criminal Networks:</strong> Reveal the masterminds behind criminal activities, enhancing law enforcement capabilities.</li>
-    <li><strong>Education:</strong> Discover central interdisciplinary subjects that serve as educational connectors, promoting comprehensive learning experiences.</li>
-    <li><strong>Supply Chains:</strong> Spot critical intermediaries to streamline production, boosting efficiency and reducing operational costs.</li>
-</ul>
-
-<p>The possibilities are boundless, and the diverse applications of our graph connector methods promise a future rich with insight and innovation!</p>
-
-
-<p></p>
-
-
-<p></p>
-<p><h3>Next Post - Graph Connectors</h3>
-
-In the next spost we will continue exploring graph connector techniques.
-<p></p>
-</p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Hidden Connectors in Knowledge Graphs In this project, we dive into a semantic knowledge graph built from art biographies and go beyond the simple question “who is linked to whom?”. We use Graph AI to embed nodes in a vector space and measure how strongly they connect, then examine tiny three-node patterns (triangles) to find cases where one link is much stronger than the others. Those nodes often act as quiet bridges between otherwise distant concepts or artists. The same idea scales far beyond art. In medicine, hidden connectors can illuminate critical genetic pathways that influence disease and point toward targeted therapies. In social networks, they reveal quiet influencers and emerging trends. In finance, connector analysis can surface firms that quietly support market stability; in criminal intelligence, it can highlight organizers who sit behind fragmented activity.]]></summary></entry></feed>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Graph AI for Time-Series Change Detection Sliding time series graphs transform long, noisy signals into a sequence of short, structured snapshots, each captured as its own graph. By analyzing these snapshots with graph-based AI, we can pinpoint when a system shifts from normal to unusual behavior, highlight emerging regimes, and separate stable periods from early warning signals. Instead of a single summary label for an entire asset, customer base, or region, this approach shows when and where change is happening, enabling faster, more targeted decisions.]]></summary></entry></feed>
