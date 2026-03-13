@@ -1,4 +1,343 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-01-31T08:00:09-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Sparkling Data Ocean</title><subtitle>Boutique consulting -- AI &amp; Data Analytics.</subtitle><entry><title type="html">Monitoring Market Topology Shifts</title><link href="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/" rel="alternate" type="text/html" title="Monitoring Market Topology Shifts" /><published>2026-01-26T07:00:00-05:00</published><updated>2026-01-26T07:00:00-05:00</updated><id>http://localhost:4000/2026/01/26/slidingWindowGraphFIN</id><content type="html" xml:base="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/"><![CDATA[<p>LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-03-13T15:12:14-04:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Sparkling Data Ocean</title><subtitle>Boutique consulting -- AI &amp; Data Analytics.</subtitle><entry><title type="html">Semantic Similarity Is Not Evidence</title><link href="http://localhost:4000/2026/03/03/relationship_metrics/" rel="alternate" type="text/html" title="Semantic Similarity Is Not Evidence" /><published>2026-03-03T07:00:00-05:00</published><updated>2026-03-03T07:00:00-05:00</updated><id>http://localhost:4000/2026/03/03/relationship_metrics</id><content type="html" xml:base="http://localhost:4000/2026/03/03/relationship_metrics/"><![CDATA[<h1>Semantic Similarity Is Not Evidence</h1>
+
+<p>
+Large language models are very good at turning text into compact semantic representations. That strength is exactly why embeddings have become such a common foundation for search, recommendation, retrieval, matching, and ranking. In many tasks, that is enough. But this small research experiment highlights an important boundary case: some systems depend not only on what entities say, but on how they are connected.
+</p>
+
+<p>
+In many tasks, correctness depends not only on what entities say, but on how they are connected. Two items can sound close in language and still not belong together in the way the system actually cares about. And the reverse can also happen: two items may not look very similar in text, yet still be strongly connected through behavior, session context, or other observed relationships.
+</p>
+
+<p>
+This post is about making that gap visible.
+</p>
+
+<p>
+Instead of asking only whether two items look similar in language, we compare two representation spaces: a text-only embedding baseline and a relationship-aware embedding space built from the same text vectors, but refined through graph learning over an evidence graph. This is not meant as a new production recommender. It is a small, concrete research example meant to illustrate a broader concept: there are settings in which text-only similarity, even when powered by strong language models, is not the same thing as evidence.
+</p>
+
+<p>
+The central idea is simple: even strong semantic similarity is not always the same thing as evidence. If your system depends on interactions, constraints, or relationship structure, then text-only similarity can feel persuasive while still being structurally wrong. Relationship-aware diagnostics make that difference measurable.
+</p>
+
+<h2>Introduction</h2>
+
+<p>
+LLM-based systems are extremely effective when the signal really is in the text. Summarization, semantic search, question answering, and many classification tasks fit that pattern well. In those settings, a dense semantic representation often captures most of what matters.
+</p>
+
+<p>
+But not every problem is truly linguistic.
+</p>
+
+<p>
+In many real-world systems, what makes a connection valid is relational rather than descriptive. A pair of entities may share vocabulary, topic, or tone and still not belong together in the way the system needs. On the other hand, two entities may have weak textual overlap but still be strongly tied by interaction history, shared users, session behavior, or some other kind of evidence.
+</p>
+
+<p>
+That distinction matters far beyond recommendation. It matters in retrieval pipelines, matching systems, decision support, graph-enhanced AI, and any environment where people may start treating a high similarity score as if it were enough to justify a downstream connection.
+</p>
+
+<p>
+So the real question is not whether LLMs are useful. Of course they are. The real question is whether they capture the kind of relationship your task actually depends on.
+</p>
+
+<p>
+We like to frame this as a data quality question for AI systems. Instead of arguing abstractly about whether LLM-only systems are sufficient, we can ask something much more practical: does semantic similarity behave like real support in this setting, or does relational evidence change what should count as correct?
+</p>
+
+<p></p>
+<p><a href="#">
+  <img src="/img/relMetrics11.jpg" alt="Diagnostic pipeline from user-item interactions to text vectors, graph vectors, similarity matrix, and diagnostic metrics" width="808" />
+</a></p>
+<p><em>Figure 1.</em> The diagnostic pipeline. Text and observed interactions are combined into an evidence graph, which supports two representation pathways: a text-only path and a relationship-aware path. Their resulting similarity spaces are then compared using the same metrics.</p>
+
+<h2>Methods</h2>
+
+<p>
+The setup is intentionally simple. Each item has text, and the system also has observed relationships. In this study, the observed relationships come from user interactions with news articles. In this case, the “relationships” are not manually defined semantics; they are observed interaction links induced from co-click behavior. That gives us two complementary kinds of signal.
+</p>
+
+<p><strong>Textual signal:</strong> what the article title and summary say.</p>
+
+<p><strong>Relational signal:</strong> what user behavior suggests about which items are actually connected.</p>
+
+<p>
+The starting point is a bipartite user-item graph. From that, we build an item-item co-click graph: if the same user clicked two items on the same day, those items are treated as behaviorally linked. That induced co-click graph becomes the relational scaffold for the relationship-aware pathway.
+</p>
+
+<p>
+We then compare two representation spaces built over exactly the same items.
+</p>
+
+<ol>
+  <li>
+    <strong>Text-only baseline.</strong> Each news item is encoded independently with the <code>all-MiniLM-L6-v2</code> sentence-transformers model, producing a 384-dimensional embedding. This gives a clean semantic baseline from language alone.
+  </li>
+  <li>
+    <strong>Relationship-aware representation.</strong> The same text embeddings are used as input features for a GraphSAGE model trained with a link-prediction objective on the co-click graph. Importantly, the downstream analysis does not use raw link predictions. Instead, it uses the model’s pre-final node embeddings. That keeps the comparison focused on representation quality rather than classifier output.
+  </li>
+</ol>
+
+<p>
+Once both spaces are built, cosine similarity is computed for item pairs in each space. Those similarity scores are then evaluated on the same labeled pair set, where positives are co-click edges and negatives are non-edges. Holding the items, pair labels, and similarity function fixed makes the comparison clean: the main difference is whether relational structure was allowed to reshape the geometry of the space.
+</p>
+
+<p>
+The diagnostics are deliberately interpretable.
+</p>
+
+<ul>
+  <li><strong>Edge recovery (ROC AUC):</strong> if similarity is used as a score, how well does it distinguish true interaction-supported edges from non-edges?</li>
+  <li><strong>Distribution separation (Cohen’s d):</strong> how far apart are the similarity distributions for edges and non-edges?</li>
+  <li><strong>Top-quantile concentration (Lift@q):</strong> among the most similar pairs, how concentrated are the true edges relative to the overall edge rate?</li>
+</ul>
+
+<p>
+These metrics answer slightly different versions of the same practical question: does “similar” really mean “supported”?
+</p>
+
+<h2>Experiments</h2>
+
+<p>
+This post uses a small, focused experiment to illustrate the idea rather than to cover every possible scenario. The goal is not to optimize a production recommender system. The goal is to test whether adding behavioral relationships changes the similarity space in ways that text-only embeddings do not capture on their own.
+</p>
+
+<h3>Dataset and day-level slice</h3>
+
+<p>
+The data source for this experiment is the Microsoft News Dataset (MIND), using the <code>MINDsmall</code> training split. To keep the analysis easy to inspect and easy to explain, We restrict the study to a single day: <strong>2019-11-11</strong>.
+</p>
+
+<p>
+Only the two raw tables needed for this diagnostic setup are used:
+</p>
+
+<ul>
+  <li><strong><code>news.tsv</code></strong>, which provides article identifiers, categories, and text fields</li>
+  <li><strong><code>behaviors.tsv</code></strong>, which records user impressions and click histories</li>
+</ul>
+
+<p>
+This day-level slice serves as a compact, self-contained snapshot for the experiment. It provides the text needed to build the text-only baseline and the interaction data needed to construct behavioral relationships, making it possible to compare the two representation pathways on the same set of news items.
+</p>
+
+<p>
+Dataset page: <a href="https://msnews.github.io/" target="_blank" rel="noopener noreferrer">MIND: Microsoft News Dataset</a>.
+</p>
+
+<h3>Behavioral relationship graph</h3>
+
+<p>
+From the filtered <code>behaviors.tsv</code> and <code>news.tsv</code> records for <strong>2019-11-11</strong>, we build a day-specific bipartite user-item interaction graph. Because the diagnostics in this post are computed on <em>item pairs</em>, that bipartite graph is then projected onto the item side to form an item-item <strong>co-click graph</strong>.
+</p>
+
+<p>
+In practical terms, if the same user clicked two news items on the same day, those two items are treated as behaviorally linked. These co-click links define the <strong>positive</strong> item pairs. Pairs of items without a co-click link are treated as <strong>negative</strong> pairs for evaluation.
+</p>
+
+<p>
+To make sure each retained user contributes pairwise signal, we keep only users with at least two clicks that day. After filtering, the retained day-level data contains:
+</p>
+
+<ul>
+  <li><strong>10,656 users</strong></li>
+  <li><strong>22,157 impressions</strong></li>
+  <li><strong>37,435 clicks</strong></li>
+  <li><strong>27,945 unique news items observed in the filtered logs</strong></li>
+</ul>
+
+<p>
+From this filtered interaction data, the induced co-click graph used for representation learning and diagnostics contains:
+</p>
+
+<ul>
+  <li><strong>1,991 graph nodes (news items)</strong></li>
+  <li><strong>40,637 graph edges (co-click relationships)</strong></li>
+</ul>
+
+<p>
+Although many items appear in the logs, only the 1,991 items that participate in at least one co-click relationship are included in the induced graph. All representation learning and diagnostics are restricted to this item set.
+</p>
+
+<h3>Representations compared</h3>
+
+<p>
+The experiment compares two representation pathways over exactly the same news items.
+</p>
+
+<ol>
+  <li>
+    <strong>Text-only baseline.</strong> Each news item is encoded independently with the <code>all-MiniLM-L6-v2</code> sentence-transformers model, producing a 384-dimensional embedding. This gives a clean semantic baseline from language alone.
+  </li>
+  <li>
+    <strong>Relationship-aware representation.</strong> The same text embeddings are used as input features for a GraphSAGE model trained with a link-prediction objective on the induced co-click graph. Importantly, the downstream analysis does not use the model’s raw link predictions. Instead, it uses the model’s pre-final node embeddings, which incorporate both text features and interaction-derived relational context.
+  </li>
+</ol>
+
+<p>
+For both representation spaces, cosine similarity is computed over item pairs and evaluated using the same diagnostic metrics. That keeps the comparison focused on the question that matters here: what changes when relationship structure is allowed to reshape the embedding space?
+</p>
+
+<h3>Reported diagnostics</h3>
+
+<p>
+The results show a clear and useful pattern.
+</p>
+
+<p>
+<strong>Edge recovery.</strong> Relationship-aware embeddings achieve much higher ROC AUC than text-only embeddings, reaching about <strong>0.75</strong> compared with about <strong>0.52</strong> for the text-only baseline. In this experiment, the relationship-aware space is much better aligned with true interaction-supported edges.
+</p>
+
+<p></p>
+<p><a href="#">
+  <img src="/img/relMetrics1.jpg" alt="ROC curve comparing text-only and relationship-aware embeddings for edge recovery" width="808" />
+</a></p>
+<p><em>Figure 2.</em> ROC curves for predicting co-click edges from cosine similarity. The relationship-aware space reaches an AUC of about 0.75, while the text-only space stays near 0.52, close to chance.</p>
+
+<p>
+<strong>Edge vs. non-edge separation.</strong> The same story appears in the similarity distributions. In the text-only space, edge and non-edge pairs overlap heavily. In the relationship-aware space, the two groups separate much more clearly, which means the representation is doing a better job of aligning similarity with evidence-supported structure.
+</p>
+
+<p></p>
+<p><a href="#">
+  <img src="/img/relMetrics7.jpg" alt="Histogram of text-only similarity for edge and non-edge pairs" width="808" />
+</a></p>
+<p><em>Figure 3.</em> Text-only similarity distributions for edge and non-edge pairs. The overlap is substantial, which means language-only similarity provides weak separation between linked and unlinked pairs.</p>
+
+<p></p>
+<p><a href="#">
+  <img src="/img/relMetrics8.jpg" alt="Histogram of relationship-aware similarity for edge and non-edge pairs" width="808" />
+</a></p>
+<p><em>Figure 4.</em> Relationship-aware similarity distributions for edge and non-edge pairs. The separation is much clearer, indicating stronger alignment with interaction-supported structure.</p>
+
+<p>
+<strong>Top-quantile concentration.</strong> The pattern also holds where many real systems care most: the top of the ranking. Among the highest-similarity pairs, the relationship-aware space is much more enriched with true co-click edges than the text-only baseline.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Top fraction q</th>
+      <th>Edge rate (Text-only)</th>
+      <th>Edge rate (Relationship-aware)</th>
+      <th>Lift improvement</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0.001 (0.1%)</td>
+      <td>0.099</td>
+      <td>0.217</td>
+      <td>2.19×</td>
+    </tr>
+    <tr>
+      <td>0.005 (0.5%)</td>
+      <td>0.064</td>
+      <td>0.147</td>
+      <td>2.30×</td>
+    </tr>
+    <tr>
+      <td>0.010 (1%)</td>
+      <td>0.050</td>
+      <td>0.125</td>
+      <td>2.48×</td>
+    </tr>
+    <tr>
+      <td>0.050 (5%)</td>
+      <td>0.034</td>
+      <td>0.084</td>
+      <td>2.46×</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+At the top 1% of most similar pairs, the relationship-aware space produces an edge rate of <strong>0.125</strong> versus <strong>0.050</strong> for the text-only baseline. In other words, the very top of the relationship-aware similarity ranking is about <strong>two and a half times better aligned</strong> with true co-click links.
+</p>
+
+<p>
+So the point here is not that LLMs are weak. LLMs are already very strong. The point is that there are real scenarios where <strong>LLM-only is weaker than LLM + GNN</strong>. This experiment shows one compact example of that pattern in a form that is easy to inspect, reuse, and adapt.
+</p>
+
+<p>
+The disagreement examples are just as interesting as the aggregate metrics. Rather than keeping long academic tables, it is easier to think of them as two recurring failure modes.
+</p>
+
+<h3>Outlier analysis</h3>
+
+<p>
+To make the disagreement between semantic similarity and relationship-aware similarity more concrete, we also looked at <em>outlier pairs</em> where the two measures strongly diverge. These are not a separate metric. They are qualitative examples that help show what the diagnostic results mean in practice.
+</p>
+
+<p>
+The goal is to surface pairs where one representation says “these two items are very similar,” while the other says “not really.” That gives a more interpretable view of the same distinction already visible in the ROC curves, distribution plots, and Lift@q results.
+</p>
+
+<p>
+We consider two symmetric outlier types using fixed percentile thresholds.
+</p>
+
+<ul>
+  <li>
+    <strong>High text similarity, low relationship-aware similarity.</strong>
+    These are pairs in the <strong>top 1%</strong> of text-only similarity scores but the <strong>bottom 50%</strong> of relationship-aware similarity scores.
+  </li>
+  <li>
+    <strong>High relationship-aware similarity, low text similarity.</strong>
+    These are pairs in the <strong>top 1%</strong> of relationship-aware similarity scores but the <strong>bottom 50%</strong> of text-only similarity scores.
+  </li>
+</ul>
+
+<p>
+To make the examples more informative, we restrict the analysis to <strong>cross-category pairs</strong> and rank candidates by the size of the disagreement. That helps emphasize structural effects rather than trivial cases where two items look similar simply because they share obvious vocabulary or belong to the same narrow topical bucket.
+</p>
+
+<p>
+These two outlier groups reveal complementary patterns.
+</p>
+
+<p>
+The first group — <strong>text-high, structure-low</strong> — captures pairs that look convincing in language but are not strongly supported by observed interaction structure. A representative example is the pair <em>“Watch: SpaceX launches 60 Starlink satellites from Cape Canaveral”</em> and <em>“SpaceX launches 60 mini satellites into orbit”</em>. The text-only similarity is extremely high, which makes intuitive sense, but the relationship-aware score is noticeably lower. In other words, semantic resemblance alone does not guarantee the kind of evidence-supported link captured by user behavior.
+</p>
+<p></p>
+<p><a href="#">
+  <img src="/img/relMetrics12.jpg" alt="Histogram of relationship-aware similarity for edge and non-edge pairs" width="808" />
+</a></p>
+<p>
+The second group — <strong>structure-high, text-low</strong> — captures the opposite case: pairs that are weakly expressed, or even absent, in language but become strongly connected once interaction structure is taken into account. One example is <em>“Underwater camera captures swimming tigers”</em> paired with <em>“Barham Fire: Crews gain control of Hollywood Hills brush fire...”</em>. Here the text-only similarity is strongly negative, while the relationship-aware similarity is very high. That does not mean the pair is intuitively similar in language. It means the evidence graph is capturing a relationship signal that text alone does not express.
+</p>
+<p></p>
+<p><a href="#">
+  <img src="/img/relMetrics13.jpg" alt="Histogram of relationship-aware similarity for edge and non-edge pairs" width="808" />
+</a></p>
+<p>
+Taken together, these outliers make the broader point easier to see. Semantic similarity can be plausible without being evidence-supported, and evidence-supported links can be nearly invisible to text alone. That is exactly the distinction the diagnostic framework is meant to surface.
+</p>
+
+<h2>Conclusion</h2>
+
+<p>
+The main takeaway is not that LLMs are failing. LLMs are already extremely capable, and in many tasks they may be entirely sufficient. The takeaway is that semantic similarity should not automatically be treated as evidence.
+</p>
+
+<p>
+This small research experiment shows one concrete case where <strong>LLM-only performs worse than LLM + GNN</strong>. That does not mean every problem needs graph learning. It means the boundary is testable.
+</p>
+
+<p>
+That is the value of the concept presented here. It gives practitioners a simple way to ask a better question: not whether LLMs are good in general, but whether text-only similarity is enough for the specific relationship their task depends on.
+</p>
+
+<p>
+This blog illustrates the idea with one compact example, not all possible scenarios. The same diagnostic idea can be adapted to other datasets, other domains, other evidence graphs, and other language models.
+</p>
+
+<p>
+Soon we will also share the notebook so readers can reuse the pattern, modify it, and hand it to AI coding tools such as Codex or Opus to reimplement in another environment. The broader lesson is not tied to one specific model. You can take the same idea and test it with other LLMs, other embedding pipelines, and other graph-learning setups. The conceptual question remains the same: when is LLM-only enough, and when does adding relationship structure produce a better representation?
+</p>
+
+<hr />]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Semantic Similarity Is Not Evidence]]></summary></entry><entry><title type="html">Monitoring Market Topology Shifts</title><link href="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/" rel="alternate" type="text/html" title="Monitoring Market Topology Shifts" /><published>2026-01-26T12:00:00+00:00</published><updated>2026-01-26T12:00:00+00:00</updated><id>http://localhost:4000/2026/01/26/slidingWindowGraphFIN</id><content type="html" xml:base="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/"><![CDATA[<p>LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.</p>
 
 <p></p>
 <h2>Introduction</h2>
@@ -920,7 +1259,7 @@ Finally, we keep the strongest 1–2 episodes per sector as candidate periods of
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.]]></summary></entry><entry><title type="html">Giving AI a Shared Language with Unified Knowledge Graphs</title><link href="http://localhost:4000/2025/12/25/knowledgeGraph4artists/" rel="alternate" type="text/html" title="Giving AI a Shared Language with Unified Knowledge Graphs" /><published>2025-12-25T07:00:00-05:00</published><updated>2025-12-25T07:00:00-05:00</updated><id>http://localhost:4000/2025/12/25/knowledgeGraph4artists</id><content type="html" xml:base="http://localhost:4000/2025/12/25/knowledgeGraph4artists/"><![CDATA[<section>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.]]></summary></entry><entry><title type="html">Giving AI a Shared Language with Unified Knowledge Graphs</title><link href="http://localhost:4000/2025/12/25/knowledgeGraph4artists/" rel="alternate" type="text/html" title="Giving AI a Shared Language with Unified Knowledge Graphs" /><published>2025-12-25T12:00:00+00:00</published><updated>2025-12-25T12:00:00+00:00</updated><id>http://localhost:4000/2025/12/25/knowledgeGraph4artists</id><content type="html" xml:base="http://localhost:4000/2025/12/25/knowledgeGraph4artists/"><![CDATA[<section>
   <h2>Why AI Needs a Shared Language</h2>
 
   <p>
@@ -1444,7 +1783,7 @@ Unified Knowledge Graphs help by acting as a relationship layer that can hold al
   </p><p>
   The approach assumes an informative relational backbone, and extending it to noisier or weaker graphs is an important next step. But even in its current form, unified knowledge graphs offer a practical path from messy data to coherent, machine-readable understanding.
   </p><p>
-</p></section>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Why AI Needs a Shared Language]]></summary></entry><entry><title type="html">Temporal–Spatial GNN Fusion for Climate Analytics</title><link href="http://localhost:4000/2025/06/25/voronoiGNN/" rel="alternate" type="text/html" title="Temporal–Spatial GNN Fusion for Climate Analytics" /><published>2025-06-25T08:00:00-04:00</published><updated>2025-06-25T08:00:00-04:00</updated><id>http://localhost:4000/2025/06/25/voronoiGNN</id><content type="html" xml:base="http://localhost:4000/2025/06/25/voronoiGNN/"><![CDATA[<h2>Spatio-Temporal Graphs for Climate Patterns</h2>
+</p></section>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Why AI Needs a Shared Language]]></summary></entry><entry><title type="html">Temporal–Spatial GNN Fusion for Climate Analytics</title><link href="http://localhost:4000/2025/06/25/voronoiGNN/" rel="alternate" type="text/html" title="Temporal–Spatial GNN Fusion for Climate Analytics" /><published>2025-06-25T13:00:00+01:00</published><updated>2025-06-25T13:00:00+01:00</updated><id>http://localhost:4000/2025/06/25/voronoiGNN</id><content type="html" xml:base="http://localhost:4000/2025/06/25/voronoiGNN/"><![CDATA[<h2>Spatio-Temporal Graphs for Climate Patterns</h2>
 <p>
   Here we combine <strong>time series graphs</strong> with a global <strong>spatial graph</strong>
   of cities to create a spatio-temporal view of climate. Decades of daily temperatures are turned
@@ -2599,7 +2938,7 @@ There’s a lot more to explore. These first examples are just a glimpse of how 
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Spatio-Temporal Graphs for Climate Patterns Here we combine time series graphs with a global spatial graph of cities to create a spatio-temporal view of climate. Decades of daily temperatures are turned into graph-based climate fingerprints for each city, then injected into a Voronoi-based world graph where neighboring regions share borders. A GNN refines this fused graph so we can see which distant cities behave almost identically, which nearby cities quietly diverge, and which “bridge cities” connect climate regions. The same method can be applied to any setting where signals evolve over time and are anchored in space—sensors, assets, patients, or networks.]]></summary></entry><entry><title type="html">Sliding Graph Neural Networks for EEG Analysis</title><link href="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/" rel="alternate" type="text/html" title="Sliding Graph Neural Networks for EEG Analysis" /><published>2025-01-25T07:00:00-05:00</published><updated>2025-01-25T07:00:00-05:00</updated><id>http://localhost:4000/2025/01/25/slidingWindowGraph%20EEG</id><content type="html" xml:base="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/"><![CDATA[<h2>Sliding Graphs: Watching Signals Change Like a Movie</h2>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Spatio-Temporal Graphs for Climate Patterns Here we combine time series graphs with a global spatial graph of cities to create a spatio-temporal view of climate. Decades of daily temperatures are turned into graph-based climate fingerprints for each city, then injected into a Voronoi-based world graph where neighboring regions share borders. A GNN refines this fused graph so we can see which distant cities behave almost identically, which nearby cities quietly diverge, and which “bridge cities” connect climate regions. The same method can be applied to any setting where signals evolve over time and are anchored in space—sensors, assets, patients, or networks.]]></summary></entry><entry><title type="html">Sliding Graph Neural Networks for EEG Analysis</title><link href="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/" rel="alternate" type="text/html" title="Sliding Graph Neural Networks for EEG Analysis" /><published>2025-01-25T12:00:00+00:00</published><updated>2025-01-25T12:00:00+00:00</updated><id>http://localhost:4000/2025/01/25/slidingWindowGraph%20EEG</id><content type="html" xml:base="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/"><![CDATA[<h2>Sliding Graphs: Watching Signals Change Like a Movie</h2>
 <p>
   Sliding graphs are a way to let AI watch how a signal behaves over time, not just look at a
   summary. Instead of treating a long recording as one big block, we break it into many small,
@@ -4022,7 +4361,7 @@ These findings suggest sliding graph-based GNNs as a powerful framework for mode
 
 <p></p>
 <p></p>
-</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Sliding Graphs: Watching Signals Change Like a Movie Sliding graphs are a way to let AI watch how a signal behaves over time, not just look at a summary. Instead of treating a long recording as one big block, we break it into many small, overlapping moments and let AI see which moments look alike and which don’t. Put together, these moments form an evolving map of the signal, showing when things are calm, when they shift, and when something unusual starts to happen. We illustrate this with EEG sleep vs rest, but the same idea works for machines, sensors, markets, climate, or any long signal—anywhere you want AI to say not only what is happening, but when things start to change.]]></summary></entry><entry><title type="html">Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs</title><link href="http://localhost:4000/2025/01/20/vectors2gafGNN/" rel="alternate" type="text/html" title="Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs" /><published>2025-01-20T07:00:00-05:00</published><updated>2025-01-20T07:00:00-05:00</updated><id>http://localhost:4000/2025/01/20/vectors2gafGNN</id><content type="html" xml:base="http://localhost:4000/2025/01/20/vectors2gafGNN/"><![CDATA[<p><h2> Introduction</h2>
+</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Sliding Graphs: Watching Signals Change Like a Movie Sliding graphs are a way to let AI watch how a signal behaves over time, not just look at a summary. Instead of treating a long recording as one big block, we break it into many small, overlapping moments and let AI see which moments look alike and which don’t. Put together, these moments form an evolving map of the signal, showing when things are calm, when they shift, and when something unusual starts to happen. We illustrate this with EEG sleep vs rest, but the same idea works for machines, sensors, markets, climate, or any long signal—anywhere you want AI to say not only what is happening, but when things start to change.]]></summary></entry><entry><title type="html">Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs</title><link href="http://localhost:4000/2025/01/20/vectors2gafGNN/" rel="alternate" type="text/html" title="Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs" /><published>2025-01-20T12:00:00+00:00</published><updated>2025-01-20T12:00:00+00:00</updated><id>http://localhost:4000/2025/01/20/vectors2gafGNN</id><content type="html" xml:base="http://localhost:4000/2025/01/20/vectors2gafGNN/"><![CDATA[<p><h2> Introduction</h2>
 <p></p>
 Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.
 <p></p>
@@ -5349,7 +5688,7 @@ Looking ahead, these techniques could be applied to a wide range of scenarios in
 
 
 <p></p>
-</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Introduction Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.]]></summary></entry><entry><title type="html">Connecting Art and Data: Building a Unified Knowledge Graph</title><link href="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/" rel="alternate" type="text/html" title="Connecting Art and Data: Building a Unified Knowledge Graph" /><published>2025-01-01T07:00:00-05:00</published><updated>2025-01-01T07:00:00-05:00</updated><id>http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings</id><content type="html" xml:base="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/"><![CDATA[<h2>Unified Knowledge Graph for Artists and Paintings</h2>
+</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Introduction Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.]]></summary></entry><entry><title type="html">Connecting Art and Data: Building a Unified Knowledge Graph</title><link href="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/" rel="alternate" type="text/html" title="Connecting Art and Data: Building a Unified Knowledge Graph" /><published>2025-01-01T12:00:00+00:00</published><updated>2025-01-01T12:00:00+00:00</updated><id>http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings</id><content type="html" xml:base="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/"><![CDATA[<h2>Unified Knowledge Graph for Artists and Paintings</h2>
 <p>
   Think of this project as one map of the art world, where artists and paintings are dots and
   their relationships form the lines between them. We turn biographies and images into a single
@@ -6912,7 +7251,7 @@ This study presented a Unified Knowledge Graph framework that combines text and 
 <p>
 The Unified Knowledge Graph provides a powerful tool for analyzing complex datasets, offering fresh perspectives on art history. It also paves the way for applications in recommendation systems, classification tasks, and cultural analysis. Future work will focus on expanding the graph with additional data types and improving model interpretability.
 </p>
-</p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Unified Knowledge Graph for Artists and Paintings Think of this project as one map of the art world, where artists and paintings are dots and their relationships form the lines between them. We turn biographies and images into a single unified knowledge graph, then use Graph AI to see which artists and works are close, far, or unexpectedly linked. Instead of scrolling through lists, you can explore art as a connected network and discover relationships you wouldn’t notice from text or images alone. The same pattern extends far beyond art: this pipeline can fuse text, images, time series, and other data into a unified knowledge graph in any domain, keeping everything analyzable with one Graph AI workflow.]]></summary></entry><entry><title type="html">Graph Neural Networks for EEG Connectivity Analysis</title><link href="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/" rel="alternate" type="text/html" title="Graph Neural Networks for EEG Connectivity Analysis" /><published>2024-11-09T07:00:00-05:00</published><updated>2024-11-09T07:00:00-05:00</updated><id>http://localhost:4000/2024/11/09/GNN_timeSeries_EEG</id><content type="html" xml:base="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/"><![CDATA[<h2>Brain Graphs with Time Series Signals</h2>
+</p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Unified Knowledge Graph for Artists and Paintings Think of this project as one map of the art world, where artists and paintings are dots and their relationships form the lines between them. We turn biographies and images into a single unified knowledge graph, then use Graph AI to see which artists and works are close, far, or unexpectedly linked. Instead of scrolling through lists, you can explore art as a connected network and discover relationships you wouldn’t notice from text or images alone. The same pattern extends far beyond art: this pipeline can fuse text, images, time series, and other data into a unified knowledge graph in any domain, keeping everything analyzable with one Graph AI workflow.]]></summary></entry><entry><title type="html">Graph Neural Networks for EEG Connectivity Analysis</title><link href="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/" rel="alternate" type="text/html" title="Graph Neural Networks for EEG Connectivity Analysis" /><published>2024-11-09T12:00:00+00:00</published><updated>2024-11-09T12:00:00+00:00</updated><id>http://localhost:4000/2024/11/09/GNN_timeSeries_EEG</id><content type="html" xml:base="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/"><![CDATA[<h2>Brain Graphs with Time Series Signals</h2>
 <p>
   In this project, we model the brain as a <strong>spatial graph</strong>: each node is an EEG
   electrode on the scalp, and edges connect nearby positions in the standard montage. The time
@@ -7624,7 +7963,7 @@ After establishing the graph structure, we defined graph nodes and their feature
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Brain Graphs with Time Series Signals In this project, we model the brain as a spatial graph: each node is an EEG electrode on the scalp, and edges connect nearby positions in the standard montage. The time series data are used as node features for each trial, so every channel carries its full signal while staying embedded in the brain’s geometry. A GNN link prediction model then learns how these nodes connect under different conditions, revealing changes in functional connectivity and highlighting which regions act as key connectors in Control vs Alcohol groups.]]></summary></entry><entry><title type="html">Unlocking the Power of Pre-Final Vectors in GNN Graph Classification</title><link href="http://localhost:4000/2024/07/04/vectorsGNN/" rel="alternate" type="text/html" title="Unlocking the Power of Pre-Final Vectors in GNN Graph Classification" /><published>2024-07-04T08:00:00-04:00</published><updated>2024-07-04T08:00:00-04:00</updated><id>http://localhost:4000/2024/07/04/vectorsGNN</id><content type="html" xml:base="http://localhost:4000/2024/07/04/vectorsGNN/"><![CDATA[<h2>Graph-Level Embeddings</h2>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Brain Graphs with Time Series Signals In this project, we model the brain as a spatial graph: each node is an EEG electrode on the scalp, and edges connect nearby positions in the standard montage. The time series data are used as node features for each trial, so every channel carries its full signal while staying embedded in the brain’s geometry. A GNN link prediction model then learns how these nodes connect under different conditions, revealing changes in functional connectivity and highlighting which regions act as key connectors in Control vs Alcohol groups.]]></summary></entry><entry><title type="html">Unlocking the Power of Pre-Final Vectors in GNN Graph Classification</title><link href="http://localhost:4000/2024/07/04/vectorsGNN/" rel="alternate" type="text/html" title="Unlocking the Power of Pre-Final Vectors in GNN Graph Classification" /><published>2024-07-04T13:00:00+01:00</published><updated>2024-07-04T13:00:00+01:00</updated><id>http://localhost:4000/2024/07/04/vectorsGNN</id><content type="html" xml:base="http://localhost:4000/2024/07/04/vectorsGNN/"><![CDATA[<h2>Graph-Level Embeddings</h2>
 <p>
   Graph-level embeddings are the <strong>pre-final vectors</strong> produced by a GNN graph
   classification model, giving one compact fingerprint for each graph—whether it represents a
@@ -8202,7 +8541,7 @@ The results suggest that combining linear algebra with GNNs enhances the models'
 
 <p></p>
 <p></p>
-</p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Graph-Level Embeddings Graph-level embeddings are the pre-final vectors produced by a GNN graph classification model, giving one compact fingerprint for each graph—whether it represents a city’s climate, an EEG trial, a machine, or a document. Once we have these embeddings, we can use simple vector-space tools (similarity, clustering, thresholds) to compare graphs, group similar cases, spot outliers, and even build a “graph of graphs” on top of them. In other words, graph-level embeddings turn single GNN predictions into a reusable layer for deeper analysis across many small graphs.]]></summary></entry><entry><title type="html">Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction</title><link href="http://localhost:4000/2024/06/21/knowledgeGraphEmail/" rel="alternate" type="text/html" title="Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction" /><published>2024-06-21T08:00:00-04:00</published><updated>2024-06-21T08:00:00-04:00</updated><id>http://localhost:4000/2024/06/21/knowledgeGraphEmail</id><content type="html" xml:base="http://localhost:4000/2024/06/21/knowledgeGraphEmail/"><![CDATA[<h2>Semantic Graphs for Communication Networks</h2>
+</p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Graph-Level Embeddings Graph-level embeddings are the pre-final vectors produced by a GNN graph classification model, giving one compact fingerprint for each graph—whether it represents a city’s climate, an EEG trial, a machine, or a document. Once we have these embeddings, we can use simple vector-space tools (similarity, clustering, thresholds) to compare graphs, group similar cases, spot outliers, and even build a “graph of graphs” on top of them. In other words, graph-level embeddings turn single GNN predictions into a reusable layer for deeper analysis across many small graphs.]]></summary></entry><entry><title type="html">Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction</title><link href="http://localhost:4000/2024/06/21/knowledgeGraphEmail/" rel="alternate" type="text/html" title="Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction" /><published>2024-06-21T13:00:00+01:00</published><updated>2024-06-21T13:00:00+01:00</updated><id>http://localhost:4000/2024/06/21/knowledgeGraphEmail</id><content type="html" xml:base="http://localhost:4000/2024/06/21/knowledgeGraphEmail/"><![CDATA[<h2>Semantic Graphs for Communication Networks</h2>
 <p>
   In this project, we move beyond simple “who emailed whom” graphs and build a
   <strong>semantic graph</strong> of communication. Instead of treating edges as raw message
@@ -8653,375 +8992,4 @@ By focusing on both semantics and graph topology, and leveraging higher graph la
 
 <p></p>
 <p></p>
-</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Semantic Graphs for Communication Networks In this project, we move beyond simple “who emailed whom” graphs and build a semantic graph of communication. Instead of treating edges as raw message counts, we create nodes for individual interactions (who wrote to whom, with what text), enrich them with transformer-based text embeddings, and use a GNN link prediction model to learn which interactions are genuinely related. This text-enriched graph lets us recompute centrality and see a different set of key players: not just the loudest senders, but the quiet connectors who bridge topics and conversation clusters—hidden connectors that a plain traffic graph would never reveal.]]></summary></entry><entry><title type="html">Sliding Window Graph in GNN Graph Classification</title><link href="http://localhost:4000/2024/05/25/slidingWindowGraph/" rel="alternate" type="text/html" title="Sliding Window Graph in GNN Graph Classification" /><published>2024-05-25T08:00:00-04:00</published><updated>2024-05-25T08:00:00-04:00</updated><id>http://localhost:4000/2024/05/25/slidingWindowGraph</id><content type="html" xml:base="http://localhost:4000/2024/05/25/slidingWindowGraph/"><![CDATA[<h2>Graph AI for Time-Series Change Detection</h2>
-<p>
-  Sliding time series graphs transform long, noisy signals into a sequence of short, structured snapshots,
-  each captured as its own graph. By analyzing these snapshots with graph-based AI, we can pinpoint when a
-  system shifts from normal to unusual behavior, highlight emerging regimes, and separate stable periods
-  from early warning signals. Instead of a single summary label for an entire asset, customer base, or
-  region, this approach shows <em>when</em> and <em>where</em> change is happening, enabling faster, more
-  targeted decisions.
-</p>
-
-<h2>Conference &amp; Publication</h2>
-<p>
-  This work was presented at <strong>ICMLT 2024</strong> in Oslo, Norway, on
-  <strong>24–25 May 2024</strong>, as the paper
-  <em>“GNN Graph Classification for Time Series: A New Perspective on Climate Change Analysis”</em>,
-  doi:
-  <a href="https://doi.org/10.1145/3674029.3674059" target="_blank" rel="noopener">
-    10.1145/3674029.3674059
-  </a>.
-</p>
-<p>
-  In that presentation, we combined and compared two GNN-based methods for time series climate
-  analysis. Our earlier work,
-  <a href="http://sparklingdataocean.com/2023/02/11/cityTempGNNgraphs/" target="_blank" rel="noopener">
-    “GNN Graph Classification for Climate Change Patterns”
-  </a>,
-  introduced the <strong>city-graph method</strong>, which captures static temporal snapshots to sort
-  cities into “stable” and “unstable” climate categories. The ICMLT paper extended this with a
-  new <strong>sliding window graph method</strong>, which breaks time series into overlapping
-  segments, turns each segment into a graph, and uses GNN graph classification to reveal how
-  short-term climate behavior shifts over time.
-</p>
-
-<h2> Time Series Meets GNN Graph Classification</h2>
-<p>The use of Graph Neural Networks (GNNs) in time series analysis represents a rising field of study, particularly in the context of GNN Graph Classification, a technique traditionally applied in disciplines such as biology and chemistry. Our research repurposes GNN Graph Classification for the analysis of time series climate data, focusing on two distinct methodologies: the city-graph method, which effectively captures static temporal snapshots, and the sliding window graph method, adept at tracking dynamic temporal changes. This innovative application of GNN Graph Classification within time series data enables the uncovering of nuanced data trends.</p>
-<p></p>
-<p>We demonstrate how GNNs can construct meaningful graphs from time series data, showcasing their versatility across different analytical contexts. A key finding is GNNs’ adeptness at adapting to changes in graph structure, which significantly improves outlier detection. This enhances our understanding of climate patterns and suggests broader applications of GNN Graph Classification in analyzing complex data systems beyond traditional time series analysis. Our research seeks to fill a gap in current studies by providing an examination of GNNs in climate change analysis, highlighting the potential of these methods in capturing and interpreting intricate data trends.</p>
-
-<h3> Introduction</h3>
-<p></p>
-
-<p>In 2012, deep learning and knowledge graphs took a big leap forward in data analysis and machine learning. AlexNet, a new type of Convolutional Neural Network (CNN) for image classification, showed much better results than older methods. Around the same time, Google introduced knowledge graphs, which improved how data is integrated and managed.</p>
-<p></p>
-<p>However, CNNs struggled with graph-structured data, and graph techniques lacked deep learning’s ability to recognize patterns. This changed with the arrival of Graph Neural Networks (GNNs). GNNs combined deep learning with graph data processing, making it easier to analyze graph-structured data.</p>
-<p></p>
-<p>GNN models are designed specifically for graph data. They use geometric relationships and combine node features with graph structure. This makes them very useful for tasks like node classification, link prediction, and graph classification. GNN Graph Classification models, which have been used in areas like chemistry and medicine, classify entire graphs based on their structure and features.</p>
-<p></p>
-<p></p>
-<p><a href="#">
-    <img src="/img/slidingWindow1.jpg" alt="Post Sample Image" width="777" />
-</a></p>
-<p></p>
-<p></p>
-<p>In 2021, the “Geometric Deep Learning” paper was written when Convolutional Neural Networks (CNNs) were the dominant models in the deep learning landscape. If the paper were written in 2023-2024, Large Language Models (LLMs) would undoubtedly be considered the leading technology. The field of deep learning is rapidly evolving, and it remains to be seen what new advancements and models will emerge as the “biggest animals” in the next 2-3 years.</p>
-<p></p>
-
-<p>In this study, we expand on our previous research using Graph Neural Network (GNN) models to analyze climate data. Our earlier method categorized climate time series data into ‘stable’ and ‘unstable’ to identify unusual patterns in climate change.</p>
-<p></p>
-<p>Now, we introduce the sliding window graph method, which breaks down time series data into overlapping sections to capture specific time-related features. This approach creates graphs from these sections, offering a new perspective on short-term climate changes.</p>
-<p></p>
-<p>Our previous study used a city-graph method, where nodes represent city-year combinations with daily temperature vectors as features. The new sliding window method compares identical dates across different cities and years, helping us understand global climate trends.</p>
-<p></p>
-<p>Our research aims to explore the potential of GNN graph classification in identifying and interpreting global climate dynamics, providing valuable insights into seasonal changes and long-term shifts in climate.</p>
-
-<p></p>
-
-<h3>Methods</h3>
-<p></p>
-<h4>Graph Construction Methods</h4>
-<p></p>
-<p>In our study, we explore two different methods for constructing graphs from climate data: the City-Graph Method and the Sliding Window Method.</p>
-<p></p>
-<p><a href="#">
-    <img src="/img/slidingWindow2.jpg" alt="Post Sample Image" width="678" />
-</a></p>
-<p></p>
-<p></p>
-<p>City-Graph Method:</p>
-<p></p>
-<ul>
-        <li>Creating graphs where nodes represent city-year pairs.</li>
-        <li>Features are daily temperature vectors for each city-year.</li>
-        <li>Edges are established based on cosine similarities between the temperature vectors of different city-years.</li>
-        <li>Categorizes city graphs into 'stable' or 'unstable' climates based on their temperature patterns over time.</li>
-</ul>
-<p></p>
-<p>Sliding Window Method:</p>
-<p></p>
-<ul>
-        <li>Constructing graphs by breaking down time series data into overlapping sections.</li>
-        <li>Nodes represent data points within a sliding window, with features reflecting their values.</li>
-        <li>Edges connect sequential points to maintain the temporal sequence.</li>
-        <li>Labels are assigned to capture patterns within the time series.</li>
-</ul>
-
-<p></p>
-
-<p></p>
-<h4>Common Pipeline</h4>
-<p></p>
-<p>While the graph construction methods differ, both follow a common pipeline for GNN Graph Classification:</p>
-<p></p>
-<p><a href="#">
-    <img src="/img/slidingWindow3.jpg" alt="Post Sample Image" width="678" />
-</a></p>
-<p></p>
-
-<ul>
-        <li><strong>Data Input:</strong> daily temperature data for 1000 populous cities over 40 years.</li>
-        <li><strong>Climate Trends</strong> as 'stable' or 'unstable'.</li>
-        <li><strong>Graph Construction:</strong>
-            <ul>
-                <li>City-Graph Method.</li>
-                <li>Sliding Window Method.</li>
-            </ul>
-        </li>
-        <li><strong>Virtual Nodes:</strong> to act as central hubs in small graphs, tuning the models for better accuracy..</li>
-
-        <li><strong>GNN Model Application:</strong> use GNN model to classify graphs based on patterns.</li>
-</ul>
-
-<p></p>
-
-<p></p>
-
-<h4>Methodology for Sliding Window Graph Construction</h4>
-
-<p>Our approach uses Graph Neural Networks (GNNs) combined with a sliding window technique to analyze time series data. Here’s an overview of the process:</p>
-
-<h5>Data to Graph Transformation</h5>
-<p>We segment time series data into smaller graphs using a sliding window, which captures local temporal patterns. Each time segment forms a unique graph.</p>
-
-<h5>Graph Creation</h5>
-<p>In these graphs, nodes represent data points within the window, with features reflecting their values. Edges connect these sequential points to maintain the temporal order.</p>
-
-<h5>Crucial Parameters</h5>
-<p>The window size (W) and overlap (shift size S) are important as they determine how the data is segmented and analyzed. Edge definitions within the graphs are tailored to the specifics of the time series data, helping to detect patterns.</p>
-
-<h5>Node Calculation</h5>
-<p>For a dataset with N data points, we apply a sliding window of size W with a shift of S to create nodes. The number of nodes, N<sub>nodes</sub>, is calculated as:
-    <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mrow>
-            <msub>
-                <mi>N</mi>
-                <mi>nodes</mi>
-            </msub>
-            <mo>=</mo>
-            <mrow>
-                <mo>&lfloor;</mo>
-                <mfrac>
-                    <mrow>
-                        <mi>N</mi>
-                        <mo>-</mo>
-                        <mi>W</mi>
-                    </mrow>
-                    <mi>S</mi>
-                </mfrac>
-                <mo>&rfloor;</mo>
-            </mrow>
-            <mo>+</mo>
-            <mn>1</mn>
-        </mrow>
-    </math></p>
-
-<h5>Graph Calculation</h5>
-<p>With the nodes determined, we construct graphs, each comprising G nodes, with a shift of S<sub>g</sub> between successive graphs. The number of graphs, N<sub>graphs</sub>, is calculated by:
-    <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mrow>
-            <msub>
-                <mi>N</mi>
-                <mi>graphs</mi>
-            </msub>
-            <mo>=</mo>
-            <mrow>
-                <mo>&lfloor;</mo>
-                <mfrac>
-                    <mrow>
-                        <msub>
-                            <mi>N</mi>
-                            <mi>nodes</mi>
-                        </msub>
-                        <mo>-</mo>
-                        <mi>G</mi>
-                    </mrow>
-                    <msub>
-                        <mi>S</mi>
-                        <mi>g</mi>
-                    </msub>
-                </mfrac>
-                <mo>&rfloor;</mo>
-            </mrow>
-            <mo>+</mo>
-            <mn>1</mn>
-        </mrow>
-    </math></p>
-
-<p>This method allows us to analyze time series data effectively by capturing both local and global patterns, providing valuable insights into temporal dynamics.</p>
-<p></p>
-<h4>Model Training</h4>
-<p></p>
-
-<p>Our methodology involves processing both city-centric and sliding window graphs. We start by generating cosine similarity matrices from time series data, which are then converted into graph adjacency matrices. This process includes creating edges for vector pairs with cosine values above a set threshold and adding a virtual node to ensure network connectivity, a critical step for preparing the graph structure.</p>
-<p></p>
-<p>For graph classification tasks, we use the GCNConv model from the PyTorch Geometric Library. This model excels in feature extraction through its convolutional operations, taking into account edges, node attributes, and graph labels for comprehensive graph analysis. The approach concludes with the training phase of the GNN model, applying these techniques to both types of graphs for robust classification.</p>
-<p></p>
-
-<p></p>
-<h3>Experiments Overview</h3>
-<p></p>
-<h4>Data Source: Climate Data</h4>
-
-<p></p>
-<p>For this study, we utilized climate data from Kaggle, specifically the dataset titled
-<i><a href="https://www.kaggle.com/hansukyang/temperature-history-of-1000-cities-1980-to-2020">“Temperature History of 1000 Cities 1980 to 2020”</a></i>.
-This dataset provides average daily temperature data from 1980 to 2020 for the 1000 most populous cities in the world.
-This comprehensive dataset served as the foundation for both the city-centric and sliding window graph methods employed in our analysis.</p>
-<p></p>
-<p><a href="#">
-    <img src="/img/slidingWindow4.jpg" alt="Post Sample Image" width="678" />
-</a></p>
-<p></p>
-<p>The bar chart shows city frequency by latitude. Most cities are between 20 and 60 degrees in the Northern Hemisphere. There are fewer cities around the equator and even fewer in the Southern Hemisphere.</p>
-
-<p></p>
-<h4>Sliding Window Graph GNN Graph Classification</h4>
-<p></p>
-<p>Using a 40-year dataset of daily temperatures from 1000 cities, our study evaluates GNN’s effectiveness in identifying global climate patterns. We focus on data from January 1st to the start of each month, providing insights into climate consistency, seasonal changes, and long-term shifts.</p>
-<p></p>
-<h5>Sliding Window Analysis for Global Climate Data.</h5>
-<p></p>
-<p>In our global climate data analysis, we use the sliding window graph method on a dataset with 40 years of daily temperatures from 1000 cities. This approach segments the data into graphs, each defined by a 30-day window (𝑊 = 30) with a 7-day shift (𝑆 = 7), effectively capturing local climate dynamics. This results in 1624 small graphs, allowing us to analyze short-term climate variations and trends.</p>
-<p></p>
-<p>Our accuracy metrics provide insights into the stability and variability of global climate patterns. High accuracy suggests predictable seasonal trends, while lower accuracy indicates irregular climate patterns or shifts. The sliding window graph method allows us to thoroughly evaluate the model’s ability to identify complex patterns in large climate datasets.</p>
-<p></p>
-<p></p>
-<p><a href="#">
-    <img src="/img/slidingWindow5.jpg" alt="Post Sample Image" width="678" />
-</a></p>
-<p></p>
-<p>When examining closely spaced months, such as January 1st to February 1st and January 1st to December 1st, the GNN model’s accuracy around 0.5 suggests difficulty in identifying distinct climate patterns. This low accuracy points to potential variability and unpredictability in global weather patterns during these periods, highlighting the complex dynamics of weather.</p>
-<p></p>
-<p>For periods between January and months like March, April, or October, the model achieves accuracy metrics averaging around 0.7 to 0.8, indicating moderate success in capturing climatic patterns. This is likely due to the model’s proficiency in identifying consistent seasonal transitions over these extended timeframes.</p>
-<p></p>
-<p>The highest accuracy metrics, ranging from 0.94 to 0.99, are observed for months other than January, such as May, June, July, August, and September. These results reflect the model’s exceptional performance in predicting climate patterns during these months, particularly in the stable summer months. This suggests that the GNN model excels in recognizing and adapting to distinctive climatic patterns, resulting in highly accurate predictions.</p>
-<p></p>
-<h5>Sliding Window Analysis for Stable and Unstable Climate Data.</h5>
-<p></p>
-<p>For classification, we split our graph dataset into ‘stable’ and ‘unstable’ groups based on average cosine similarities between consecutive years. This method segmented the global dataset into stable and unstable categories for our sliding window analysis. Using 20,000 city-year combinations, we set a window size of 30 (𝑊 = 30) and a shift size of 6 (𝑆 = 6), facilitating precise computations for both stable and unstable datasets. Each graph contains 30 nodes (𝐺 = 30), with a shift of 4 (𝑆𝑔 = 4) between successive graphs, resulting in a total of 1648 small graphs.</p>
-<p></p>
-<p>In our study, GNN graph classification for stable climate cities starts with moderate accuracy in February, significantly improves by May reaching a peak of 100%, and maintains high accuracy through the summer months, only to dip in October with a slight recovery in November. In contrast, unstable climate cities start with near-random accuracy in February, improve steadily, peak in August, and then decline sharply, returning to early-year levels by December. This indicates the model’s varying adaptability to stable and unstable climate patterns throughout the year.</p>
-<p></p>
-<p><a href="#">
-    <img src="/img/slidingWindow6.jpg" alt="Post Sample Image" width="678" />
-</a></p>
-<p></p>
-<p></p>
-<p>Analysis starting from January 1 shows that the model’s performance is influenced by the time of year. Unstable climates see low accuracies in the early and late parts of the year, suggesting limited learning during these periods. Conversely, stable climates exhibit significant improvements in accuracy during spring and summer, indicating effective data integration. However, the model’s performance overall is subject to fluctuations, peaking in the summer months before declining towards the end of the year, highlighting the challenges in generalizing across seasonal variations in climate data.</p>
-<p></p>
-
-<p></p>
-<h4>Code Details</h4>
-<p></p>
-<p>The <code class="language-plaintext highlighter-rouge">create_segments_df</code> function segments a specified column from a DataFrame into fixed-size windows. For each segment, it adds context such as the start date, row index, and column label. The function then combines these segments into a new DataFrame. This is useful for time series analysis or preparing data for machine learning models.</p>
-<p></p>
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">create_segments_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column_name</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span><span class="n">columnLabel</span><span class="p">):</span>
-    <span class="n">segments</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nf">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">window_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
-        <span class="n">segment</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">window_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">column_name</span><span class="p">]].</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">segment</span> <span class="o">=</span> <span class="n">segment</span><span class="p">.</span><span class="n">T</span>  <span class="c1"># Transpose to get the segment as a row
-</span>        <span class="n">segment</span><span class="p">[</span><span class="sh">'</span><span class="s">start_date</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">date</span><span class="sh">'</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">segment</span><span class="p">[</span><span class="sh">'</span><span class="s">rowIndex</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">rowIndex</span><span class="sh">'</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">segment</span><span class="p">[</span><span class="sh">'</span><span class="s">theColumn</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">column_name</span>
-        <span class="n">segment</span><span class="p">[</span><span class="sh">'</span><span class="s">columnLabel</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">columnLabel</span>
-        <span class="n">segments</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
-
-<p></p>
-
-<p></p>
-<p>The <code class="language-plaintext highlighter-rouge">group_segments</code> function takes a DataFrame of segments and groups them into larger segments based on specified sizes and shifts. It adds a group index to each group and combines them into a new DataFrame. This is useful for aggregating data over larger windows, essential for graph-based models or detailed data analysis.</p>
-<p></p>
-
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">group_segments</span><span class="p">(</span><span class="n">segments_df</span><span class="p">,</span> <span class="n">group_size</span><span class="p">,</span> <span class="n">group_shift</span><span class="p">):</span>
-    <span class="n">grouped_segments</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">group_index</span> <span class="o">=</span> <span class="mi">0</span>  
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nf">len</span><span class="p">(</span><span class="n">segments_df</span><span class="p">)</span> <span class="o">-</span> <span class="n">group_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">group_shift</span><span class="p">):</span>
-        <span class="n">group</span> <span class="o">=</span> <span class="n">segments_df</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">group_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">group</span><span class="p">[</span><span class="sh">'</span><span class="s">graphIndex</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">group_index</span>  <span class="c1"># Assign group index
-</span>        <span class="n">grouped_segments</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-        <span class="n">group_index</span> <span class="o">+=</span> <span class="mi">1</span>  
-    <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">(</span><span class="n">grouped_segments</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></figure>
-
-<p></p>
-<p>Take columns <code class="language-plaintext highlighter-rouge">col1</code> and <code class="language-plaintext highlighter-rouge">col2</code> from a dataset, fill NaN values in with their mean values and scale these columns using MinMaxScaler.</p>
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span>
-<span class="n">scaler</span> <span class="o">=</span> <span class="nc">MinMaxScaler</span><span class="p">()</span>
-<span class="n">fx_data</span><span class="o">=</span><span class="n">df</span>
-<span class="k">if</span> <span class="n">col1</span> <span class="ow">in</span> <span class="n">fx_data</span><span class="p">.</span><span class="n">columns</span><span class="p">:</span>
-    <span class="n">fx_data</span><span class="p">[</span><span class="n">col1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fx_data</span><span class="p">[</span><span class="n">col1</span><span class="p">].</span><span class="nf">fillna</span><span class="p">(</span><span class="n">fx_data</span><span class="p">[</span><span class="n">col1</span><span class="p">].</span><span class="nf">mean</span><span class="p">())</span>
-    <span class="n">fx_data</span><span class="p">[</span><span class="n">col1</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="nf">fit_transform</span><span class="p">(</span><span class="n">fx_data</span><span class="p">[[</span><span class="n">col1</span><span class="p">]])</span>
-<span class="k">if</span> <span class="n">col2</span> <span class="ow">in</span> <span class="n">fx_data</span><span class="p">.</span><span class="n">columns</span><span class="p">:</span>
-    <span class="n">fx_data</span><span class="p">[</span><span class="n">col2</span><span class="p">]</span> <span class="o">=</span> <span class="n">fx_data</span><span class="p">[</span><span class="n">col2</span><span class="p">].</span><span class="nf">fillna</span><span class="p">(</span><span class="n">fx_data</span><span class="p">[</span><span class="n">col2</span><span class="p">].</span><span class="nf">mean</span><span class="p">())</span>
-    <span class="n">fx_data</span><span class="p">[</span><span class="n">col2</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="nf">fit_transform</span><span class="p">(</span><span class="n">fx_data</span><span class="p">[[</span><span class="n">col2</span><span class="p">]])</span></code></pre></figure>
-
-<p></p>
-<p></p>
-
-<p>The code creates segments from two columns (<code>col1</code> and <code>col2</code>) of a dataset using the <code>create_segments_df</code> function, assigns node indices to each segment, and then groups these segments with the <code>group_segments</code> function. It combines the grouped segments into a final dataset, assigning a unique <span style="color: blue;">datasetIdx</span> to each. Finally, it generates metadata for each dataset index and merges it with the segment data to form <span style="color: blue;">graphList</span>.</p>
-
-<p></p>
-
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">columnLabel</span><span class="o">=</span><span class="mi">0</span>
-<span class="n">segments1</span> <span class="o">=</span> <span class="nf">create_segments_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col1</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span> <span class="n">columnLabel</span><span class="p">)</span>
-<span class="n">columnLabel</span><span class="o">=</span><span class="mi">1</span>
-<span class="n">segments2</span> <span class="o">=</span> <span class="nf">create_segments_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col2</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span> <span class="n">columnLabel</span><span class="p">)</span>
-<span class="n">segments1</span><span class="p">[</span><span class="sh">'</span><span class="s">nodeIndex</span><span class="sh">'</span><span class="p">]</span><span class="o">=</span><span class="n">segments1</span><span class="p">.</span><span class="n">index</span>
-<span class="n">segments2</span><span class="p">[</span><span class="sh">'</span><span class="s">nodeIndex</span><span class="sh">'</span><span class="p">]</span><span class="o">=</span><span class="n">segments2</span><span class="p">.</span><span class="n">index</span>
-<span class="n">grouped_segments1</span> <span class="o">=</span> <span class="nf">group_segments</span><span class="p">(</span><span class="n">segments1</span><span class="p">,</span> <span class="n">group_size</span><span class="p">,</span> <span class="n">group_shift</span><span class="p">)</span>
-<span class="n">grouped_segments2</span> <span class="o">=</span> <span class="nf">group_segments</span><span class="p">(</span><span class="n">segments2</span><span class="p">,</span> <span class="n">group_size</span><span class="p">,</span> <span class="n">group_shift</span><span class="p">)</span>
-<span class="n">dataSet</span><span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">([</span><span class="n">grouped_segments1</span><span class="p">,</span> <span class="n">grouped_segments2</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">dataSet</span><span class="p">[</span><span class="sh">'</span><span class="s">datasetIdx</span><span class="sh">'</span><span class="p">]</span><span class="o">=</span><span class="n">dataSet</span><span class="p">[</span><span class="sh">'</span><span class="s">columnLabel</span><span class="sh">'</span><span class="p">]</span><span class="o">*</span><span class="n">graphMax</span><span class="o">+</span><span class="n">dataSet</span><span class="p">[</span><span class="sh">'</span><span class="s">graphIndex</span><span class="sh">'</span><span class="p">]</span>
-<span class="n">dataSubset</span> <span class="o">=</span> <span class="n">dataSet</span><span class="p">[[</span><span class="sh">'</span><span class="s">datasetIdx</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">graphIndex</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">columnLabel</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">theColumn</span><span class="sh">'</span><span class="p">]].</span><span class="nf">drop_duplicates</span><span class="p">()</span>
-<span class="n">graphMeta</span> <span class="o">=</span> <span class="n">dataSet</span><span class="p">.</span><span class="nf">groupby</span><span class="p">([</span> <span class="sh">'</span><span class="s">datasetIdx</span><span class="sh">'</span><span class="p">])[</span><span class="sh">'</span><span class="s">start_date</span><span class="sh">'</span><span class="p">].</span><span class="nf">agg</span><span class="p">([</span><span class="sh">'</span><span class="s">min</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">max</span><span class="sh">'</span><span class="p">])</span>
-<span class="n">graphList</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">dataSubset</span><span class="p">,</span> <span class="n">graphMeta</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="sh">'</span><span class="s">datasetIdx</span><span class="sh">'</span><span class="p">)</span></code></pre></figure>
-
-<p></p>
-
-<p>Continuation of coding is described in our previous study, <a href="http://sparklingdataocean.com/2023/02/11/cityTempGNNgraphs/">“GNN Graph Classification for Climate Change Patterns: Graph Neural Network (GNN) Graph Classification - A Novel Method for Analyzing Time Series Data”</a>. This current work continues the same coding methodology for both city graphs and sliding window graphs.</p>
-
-<p></p>
-<h4>Comparison of GNN Graph Classification Methods.</h4>
-<p></p>
-<p>In this research, we evaluated two distinct GNN Graph Classification techniques for analyzing climate data: the city-graph and the sliding window graph methods. The city-graph method assigns a node to each city-year pair, connecting them based on the cosine similarity of their temperature profiles, making it particularly suited for analyzing long-term climate trends. In contrast, the sliding window technique divides time series data into overlapping segments to form graphs, adeptly identifying short-term climate variations.</p>
-<p></p>
-<p>Both techniques were applied to the same dataset to compare their effectiveness in categorizing cities by climate stability. We found that the city-graph method more accurately discerned long-term climate stability, whereas the sliding window approach excelled in detecting short-term climate changes. Therefore, the choice of method depends on the specific objectives of the analysis: the city-graph is preferable for examining extended trends, while the sliding window method is ideal for investigating immediate climatic shifts.</p>
-<p></p>
-
-<p></p>
-
-<p></p>
-
-<p></p>
-<h3>In Conclusion</h3>
-<p></p>
-
-<p>GNN graph classification has shown its strength in mapping complex relationships within graph-based datasets, making it a versatile tool in fields ranging from molecular dynamics to social network analysis. This versatility extends to climate data analysis, where it aids in identifying stable versus unstable climate patterns across cities by evaluating average cosine similarities of yearly temperature fluctuations. The addition of the sliding window graph approach further refines our study, enabling the model to continuously integrate new data and offer a detailed view of changing climate patterns. This technique is adept at capturing the dynamic nature of climate data, allowing for a more nuanced analysis of temporal trends and making it particularly suitable for managing the variable nature of climate data. This method’s ability to prioritize recent data over older information is crucial for adapting to the fast-paced changes characteristic of climate patterns.</p>
-<p></p>
-<p>In this study, we have leveraged GNN graph classification to address the complex challenge of analyzing climate patterns across different geographic locales, underscoring the method’s adaptability and broad applicability. Our research aimed explicitly at harnessing the potential of GNNs to distinguish between stable and unstable climate conditions in cities worldwide, using average cosine similarities of annual temperature variations as a novel classification metric. By integrating the sliding window graph approach, we have enhanced our model’s ability to dynamically assimilate and refresh data, offering a granular perspective on the fluctuating climate patterns and their implications over time.</p>
-<p></p>
-<p></p>
-<p><a href="#">
-    <img src="/img/slidingWindow7.jpg" alt="Post Sample Image" width="678" />
-</a></p>
-<p></p>
-<p>This investigation has demonstrated that while equatorial cities exhibit consistency in climate stability, higher latitude cities experience more pronounced fluctuations. Remarkably, our analysis also brought to light certain anomalies, such as Mediterranean cities with unexpectedly consistent climates and cities in China and Mexico with notable climate variability. These findings highlight the critical importance of considering local geographical and climatic factors in climate studies and underscore the nuanced capabilities of GNN models in detecting subtle climate dynamics.</p>
-<p></p>
-<p>Ultimately, our study reinforces the utility of GNN graph classification, especially with the incorporation of the sliding window approach, as a potent tool for dissecting and understanding climate data. This method does not merely augment the predictive accuracy of our models but significantly bolsters their adaptability to ongoing climate changes, offering a richer comprehension of the complex interplay of factors influencing global climate trends. As such, GNN graph classification emerges as an indispensable instrument in the ongoing efforts to tackle the multifaceted challenges posed by global climate change, paving the way for more informed and effective climate resilience strategies.</p>
-
-<p></p>
-
-<p></p>
-
-<p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Graph AI for Time-Series Change Detection Sliding time series graphs transform long, noisy signals into a sequence of short, structured snapshots, each captured as its own graph. By analyzing these snapshots with graph-based AI, we can pinpoint when a system shifts from normal to unusual behavior, highlight emerging regimes, and separate stable periods from early warning signals. Instead of a single summary label for an entire asset, customer base, or region, this approach shows when and where change is happening, enabling faster, more targeted decisions.]]></summary></entry></feed>
+</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Semantic Graphs for Communication Networks In this project, we move beyond simple “who emailed whom” graphs and build a semantic graph of communication. Instead of treating edges as raw message counts, we create nodes for individual interactions (who wrote to whom, with what text), enrich them with transformer-based text embeddings, and use a GNN link prediction model to learn which interactions are genuinely related. This text-enriched graph lets us recompute centrality and see a different set of key players: not just the loudest senders, but the quiet connectors who bridge topics and conversation clusters—hidden connectors that a plain traffic graph would never reveal.]]></summary></entry></feed>

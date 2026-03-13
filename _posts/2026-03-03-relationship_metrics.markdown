@@ -1,0 +1,362 @@
+---
+layout:     post
+title:      "Semantic Similarity Is Not Evidence"
+subtitle:   "How relationship-aware diagnostics reveal when text-only embeddings miss what the data actually supports"
+date:       2026-3-3 12:00:00
+author:     "Melenar"
+header-img: "img/citPage14.jpg"
+---
+
+<h1>Semantic Similarity Is Not Evidence</h1>
+
+
+
+<p>
+Large language models are very good at turning text into compact semantic representations. That strength is exactly why embeddings have become such a common foundation for search, recommendation, retrieval, matching, and ranking. In many tasks, that is enough. But this small research experiment highlights an important boundary case: some systems depend not only on what entities say, but on how they are connected.
+</p>
+
+<p>
+In many tasks, correctness depends not only on what entities say, but on how they are connected. Two items can sound close in language and still not belong together in the way the system actually cares about. And the reverse can also happen: two items may not look very similar in text, yet still be strongly connected through behavior, session context, or other observed relationships.
+</p>
+
+<p>
+This post is about making that gap visible.
+</p>
+
+<p>
+Instead of asking only whether two items look similar in language, we compare two representation spaces: a text-only embedding baseline and a relationship-aware embedding space built from the same text vectors, but refined through graph learning over an evidence graph. This is not meant as a new production recommender. It is a small, concrete research example meant to illustrate a broader concept: there are settings in which text-only similarity, even when powered by strong language models, is not the same thing as evidence.
+</p>
+
+<p>
+The central idea is simple: even strong semantic similarity is not always the same thing as evidence. If your system depends on interactions, constraints, or relationship structure, then text-only similarity can feel persuasive while still being structurally wrong. Relationship-aware diagnostics make that difference measurable.
+</p>
+
+<h2>Introduction</h2>
+
+<p>
+LLM-based systems are extremely effective when the signal really is in the text. Summarization, semantic search, question answering, and many classification tasks fit that pattern well. In those settings, a dense semantic representation often captures most of what matters.
+</p>
+
+<p>
+But not every problem is truly linguistic.
+</p>
+
+<p>
+In many real-world systems, what makes a connection valid is relational rather than descriptive. A pair of entities may share vocabulary, topic, or tone and still not belong together in the way the system needs. On the other hand, two entities may have weak textual overlap but still be strongly tied by interaction history, shared users, session behavior, or some other kind of evidence.
+</p>
+
+<p>
+That distinction matters far beyond recommendation. It matters in retrieval pipelines, matching systems, decision support, graph-enhanced AI, and any environment where people may start treating a high similarity score as if it were enough to justify a downstream connection.
+</p>
+
+<p>
+So the real question is not whether LLMs are useful. Of course they are. The real question is whether they capture the kind of relationship your task actually depends on.
+</p>
+
+<p>
+We like to frame this as a data quality question for AI systems. Instead of arguing abstractly about whether LLM-only systems are sufficient, we can ask something much more practical: does semantic similarity behave like real support in this setting, or does relational evidence change what should count as correct?
+</p>
+
+<p></p>
+<a href="#">
+  <img src="{{ site.baseurl }}/img/relMetrics11.jpg" alt="Diagnostic pipeline from user-item interactions to text vectors, graph vectors, similarity matrix, and diagnostic metrics" width="808">
+</a>
+<p><em>Figure 1.</em> The diagnostic pipeline. Text and observed interactions are combined into an evidence graph, which supports two representation pathways: a text-only path and a relationship-aware path. Their resulting similarity spaces are then compared using the same metrics.</p>
+
+<h2>Methods</h2>
+
+
+
+<p>
+The setup is intentionally simple. Each item has text, and the system also has observed relationships. In this study, the observed relationships come from user interactions with news articles. In this case, the “relationships” are not manually defined semantics; they are observed interaction links induced from co-click behavior. That gives us two complementary kinds of signal.
+</p>
+
+<p><strong>Textual signal:</strong> what the article title and summary say.</p>
+
+<p><strong>Relational signal:</strong> what user behavior suggests about which items are actually connected.</p>
+
+<p>
+The starting point is a bipartite user-item graph. From that, we build an item-item co-click graph: if the same user clicked two items on the same day, those items are treated as behaviorally linked. That induced co-click graph becomes the relational scaffold for the relationship-aware pathway.
+</p>
+
+<p>
+We then compare two representation spaces built over exactly the same items.
+</p>
+
+<ol>
+  <li>
+    <strong>Text-only baseline.</strong> Each news item is encoded independently with the <code>all-MiniLM-L6-v2</code> sentence-transformers model, producing a 384-dimensional embedding. This gives a clean semantic baseline from language alone.
+  </li>
+  <li>
+    <strong>Relationship-aware representation.</strong> The same text embeddings are used as input features for a GraphSAGE model trained with a link-prediction objective on the co-click graph. Importantly, the downstream analysis does not use raw link predictions. Instead, it uses the model’s pre-final node embeddings. That keeps the comparison focused on representation quality rather than classifier output.
+  </li>
+</ol>
+
+<p>
+Once both spaces are built, cosine similarity is computed for item pairs in each space. Those similarity scores are then evaluated on the same labeled pair set, where positives are co-click edges and negatives are non-edges. Holding the items, pair labels, and similarity function fixed makes the comparison clean: the main difference is whether relational structure was allowed to reshape the geometry of the space.
+</p>
+
+<p>
+The diagnostics are deliberately interpretable.
+</p>
+
+<ul>
+  <li><strong>Edge recovery (ROC AUC):</strong> if similarity is used as a score, how well does it distinguish true interaction-supported edges from non-edges?</li>
+  <li><strong>Distribution separation (Cohen’s d):</strong> how far apart are the similarity distributions for edges and non-edges?</li>
+  <li><strong>Top-quantile concentration (Lift@q):</strong> among the most similar pairs, how concentrated are the true edges relative to the overall edge rate?</li>
+</ul>
+
+<p>
+These metrics answer slightly different versions of the same practical question: does “similar” really mean “supported”?
+</p>
+
+<h2>Experiments</h2>
+
+<p>
+This post uses a small, focused experiment to illustrate the idea rather than to cover every possible scenario. The goal is not to optimize a production recommender system. The goal is to test whether adding behavioral relationships changes the similarity space in ways that text-only embeddings do not capture on their own.
+</p>
+
+<h3>Dataset and day-level slice</h3>
+
+<p>
+The data source for this experiment is the Microsoft News Dataset (MIND), using the <code>MINDsmall</code> training split. To keep the analysis easy to inspect and easy to explain, We restrict the study to a single day: <strong>2019-11-11</strong>.
+</p>
+
+<p>
+Only the two raw tables needed for this diagnostic setup are used:
+</p>
+
+<ul>
+  <li><strong><code>news.tsv</code></strong>, which provides article identifiers, categories, and text fields</li>
+  <li><strong><code>behaviors.tsv</code></strong>, which records user impressions and click histories</li>
+</ul>
+
+<p>
+This day-level slice serves as a compact, self-contained snapshot for the experiment. It provides the text needed to build the text-only baseline and the interaction data needed to construct behavioral relationships, making it possible to compare the two representation pathways on the same set of news items.
+</p>
+
+<p>
+Dataset page: <a href="https://msnews.github.io/" target="_blank" rel="noopener noreferrer">MIND: Microsoft News Dataset</a>.
+</p>
+
+
+
+
+<h3>Behavioral relationship graph</h3>
+
+<p>
+From the filtered <code>behaviors.tsv</code> and <code>news.tsv</code> records for <strong>2019-11-11</strong>, we build a day-specific bipartite user-item interaction graph. Because the diagnostics in this post are computed on <em>item pairs</em>, that bipartite graph is then projected onto the item side to form an item-item <strong>co-click graph</strong>.
+</p>
+
+<p>
+In practical terms, if the same user clicked two news items on the same day, those two items are treated as behaviorally linked. These co-click links define the <strong>positive</strong> item pairs. Pairs of items without a co-click link are treated as <strong>negative</strong> pairs for evaluation.
+</p>
+
+<p>
+To make sure each retained user contributes pairwise signal, we keep only users with at least two clicks that day. After filtering, the retained day-level data contains:
+</p>
+
+<ul>
+  <li><strong>10,656 users</strong></li>
+  <li><strong>22,157 impressions</strong></li>
+  <li><strong>37,435 clicks</strong></li>
+  <li><strong>27,945 unique news items observed in the filtered logs</strong></li>
+</ul>
+
+<p>
+From this filtered interaction data, the induced co-click graph used for representation learning and diagnostics contains:
+</p>
+
+<ul>
+  <li><strong>1,991 graph nodes (news items)</strong></li>
+  <li><strong>40,637 graph edges (co-click relationships)</strong></li>
+</ul>
+
+<p>
+Although many items appear in the logs, only the 1,991 items that participate in at least one co-click relationship are included in the induced graph. All representation learning and diagnostics are restricted to this item set.
+</p>
+
+<h3>Representations compared</h3>
+
+<p>
+The experiment compares two representation pathways over exactly the same news items.
+</p>
+
+<ol>
+  <li>
+    <strong>Text-only baseline.</strong> Each news item is encoded independently with the <code>all-MiniLM-L6-v2</code> sentence-transformers model, producing a 384-dimensional embedding. This gives a clean semantic baseline from language alone.
+  </li>
+  <li>
+    <strong>Relationship-aware representation.</strong> The same text embeddings are used as input features for a GraphSAGE model trained with a link-prediction objective on the induced co-click graph. Importantly, the downstream analysis does not use the model’s raw link predictions. Instead, it uses the model’s pre-final node embeddings, which incorporate both text features and interaction-derived relational context.
+  </li>
+</ol>
+
+<p>
+For both representation spaces, cosine similarity is computed over item pairs and evaluated using the same diagnostic metrics. That keeps the comparison focused on the question that matters here: what changes when relationship structure is allowed to reshape the embedding space?
+</p>
+
+<h3>Reported diagnostics</h3>
+
+<p>
+The results show a clear and useful pattern.
+</p>
+
+<p>
+<strong>Edge recovery.</strong> Relationship-aware embeddings achieve much higher ROC AUC than text-only embeddings, reaching about <strong>0.75</strong> compared with about <strong>0.52</strong> for the text-only baseline. In this experiment, the relationship-aware space is much better aligned with true interaction-supported edges.
+</p>
+
+<p></p>
+<a href="#">
+  <img src="{{ site.baseurl }}/img/relMetrics1.jpg" alt="ROC curve comparing text-only and relationship-aware embeddings for edge recovery" width="808">
+</a>
+<p><em>Figure 2.</em> ROC curves for predicting co-click edges from cosine similarity. The relationship-aware space reaches an AUC of about 0.75, while the text-only space stays near 0.52, close to chance.</p>
+
+<p>
+<strong>Edge vs. non-edge separation.</strong> The same story appears in the similarity distributions. In the text-only space, edge and non-edge pairs overlap heavily. In the relationship-aware space, the two groups separate much more clearly, which means the representation is doing a better job of aligning similarity with evidence-supported structure.
+</p>
+
+<p></p>
+<a href="#">
+  <img src="{{ site.baseurl }}/img/relMetrics7.jpg" alt="Histogram of text-only similarity for edge and non-edge pairs" width="808">
+</a>
+<p><em>Figure 3.</em> Text-only similarity distributions for edge and non-edge pairs. The overlap is substantial, which means language-only similarity provides weak separation between linked and unlinked pairs.</p>
+
+<p></p>
+<a href="#">
+  <img src="{{ site.baseurl }}/img/relMetrics8.jpg" alt="Histogram of relationship-aware similarity for edge and non-edge pairs" width="808">
+</a>
+<p><em>Figure 4.</em> Relationship-aware similarity distributions for edge and non-edge pairs. The separation is much clearer, indicating stronger alignment with interaction-supported structure.</p>
+
+<p>
+<strong>Top-quantile concentration.</strong> The pattern also holds where many real systems care most: the top of the ranking. Among the highest-similarity pairs, the relationship-aware space is much more enriched with true co-click edges than the text-only baseline.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Top fraction q</th>
+      <th>Edge rate (Text-only)</th>
+      <th>Edge rate (Relationship-aware)</th>
+      <th>Lift improvement</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0.001 (0.1%)</td>
+      <td>0.099</td>
+      <td>0.217</td>
+      <td>2.19×</td>
+    </tr>
+    <tr>
+      <td>0.005 (0.5%)</td>
+      <td>0.064</td>
+      <td>0.147</td>
+      <td>2.30×</td>
+    </tr>
+    <tr>
+      <td>0.010 (1%)</td>
+      <td>0.050</td>
+      <td>0.125</td>
+      <td>2.48×</td>
+    </tr>
+    <tr>
+      <td>0.050 (5%)</td>
+      <td>0.034</td>
+      <td>0.084</td>
+      <td>2.46×</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+At the top 1% of most similar pairs, the relationship-aware space produces an edge rate of <strong>0.125</strong> versus <strong>0.050</strong> for the text-only baseline. In other words, the very top of the relationship-aware similarity ranking is about <strong>two and a half times better aligned</strong> with true co-click links.
+</p>
+
+<p>
+So the point here is not that LLMs are weak. LLMs are already very strong. The point is that there are real scenarios where <strong>LLM-only is weaker than LLM + GNN</strong>. This experiment shows one compact example of that pattern in a form that is easy to inspect, reuse, and adapt.
+</p>
+
+<p>
+The disagreement examples are just as interesting as the aggregate metrics. Rather than keeping long academic tables, it is easier to think of them as two recurring failure modes.
+</p>
+
+
+
+<h3>Outlier analysis</h3>
+
+<p>
+To make the disagreement between semantic similarity and relationship-aware similarity more concrete, we also looked at <em>outlier pairs</em> where the two measures strongly diverge. These are not a separate metric. They are qualitative examples that help show what the diagnostic results mean in practice.
+</p>
+
+<p>
+The goal is to surface pairs where one representation says “these two items are very similar,” while the other says “not really.” That gives a more interpretable view of the same distinction already visible in the ROC curves, distribution plots, and Lift@q results.
+</p>
+
+<p>
+We consider two symmetric outlier types using fixed percentile thresholds.
+</p>
+
+<ul>
+  <li>
+    <strong>High text similarity, low relationship-aware similarity.</strong>
+    These are pairs in the <strong>top 1%</strong> of text-only similarity scores but the <strong>bottom 50%</strong> of relationship-aware similarity scores.
+  </li>
+  <li>
+    <strong>High relationship-aware similarity, low text similarity.</strong>
+    These are pairs in the <strong>top 1%</strong> of relationship-aware similarity scores but the <strong>bottom 50%</strong> of text-only similarity scores.
+  </li>
+</ul>
+
+<p>
+To make the examples more informative, we restrict the analysis to <strong>cross-category pairs</strong> and rank candidates by the size of the disagreement. That helps emphasize structural effects rather than trivial cases where two items look similar simply because they share obvious vocabulary or belong to the same narrow topical bucket.
+</p>
+
+<p>
+These two outlier groups reveal complementary patterns.
+</p>
+
+<p>
+The first group — <strong>text-high, structure-low</strong> — captures pairs that look convincing in language but are not strongly supported by observed interaction structure. A representative example is the pair <em>“Watch: SpaceX launches 60 Starlink satellites from Cape Canaveral”</em> and <em>“SpaceX launches 60 mini satellites into orbit”</em>. The text-only similarity is extremely high, which makes intuitive sense, but the relationship-aware score is noticeably lower. In other words, semantic resemblance alone does not guarantee the kind of evidence-supported link captured by user behavior.
+</p>
+<p></p>
+<a href="#">
+  <img src="{{ site.baseurl }}/img/relMetrics12.jpg" alt="Histogram of relationship-aware similarity for edge and non-edge pairs" width="808">
+</a>
+<p>
+The second group — <strong>structure-high, text-low</strong> — captures the opposite case: pairs that are weakly expressed, or even absent, in language but become strongly connected once interaction structure is taken into account. One example is <em>“Underwater camera captures swimming tigers”</em> paired with <em>“Barham Fire: Crews gain control of Hollywood Hills brush fire...”</em>. Here the text-only similarity is strongly negative, while the relationship-aware similarity is very high. That does not mean the pair is intuitively similar in language. It means the evidence graph is capturing a relationship signal that text alone does not express.
+</p>
+<p></p>
+<a href="#">
+  <img src="{{ site.baseurl }}/img/relMetrics13.jpg" alt="Histogram of relationship-aware similarity for edge and non-edge pairs" width="808">
+</a>
+<p>
+Taken together, these outliers make the broader point easier to see. Semantic similarity can be plausible without being evidence-supported, and evidence-supported links can be nearly invisible to text alone. That is exactly the distinction the diagnostic framework is meant to surface.
+</p>
+
+
+
+<h2>Conclusion</h2>
+
+<p>
+The main takeaway is not that LLMs are failing. LLMs are already extremely capable, and in many tasks they may be entirely sufficient. The takeaway is that semantic similarity should not automatically be treated as evidence.
+</p>
+
+<p>
+This small research experiment shows one concrete case where <strong>LLM-only performs worse than LLM + GNN</strong>. That does not mean every problem needs graph learning. It means the boundary is testable.
+</p>
+
+<p>
+That is the value of the concept presented here. It gives practitioners a simple way to ask a better question: not whether LLMs are good in general, but whether text-only similarity is enough for the specific relationship their task depends on.
+</p>
+
+<p>
+This blog illustrates the idea with one compact example, not all possible scenarios. The same diagnostic idea can be adapted to other datasets, other domains, other evidence graphs, and other language models.
+</p>
+
+<p>
+Soon we will also share the notebook so readers can reuse the pattern, modify it, and hand it to AI coding tools such as Codex or Opus to reimplement in another environment. The broader lesson is not tied to one specific model. You can take the same idea and test it with other LLMs, other embedding pipelines, and other graph-learning setups. The conceptual question remains the same: when is LLM-only enough, and when does adding relationship structure produce a better representation?
+</p>
+
+
+
+<hr>
