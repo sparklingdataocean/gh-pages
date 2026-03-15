@@ -31,6 +31,21 @@ Instead of asking only whether two items look similar in language, we compare tw
 The central idea is simple: even strong semantic similarity is not always the same thing as evidence. If your system depends on interactions, constraints, or relationship structure, then text-only similarity can feel persuasive while still being structurally wrong. Relationship-aware diagnostics make that difference measurable.
 </p>
 
+<div style="border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px; margin:24px 0; background:#fafafa;">
+  <p style="margin:0 0 10px 0;">
+    For readers who want to go beyond the article, we’ve also made the <strong>Relationship Metrics Starter Kit</strong> available as a notebook-based reference implementation that carries the full idea and architecture of the method into a form that can be inspected, tested, and extended. In the era of AI coding, that matters: the notebook is not just something to run, but a transparent handoff layer for the workflow itself, making it easier to transfer the method into new datasets, environments, and business contexts with the help of coding agents.
+  </p>
+  <p style="margin:0 0 12px 0;"><strong>Pay what you want, starting at $0.</strong></p>
+  <a href="https://payhip.com/b/qayzo"
+     style="display:inline-block; background:#2563eb; color:#ffffff; text-decoration:none; padding:10px 18px; border-radius:8px; font-weight:600;">
+    View the Starter Kit
+  </a>
+</div>
+
+
+
+
+
 <h2>Introduction</h2>
 
 <p>
@@ -357,6 +372,27 @@ This blog illustrates the idea with one compact example, not all possible scenar
 Soon we will also share the notebook so readers can reuse the pattern, modify it, and hand it to AI coding tools such as Codex or Opus to reimplement in another environment. The broader lesson is not tied to one specific model. You can take the same idea and test it with other LLMs, other embedding pipelines, and other graph-learning setups. The conceptual question remains the same: when is LLM-only enough, and when does adding relationship structure produce a better representation?
 </p>
 
-
+<div style="border:1px solid #e5e7eb; border-radius:12px; padding:24px; margin:32px 0; background:#fafafa;">
+  <p style="margin:0 0 12px 0; font-size:1.15em;"><strong>Try the Relationship Metrics Starter Kit</strong></p>
+  <p style="margin:0 0 12px 0;">
+    This post used a compact sample dataset to make the method easy to inspect. The next step is practical: take a dataset you care about, represent it as nodes and edges, and run the notebook. The goal is to test, early and concretely, whether relationship-aware diagnostics reveal meaningful signal beyond text-only similarity in your own setting.
+  </p>
+  <p style="margin:0 0 12px 0;">
+    The kit is designed not only for hands-on testing, but also for idea and architecture transfer. It provides a transparent workflow that can be inspected step by step and then adapted with AI coding tools for new data, environments, and business contexts.
+  </p>
+  <p style="margin:0 0 8px 0;"><strong>It includes:</strong></p>
+  <ul style="margin:0 0 14px 20px; padding:0;">
+    <li>notebook</li>
+    <li>sample nodes-and-edges dataset</li>
+    <li>README</li>
+    <li>data dictionary</li>
+    <li>example results</li>
+  </ul>
+  <p style="margin:0 0 12px 0;"><strong>Pay what you want, starting at $0.</strong></p>
+  <a href="https://payhip.com/b/qayzo"
+     style="display:inline-block; background:#2563eb; color:#ffffff; text-decoration:none; padding:10px 18px; border-radius:8px; font-weight:600;">
+    Download the Starter Kit
+  </a>
+</div>
 
 <hr>
