@@ -1,4 +1,145 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-03-15T12:48:29-04:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Sparkling Data Ocean</title><subtitle>Boutique consulting -- AI &amp; Data Analytics.</subtitle><entry><title type="html">Semantic Similarity Is Not Evidence</title><link href="http://localhost:4000/2026/03/03/relationship_metrics/" rel="alternate" type="text/html" title="Semantic Similarity Is Not Evidence" /><published>2026-03-03T07:00:00-05:00</published><updated>2026-03-03T07:00:00-05:00</updated><id>http://localhost:4000/2026/03/03/relationship_metrics</id><content type="html" xml:base="http://localhost:4000/2026/03/03/relationship_metrics/"><![CDATA[<h1>Semantic Similarity Is Not Evidence</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-11-07T10:01:24-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Sparkling Data Ocean</title><subtitle>Boutique consulting -- AI &amp; Data Analytics.</subtitle><entry><title type="html">Relationships, Language, and Trust in AI</title><link href="http://localhost:4000/2026/11/04/relationship_why/" rel="alternate" type="text/html" title="Relationships, Language, and Trust in AI" /><published>2026-11-04T07:00:00-05:00</published><updated>2026-11-04T07:00:00-05:00</updated><id>http://localhost:4000/2026/11/04/relationship_why</id><content type="html" xml:base="http://localhost:4000/2026/11/04/relationship_why/"><![CDATA[<h1 id="relationships-language-and-trust-in-ai">Relationships, Language, and Trust in AI</h1>
+<p>The more capable AI becomes and the fewer mistakes it makes, the more we trust it and rely on it for consequential decisions. But greater accuracy does not, by itself, make the evidence more traceable. A correct answer can still leave unclear whether a relationship was stated in a source record or inferred from learned patterns. As we give AI more responsibility, that distinction matters more. Meaningful oversight requires understanding both whether a claim is right and what supports it.</p>
+<p>A relationship tells us how things are connected. Two quantities can vary together, a river can feed a lake, and a person can authorize a decision. Each connection gives us information about the world that a description of either participant alone leaves open. The kind of connection matters. An association describes what varies together. A causal relationship makes a claim about what brings about a change. An approval records a decision by someone acting in a particular role.</p>
+<p>We focus on a narrower question in AI. When a system encounters or produces a claim about a specific relationship, what can it recover about the connection and its source? Our unit of analysis is the <strong>relationship claim</strong>, such as <em>Maria approved Project X</em>. We follow claims at this scale across language, structured data, and model outputs. That lets us ask separately whether the system recovered the connection, whether explicit structure helped, and what we can establish about its evidential basis.</p>
+<h2 id="choosing-a-scale">Choosing a scale</h2>
+<p>In <em>The Hedgehog and the Fox</em>, Isaiah Berlin describes two ways of making sense of the world. The hedgehog sees things through one organizing idea. The fox draws on many experiences and explanations. For our purposes, there is a related question about scale. What can we see between the smallest details and the whole picture? <a href="https://press.princeton.edu/books/paperback/9780691156002/the-hedgehog-and-the-fox">Isaiah Berlin, <em>The Hedgehog and the Fox</em></a></p>
+<p>Biology gives us an example. At the molecular scale, we can ask how a reaction happens. At the scale of a cell, we can ask what that reaction lets the cell do. At the scale of an organ, we can ask how tissues work together. Each scale makes a different question possible.</p>
+<p>In language, tokens are the pieces a model processes, and paragraphs and documents provide context. The relationship claim gives us something specific to follow across both. We can find <em>Maria approved Project X</em> in a document, represent it in a graph, or test whether a model recovers it. We can also ask which version she approved and which record establishes that approval. That makes the relationship claim the unit of analysis for this study.</p>
+<figure style="margin:24px 0;">
+  <img src="/img/whyMap4.png" alt="Biology and language at three scales, with the cell and the relationship claim highlighted." style="display:block; max-width:100%; height:auto;" loading="lazy" />
+  <figcaption style="margin-top:10px;"><strong>Figure 1. Choosing a scale of investigation.</strong> The highlighted column shows an intermediate scale in each domain. The relationship claim is the unit we follow in this study.</figcaption>
+</figure>
+
+<h2 id="why-relationships">Why Relationships</h2>
+<h3 id="in-language-relationships-build-meaning">In language, relationships build meaning</h3>
+<p>The names <em>Maria</em> and <em>Project A</em> tell us who and what we are talking about. The relationship gives each a role. In <em>Maria approved Project A</em>, Maria made the decision and Project A was the subject of it. <em>Maria reviewed Project A</em> names the same person and project but describes a different action. We can also qualify the approval by saying which version it covered or whether it depended on a safety review.</p>
+<p>Figure 2 follows that claim from an approval record through a language model. The answer preserves who approved what, while leaving out the source. If we are looking for someone to contact, Maria is a useful lead. If we are deciding whether to release funds, we need to find the approval record and check that it covers the decision at hand.</p>
+<figure style="margin:24px 0;">
+  <img src="/img/whyMap2.png" alt="An approval record goes through a language model. The output says Maria approved Project A and leaves its source out. Two branches show using the answer to find a contact and checking the approval record before releasing funds." style="display:block; max-width:100%; height:auto;" loading="lazy" />
+  <figcaption style="margin-top:10px;"><strong>Figure 2. One approval claim, two uses.</strong> The answer can point us to a contact. Releasing funds requires checking the approval record.</figcaption>
+</figure>
+
+<h3 id="in-structured-data-relationships-become-queryable">In structured data, relationships become queryable</h3>
+<p>When we represent relationships explicitly, a question about their meaning becomes a query over recorded data. We can ask which versions Maria approved, which approvals carried a condition, or which payments depended on an approval that was later revoked.</p>
+<p>There are several ways to represent these connections. A relational database can keep an approval table with references to the approver, project version, and decision record. A query can join those tables to retrieve the approvals and their sources. A graph can represent the same approval as an event linked to its participants and record. A graph query can then follow a chain of relationships from a payment through an approval to the version it covers. In either form, we can ask precise questions about the connections the data actually records.</p>
+<h3 id="in-ai-relationships-can-be-learned-and-inferred">In AI, relationships can be learned and inferred</h3>
+<p>A language model learns by predicting the next token. Along the way, it can learn patterns that help it recognize the same relationship in different wording or infer a connection from clues across passages. Some patterns can be expressed geometrically in vector space, as the Word2Vec example in Figure 3 illustrates.</p>
+<p>As Figure 2 shows, the model can tell us who approved the project while leaving out the source. A citation claim works the same way. “Paper A cites Paper B” can come from a reference list or an inference. The wording alone leaves us unable to tell which.</p>
+<figure style="margin:24px 0;">
+  <img src="/img/whyMap5c.png" alt="Four panels show next-token prediction, learned relationships, a word-vector analogy, and how a recorded citation and an inferred citation can produce the same output." style="display:block; max-width:100%; height:auto;" loading="lazy" />
+  <figcaption style="margin-top:10px;"><strong>Figure 3. How language models learn and express relationships.</strong> The last panel shows how a recorded citation and an inference can lead to the same answer.</figcaption>
+</figure>
+
+<h2 id="what-we-measure">What We Measure</h2>
+<p>We study the gap from three directions. We first ask what a trained model recovers about a relationship and its recorded origin category. We then ask when explicit graph structure helps distinguish observed links from alternatives. Finally, we test whether a representation can single out a particular recorded connection. Each study has its own data, method, and result.</p>
+<figure style="margin:24px 0;">
+  <img src="/img/whyMap1b.jpg" alt="A workflow connects input records, AI processing, and an approval claim. Three diagnostics examine recovery, the value of structure, and traceability. A separate decision branch asks whether the task requires verified evidence." style="display:block; max-width:100%; height:auto;" loading="lazy" />
+  <figcaption style="margin-top:10px;"><strong>Figure 4. A framework for measuring relationships in AI.</strong> The first two branches concern recovery and the value of explicit structure. The third points toward evidence traceability. Our current test measures one step in that direction, identifying a recorded target among plausible alternatives. The diagram also shows where verification of a supporting record would fit.</figcaption>
+</figure>
+
+<h3 id="1-recovering-a-relationship-and-its-origin-category">1. Recovering a relationship and its origin</h3>
+<p>Can a language model learn a relationship before it learns where the claim came from? We ran a small training experiment to find out. We trained a model from scratch on fictional claims so we could control exactly what it saw. By testing it at several points during training, we could see when it began to recover the relationships and when it could also identify their recorded source categories.</p>
+<h4 id="methods">Methods</h4>
+<p>The training text described who received credit, who was offered an opportunity, and who had authority in fictional community clubs. Every claim had an assigned source category, such as a project record or a colleague’s opinion. We varied how often a claim appeared and how often its source was stated. Some claims appeared 32 times and others appeared eight times. In each group, we stated the source either every time or in one out of eight mentions.</p>
+<p>At each checkpoint, we asked the model to complete a claim by choosing the club. We then asked it to identify the source category for the claim it had just completed. This gave us two scores: how often it got the relationship right, and how often it got both the relationship and its source category right.</p>
+<h4 id="experiments-and-results">Experiments and results</h4>
+<p>At 120,000 training tokens, the model correctly recovered <strong>98.6%</strong> of frequent relationships whose source was stated only occasionally. It got <strong>both the relationship and the source category right in 11.1%</strong> of the same 144 trials. For frequent claims whose source was stated every time, joint recovery was <strong>95.1%</strong> at the same checkpoint. With more training, the gap largely closed. By the final checkpoint, joint recovery was at least 98.6% in all four conditions.</p>
+<h4 id="interpretation">Interpretation</h4>
+<p>In one run, the model correctly identified GardenClub as the club that gave Leon design credit. It attributed the claim to Leon himself, while the corpus attributed it to a project record. That is the distinction the experiment makes visible. A model can learn the relationship before it reliably learns what kind of source the claim came from. Checking the claim itself would still require finding and examining the record.</p>
+<h3 id="2-measuring-what-explicit-graph-structure-adds">2. Measuring what explicit graph structure adds</h3>
+<h4 id="methods-1">Methods</h4>
+<p>One part of this work appeared at SEMANTiCS 2026 in <a href="https://doi.org/10.3233/SSW260017"><em>When Knowledge Graph Relationships Still Matter</em></a>. The paper asks what can be recovered from text and what improves when a representation can also learn from graph structure. In its OpenAlex case study, the same papers offer multiple kinds of connections. Two papers can cite the same references, belong to the same topic, or directly cite one another. The papers and their title and abstract text can stay the same while the relationship under investigation changes.</p>
+<p>The study uses cosine similarity to score the same held-out paper pairs in two embedding spaces. The first comes from the text alone. The second uses GraphSAGE to reshape those text features using the observed training links. ROC AUC summarizes how well each representation ranks observed links above sampled non-links. The difference, <strong>ΔAUC = graph AUC − text AUC</strong>, shows which representation performed better under that comparison.</p>
+<h4 id="experiments-and-results-1">Experiments and results</h4>
+<p>The study repeated the comparison across relation types and publication-year slices. The table shows selected results for the Language Models / Transformers slice.</p>
+<div style="overflow-x:auto; margin:24px 0;">
+<table>
+<thead>
+<tr class="header">
+<th>OpenAlex relationship</th>
+<th style="text-align: right;">Slice year</th>
+<th style="text-align: right;">Text AUC</th>
+<th style="text-align: right;">Graph AUC</th>
+<th style="text-align: right;">Reported ΔAUC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Shared references</td>
+<td style="text-align: right;">2021</td>
+<td style="text-align: right;">0.707</td>
+<td style="text-align: right;">0.933</td>
+<td style="text-align: right;">+0.225</td>
+</tr>
+<tr class="even">
+<td>Shared references</td>
+<td style="text-align: right;">2025</td>
+<td style="text-align: right;">0.737</td>
+<td style="text-align: right;">0.914</td>
+<td style="text-align: right;">+0.176</td>
+</tr>
+<tr class="odd">
+<td>Direct citation</td>
+<td style="text-align: right;">2021</td>
+<td style="text-align: right;">0.883</td>
+<td style="text-align: right;">0.626</td>
+<td style="text-align: right;">−0.257</td>
+</tr>
+<tr class="even">
+<td>Shared topic</td>
+<td style="text-align: right;">2021</td>
+<td style="text-align: right;">0.653</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">+0.347</td>
+</tr>
+<tr class="odd">
+<td>Shared topic</td>
+<td style="text-align: right;">2025</td>
+<td style="text-align: right;">0.591</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">+0.409</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><em>Selected results from the Language Models / Transformers slice. The paper reports gaps from unrounded values. The focused 2025 direct-citation comparison was excluded because the retained graph was sparse.</em></p>
+<p>Shared references showed a graph advantage in both slices. Direct citation favored the text representation in the 2021 comparison. Shared topic was a calibration case because the graph already encoded topic membership. The smaller shared-reference gap in 2025 is a comparison between publication-year slices, with differences in composition and citation maturity. These results concern the evaluated representations and pair task.</p>
+<p>This comparison gives us a way to test where explicit graph structure adds predictive value. The direct-citation result describes how the two representations ranked pairs. We can check the citation record to see which paper was actually cited.</p>
+<h3 id="3-identifying-the-recorded-connection">3. Identifying the recorded connection</h3>
+<h4 id="methods-2">Methods</h4>
+<p>In ongoing work, we separate population-level ranking from identification of a particular recorded connection. For each held-out case, we rank one recorded target against 20 eligible challengers. The target is the cited paper in the citation example and the recorded approver in the synthetic example. Strict Top-1 counts a success only when the recorded target outranks every challenger. The strongest-challenger margin measures the score gap between the recorded target and its highest-scoring alternative.</p>
+<p>In the synthetic experiment, the scorers rank candidates without access to the supporting approval records. A match can help narrow the search for the relevant record. Verifying the claim requires locating that record and checking what it establishes.</p>
+<h4 id="experiments-and-results-2">Experiments and results</h4>
+<div style="overflow-x:auto; margin:24px 0;">
+<table>
+<thead>
+<tr class="header">
+<th>Recorded target</th>
+<th style="text-align: right;">Text strict Top-1</th>
+<th style="text-align: right;">GraphSAGE strict Top-1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Scientific citation</td>
+<td style="text-align: right;">45.79%</td>
+<td style="text-align: right;">32.09%</td>
+</tr>
+<tr class="even">
+<td>Synthetic approval, aligned descriptions</td>
+<td style="text-align: right;">13.33%</td>
+<td style="text-align: right;">9.33%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In the citation illustration, text ranked the recorded paper first more often than GraphSAGE, yet plausible alternatives frequently outranked it. In the synthetic approval illustration, descriptions exposed who could plausibly approve a release, while identifying the recorded approver remained difficult. The two illustrations use different data and protocols.</p>
+<p>Low identification tells us the tested representation is a weak route to the recorded connection. Direct access to the original record may be needed. Higher identification would give us a stronger candidate to investigate.</p>
+<h2 id="what-we-have-measured-and-what-comes-next">What we have measured and what comes next</h2>
+<p>Across the three studies, we measured different properties of a relationship. In controlled training, we found that when attribution was sparse, a model recovered relationships more often than it recovered their origin categories. In OpenAlex, we measured how access to graph structure changed the ranking of candidate pairs for different types of relationships. In a separate experiment, we tested whether a representation could distinguish the exact recorded target from plausible alternatives.</p>
+<p>These studies cover the methods we have explored so far. Making relationships queryable opens up other ways to study them. This is part of the appeal of knowledge graphs in AI. We can follow a chain of connections or compare patterns across many entities. We can also query relationships in relational databases, compare them across versions of a dataset, or test how they change when we give a model different evidence. Each approach lets us ask a different kind of question about the connections themselves.</p>
+<p>This work has applications in AI risk assessment, AI governance, the review of complaints about AI-assisted decisions, and the design of AI agents. Looking at individual relationships can help us identify which claims need evidence, trace which decisions depend on them, and decide what an agent should verify before it acts.</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Relationships, Language, and Trust in AI The more capable AI becomes and the fewer mistakes it makes, the more we trust it and rely on it for consequential decisions. But greater accuracy does not, by itself, make the evidence more traceable. A correct answer can still leave unclear whether a relationship was stated in a source record or inferred from learned patterns. As we give AI more responsibility, that distinction matters more. Meaningful oversight requires understanding both whether a claim is right and what supports it. A relationship tells us how things are connected. Two quantities can vary together, a river can feed a lake, and a person can authorize a decision. Each connection gives us information about the world that a description of either participant alone leaves open. The kind of connection matters. An association describes what varies together. A causal relationship makes a claim about what brings about a change. An approval records a decision by someone acting in a particular role. We focus on a narrower question in AI. When a system encounters or produces a claim about a specific relationship, what can it recover about the connection and its source? Our unit of analysis is the relationship claim, such as Maria approved Project X. We follow claims at this scale across language, structured data, and model outputs. That lets us ask separately whether the system recovered the connection, whether explicit structure helped, and what we can establish about its evidential basis. Choosing a scale In The Hedgehog and the Fox, Isaiah Berlin describes two ways of making sense of the world. The hedgehog sees things through one organizing idea. The fox draws on many experiences and explanations. For our purposes, there is a related question about scale. What can we see between the smallest details and the whole picture? Isaiah Berlin, The Hedgehog and the Fox Biology gives us an example. At the molecular scale, we can ask how a reaction happens. At the scale of a cell, we can ask what that reaction lets the cell do. At the scale of an organ, we can ask how tissues work together. Each scale makes a different question possible. In language, tokens are the pieces a model processes, and paragraphs and documents provide context. The relationship claim gives us something specific to follow across both. We can find Maria approved Project X in a document, represent it in a graph, or test whether a model recovers it. We can also ask which version she approved and which record establishes that approval. That makes the relationship claim the unit of analysis for this study. Figure 1. Choosing a scale of investigation. The highlighted column shows an intermediate scale in each domain. The relationship claim is the unit we follow in this study.]]></summary></entry><entry><title type="html">Semantic Similarity Is Not Evidence</title><link href="http://localhost:4000/2026/03/03/relationship_metrics/" rel="alternate" type="text/html" title="Semantic Similarity Is Not Evidence" /><published>2026-03-03T07:00:00-05:00</published><updated>2026-03-03T07:00:00-05:00</updated><id>http://localhost:4000/2026/03/03/relationship_metrics</id><content type="html" xml:base="http://localhost:4000/2026/03/03/relationship_metrics/"><![CDATA[<h1>Semantic Similarity Is Not Evidence</h1>
 
 <p>
 Large language models are very good at turning text into compact semantic representations. That strength is exactly why embeddings have become such a common foundation for search, recommendation, retrieval, matching, and ranking. In many tasks, that is enough. But this small research experiment highlights an important boundary case: some systems depend not only on what entities say, but on how they are connected.
@@ -369,7 +510,7 @@ Soon we will also share the notebook so readers can reuse the pattern, modify it
   </a>
 </div>
 
-<hr />]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Semantic Similarity Is Not Evidence]]></summary></entry><entry><title type="html">Monitoring Market Topology Shifts</title><link href="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/" rel="alternate" type="text/html" title="Monitoring Market Topology Shifts" /><published>2026-01-26T12:00:00+00:00</published><updated>2026-01-26T12:00:00+00:00</updated><id>http://localhost:4000/2026/01/26/slidingWindowGraphFIN</id><content type="html" xml:base="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/"><![CDATA[<p>LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.</p>
+<hr />]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Semantic Similarity Is Not Evidence]]></summary></entry><entry><title type="html">Monitoring Market Topology Shifts</title><link href="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/" rel="alternate" type="text/html" title="Monitoring Market Topology Shifts" /><published>2026-01-26T07:00:00-05:00</published><updated>2026-01-26T07:00:00-05:00</updated><id>http://localhost:4000/2026/01/26/slidingWindowGraphFIN</id><content type="html" xml:base="http://localhost:4000/2026/01/26/slidingWindowGraphFIN/"><![CDATA[<p>LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.</p>
 
 <p></p>
 <h2>Introduction</h2>
@@ -1291,7 +1432,7 @@ Finally, we keep the strongest 1–2 episodes per sector as candidate periods of
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.]]></summary></entry><entry><title type="html">Giving AI a Shared Language with Unified Knowledge Graphs</title><link href="http://localhost:4000/2025/12/25/knowledgeGraph4artists/" rel="alternate" type="text/html" title="Giving AI a Shared Language with Unified Knowledge Graphs" /><published>2025-12-25T12:00:00+00:00</published><updated>2025-12-25T12:00:00+00:00</updated><id>http://localhost:4000/2025/12/25/knowledgeGraph4artists</id><content type="html" xml:base="http://localhost:4000/2025/12/25/knowledgeGraph4artists/"><![CDATA[<section>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[LLMs excel at language, but they are natively sequential—making them a poor default tool when the signal is structural and relational. Financial time series have a similar blind spot: standard rolling comparisons summarize local movement, but can miss early shifts in market topology. When relationships matter, Graph AI offers an alternative: we represent each series as a sequence of sliding graphs, use a GNN to embed each graph snapshot into a vector, and align embedding streams to produce local similarity timelines for SPY vs sector ETFs. We compare this to a rolling-window baseline and flag short episodes where the two views disagree most—reviewable moments when relationships may be reorganizing even if sequential similarity looks stable.]]></summary></entry><entry><title type="html">Giving AI a Shared Language with Unified Knowledge Graphs</title><link href="http://localhost:4000/2025/12/25/knowledgeGraph4artists/" rel="alternate" type="text/html" title="Giving AI a Shared Language with Unified Knowledge Graphs" /><published>2025-12-25T07:00:00-05:00</published><updated>2025-12-25T07:00:00-05:00</updated><id>http://localhost:4000/2025/12/25/knowledgeGraph4artists</id><content type="html" xml:base="http://localhost:4000/2025/12/25/knowledgeGraph4artists/"><![CDATA[<section>
   <h2>Why AI Needs a Shared Language</h2>
 
   <p>
@@ -1815,7 +1956,7 @@ Unified Knowledge Graphs help by acting as a relationship layer that can hold al
   </p><p>
   The approach assumes an informative relational backbone, and extending it to noisier or weaker graphs is an important next step. But even in its current form, unified knowledge graphs offer a practical path from messy data to coherent, machine-readable understanding.
   </p><p>
-</p></section>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Why AI Needs a Shared Language]]></summary></entry><entry><title type="html">Temporal–Spatial GNN Fusion for Climate Analytics</title><link href="http://localhost:4000/2025/06/25/voronoiGNN/" rel="alternate" type="text/html" title="Temporal–Spatial GNN Fusion for Climate Analytics" /><published>2025-06-25T13:00:00+01:00</published><updated>2025-06-25T13:00:00+01:00</updated><id>http://localhost:4000/2025/06/25/voronoiGNN</id><content type="html" xml:base="http://localhost:4000/2025/06/25/voronoiGNN/"><![CDATA[<h2>Spatio-Temporal Graphs for Climate Patterns</h2>
+</p></section>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Why AI Needs a Shared Language]]></summary></entry><entry><title type="html">Temporal–Spatial GNN Fusion for Climate Analytics</title><link href="http://localhost:4000/2025/06/25/voronoiGNN/" rel="alternate" type="text/html" title="Temporal–Spatial GNN Fusion for Climate Analytics" /><published>2025-06-25T08:00:00-04:00</published><updated>2025-06-25T08:00:00-04:00</updated><id>http://localhost:4000/2025/06/25/voronoiGNN</id><content type="html" xml:base="http://localhost:4000/2025/06/25/voronoiGNN/"><![CDATA[<h2>Spatio-Temporal Graphs for Climate Patterns</h2>
 <p>
   Here we combine <strong>time series graphs</strong> with a global <strong>spatial graph</strong>
   of cities to create a spatio-temporal view of climate. Decades of daily temperatures are turned
@@ -2970,7 +3111,7 @@ There’s a lot more to explore. These first examples are just a glimpse of how 
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Spatio-Temporal Graphs for Climate Patterns Here we combine time series graphs with a global spatial graph of cities to create a spatio-temporal view of climate. Decades of daily temperatures are turned into graph-based climate fingerprints for each city, then injected into a Voronoi-based world graph where neighboring regions share borders. A GNN refines this fused graph so we can see which distant cities behave almost identically, which nearby cities quietly diverge, and which “bridge cities” connect climate regions. The same method can be applied to any setting where signals evolve over time and are anchored in space—sensors, assets, patients, or networks.]]></summary></entry><entry><title type="html">Sliding Graph Neural Networks for EEG Analysis</title><link href="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/" rel="alternate" type="text/html" title="Sliding Graph Neural Networks for EEG Analysis" /><published>2025-01-25T12:00:00+00:00</published><updated>2025-01-25T12:00:00+00:00</updated><id>http://localhost:4000/2025/01/25/slidingWindowGraph%20EEG</id><content type="html" xml:base="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/"><![CDATA[<h2>Sliding Graphs: Watching Signals Change Like a Movie</h2>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Spatio-Temporal Graphs for Climate Patterns Here we combine time series graphs with a global spatial graph of cities to create a spatio-temporal view of climate. Decades of daily temperatures are turned into graph-based climate fingerprints for each city, then injected into a Voronoi-based world graph where neighboring regions share borders. A GNN refines this fused graph so we can see which distant cities behave almost identically, which nearby cities quietly diverge, and which “bridge cities” connect climate regions. The same method can be applied to any setting where signals evolve over time and are anchored in space—sensors, assets, patients, or networks.]]></summary></entry><entry><title type="html">Sliding Graph Neural Networks for EEG Analysis</title><link href="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/" rel="alternate" type="text/html" title="Sliding Graph Neural Networks for EEG Analysis" /><published>2025-01-25T07:00:00-05:00</published><updated>2025-01-25T07:00:00-05:00</updated><id>http://localhost:4000/2025/01/25/slidingWindowGraph%20EEG</id><content type="html" xml:base="http://localhost:4000/2025/01/25/slidingWindowGraph-EEG/"><![CDATA[<h2>Sliding Graphs: Watching Signals Change Like a Movie</h2>
 <p>
   Sliding graphs are a way to let AI watch how a signal behaves over time, not just look at a
   summary. Instead of treating a long recording as one big block, we break it into many small,
@@ -4393,7 +4534,7 @@ These findings suggest sliding graph-based GNNs as a powerful framework for mode
 
 <p></p>
 <p></p>
-</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Sliding Graphs: Watching Signals Change Like a Movie Sliding graphs are a way to let AI watch how a signal behaves over time, not just look at a summary. Instead of treating a long recording as one big block, we break it into many small, overlapping moments and let AI see which moments look alike and which don’t. Put together, these moments form an evolving map of the signal, showing when things are calm, when they shift, and when something unusual starts to happen. We illustrate this with EEG sleep vs rest, but the same idea works for machines, sensors, markets, climate, or any long signal—anywhere you want AI to say not only what is happening, but when things start to change.]]></summary></entry><entry><title type="html">Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs</title><link href="http://localhost:4000/2025/01/20/vectors2gafGNN/" rel="alternate" type="text/html" title="Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs" /><published>2025-01-20T12:00:00+00:00</published><updated>2025-01-20T12:00:00+00:00</updated><id>http://localhost:4000/2025/01/20/vectors2gafGNN</id><content type="html" xml:base="http://localhost:4000/2025/01/20/vectors2gafGNN/"><![CDATA[<p><h2> Introduction</h2>
+</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Sliding Graphs: Watching Signals Change Like a Movie Sliding graphs are a way to let AI watch how a signal behaves over time, not just look at a summary. Instead of treating a long recording as one big block, we break it into many small, overlapping moments and let AI see which moments look alike and which don’t. Put together, these moments form an evolving map of the signal, showing when things are calm, when they shift, and when something unusual starts to happen. We illustrate this with EEG sleep vs rest, but the same idea works for machines, sensors, markets, climate, or any long signal—anywhere you want AI to say not only what is happening, but when things start to change.]]></summary></entry><entry><title type="html">Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs</title><link href="http://localhost:4000/2025/01/20/vectors2gafGNN/" rel="alternate" type="text/html" title="Exploring Geo-Connectivity and Multi-Feature Graphs with GNNs" /><published>2025-01-20T07:00:00-05:00</published><updated>2025-01-20T07:00:00-05:00</updated><id>http://localhost:4000/2025/01/20/vectors2gafGNN</id><content type="html" xml:base="http://localhost:4000/2025/01/20/vectors2gafGNN/"><![CDATA[<p><h2> Introduction</h2>
 <p></p>
 Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.
 <p></p>
@@ -5720,7 +5861,7 @@ Looking ahead, these techniques could be applied to a wide range of scenarios in
 
 
 <p></p>
-</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Introduction Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.]]></summary></entry><entry><title type="html">Connecting Art and Data: Building a Unified Knowledge Graph</title><link href="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/" rel="alternate" type="text/html" title="Connecting Art and Data: Building a Unified Knowledge Graph" /><published>2025-01-01T12:00:00+00:00</published><updated>2025-01-01T12:00:00+00:00</updated><id>http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings</id><content type="html" xml:base="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/"><![CDATA[<h2>Unified Knowledge Graph for Artists and Paintings</h2>
+</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Introduction Graphs are everywhere in our lives. They represent molecules in chemistry, roads in navigation, and our social networks like Facebook. From molecules to city maps and social network graphs, graphs allow us to model complex relationships in ways that are easy to analyze and visualize.]]></summary></entry><entry><title type="html">Connecting Art and Data: Building a Unified Knowledge Graph</title><link href="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/" rel="alternate" type="text/html" title="Connecting Art and Data: Building a Unified Knowledge Graph" /><published>2025-01-01T07:00:00-05:00</published><updated>2025-01-01T07:00:00-05:00</updated><id>http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings</id><content type="html" xml:base="http://localhost:4000/2025/01/01/knowledgeGraph4artPaintings/"><![CDATA[<h2>Unified Knowledge Graph for Artists and Paintings</h2>
 <p>
   Think of this project as one map of the art world, where artists and paintings are dots and
   their relationships form the lines between them. We turn biographies and images into a single
@@ -7283,7 +7424,7 @@ This study presented a Unified Knowledge Graph framework that combines text and 
 <p>
 The Unified Knowledge Graph provides a powerful tool for analyzing complex datasets, offering fresh perspectives on art history. It also paves the way for applications in recommendation systems, classification tasks, and cultural analysis. Future work will focus on expanding the graph with additional data types and improving model interpretability.
 </p>
-</p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Unified Knowledge Graph for Artists and Paintings Think of this project as one map of the art world, where artists and paintings are dots and their relationships form the lines between them. We turn biographies and images into a single unified knowledge graph, then use Graph AI to see which artists and works are close, far, or unexpectedly linked. Instead of scrolling through lists, you can explore art as a connected network and discover relationships you wouldn’t notice from text or images alone. The same pattern extends far beyond art: this pipeline can fuse text, images, time series, and other data into a unified knowledge graph in any domain, keeping everything analyzable with one Graph AI workflow.]]></summary></entry><entry><title type="html">Graph Neural Networks for EEG Connectivity Analysis</title><link href="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/" rel="alternate" type="text/html" title="Graph Neural Networks for EEG Connectivity Analysis" /><published>2024-11-09T12:00:00+00:00</published><updated>2024-11-09T12:00:00+00:00</updated><id>http://localhost:4000/2024/11/09/GNN_timeSeries_EEG</id><content type="html" xml:base="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/"><![CDATA[<h2>Brain Graphs with Time Series Signals</h2>
+</p></p></p></p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Unified Knowledge Graph for Artists and Paintings Think of this project as one map of the art world, where artists and paintings are dots and their relationships form the lines between them. We turn biographies and images into a single unified knowledge graph, then use Graph AI to see which artists and works are close, far, or unexpectedly linked. Instead of scrolling through lists, you can explore art as a connected network and discover relationships you wouldn’t notice from text or images alone. The same pattern extends far beyond art: this pipeline can fuse text, images, time series, and other data into a unified knowledge graph in any domain, keeping everything analyzable with one Graph AI workflow.]]></summary></entry><entry><title type="html">Graph Neural Networks for EEG Connectivity Analysis</title><link href="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/" rel="alternate" type="text/html" title="Graph Neural Networks for EEG Connectivity Analysis" /><published>2024-11-09T07:00:00-05:00</published><updated>2024-11-09T07:00:00-05:00</updated><id>http://localhost:4000/2024/11/09/GNN_timeSeries_EEG</id><content type="html" xml:base="http://localhost:4000/2024/11/09/GNN_timeSeries_EEG/"><![CDATA[<h2>Brain Graphs with Time Series Signals</h2>
 <p>
   In this project, we model the brain as a <strong>spatial graph</strong>: each node is an EEG
   electrode on the scalp, and edges connect nearby positions in the standard montage. The time
@@ -7995,7 +8136,7 @@ After establishing the graph structure, we defined graph nodes and their feature
 <p></p>
 
 <p></p>
-<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Brain Graphs with Time Series Signals In this project, we model the brain as a spatial graph: each node is an EEG electrode on the scalp, and edges connect nearby positions in the standard montage. The time series data are used as node features for each trial, so every channel carries its full signal while staying embedded in the brain’s geometry. A GNN link prediction model then learns how these nodes connect under different conditions, revealing changes in functional connectivity and highlighting which regions act as key connectors in Control vs Alcohol groups.]]></summary></entry><entry><title type="html">Unlocking the Power of Pre-Final Vectors in GNN Graph Classification</title><link href="http://localhost:4000/2024/07/04/vectorsGNN/" rel="alternate" type="text/html" title="Unlocking the Power of Pre-Final Vectors in GNN Graph Classification" /><published>2024-07-04T13:00:00+01:00</published><updated>2024-07-04T13:00:00+01:00</updated><id>http://localhost:4000/2024/07/04/vectorsGNN</id><content type="html" xml:base="http://localhost:4000/2024/07/04/vectorsGNN/"><![CDATA[<h2>Graph-Level Embeddings</h2>
+<p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Brain Graphs with Time Series Signals In this project, we model the brain as a spatial graph: each node is an EEG electrode on the scalp, and edges connect nearby positions in the standard montage. The time series data are used as node features for each trial, so every channel carries its full signal while staying embedded in the brain’s geometry. A GNN link prediction model then learns how these nodes connect under different conditions, revealing changes in functional connectivity and highlighting which regions act as key connectors in Control vs Alcohol groups.]]></summary></entry><entry><title type="html">Unlocking the Power of Pre-Final Vectors in GNN Graph Classification</title><link href="http://localhost:4000/2024/07/04/vectorsGNN/" rel="alternate" type="text/html" title="Unlocking the Power of Pre-Final Vectors in GNN Graph Classification" /><published>2024-07-04T08:00:00-04:00</published><updated>2024-07-04T08:00:00-04:00</updated><id>http://localhost:4000/2024/07/04/vectorsGNN</id><content type="html" xml:base="http://localhost:4000/2024/07/04/vectorsGNN/"><![CDATA[<h2>Graph-Level Embeddings</h2>
 <p>
   Graph-level embeddings are the <strong>pre-final vectors</strong> produced by a GNN graph
   classification model, giving one compact fingerprint for each graph—whether it represents a
@@ -8573,455 +8714,4 @@ The results suggest that combining linear algebra with GNNs enhances the models'
 
 <p></p>
 <p></p>
-</p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Graph-Level Embeddings Graph-level embeddings are the pre-final vectors produced by a GNN graph classification model, giving one compact fingerprint for each graph—whether it represents a city’s climate, an EEG trial, a machine, or a document. Once we have these embeddings, we can use simple vector-space tools (similarity, clustering, thresholds) to compare graphs, group similar cases, spot outliers, and even build a “graph of graphs” on top of them. In other words, graph-level embeddings turn single GNN predictions into a reusable layer for deeper analysis across many small graphs.]]></summary></entry><entry><title type="html">Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction</title><link href="http://localhost:4000/2024/06/21/knowledgeGraphEmail/" rel="alternate" type="text/html" title="Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction" /><published>2024-06-21T13:00:00+01:00</published><updated>2024-06-21T13:00:00+01:00</updated><id>http://localhost:4000/2024/06/21/knowledgeGraphEmail</id><content type="html" xml:base="http://localhost:4000/2024/06/21/knowledgeGraphEmail/"><![CDATA[<h2>Semantic Graphs for Communication Networks</h2>
-<p>
-  In this project, we move beyond simple “who emailed whom” graphs and build a
-  <strong>semantic graph</strong> of communication. Instead of treating edges as raw message
-  counts, we create nodes for individual interactions (who wrote to whom, with what text), enrich
-  them with transformer-based text embeddings, and use a GNN link prediction model to learn which
-  interactions are genuinely related. This text-enriched graph lets us recompute centrality and see
-  a different set of key players: not just the loudest senders, but the quiet connectors who bridge
-  topics and conversation clusters—hidden connectors that a plain traffic graph would never reveal.
-</p>
-
-<h2>Conference &amp; Workshop</h2>
-<p>
-  The work <em>“Multi-Layer Graph Analysis for Text-Driven Relationships Using GNN Link Prediction”</em>
-  was presented at the <strong>MLH 2024 – Mining and Learning with Hypergraphs</strong> workshop,
-  co-located with <strong>ECML-PKDD 2024</strong>, in Vilnius, Lithuania, on
-  <strong>13 September 2024</strong>. The contribution appears in the non-archival online
-  workshop program and is available via the MLH 2024 website.
-</p>
-
-<p><h2>Multi-Layer Graph Analysis for Communication Networks </h2>
-<p></p>
-
-Analyzing complex graphs can be quite challenging, especially when the whole is greater than the sum of its parts. To address these challenges, we dive into the Enron email dataset, using its rich information to create a strong multi-layer graph analysis framework.
-<p></p>
-We start by building a foundational graph layer where email addresses are the nodes and email exchanges form the edges. This layer gives us a clear picture of the communication network, showing the direct interactions between individuals within the dataset.
-<p></p>
-
-Building upon this, we introduce a second graph layer that goes deeper into the content of these communications. Here, each interaction is represented as a node in the form of triplets—comprising the sender, receiver, email subject, and body. Edges in this layer signify communication chains, illustrating how discussions and information flow within the network.
-<p></p>
-To extract meaningful patterns from the textual content, we transform these triplet nodes into vectors using a transformer model. This transformation captures the semantic nuances of the email content. Following this, a Graph Neural Network (GNN) Link Prediction model is applied to these vectors. The model identifies potential links within the graph based on semantic similarity and structural patterns.
-<p></p>
-
-The output vectors from the GNN Link Prediction model, which capture both the semantic content and the graph structure, help us create a third graph layer. In this layer, nodes represent pairs of emails with high cosine similarities, forming a network that highlights strong semantic connections.
-<p></p>
-This third graph layer is key to identifying influencers within the network, revealing individuals who play important roles in spreading information. It also gives us a better understanding of engagement dynamics, showing how interactions evolve and spread across the network.
-<p></p>
-By using this multi-layer approach, we provide a comprehensive framework for analyzing complex textual interactions within graph structures. This method not only offers deeper insights into network dynamics but also improves our ability to identify key influencers, ultimately enhancing our understanding of intricate communication networks.
-
-<p></p>
-
-<h3>Introduction</h3>
-<p></p>
-
-Graphs are powerful tools for representing complex relationships, with each level building on the previous one’s capabilities and efficiency. Think of atoms forming molecules with unique properties, molecules creating cells with essential functions, and cells building organs with specialized roles. However, as graphs become more intricate, analyzing them becomes increasingly challenging.
-<p></p>
-Complex system analysis can be approached both top-down and bottom-up. In this study, we introduce a bottom-up method for analyzing graph layers built on text-driven relationships. This approach captures intricate details and emergent properties from foundational elements upwards.
-<p></p>
-
-For example, imagine a bipartite graph with individuals on one side and movie narratives on the other. Relationships in this graph are defined by shared interests in particular movies. By exploring the narrative elements in recommender systems, we can uncover complex relationships that go beyond merely identifying pairs or groups of people with common movie interests.
-
-<p></p>
-Another example is influence networks in social media, where nodes represent users and directed edges signify interactions such as likes, comments, or shares. By examining the content of posts and interactions, we can uncover text-driven relationships that reveal influence patterns and topics of interest. This approach helps us understand the dynamics of influence and engagement within the social media ecosystem.
-
-<p></p>
-
-
-
-    In a prior study <a href="https://doi.org/10.5220/0011664400003393">
-  'Rewiring Knowledge Graphs by Graph Neural Network Link Predictions'
-    </a> (2023), we focused on rewiring text-based knowledge graphs through the use of GNN link prediction models, specifically targeting semantic knowledge graphs built from text documents. We utilized GNN link prediction techniques to modify these graphs, revealing hidden connections between nodes.
-<p></p>
-    In another study <a href="https://doi.org/10.1007/978-981-99-8324-7_2"> 'Uncovering Hidden Connections: Granular Relationship Analysis in Knowledge Graphs' </a> (2024), we also applied GNN link prediction models to semantic knowledge graphs to uncover hidden relationships within a detailed vector space. We focused on identifying 'graph connectors' that expose deeper network structures and used graph triangle analysis to delve into complex interactions.
-
-<p></p>
-
-The Enron email corpus provides a valuable opportunity to explore the potential of text-enhanced knowledge graphs in uncovering hidden patterns within organizational communication. By focusing on direct interactions and using transformer models for text embedding, we lay the groundwork for a knowledge graph that better captures the complexity of real-world relationships.
-
-<p></p>
-Our findings highlight the significant impact of incorporating textual data and GNN Link Prediction in knowledge graph analysis. This approach provides a more complete view of how entities interact, helping us understand complex networks better. As we continue to refine these methods, the potential for uncovering new insights in data-rich environments seems limitless, opening up exciting possibilities for future research.
-<p></p>
-
-
-
-
-    <h3>Key Methodologies of Our Study</h3>
-<p></p>    
-<h4>Architecture Pipeline</h4>
-<p></p>
-    Our architecture pipeline for the multi-layer graph approach begins with raw data processing and follows to link prediction model:
-<p></p>
-<a href="#">
-        <img src="/img/archPipeline2.jpg" alt="Post Sample Image" width="1024" />
-</a>
-<p></p>
-        <ul>
-            <li>
-                <strong>Raw Data:</strong> The initial dataset includes attributes such as ‘from’, ‘to’, ‘body’, and ‘time’.
-            </li>
-            <li>
-                <strong>Initial Graph Layer:</strong> Email addresses are depicted as nodes connected by edges representing email exchanges.
-            </li>
-            <li>
-                <strong>Transformation to Triplet Nodes:</strong> Email exchanges are converted into triplets (from, to, email body).
-            </li>
-            <li>
-                <strong>Second-Layer Graph Construction:</strong> Triplet nodes form edges based on communication chains (to-to connections).
-            </li>
-            <li>
-                <strong>Node Embedding:</strong> Embedding node features to vectors.
-            </li>
-            <li>
-                <strong>GNN Link Prediction:</strong> The GNN model is applied, transforming triplet nodes into vectors.
-            </li>
-        </ul>
-        <p>
-            After GNN Link Prediction model training, we will examine structural changes in the network to uncover key influencers.
-        </p>
-
-<p></p>
-
-<h4>Transformation Process from Initial Graph to Second-Layer Graph</h4>
-<p></p>
-The process begins with constructing the initial graph layer, where email addresses are depicted as nodes connected by edges representing email exchanges, as shown in the picture. Each email exchange is then converted into triplets consisting of 'from', 'to', and the email's subject and body. Subsequently, a second-layer graph is constructed where these triplet nodes form edges based on communication chains ('to-to' connections), as illustrated in the picture.
-<p></p>
-<a href="#">
-    <img src="/img/kgArch.jpg" alt="Post Sample Image" width="978" />
-</a>
-
-<p></p>
-<h4>Node Embedding</h4>
-<p></p>
-To translate text into vectors, we will use the 'all-MiniLM-L6-v2' transformer model from Hugging Face. This sentence-transformer model efficiently maps text into 384-dimensional vectors. This process transforms sentences into dense vectors, preserving their semantic content for machine learning applications. This embedding step is crucial, ensuring the text is suitably prepared for deep learning analyses, including GNN link prediction, by capturing the nuanced meanings in a format compatible with our algorithms.
-<p></p>
-<h4>Training the GNN Link Prediction Model</h4>
-
-<p></p>
-
-After setting up the nodes, we refine the graph with GNN Link Prediction to uncover detailed interactions. By examining the graph’s structure and node details, we reveal previously hidden connections, enhancing the graph’s depth and utility for analysis.
-<p></p>
-We use the GraphSAGE link prediction model, which generates node embeddings based on attributes and neighbors without retraining. Our study employs a GNN Link Prediction model from the Deep Graph Library (DGL), with two GraphSAGE layers. This approach improves node representation by combining details from nearby nodes and discovering hidden connections in the Enron email dataset.
-<p></p>
-The output vectors from this model can be used for further analysis, and we will showcase this in our 'Experiments' section.
-
-<p></p>
-
-
-<h3>Experiments Overview</h3>
-
-<p></p>
-<h4>Data Source</h4>
-
-<p></p>
-
-Our main data source is the Enron email corpus, a comprehensive collection of emails exchanged among executives of the Enron Corporation. This dataset, freely available to the public, captures a wealth of corporate communications, offering a deep dive into the intricacies of a complex organizational network. Its rich detail makes it an excellent resource for our knowledge graph analysis, shedding light on the dynamics of corporate interactions.
-<p></p>
-The Enron email corpus is hosted on Kaggle, providing easy access for those looking to conduct detailed analyses of the dataset. For further information or to explore the dataset yourself, visit <a href="https://www.kaggle.com/datasets/wcukierski/enron-email-dataset/data">Kaggle's Enron Email Dataset</a>.
-
-
-<p></p>
-
-
-<h4>Input Data Preparation</h4>
-<p></p>
-
-Our study starts with building a graph using the Enron email dataset from the year 2000, focusing on internal communications by selecting emails sent from @enron.com addresses. We aimed to analyze direct email exchanges between individuals, excluding group emails to ensure a clear and focused analysis.
-<p></p>
-For the graph’s nodes, we merged the 'From', 'To', 'Subject', and 'Body' fields of each email into a single text unit, as illustrated in the picture. This method ensures that each node fully represents an individual email conversation, including all its context and specifics.
-<p></p>
-To link these nodes in the graph, we connected emails that had either the same sender or recipient, indicating a direct line of communication between parties. This setup accurately mirrors how communication unfolded within Enron, revealing the network’s detailed structure and the rich interplay of relationships among employees.
-<p></p>
-
-<h4>Constructing Layer Graphs from Enron's 2000 Email Corpus</h4>
-<p></p>
-Our investigation begins by creating a knowledge graph derived from the Enron email dataset, specifically focusing on the year 2000. Our selection criteria were emails exchanged internally, identifiable through @enron.com addresses, allowing us to concentrate on direct communications between individual employees while excluding group emails for a more targeted analysis.
-<p></p>
-<h5>Node Creation in the Knowledge Graph</h5>
-<p></p>
-To form the nodes of our knowledge graph, we combined the 'From', 'To', 'Subject', and 'Body' of each email into a unified text representation. This approach ensured that each node captured the entirety of an email exchange, preserving both the context and the details of the conversation.
-<p></p>
-
-Concatenate 'From', 'To', 'Subject', and 'body' columns with '^' between
-
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">emailText</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span>
-   <span class="n">df</span><span class="p">[[</span><span class="sh">'</span><span class="s">From</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">To</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">Subject</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">body</span><span class="sh">'</span><span class="p">]]</span>
-   <span class="p">.</span><span class="nf">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="sh">'</span><span class="s"> ^ </span><span class="sh">'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">row</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="nf">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code></pre></figure>
-
-        <p></p>
-Combine and index 'From' and 'To' columns:
-        <p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">unique_emails</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">([</span><span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">From</span><span class="sh">'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">To</span><span class="sh">'</span><span class="p">]]).</span><span class="nf">unique</span><span class="p">()</span>
-<span class="n">email_index</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nc">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">unique_emails</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">unique_emails</span><span class="p">)),</span> <span class="n">name</span><span class="o">=</span><span class="sh">'</span><span class="s">emailIdx</span><span class="sh">'</span><span class="p">)</span>
-<span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">FromIdx</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">From</span><span class="sh">'</span><span class="p">].</span><span class="nf">map</span><span class="p">(</span><span class="n">email_index</span><span class="p">)</span>
-<span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">ToIdx</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">To</span><span class="sh">'</span><span class="p">].</span><span class="nf">map</span><span class="p">(</span><span class="n">email_index</span><span class="p">)</span>
-<span class="n">emailFromTo</span><span class="o">=</span><span class="n">df</span><span class="p">[[</span><span class="sh">'</span><span class="s">FromIdx</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">emailTextIdx</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">emailText</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">ToIdx</span><span class="sh">'</span><span class="p">]]</span>
-<span class="n">emailFromTo</span><span class="p">.</span><span class="nf">tail</span><span class="p">()</span></code></pre></figure>
-
-        <p></p>
-
-<a href="#">
-            <img src="/img/enron1.jpg" alt="Post Sample Image" width="543" />
-</a>
-
-<p></p>
-
-<h5>Linking Nodes in the Knowledge Graph</h5>
-<p></p>        
-        In establishing connections within the knowledge graph, we linked emails sharing common senders or recipients, thereby reflecting a direct communication pathway between entities. This method provided an accurate reflection of how interactions occurred within Enron, uncovering the intricate structure of the network and the dynamic web of relationships between employees.
-
-<p></p>
-        Self-join emailFromTo table to create edges:
-<p></p>        
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df</span><span class="o">=</span><span class="n">emailFromTo</span>
-<span class="n">joined_df</span> <span class="o">=</span>
-   <span class="n">df</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="sh">'</span><span class="s">ToIdx</span><span class="sh">'</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="sh">'</span><span class="s">FromIdx</span><span class="sh">'</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="sh">'</span><span class="s">_left</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">_right</span><span class="sh">'</span><span class="p">))</span>
-<span class="n">df2</span> <span class="o">=</span> <span class="n">joined_df</span><span class="p">.</span><span class="nf">query</span><span class="p">(</span><span class="sh">'</span><span class="s">FromIdx_left != ToIdx_right</span><span class="sh">'</span><span class="p">)</span>
-<span class="n">dfLeft</span> <span class="o">=</span> <span class="n">em2text2em</span><span class="p">[[</span><span class="sh">'</span><span class="s">emailText_left</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">emailTextIdx_left</span><span class="sh">'</span><span class="p">]]</span>
-   <span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">emailText_left</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">A</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">emailTextIdx_left</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">idx</span><span class="sh">'</span><span class="p">})</span>
-<span class="n">dfRight</span> <span class="o">=</span> <span class="n">em2text2em</span><span class="p">[[</span><span class="sh">'</span><span class="s">emailText_right</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">emailTextIdx_right</span><span class="sh">'</span><span class="p">]]</span>
-   <span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">emailText_right</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">A</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">emailTextIdx_right</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">idx</span><span class="sh">'</span><span class="p">})</span></code></pre></figure>
-
-<p></p>
-Excluded disconnected nodes and reindex:
-
-<p></p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">dff</span><span class="o">=</span><span class="n">em2text2em</span>  
-<span class="n">combined_df</span> <span class="o">=</span>
-   <span class="n">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">([</span><span class="n">dfLeft</span><span class="p">,</span> <span class="n">dfRight</span><span class="p">]).</span><span class="nf">drop_duplicates</span><span class="p">().</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">combined_df</span> <span class="o">=</span> <span class="n">combined_df</span><span class="p">.</span><span class="nf">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span><span class="p">)</span>
-<span class="n">combined_df</span><span class="p">.</span><span class="nf">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">combined_df</span><span class="p">[</span><span class="sh">'</span><span class="s">new_index</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_df</span><span class="p">.</span><span class="n">index</span>   
-<span class="n">nodes</span><span class="o">=</span><span class="n">combined_df</span><span class="p">[[</span><span class="sh">'</span><span class="s">new_index</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span><span class="p">]]</span>
-<span class="n">nodes</span><span class="p">.</span><span class="nf">tail</span><span class="p">()</span>               </code></pre></figure>
-
-<p></p>
-<a href="#">
-    <img src="/img/enron2.jpg" alt="Post Sample Image" width="543" />
-</a>
-
-<p></p>
-      Reindex edges:
-
-<p></p>               
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">idx_mapping</span> <span class="o">=</span>
-   <span class="n">pd</span><span class="p">.</span><span class="nc">Series</span><span class="p">(</span><span class="n">combined_df</span><span class="p">[</span><span class="sh">'</span><span class="s">new_index</span><span class="sh">'</span><span class="p">].</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">combined_df</span><span class="p">[</span><span class="sh">'</span><span class="s">idx</span><span class="sh">'</span><span class="p">]).</span><span class="nf">to_dict</span><span class="p">()</span>
-<span class="n">dff</span><span class="p">[</span><span class="sh">'</span><span class="s">new_idxLeft</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfLeft</span><span class="p">[</span><span class="sh">'</span><span class="s">idx</span><span class="sh">'</span><span class="p">].</span><span class="nf">map</span><span class="p">(</span><span class="n">idx_mapping</span><span class="p">)</span>
-<span class="n">dff</span><span class="p">[</span><span class="sh">'</span><span class="s">new_idxRight</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfRight</span><span class="p">[</span><span class="sh">'</span><span class="s">idx</span><span class="sh">'</span><span class="p">].</span><span class="nf">map</span><span class="p">(</span><span class="n">idx_mapping</span><span class="p">)</span>
-<span class="n">edges</span><span class="o">=</span><span class="n">dff</span><span class="p">[[</span><span class="sh">'</span><span class="s">new_idxLeft</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">new_idxRight</span><span class="sh">'</span><span class="p">]]</span>
-<span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">.</span><span class="nf">drop_duplicates</span><span class="p">()</span>
-<span class="n">edges</span><span class="p">.</span><span class="nf">tail</span><span class="p">()</span>           </code></pre></figure>
-
-<p></p>
-
-<a href="#">
-    <img src="/img/enron3.jpg" alt="Post Sample Image" width="314" />
-</a>
-
-<p></p>
-
-<h4>Model Training</h4>
-<p></p>
-
-
-For model training, we first used the 'all-MiniLM-L6-v2' transformer from Hugging Face to transform email texts into vectors. Next, we applied the GNN Link Prediction model from the DGL library, aiming to discover unseen graph connections by analyzing these vectors and the graph structure.
-<p></p>
-    <ul>
-        <li>Total number of nodes: 9,654</li>
-        <li>Total number of edges: 667,354</li>
-        <li>Embedded nodes represented as a PyTorch tensor of size [9,654, 384]</li>
-        <li>The output vector size for the GraphSAGE model was set to 64</li>
-    </ul>
-<p></p>
-To evaluate the efficacy of the model, we employed the Area Under Curve (AUC) metric as a measure of accuracy. The achieved model accuracy was approximately 96.7%, demonstrating the model’s high predictive performance.
-<p></p>
-
-<h5>Code Details</h5>
-<p></p>
-Convert edges to DGL model:
-    <p></p>               
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">unpickEdges</span><span class="o">=</span><span class="n">edges</span>
-<span class="n">edge_index</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">unpickEdges</span><span class="p">[[</span><span class="sh">'</span><span class="s">new_idxLeft</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">new_idxRight</span><span class="sh">'</span><span class="p">]].</span><span class="n">T</span><span class="p">.</span><span class="n">values</span><span class="p">)</span>
-<span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="o">=</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">g</span><span class="o">=</span><span class="n">dgl</span><span class="p">.</span><span class="nf">graph</span><span class="p">((</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
-<span class="n">g</span><span class="o">=</span><span class="n">dgl</span><span class="p">.</span><span class="nf">add_self_loop</span><span class="p">(</span><span class="n">gNew</span><span class="p">)</span>
-<span class="n">g</span>
-<span class="nc">Graph</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">9654</span><span class="p">,</span> <span class="n">num_edges</span><span class="o">=</span><span class="mi">667354</span><span class="p">,</span>
-  <span class="n">ndata_schemes</span><span class="o">=</span><span class="p">{}</span>
-  <span class="n">edata_schemes</span><span class="o">=</span><span class="p">{})</span>      </code></pre></figure>
-
-    <p></p>
-Embed node feature text:
-
-    <p></p>               
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
-<span class="n">modelST</span> <span class="o">=</span> <span class="nc">SentenceTransformer</span><span class="p">(</span><span class="sh">'</span><span class="s">all-MiniLM-L6-v2</span><span class="sh">'</span><span class="p">)</span>
-<span class="n">node_embeddings</span> <span class="o">=</span> <span class="n">modelST</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span><span class="p">],</span><span class="n">convert_to_tensor</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">node_embeddings</span> <span class="o">=</span> <span class="n">node_embeddings</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cpu</span><span class="sh">'</span><span class="p">))</span>
-<span class="n">g</span><span class="p">.</span><span class="n">ndata</span><span class="p">[</span><span class="sh">'</span><span class="s">feat</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_embeddings</span>
-<span class="n">g</span>
-<span class="nc">Graph</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">9654</span><span class="p">,</span> <span class="n">num_edges</span><span class="o">=</span><span class="mi">667354</span><span class="p">,</span>
-  <span class="n">ndata_schemes</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">feat</span><span class="sh">'</span><span class="p">:</span> <span class="nc">Scheme</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">384</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">)}</span>
-  <span class="n">edata_schemes</span><span class="o">=</span><span class="p">{})</span>        </code></pre></figure>
-
-    <p></p>
-    In our training process, we leveraged the GraphSAGE model, following closely with examples provided in the Deep Graph Library (DGL) tutorial. This choice allowed us to utilize a well-established framework for our Graph Neural Network (GNN) Link Prediction model, ensuring a solid foundation for our analysis. Below are GNN Link Prediction model statistics:
-
-    <p></p>               
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">all_logits</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
-    <span class="c1"># forward
-</span>    <span class="n">h</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="n">train_g</span><span class="p">,</span> <span class="n">train_g</span><span class="p">.</span><span class="n">ndata</span><span class="p">[</span><span class="sh">'</span><span class="s">feat</span><span class="sh">'</span><span class="p">].</span><span class="nf">float</span><span class="p">())</span>
-    <span class="n">pos_score</span> <span class="o">=</span> <span class="nf">pred</span><span class="p">(</span><span class="n">train_pos_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    <span class="n">neg_score</span> <span class="o">=</span> <span class="nf">pred</span><span class="p">(</span><span class="n">train_neg_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">)</span>
-    <span class="c1"># backward
-</span>    <span class="n">optimizer</span><span class="p">.</span><span class="nf">zero_grad</span><span class="p">()</span>
-    <span class="n">loss</span><span class="p">.</span><span class="nf">backward</span><span class="p">()</span>
-    <span class="n">optimizer</span><span class="p">.</span><span class="nf">step</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">e</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">In epoch {}, loss: {}</span><span class="sh">'</span><span class="p">.</span><span class="nf">format</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">loss</span><span class="p">))</span>       </code></pre></figure>
-
-<p></p>
-<a href="#">
-    <img src="/img/enron4.jpg" alt="Post Sample Image" width="314" />
-</a>
-
-<p></p>               
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="n">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
-<span class="k">with</span> <span class="n">torch</span><span class="p">.</span><span class="nf">no_grad</span><span class="p">():</span>
-    <span class="n">pos_score</span> <span class="o">=</span> <span class="nf">pred</span><span class="p">(</span><span class="n">test_pos_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    <span class="n">neg_score</span> <span class="o">=</span> <span class="nf">pred</span><span class="p">(</span><span class="n">test_neg_g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">AUC</span><span class="sh">'</span><span class="p">,</span> <span class="nf">compute_auc</span><span class="p">(</span><span class="n">pos_score</span><span class="p">,</span> <span class="n">neg_score</span><span class="p">))</span>         
-<span class="n">AUC</span> <span class="mf">0.9673248461572111</span></code></pre></figure>
-
-<p></p>
-
-
-<h4>Results and Further Analysis</h4>
-
-<p></p>
-
-The GNN Link Prediction model outputs a set of re-embedded vectors that capture nuanced relationships within the graph. These vectors are valuable for deeper analysis, including statistical evaluation, clustering, and gaining further insights into the network’s structure. In this study, we built a new graph layer based on pairs of vectors with a cosine similarity threshold of 0.95, allowing for a detailed examination of the network’s dynamics and connections.
-<p></p>
-This method enables us to observe which influencers within the network have become more or less central after introducing these new connections. For this analysis, we focused on betweenness centrality, which measures a node’s importance in a graph by indicating how often it acts as a bridge along the shortest path between two other nodes. In complex relationships, these metrics help identify key nodes that facilitate communication or interaction across the network, revealing shifts in centrality and influence based on the newly established connections.
-<p></p>
-<p></p>    
-    <a href="#">
-        <img src="/img/enronResult1.jpg" alt="Post Sample Image" width="567" />
-    </a>
-<p></p>
-When we compare the betweenness centrality scores before and after applying our method, we observe shifts in network influence. Initially, graph connections were based solely on direct email interactions. After incorporating text-driven relationships, new dynamics and hidden connections were revealed. This significantly altered the network’s structure, uncovering previously unrecognized key connectors and providing a more comprehensive view of the network’s influence and interactions.
-
-
-  <p></p>
-
-<p></p>
-
-<a href="#">
-    <img src="/img/enronResult2.jpg" alt="Post Sample Image" width="567" />
-</a>
-<p></p>
-
-<p></p>
-
-<p></p>
-
-
-
-<h5>Code Details</h5>
-<p></p>
-Cosine Similarities function:    
-<p></p>
-    
-<figure class="highlight"><pre><code class="language-python" data-lang="python">    <span class="kn">import</span> <span class="n">torch</span>
-    <span class="k">def</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">cos_sim</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">):</span>
-            <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">a_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">functional</span><span class="p">.</span><span class="nf">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">b_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">functional</span><span class="p">.</span><span class="nf">normalize</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="p">.</span><span class="nf">mm</span><span class="p">(</span><span class="n">a_norm</span><span class="p">,</span> <span class="n">b_norm</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-    </code></pre></figure>
-
-    <p></p>
-Select pairs of vectors with cosine similarities higher than 0.95.
-    <p></p>               
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">cosine_scores_gnn</span> <span class="o">=</span> <span class="nf">pytorch_cos_sim</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-<span class="n">pairs_gnn</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">cosine_scores_gnn</span><span class="p">)):</span>
-  <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">cosine_scores_gnn</span><span class="p">)):</span>
-    <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="n">j</span><span class="p">:</span>
-      <span class="k">if</span> <span class="n">cosine_scores_gnn</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">].</span><span class="nf">detach</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.95</span><span class="p">:</span>
-        <span class="n">pairs_gnn</span><span class="p">.</span><span class="nf">append</span><span class="p">({</span><span class="sh">'</span><span class="s">idx1</span><span class="sh">'</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span><span class="sh">'</span><span class="s">idx2</span><span class="sh">'</span><span class="p">:</span> <span class="n">j</span><span class="p">,</span>
-        <span class="sh">'</span><span class="s">score</span><span class="sh">'</span><span class="p">:</span> <span class="n">cosine_scores_gnn</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">].</span><span class="nf">detach</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()})</span>        </code></pre></figure>
-
-    <p></p>
-To pinpoint the main influencers in the knowledge graph, we employed betweenness centrality metrics. This approach enabled us to identify nodes that serve as crucial connectors facilitating information flow throughout the network. The initial step involves creating a graph using the NetworkX library:
-<p></p>  
-
-<p></p>               
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">networkx</span> <span class="k">as</span> <span class="n">nx</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nc">Graph</span><span class="p">()</span>
-<span class="n">edges</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">score</span><span class="sh">'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.95</span><span class="p">][[</span><span class="sh">'</span><span class="s">idx1</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">idx2</span><span class="sh">'</span><span class="p">]]</span>
-<span class="n">edges</span><span class="p">.</span><span class="nf">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">idx1</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">source</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">idx2</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">target</span><span class="sh">'</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">G</span><span class="p">.</span><span class="nf">add_edges_from</span><span class="p">(</span><span class="n">edges</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="nf">tolist</span><span class="p">())</span>        </code></pre></figure>
-
-
-<p></p>
-Next, we determined the top 10 nodes with the highest betweenness centrality scores, highlighting the most influential connectors in the graph:
-    <p></p>               
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">betweenness_rewired</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="nf">betweenness_centrality</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
-<span class="n">top_rewired</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="n">betweenness_rewired</span><span class="p">.</span><span class="nf">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span></code></pre></figure>
-
-<p></p>
-
-
-
-<h3>In Conclusion</h3>
-<p></p>
-
-In this post, we introduced a novel approach to better understand and analyze complex connections within networks by incorporating descriptive texts into graph structures. Traditional models often miss the subtle nuances in textual content that are crucial for revealing hidden linkages and intricate interactions.
-<p></p>
-Our method treats interactions as high-dimensional entities, transforming email exchange triplets into nodes for the next graph layer and applying a GNN Link Prediction model. This approach captures the complexity of relationships beyond simple pairwise interactions, providing a nuanced understanding of multifaceted connections. By including text-driven relationships, our model allows for deeper semantic analysis, uncovering the underlying meanings and contexts within communications.
-<p></p>
-Combining semantic and topological features, our approach bridges the gap between textual content and network structure, offering a comprehensive view of the network. Applying this method to the Enron network demonstrated its effectiveness in revealing hidden linkages and identifying key influencers, highlighting its broad applicability.
-<p></p>
-By focusing on both semantics and graph topology, and leveraging higher graph layers, our method shows potential for use in various fields, including social networks, bioinformatics, healthcare, and beyond. This work paves the way for future research to explore and exploit the intricate interplay between textual content and network structures, advancing the field of network analysis.
-
-
-<p></p>    
-
-
-
-
-
-<p></p>
-
-<p></p>
-
-<p></p>
-<p></p>
-</p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Semantic Graphs for Communication Networks In this project, we move beyond simple “who emailed whom” graphs and build a semantic graph of communication. Instead of treating edges as raw message counts, we create nodes for individual interactions (who wrote to whom, with what text), enrich them with transformer-based text embeddings, and use a GNN link prediction model to learn which interactions are genuinely related. This text-enriched graph lets us recompute centrality and see a different set of key players: not just the loudest senders, but the quiet connectors who bridge topics and conversation clusters—hidden connectors that a plain traffic graph would never reveal.]]></summary></entry></feed>
+</p></p>]]></content><author><name>Melenar</name></author><summary type="html"><![CDATA[Graph-Level Embeddings Graph-level embeddings are the pre-final vectors produced by a GNN graph classification model, giving one compact fingerprint for each graph—whether it represents a city’s climate, an EEG trial, a machine, or a document. Once we have these embeddings, we can use simple vector-space tools (similarity, clustering, thresholds) to compare graphs, group similar cases, spot outliers, and even build a “graph of graphs” on top of them. In other words, graph-level embeddings turn single GNN predictions into a reusable layer for deeper analysis across many small graphs.]]></summary></entry></feed>
